@@ -134,7 +134,7 @@ test.each([false, true])(
 test("does not traverse outgoing FKs of a target-only table", async () => {
   return withPgClientTransaction(async (client) => {
     const runQuery = makeRunQuery(client);
-    await runQuery(
+    await client.query(
       `
       create schema purpose_public;
       create schema purpose_private;
@@ -164,7 +164,7 @@ test("does not traverse outgoing FKs of a target-only table", async () => {
 test("only expands inaccessible row types when required by a resource", async () => {
   return withPgClientTransaction(async (client) => {
     const runQuery = makeRunQuery(client);
-    await runQuery(
+    await client.query(
       `
       create role purpose_reader;
       create schema purpose_access;
@@ -205,7 +205,7 @@ test.each(["sys_procs", "event_triggers"] as const)(
   async (entity) => {
     return withPgClientTransaction(async (client) => {
       const runQuery = makeRunQuery(client);
-      await runQuery(
+      await client.query(
         `
         create schema purpose_metadata;
         create function purpose_metadata.on_ddl() returns event_trigger

@@ -9,8 +9,9 @@ consumer-defined dependency policies. It reduces the amount of data fetched and
 retained when only part of a database is relevant, such as selected schemas or
 resources accessible to a particular role.
 
-Enable it by passing an options object as `multipass` to `introspect` or
-`introspectRaw`. Omit `multipass` or set it to `false` for a single query.
+Enable it by setting `multipass` in the options passed to `introspect` or
+`introspectRaw`, alongside the required `runQuery` adaptor. Omit `multipass` or
+set it to `false` for a single query.
 
 ## Discovery and dependencies
 
@@ -29,9 +30,11 @@ There are no default relationship policies. `multipass: {}` performs initial
 discovery without following additional relationships. `onlyEntities` controls
 both returned collections and which collections policies can request; requests
 for unselected collections are ignored. Include any collections needed by your
-navigation helpers, as described in [Usage](./index.md#collections-and-filters).
+navigation helpers, as described in [Usage](./index.md#onlyentities).
 
 ## A policy example
+
+Reuse the database adaptor from [Usage](./index.md#runquery).
 
 This example discovers procedures and types in `app_public` and fetches their
 return types even when those types belong to other schemas. It intentionally
@@ -40,7 +43,7 @@ domains, arrays or other relationships must supply policies for those too.
 
 ```ts
 import { defineIntrospectionPolicy, introspectRaw } from "pg-introspection";
-import { Pool } from "pg";
+import { runQuery } from "./runQuery.ts";
 
 declare global {
   namespace PgIntrospection {
@@ -61,27 +64,15 @@ const returnTypes = defineIntrospectionPolicy({
   },
 });
 
-const pool = new Pool({
-  connectionString: "postgres://localhost/my_database",
+const data = await introspectRaw({
+  runQuery,
+  onlyEntities: ["namespaces", "procs", "types"],
+  multipass: {
+    entrypointFilters: { namespaces: "nspname = 'app_public'" },
+    policies: [returnTypes],
+  },
 });
-
-async function main() {
-  try {
-    const data = await introspectRaw({
-      runQuery,
-      onlyEntities: ["namespaces", "procs", "types"],
-      multipass: {
-        entrypointFilters: { namespaces: "nspname = 'app_public'" },
-        policies: [returnTypes],
-      },
-    });
-    console.log(data.procs.length, data.types.length);
-  } finally {
-    await pool.end();
-  }
-}
-
-main();
+console.log(data.procs.length, data.types.length);
 ```
 
 `defineIntrospectionPolicy` infers the source row's type from `entity`. Every
@@ -190,6 +181,7 @@ const extensionFilters = {
 };
 
 const options = {
+  runQuery,
   multipass: {
     entrypointFilters: extensionFilters,
     policies: [
@@ -216,6 +208,7 @@ exposed resources and dependency metadata:
 import { pruneExtensionResources } from "pg-introspection";
 
 const options = {
+  runQuery,
   prune: pruneExtensionResources,
 };
 ```
@@ -274,6 +267,7 @@ retain matching rows only for navigation:
 
 ```js
 const options = {
+  runQuery,
   prune(data, { hide }) {
     hide("classes", (row) => row.relname === "internal_helper");
   },
@@ -302,6 +296,7 @@ function pruneInternalProcedures(_data, { hide }) {
 }
 
 const options = {
+  runQuery,
   prune(data, details) {
     pruneExtensionResources(data, details);
     pruneInternalProcedures(data, details);

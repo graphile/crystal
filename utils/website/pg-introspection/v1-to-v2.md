@@ -27,7 +27,8 @@ const introspection = parseIntrospectionResults(
 with:
 
 ```ts
-import { introspection, pruneExtensionResources } from "pg-introspection";
+import { introspect, pruneExtensionResources } from "pg-introspection";
+import { runQuery } from "./runQuery.ts";
 
 const includeFromExtensions = false;
 const prune = includeFromExtensions ? null : pruneExtensionResources;
@@ -35,16 +36,10 @@ const options = { runQuery, prune };
 const introspection = await introspect(options);
 ```
 
-Where `runQuery` is the function used to execute the SQL using your chosen
-driver:
-
-```ts
-async function runQuery(text, values) {
-  const { rows } = await pool.query(text, values);
-  return rows[0].introspection;
-}
-```
+The required `runQuery` option is a reusable database adaptor. Define it once as
+shown in [Usage](./index.md#runquery), then pass it in the options for every
+`introspect` or `introspectRaw` call. It is no longer a separate callback argument.
 
 If you were caching the result of running `makeIntrospectionQuery` then use
-the `introspectRaw`/`augmentIntrospectionData` pattern documented above instead
+the [raw data and caching pattern](./index.md#raw-data-and-caching) instead
 of just `introspect`.

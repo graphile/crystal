@@ -6,7 +6,7 @@ import {
   withTestDbPgClientTransaction,
 } from "@localrepo/test-helpers";
 import type { PoolClient } from "pg";
-import { RunQuery } from "../dist/interfaces.js";
+import type { RunQuery } from "../dist/interfaces.js";
 
 /** Postgres pool */
 let testDb: TestDb | undefined;

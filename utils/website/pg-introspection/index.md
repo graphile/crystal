@@ -11,7 +11,8 @@ your editor.
 
 ## Usage
 
-Call `introspect(options)`.
+Call `introspect(options)` with a required `runQuery` adaptor. Define the adaptor
+once and reuse it across calls to `introspect` and `introspectRaw`.
 
 ```ts
 import { introspect } from "pg-introspection";
@@ -22,7 +23,7 @@ console.log(introspection.database.getDba()?.rolname);
 ```
 
 The result includes navigation helpers for following catalog relationships.
-For raw, cacheable data, use `introspectRaw` with the same arguments, then call
+For raw, cacheable data, use `introspectRaw` with the same options, then call
 `augmentIntrospectionData(options, data)` to add navigation helpers. Pass the
 same options used for introspection and clone cached data before augmentation:
 augmentation mutates its input and rejects already-augmented data.
@@ -51,28 +52,29 @@ do not feed any untrusted input into it or you risk SQL injection.
 
 ### `runQuery`
 
-This is the only required option.
+This is the only required option for `introspect` and `introspectRaw`.
+`augmentIntrospectionData` works entirely in memory and does not require it.
 
-This library does not make connections to PostgreSQL on its own, to do so you
-pass a `runQuery` callback. This callback is given SQL text and parameter values
-and, using your database driver of choice, should execute the query against the
-database and return the `introspection` column from its single result row.
+The library does not open database connections. Your adaptor receives SQL text
+and optional parameter values, executes the query with your database driver,
+and returns the `introspection` string from its single result row.
 Here's an example `runQuery` using the `pg` module:
 
 ```ts
 // runQuery.ts
+import type { RunQuery } from "pg-introspection";
 import { Pool } from "pg";
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
 
-export async function runQuery(text: string, values: unknown[]) {
+export const runQuery: RunQuery = async (text, values) => {
   const { rows } = await pool.query<{ introspection: string }>(text, values);
   return rows[0].introspection;
-}
+};
 ```
 
-### `onlyEntites`
+### `onlyEntities`
 
 The experimental `onlyEntities` option selects which collections are returned;
 if not provided a default set of collections that are useful for many
@@ -87,9 +89,12 @@ requires `classes`. Multipass automatically includes required collections
 internally, but only returns the selected collections.
 
 ```ts
+import type { IntrospectOptions } from "pg-introspection";
+
 const options = {
+  runQuery,
   onlyEntities: ["namespaces", "classes", "attributes"],
-};
+} satisfies IntrospectOptions<"namespaces" | "classes" | "attributes">;
 ```
 
 ### `filters`
@@ -100,6 +105,7 @@ multipass introspection with `multipass.entrypointFilters`.
 
 ```ts
 const options = {
+  runQuery,
   filters: { namespaces: "nspname in ('public', 'app')" },
 };
 ```
@@ -117,7 +123,7 @@ Set `multipass` to an options object to enable multipass introspection
 amount of data returned from introspection is critical to your use case.
 
 Multipass introspection works by selecting a very narrow set of data (limited
-via `multipass.entrypointFilter`) and then "spidering out" from that starting
+via `multipass.entrypointFilters`) and then "spidering out" from that starting
 point (via `multipass.policies`) to select the required supporting data. If you
 enable `multipass.onlyAccessible` it will even respect database permissions and
 only return the details of things accessible to the given role (see caveats
@@ -167,12 +173,18 @@ Use it to cache introspection results, then augment a fresh clone for each
 consumer:
 
 ```ts
-import type { IntrospectionData, IntrospectOptions } from "pg-introspection";
+import type {
+  IntrospectionDataForEntities,
+  IntrospectOptions,
+} from "pg-introspection";
 import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
 
 // You might cache elsewhere; WeakMap is just an example.
-const cache = new WeakMap<IntrospectOptions, Promise<IntrospectionData>>();
-async function introspectForCache(options) {
+const cache = new WeakMap<
+  IntrospectOptions,
+  Promise<IntrospectionDataForEntities>
+>();
+async function introspectForCache(options: IntrospectOptions) {
   let promise = cache.get(options);
   if (promise == null) {
     promise = introspectRaw(options);
@@ -186,5 +198,10 @@ async function introspectForCache(options) {
 }
 ```
 
-Pass the same options to augmentation as to introspection. Augmentation mutates
-the supplied data and cannot be applied twice to the same object.
+`IntrospectionOptions` contains the shared configuration; `IntrospectOptions`
+extends it with the required `runQuery` adaptor. Pass the same shared options to
+augmentation as to introspection. You can pass the complete options object:
+augmentation ignores `runQuery`, so there is no need to remove it.
+
+Augmentation mutates the supplied data and cannot be applied twice to the same
+object.

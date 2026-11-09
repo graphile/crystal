@@ -33,11 +33,15 @@ And please give some love to our featured sponsors 🤩:
 
 ## Usage
 
-Call `introspect` passing options including a `runQuery` callback that should
-run the given text/values using a database adaptor of your choice and return the
-value of the `introspection` column of the first (and only) row returned.
+Call `introspect` passing options including the required `runQuery` adaptor that
+should run the given text/values using a database adaptor of your choice and
+return the value of the `introspection` column of the first (and only) row
+returned.
 
 ```ts
+import { introspect } from "pg-introspection";
+import { runQuery } from "./runQuery.ts";
+
 const introspection = await introspect({ runQuery });
 console.log(introspection.database.getDba()?.rolname);
 ```
@@ -45,13 +49,14 @@ console.log(introspection.database.getDba()?.rolname);
 Here's an example of a `runQuery` function for the `pg` module:
 
 ```ts
-import { introspect } from "pg-introspection";
+// runQuery.ts
+import type { RunQuery } from "pg-introspection";
 import { Pool } from "pg";
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
 
-const runQuery = async (text, values) => {
+export const runQuery: RunQuery = async (text, values) => {
   const { rows } = await pool.query(text, values);
   return rows[0].introspection;
 };

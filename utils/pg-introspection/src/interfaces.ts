@@ -132,7 +132,7 @@ export interface IntrospectionOptions<
 export interface IntrospectOptions<
   TEntities extends EntityType = DefaultEntities,
 > extends IntrospectionOptions<TEntities> {
-  /** Callback to execute the given text/values against your database. */
+  /** Executes SQL and returns the single result row's `introspection` string. */
   runQuery: RunQuery;
 }
 

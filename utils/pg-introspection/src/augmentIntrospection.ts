@@ -273,7 +273,7 @@ export function augmentIntrospection(
  * Adds navigation and other helpers to raw introspection data.
  *
  * `options` must be the same options passed to `introspectRaw` when
- * obtaining `introspectionData` (less the `runQuery` option).
+ * obtaining `introspectionData`; `runQuery` is not required or used here.
  */
 export function augmentIntrospectionData<
   TEntities extends EntityType = DefaultEntities,
