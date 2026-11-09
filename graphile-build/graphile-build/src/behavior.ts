@@ -132,7 +132,7 @@ export class Behavior {
           ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
-      listCache: EntityTrie;
+      listCache: ListTrie;
       inferredCache: Map<
         GraphileBuild.BehaviorEntities[entityType],
         ResolvedBehavior
@@ -302,10 +302,7 @@ export class Behavior {
       behaviorStrings: Object.create(null),
       inferredBehaviorCallbacks: [],
       overrideBehaviorCallbacks: [],
-      listCache: {
-        entity: null,
-        children: new Map(),
-      },
+      listCache: newListTrie(),
       inferredCache: new Map(),
       overrideCache: new Map(),
       fullCache: new Map(),
@@ -428,7 +425,7 @@ export class Behavior {
     const { fullCache: cache } = behaviorEntity;
 
     const entity = Array.isArray(rawEntity)
-      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      ? getCachedList(behaviorEntity.listCache, rawEntity)
       : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
@@ -463,7 +460,7 @@ export class Behavior {
       behaviorEntity;
 
     const entity = Array.isArray(rawEntity)
-      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      ? getCachedList(behaviorEntity.listCache, rawEntity)
       : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
@@ -492,7 +489,7 @@ export class Behavior {
       behaviorEntity;
 
     const entity = Array.isArray(rawEntity)
-      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      ? getCachedList(behaviorEntity.listCache, rawEntity)
       : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
@@ -896,18 +893,19 @@ interface ResolvedBehavior {
   toString(): string;
 }
 
-interface EntityTrie {
-  entity: any[] | null;
-  children: Map<unknown, EntityTrie>;
+interface ListTrie {
+  children: Map<unknown, ListTrie>;
+  list: any[] | null;
 }
 
-function trieChild<TKey>(parent: EntityTrie, key: TKey): EntityTrie {
+function newListTrie(): ListTrie {
+  return { children: new Map(), list: null };
+}
+
+function trieChild<TKey>(parent: ListTrie, key: TKey): ListTrie {
   let entry = parent.children.get(key);
   if (entry === undefined) {
-    entry = {
-      entity: null,
-      children: new Map(),
-    };
+    entry = newListTrie();
     parent.children.set(key, entry);
   }
   return entry;
@@ -917,17 +915,17 @@ function trieChild<TKey>(parent: EntityTrie, key: TKey): EntityTrie {
  * Returns an array equivalent to T, but deduplicated vs all other arrays
  * equivalent to T.
  */
-function getCachedEntity<T extends any[]>(listCache: EntityTrie, entity: T): T {
-  let node = trieChild(listCache, entity.length);
-  for (let i = 0, l = entity.length; i < l; i++) {
-    node = trieChild(node, entity[i]);
+function getCachedList<T extends any[]>(listCache: ListTrie, list: T): T {
+  let node = trieChild(listCache, list.length);
+  for (let i = 0, l = list.length; i < l; i++) {
+    node = trieChild(node, list[i]);
   }
-  const existing = node.entity;
+  const existing = node.list;
   if (existing !== null) {
     return existing as T;
   }
-  node.entity = entity;
-  return entity;
+  node.list = list;
+  return list;
 }
 
 const warned = new Set<string>();
