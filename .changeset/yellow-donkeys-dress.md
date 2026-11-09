@@ -1,6 +1,6 @@
 ---
-"graphile-build-pg": patch
-"postgraphile": patch
+"graphile-build-pg": minor
+"postgraphile": minor
 ---
 
 PgLtreePlugin now supports `ltree` type installed into schemas outside the
