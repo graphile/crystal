@@ -69,9 +69,7 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
             switch (dep.classid) {
               case pgProcId: {
                 const procId = dep.objid;
-                const pgProc = introspection.procs.find(
-                  (p) => p._id === procId,
-                );
+                const pgProc = introspection.getProc({ id: procId });
                 if (pgProc) {
                   info.state.extensionProcs.push(pgProc);
                 }
@@ -80,9 +78,7 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
               }
               case pgClassId: {
                 const relId = dep.objid;
-                const pgClass = introspection.classes.find(
-                  (p) => p._id === relId,
-                );
+                const pgClass = introspection.getClass({ id: relId });
                 if (pgClass) {
                   info.state.extensionClasses.push(pgClass);
                 }

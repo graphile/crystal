@@ -230,6 +230,12 @@ export function createEntityMethods(
           OBJECT_SCHEMA,
         );
       }),
+      getType: function (this: PgNamespace, by) {
+        assertExists(lookups.typeByNamespaceName, "types");
+        return lookups.typeByNamespaceName.get(
+          namespaceNameKey(this._id, by.name),
+        );
+      },
       getClass: function (this: PgNamespace, by) {
         assertExists(classByNamespaceName, "classes");
         return classByNamespaceName.get(namespaceNameKey(this._id, by.name));

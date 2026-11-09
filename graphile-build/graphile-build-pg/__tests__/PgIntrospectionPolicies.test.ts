@@ -63,6 +63,15 @@ test.each([false, true])(
       expect(proc).toBeDefined();
       const args = proc!.getArguments();
       expect(args[0].type.typname).toBe("pg_buffercache");
+      expect(
+        result.getType({
+          schemaName: "extension_row_type_test",
+          name: "pg_buffercache",
+        }),
+      ).toBe(args[0].type);
+      expect(result.getType({ arrayId: args[0].type.typarray! })).toBe(
+        args[0].type,
+      );
       const row = args[0].type.getClass()!;
       expect(row.relname).toBe("pg_buffercache");
       expect(row.getAttributes().map((a) => a.attname)).toContain("bufferid");
