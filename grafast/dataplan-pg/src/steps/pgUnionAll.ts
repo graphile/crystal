@@ -1046,10 +1046,9 @@ on (${sql.indent(
             : EMPTY_ARRAY,
       };
     });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
+    const executeMethod = this.hasSideEffects
+      ? "executeWithoutCache"
+      : "executeWithCache";
     const executionResult = await this.executor[executeMethod](specs, {
       text,
       rawSqlValues,
@@ -1057,7 +1056,7 @@ on (${sql.indent(
       name,
       affinity: this.executionAffinity,
       eventEmitter,
-      useTransaction: false,
+      useTransaction: this.hasSideEffects,
     });
     // debugExecute("%s; result: %c", this, executionResult);
 

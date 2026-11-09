@@ -1232,7 +1232,7 @@ export class PgSelectStep<
     }
     const context = values[this.contextId].unaryValue();
 
-    const isMutation = this.mode === "mutation";
+    const isMutation = this.mode === "mutation" || this.hasSideEffects;
     /**
      * If we know one of the identifiers is `null`, can we skip execution?
      *
@@ -1240,7 +1240,7 @@ export class PgSelectStep<
      * least one row (rather than zero) and the expressions may be null or
      * non-null (e.g. `count(*)` is `0` even over the empty set).
      */
-    const isSkippable = this.mode === "normal";
+    const isSkippable = this.mode === "normal" && !this.hasSideEffects;
 
     if (streamInitialCount == null) {
       const specs: PgExecutorInput<any>[] = [];
@@ -1309,10 +1309,9 @@ export class PgSelectStep<
           return specIdx;
         });
       }
-      const executeMethod =
-        this.operationPlan.operation.operation === "query"
-          ? "executeWithCache"
-          : "executeWithoutCache";
+      const executeMethod = isMutation
+        ? "executeWithoutCache"
+        : "executeWithCache";
       const executionResult =
         specs.length > 0
           ? await this.resource[executeMethod](specs, {
