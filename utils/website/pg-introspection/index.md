@@ -11,8 +11,9 @@ your editor.
 
 ## Usage
 
-Use `introspect` with a query callback returning the first row's `introspection`
-string. The library does not depend on a particular PostgreSQL client.
+Call `introspect(options, runQuery)`. The callback receives SQL text and parameter
+values, runs the query, and returns the `introspection` string from its single
+result row. The library does not depend on a particular PostgreSQL client.
 
 ```js
 import { introspect } from "pg-introspection";
@@ -47,8 +48,10 @@ augmentation mutates its input and rejects already-augmented data.
 
 The experimental `onlyEntities` option selects which collections are returned.
 It supports additional catalogs such as `settings`, `triggers` and
-`foreign_servers`. Required collections must also be selected; for example,
-`classes` requires `namespaces`, and `attributes` requires `classes`.
+`foreign_servers`. In single-query mode, required collections must also be
+selected; for example, `classes` requires `namespaces`, and `attributes` requires
+`classes`. Multipass includes required collections internally when building its
+initial query, but only returns the selected collections.
 TypeScript tracks the selected collections in the result. Navigation helpers
 that need an omitted collection throw an error when called.
 

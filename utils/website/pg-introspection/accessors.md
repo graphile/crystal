@@ -12,13 +12,17 @@ Examples:
 
 ```js
 const myTable = introspection.classes.find((rel) => rel.relname === "my_table");
+if (!myTable) {
+  throw new Error("Table my_table was not found");
+}
 const myTableAttributes = myTable.getAttributes();
 const myColumn = myTable.getAttribute({ name: "my_column" });
-const myColumnDescription = myColumn.getDescription();
+const myColumnDescription = myColumn?.getDescription();
 ```
 
-You can use the TypeScript autocompletion to see what accessors are available,
-or look in the `index.ts` file.
+Use your editor's TypeScript autocompletion to discover the available accessors.
+Lookups for individual objects return `undefined` when no matching object was
+fetched and retained.
 
 `introspect` adds these helpers automatically. For data from `introspectRaw`,
 call `augmentIntrospectionData` first, as described in [Usage](./index.md).

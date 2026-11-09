@@ -28,8 +28,8 @@ Enable it by passing an options object as `multipass` to `introspect` or
 There are no default relationship policies. `multipass: {}` performs initial
 discovery without following additional relationships. `onlyEntities` controls
 both returned collections and which collections policies can request; requests
-for unselected collections are ignored. Select required collections too, as
-described in [Usage](./index.md#collections-and-filters).
+for unselected collections are ignored. Include any collections needed by your
+navigation helpers, as described in [Usage](./index.md#collections-and-filters).
 
 ## A policy example
 
@@ -94,7 +94,7 @@ policy has a unique, non-empty `name`, a source collection and a synchronous
 `select` function. Call `details.request(entity, match, purposes)` to request
 dependencies; the return value of `select` is ignored.
 
-Each request specifies a target `entity`, a non-empty `match` object of catalog
+Each request specifies a target `entity`, a non-empty `match` object of catalogue
 column equalities, and a non-empty `purposes` list. Values in `match` must match
 the selected columns' types, must not be null, and are sent as query parameters.
 Use `_id` to request an object whose OID has that alias, or a catalog column such
@@ -114,6 +114,10 @@ Include `attributes` in `onlyEntities` when using this policy. The initial query
 already includes attributes for initial tables when that collection is selected;
 the policy also requests attributes for tables discovered later.
 
+Requests for OID zero are ignored where zero means there is no referenced
+object. Zero remains valid for columns where it has another meaning, such as
+`descriptions.objsubid` for a description of the object itself.
+
 ## Purposes and predictable expansion
 
 Extend `PgIntrospection.PurposeRegistry` to name the reasons your application
@@ -129,15 +133,17 @@ which missing purposes would cause a policy to run again.
 Policies run once when a row is first discovered. Use `hasPurpose` guards when
 behaviour depends on a reason for discovery. Whenever `hasPurpose` returns
 `false`, the policy subscribes to that missing purpose for the row. Subsequently,
-the policy reruns only when a subscribed purpose becomes available. Requests for
-already fetched rows still propagate new purposes without fetching those rows
-again.
+the policy reruns only when a subscribed purpose becomes available. Requests
+immediately propagate purposes to matching rows already in memory. A query is
+still needed if the selector could match additional rows that have not yet been
+fetched; complete selectors and unique selectors with a known match need no
+further query.
 
 Purposes only accumulate. A new purpose must add requirements rather than revoke
 earlier ones. Policy output must depend only on its row, inspected purposes and
 fixed configuration. Do not mutate rows or use mutable closure state to decide
-what to request. `details.catalogByOid` contains immutable catalog metadata for
-policies that need catalog OIDs.
+what to request. `details.catalogByOid` maps catalogue OIDs to catalogue names
+such as `pg_class`. Treat this shared metadata as read-only.
 
 To make a request terminal, emit a purpose for which the target policies request
 no further dependencies. In the return-type example, no policy follows types,
@@ -151,8 +157,9 @@ so the requested return types do not cause further expansion.
 | `multipass.entrypointFilters` | Applied       | Not applied        |
 
 Both accept trusted SQL predicates keyed by collection name. Predicates use the
-underlying catalog's column names; use `oid` in SQL and `_id` in request
-selectors. Never interpolate untrusted input into SQL predicates.
+underlying catalogue's column names; use `oid` in SQL and the collection's OID
+field (`_id` for most collections) in request selectors. Never interpolate
+untrusted input into SQL predicates.
 
 Use top-level `filters` for restrictions that must hold for every fetched row.
 They also work in single-pass mode with `introspect` and `introspectRaw`. Use
@@ -223,7 +230,9 @@ Pass these options to `introspect`, or to both `introspectRaw` and
 extension-owned functions, tables and views, together with their attributes,
 constraints and row types. It does not hide standalone extension types such as
 `citext` or `geometry`. It uses the `depends` collection to identify extension
-ownership.
+ownership. Include `depends` when specifying `onlyEntities`. In multipass mode,
+your policies must also fetch extension-ownership dependencies for resources
+discovered after the initial query if those resources need to be hidden.
 
 Hidden rows move into the raw result's `hidden` section. They survive JSON
 serialization and `structuredClone`. Augmentation uses both sections to build
