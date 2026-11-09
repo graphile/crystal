@@ -132,7 +132,7 @@ export class Behavior {
           ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
-      listCache: Map<number, EntityTrie>;
+      listCache: EntityTrie;
       inferredCache: Map<
         GraphileBuild.BehaviorEntities[entityType],
         ResolvedBehavior
@@ -302,7 +302,10 @@ export class Behavior {
       behaviorStrings: Object.create(null),
       inferredBehaviorCallbacks: [],
       overrideBehaviorCallbacks: [],
-      listCache: new Map(),
+      listCache: {
+        entity: null,
+        children: new Map(),
+      },
       inferredCache: new Map(),
       overrideCache: new Map(),
       fullCache: new Map(),
@@ -874,34 +877,37 @@ interface ResolvedBehavior {
   toString(): string;
 }
 
-function trieChild<TKey>(parent: Map<TKey, EntityTrie>, key: TKey): EntityTrie {
-  let child = parent.get(key);
-  if (!child) {
-    child = new Map() as EntityTrie;
-    parent.set(key, child);
+interface EntityTrie {
+  entity: any[] | null;
+  children: Map<unknown, EntityTrie>;
+}
+
+function trieChild<TKey>(parent: EntityTrie, key: TKey): EntityTrie {
+  let entry = parent.children.get(key);
+  if (entry === undefined) {
+    entry = {
+      entity: null,
+      children: new Map(),
+    };
+    parent.children.set(key, entry);
   }
-  return child;
+  return entry;
 }
 
-const $$entity = Symbol("entity");
-
-interface EntityTrie extends Map<unknown, EntityTrie> {
-  [$$entity]?: any[];
-}
-
-function getCachedEntity<T extends any[]>(
-  listCache: Map<number, EntityTrie>,
-  entity: T,
-): T {
+/**
+ * Returns an array equivalent to T, but deduplicated vs all other arrays
+ * equivalent to T.
+ */
+function getCachedEntity<T extends any[]>(listCache: EntityTrie, entity: T): T {
   let node = trieChild(listCache, entity.length);
   for (let i = 0, l = entity.length; i < l; i++) {
     node = trieChild(node, entity[i]);
   }
-  const existing = node[$$entity];
-  if (existing) {
+  const existing = node.entity;
+  if (existing !== null) {
     return existing as T;
   }
-  node[$$entity] = entity;
+  node.entity = entity;
   return entity;
 }
 
