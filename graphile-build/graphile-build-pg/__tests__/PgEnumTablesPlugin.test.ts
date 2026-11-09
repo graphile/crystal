@@ -20,8 +20,10 @@ test("uses the introspection settings to read enum table values", async () => {
   );
   mockedWithPgClientFromPgService.mockResolvedValue({ rows: [] });
 
-  const getIntrospectionData =
-    PgEnumTablesPlugin.gather?.helpers?.getIntrospectionData;
+  const gather = PgEnumTablesPlugin.gather as
+    | GraphileConfig.PluginGatherConfig<"pgEnumTables">
+    | undefined;
+  const getIntrospectionData = gather?.helpers?.getIntrospectionData;
   if (!getIntrospectionData) {
     throw new Error("PgEnumTablesPlugin.getIntrospectionData is not defined");
   }

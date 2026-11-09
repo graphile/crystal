@@ -1,4 +1,5 @@
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 import { grafast } from "grafast";
 import { makeSchema } from "graphile-build";
 import type { Pool } from "pg";
@@ -6,10 +7,6 @@ import pg from "pg";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { RegisterUserPlugin } from "./RegisterUserPlugin.ts";
 
 let pgPool: Pool | null = null;

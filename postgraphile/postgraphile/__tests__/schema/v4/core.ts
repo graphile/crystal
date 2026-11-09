@@ -16,6 +16,7 @@ import {
   SwallowAllErrorsPlugin,
   withPoolClientTransaction,
 } from "../../helpers.ts";
+import { assertIntrospectionPasses } from "../introspectionPasses.ts";
 
 jest.setTimeout(60000);
 
@@ -27,7 +28,10 @@ export const test =
     schemata: string | string[],
     options: V4Options = {},
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
-    finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
+    finalCheck?: (
+      schema: GraphQLSchema,
+      introspectionPasses: number | undefined,
+    ) => PromiseOrDirect<unknown>,
     sort = true,
     additionalPreset: GraphileConfig.Preset = {},
   ) =>
@@ -43,10 +47,21 @@ export const test =
       }
       const v4Preset = makeV4Preset(options);
       const schemas = Array.isArray(schemata) ? schemata : [schemata];
+      let introspectionPasses: number | undefined;
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
         extends: [AmberPreset, v4Preset, additionalPreset],
         plugins: [
+          {
+            name: "CountIntrospectionPasses",
+            gather: {
+              hooks: {
+                pgIntrospection_introspection(_info, { introspection }) {
+                  introspectionPasses = introspection.introspectionPasses;
+                },
+              },
+            },
+          },
           StripOidsPlugin,
           ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),
         ],
@@ -85,6 +100,7 @@ export const test =
       };
       const { schema, resolvedPreset: _resolvedPreset } =
         await makeSchema(preset);
+      assertIntrospectionPasses(schemas, introspectionPasses, options);
       const i = testPath in countByPath ? countByPath[testPath] + 1 : 1;
       countByPath[testPath] = i;
       const sorted = sort ? lexicographicSortSchema(schema) : schema;
@@ -94,7 +110,7 @@ export const test =
       }.graphql`;
       await snapshot(printed + "\n", filePath);
       if (finalCheck) {
-        await finalCheck(schema);
+        await finalCheck(schema, introspectionPasses);
       }
       // Now check the schema exports
       const { code: exportString } = await exportSchemaAsString(schema, {

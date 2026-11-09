@@ -92,6 +92,7 @@
   ],
   "devDependencies": {
     "@graphql-codegen/cli": "^6.1.0",
+    "@localrepo/test-helpers": "workspace:*",
     "@mermaid-js/mermaid-cli": "^11.12.0",
     "@types/jest": "^30.0.0",
     "@types/json5": "^2.2.0",

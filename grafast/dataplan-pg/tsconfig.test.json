@@ -1,5 +1,8 @@
 {
   "extends": "../../tsconfig.test.json",
   "include": ["__tests__/**/*", "examples/**/*", "scripts/**/*", "*.mts"],
-  "references": [{ "path": "./tsconfig.json" }]
+  "references": [
+    { "path": "./tsconfig.json" },
+    { "path": "../../utils/test-helpers" }
+  ]
 }

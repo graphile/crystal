@@ -1,5 +1,6 @@
 import { pgSelect, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 import {
   connection,
   constant,
@@ -16,10 +17,6 @@ import pg, { type Pool } from "pg";
 import { makeSchema } from "postgraphile";
 import PostGraphileAmberPreset from "postgraphile/presets/amber";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { EXPORTABLE, extendSchema, gql } from "../dist/index.js";
 
 let pgPool: Pool | null = null;

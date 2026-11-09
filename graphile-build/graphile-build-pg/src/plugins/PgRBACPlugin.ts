@@ -58,6 +58,11 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
     },
     helpers: {},
     hooks: {
+      pgIntrospection_options(_info, event) {
+        if (event.options.multipass) {
+          event.options.multipass.onlyAccessible = { includeNoInherit: true };
+        }
+      },
       async pgCodecs_attribute(info, event) {
         const { pgAttribute, serviceName, attribute } = event;
         const pgClass = pgAttribute.getClass();

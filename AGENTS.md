@@ -103,6 +103,12 @@ into 4 main categories based on the root folders, each of which have a
 - Modal verbs: avoid unnecessary language which suggests some is tentative or
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
   verbs.
+- Always use a block body for `if`, `for`, and `while` statements.
+- Prefer `if`/`else if`/`else` over early return in general, but not when
+  determining if a hook or middleware should apply, and not where it would cause
+  deep nesting. (In hooks/middleware we want to return ASAP if the hook isn't
+  appropriate to the current circumstance, and don't want the rest of the hook
+  body that does the work to need to be indented.)
 
 When writing Grafast plan resolvers in documentation, try and only do one action
 per statement; for example instead of:
@@ -144,6 +150,22 @@ the query shape.
 - Prefer **incremental** tests: cover public APIs and critical paths first.
 - Use existing test utilities and patterns; mirror nearby tests.
 - Keep tests deterministic.
+- Do not add relative imports across package boundaries, including in tests. Add
+  package-local test helpers where needed.
+- Use PostgreSQL pools in tests rather than standalone `Client` connections. Use
+  a package-local helper for database setup, transactions, client release, and
+  teardown; do not create clients or pools in individual test cases.
+- Use `@localrepo/test-helpers` for shared database provisioning and transaction
+  handling. Package-local helpers should supply the test runner's lifecycle
+  hooks; do not duplicate database setup or import another package's tests.
+- Follow the existing database isolation pattern: create a temporary
+  `gctestdb_*` database from `graphilecrystaltest_template`, connect through a
+  shared test pool, and drop the database after closing the pool. Use
+  `OWNER_DATABASE` for the administrative connection and respect `PGHOST`. Do
+  not connect tests directly to the shared `graphilecrystaltest` database.
+- If the package lacks a lifecycle helper, add a local wrapper around
+  `@localrepo/test-helpers`. Follow the relevant runner's lifecycle hooks
+  (`before`/`after` for `node:test`, `beforeAll`/`afterAll` for Jest).
 
 Note: many of the integration tests work by writing `*.test.graphql` files,
 which the system will run and capture snapshots of data, plans, errors and

@@ -62,6 +62,7 @@
   },
   "devDependencies": {
     "@dataplan/pg": "workspace:^",
+    "@localrepo/test-helpers": "workspace:*",
     "@types/node": "^22.19.1",
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
