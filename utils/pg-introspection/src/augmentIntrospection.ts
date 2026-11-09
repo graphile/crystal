@@ -30,6 +30,8 @@ function populateLookups<TEntities extends EntityType = DefaultEntities>(
     namespaceById,
     namespaceByName,
     typeById,
+    typeByArrayId,
+    typeByNamespaceName,
     classById,
     classByNamespaceName,
     rangeByTypid,
@@ -47,6 +49,7 @@ function populateLookups<TEntities extends EntityType = DefaultEntities>(
     procById,
     procsByNamespaceName,
     extensionById,
+    extensionByName,
     languageById,
     accessMethodById,
   } = lookups;
@@ -61,8 +64,17 @@ function populateLookups<TEntities extends EntityType = DefaultEntities>(
   }
   if (introspection.types) {
     assertExists(typeById, "types");
+    assertExists(typeByArrayId, "types");
+    assertExists(typeByNamespaceName, "types");
     for (const entity of introspection.types) {
       typeById.set(entity._id, entity);
+      if (entity.typarray && entity.typarray !== "0") {
+        typeByArrayId.set(entity.typarray, entity);
+      }
+      typeByNamespaceName.set(
+        namespaceNameKey(entity.typnamespace, entity.typname),
+        entity,
+      );
     }
   }
   if (introspection.classes) {
@@ -90,8 +102,10 @@ function populateLookups<TEntities extends EntityType = DefaultEntities>(
   }
   if (introspection.extensions) {
     assertExists(extensionById, "extensions");
+    assertExists(extensionByName, "extensions");
     for (const entity of introspection.extensions) {
       extensionById.set(entity._id, entity);
+      extensionByName.set(entity.extname, entity);
     }
   }
   if (introspection.languages) {
@@ -315,7 +329,11 @@ export function augmentIntrospectionData<
       namespaceById: new Map(),
       namespaceByName: new Map(),
     }),
-    ...(introspectionData.types && { typeById: new Map() }),
+    ...(introspectionData.types && {
+      typeById: new Map(),
+      typeByArrayId: new Map(),
+      typeByNamespaceName: new Map(),
+    }),
     ...(introspectionData.classes && {
       classById: new Map(),
       classByNamespaceName: new Map(),
@@ -348,6 +366,7 @@ export function augmentIntrospectionData<
     }),
     ...(introspectionData.extensions && {
       extensionById: new Map(),
+      extensionByName: new Map(),
     }),
     ...(introspectionData.languages && {
       languageById: new Map(),
@@ -467,18 +486,13 @@ export function augmentIntrospectionData<
       assertExists(lookups.typeById, "types");
       if ("id" in by) {
         return lookups.typeById.get(by.id);
+      } else if ("arrayId" in by) {
+        assertExists(lookups.typeByArrayId, "types");
+        return lookups.typeByArrayId.get(by.arrayId);
       } else {
-        for (const type of lookups.typeById.values()) {
-          if (
-            "arrayId" in by
-              ? type.typarray === by.arrayId
-              : type.typname === by.name &&
-                type.getNamespace()?.nspname === by.schemaName
-          ) {
-            return type;
-          }
-        }
-        return undefined;
+        return result
+          .getNamespace({ name: by.schemaName })
+          ?.getType({ name: by.name });
       }
     },
     getEnum: (by: { id: string }) => {
@@ -490,12 +504,8 @@ export function augmentIntrospectionData<
       if ("id" in by) {
         return lookups.extensionById.get(by.id);
       } else {
-        for (const extension of lookups.extensionById.values()) {
-          if (extension.extname === by.name) {
-            return extension;
-          }
-        }
-        return undefined;
+        assertExists(lookups.extensionByName, "extensions");
+        return lookups.extensionByName.get(by.name);
       }
     },
     getIndex: (by: { id: string }) => {

@@ -227,6 +227,8 @@ interface AllIntrospectionLookups {
   namespaceById: Map<string, PgNamespace>;
   namespaceByName: Map<string, PgNamespace>;
   typeById: Map<string, PgType>;
+  typeByNamespaceName: Map<string, PgType>;
+  typeByArrayId: Map<string, PgType>;
   classById: Map<string, PgClass>;
   classByNamespaceName: Map<string, PgClass>;
   rangeByTypid: Map<string, PgRange>;
@@ -244,6 +246,7 @@ interface AllIntrospectionLookups {
   procById: Map<string, PgProc>;
   procsByNamespaceName: Map<string, PgProc[]>;
   extensionById: Map<string, PgExtension>;
+  extensionByName: Map<string, PgExtension>;
   languageById: Map<string, PgLanguage>;
   accessMethodById: Map<string, PgAm>;
 }
@@ -261,6 +264,8 @@ type LookupEntities = CheckLookupEntities<{
   namespaceById: "namespaces";
   namespaceByName: "namespaces";
   typeById: "types";
+  typeByNamespaceName: "types";
+  typeByArrayId: "types";
   classById: "classes";
   classByNamespaceName: "classes";
   rangeByTypid: "ranges";
@@ -278,6 +283,7 @@ type LookupEntities = CheckLookupEntities<{
   procById: "procs";
   procsByNamespaceName: "procs";
   extensionById: "extensions";
+  extensionByName: "extensions";
   languageById: "languages";
   accessMethodById: "am";
 }>;
@@ -330,6 +336,7 @@ export interface PgNamespace extends PgNamespaceData {
   getTags(): PgSmartTagsDict;
   getACL(): AclObject[];
 
+  getType(by: { name: string }): PgType | undefined;
   getClass(by: { name: string }): PgClass | undefined;
   getConstraint(by: { name: string }): PgConstraint | undefined;
   getProcs(by: { name: string }): PgProc[] | undefined;
