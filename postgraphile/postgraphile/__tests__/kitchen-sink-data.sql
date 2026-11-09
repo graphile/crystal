@@ -1,5 +1,8 @@
 alter table b.types disable trigger user;
 delete from nested_arrays.t cascade;
+delete from ref_to_union.notes cascade;
+delete from ref_to_union.organizations cascade;
+delete from ref_to_union.people cascade;
 delete from smart_comment_relations.streets cascade;
 delete from smart_comment_relations.street_property cascade;
 delete from smart_comment_relations.properties cascade;
@@ -486,6 +489,18 @@ insert into named_query_builder.toy_categories(toy_id, category_id, approved) va
   (1, 3, false);
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+alter sequence ref_to_union.people_id_seq restart with 1;
+alter sequence ref_to_union.organizations_id_seq restart with 1;
+alter sequence ref_to_union.notes_id_seq restart with 1;
+insert into ref_to_union.people (username) values ('alice'), ('bob');
+insert into ref_to_union.organizations (name) values ('acme');
+insert into ref_to_union.notes (person_id, organization_id, body) values
+  (1, null, 'first note'),
+  (2, null, 'second note'),
+  (null, 1, 'note without a person');
+
 alter sequence enum_tables.letter_descriptions_id_seq restart with 101;
 insert into enum_tables.letter_descriptions(letter, letter_via_view, description) values
   ('A', 'A', 'The first letter in the alphabet'),
