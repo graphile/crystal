@@ -2,11 +2,16 @@ import { PgIntrospectionPlugin } from "../dist/plugins/PgIntrospectionPlugin.js"
 
 test("looks up an index by its identifier", async () => {
   const indexes = [{ indexrelid: "1" }, { indexrelid: "2" }];
+  const introspection = {
+    indexes,
+    getIndex: ({ id }: { id: string }) =>
+      indexes.find((index) => index.indexrelid === id),
+  };
   const info = {
     helpers: {
       pgIntrospection: {
         getIntrospection: () => [
-          { pgService: { name: "main" }, introspection: { indexes } },
+          { pgService: { name: "main" }, introspection },
         ],
       },
     },
