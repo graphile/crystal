@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy();
+## expect(data.ascAfter.edges.map(e => e.node.id)).toEqual([1, 2, 4, 5, 6]);
+## expect(data.descAfter.edges.map(e => e.node.id)).toEqual([3]);
+#> schema: ["a", "b", "c"]
+query {
+  ascFirst: allPeople(orderBy: [ABOUT_ASC], first: 1) {
+    edges { cursor node { id about } }
+  }
+  ascAfter: allPeople(orderBy: [ABOUT_ASC], after: "WyJmZmExM2NhNjljIiwiSnVzdCBhIGZyaWVuZGx5IGh1bWFuIiwzXQ==") {
+    edges { cursor node { id about } }
+  }
+  descFirst: allPeople(orderBy: [ABOUT_DESC], first: 5) {
+    edges { cursor node { id about } }
+  }
+  descAfter: allPeople(orderBy: [ABOUT_DESC], after: "WyJmZmExM2NhNjljIixudWxsLDFd") {
+    edges { cursor node { id about } }
+  }
+}
