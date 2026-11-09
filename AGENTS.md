@@ -144,6 +144,10 @@ the query shape.
 - Prefer **incremental** tests: cover public APIs and critical paths first.
 - Use existing test utilities and patterns; mirror nearby tests.
 - Keep tests deterministic.
+- Use node builtins where possible; we're phasing out usage of `jest`, `mocha`,
+  etc.
+- Do not have tests write files (except snapshots); there should be no need to
+  create temporary directories.
 
 Note: many of the integration tests work by writing `*.test.graphql` files,
 which the system will run and capture snapshots of data, plans, errors and
