@@ -11,9 +11,6 @@ your editor.
 
 ## Usage
 
-Call `introspect(options)` with a required `runQuery` adaptor. Define the adaptor
-once and reuse it across calls to `introspect` and `introspectRaw`.
-
 ```ts
 import { introspect } from "pg-introspection";
 import { runQuery } from "./runQuery.ts";
@@ -22,11 +19,17 @@ const introspection = await introspect({ runQuery });
 console.log(introspection.database.getDba()?.rolname);
 ```
 
-The result includes navigation helpers for following catalog relationships.
-For raw, cacheable data, use `introspectRaw` with the same options, then call
-`augmentIntrospectionData(options, data)` to add navigation helpers. Pass the
-same options used for introspection and clone cached data before augmentation:
-augmentation mutates its input and rejects already-augmented data.
+pg-introspection has no built in database driver, so the `runQuery` option is
+required so that pg-introspection may talk to your database using your driver of
+choice.
+
+The `introspection` result includes navigation helpers for following catalog
+relationships.
+
+For raw, cacheable data, use `introspectRaw(options)` instead, then to add
+navigation helpers, call
+`augmentIntrospectionData(options, structuredClone(data))` with the same
+options.
 
 See [Accessors](./accessors.md) for navigation helpers and
 [Naming](./naming.md) for the relationship to PostgreSQL catalog names.

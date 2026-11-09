@@ -38,7 +38,7 @@ const introspection = await introspect(options);
 
 The required `runQuery` option is a reusable database adaptor. Define it once as
 shown in [Usage](./index.md#runquery), then pass it in the options for every
-`introspect` or `introspectRaw` call. It is no longer a separate callback argument.
+`introspect` or `introspectRaw` call.
 
 If you were caching the result of running `makeIntrospectionQuery` then use
 the [raw data and caching pattern](./index.md#raw-data-and-caching) instead
