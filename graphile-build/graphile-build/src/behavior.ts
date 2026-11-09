@@ -347,7 +347,7 @@ export class Behavior {
     entity: GraphileBuild.BehaviorEntities[TEntityType],
     filter: TFilter,
   ): boolean | undefined {
-    if (!this.behaviorRegistry[filter]) {
+    if (this.behaviorRegistry[filter] == null) {
       // DIAGNOSTIC: enable for all filters
       /*
       console.warn(
@@ -366,15 +366,15 @@ export class Behavior {
           },
         },
       };
-    } else {
-      const registrationKey = `${entityType}\0${filter}`;
+    } else if (isDev) {
+      const registrationKey = `${filter}\0${entityType}`;
       if (!this.checkedRegistrations.has(registrationKey)) {
         this.checkedRegistrations.add(registrationKey);
         const isRegistered =
           !!this.behaviorRegistry[filter].entities[entityType] ||
           Object.entries(this.behaviorRegistry).some(
-            ([bhv, { entities }]) =>
-              entities[entityType] && stringMatches(bhv, filter),
+            ([behavior, { entities }]) =>
+              entities[entityType] != null && stringMatches(behavior, filter),
           );
         if (!isRegistered) {
           console.warn(
