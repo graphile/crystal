@@ -926,7 +926,7 @@ function trieChild<TKey>(parent: ListTrie, key: TKey): ListTrie {
  */
 function getCachedList<T extends any[]>(listCache: ListCache, list: T): T {
   if (listCache.lists.has(list)) return list;
-  let node = trieChild(listCache.root, list.length);
+  let node = listCache.root;
   for (let i = 0, l = list.length; i < l; i++) {
     node = trieChild(node, list[i]);
   }
