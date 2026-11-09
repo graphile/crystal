@@ -158,76 +158,85 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
         return _;
       },
 
-      GraphQLObjectType_fields_field_args(args, build, context) {
-        const {
-          extend,
-          getTypeByName,
-          graphql: { GraphQLList, GraphQLNonNull },
-          inflection,
-        } = build;
-        const { scope, Self } = context;
-        const {
-          fieldName,
-          isPgFieldConnection,
-          isPgFieldSimpleCollection,
-          pgFieldResource: pgResource,
-          pgFieldCodec,
-        } = scope;
-
-        if (!isPgFieldConnection && !isPgFieldSimpleCollection) {
-          return args;
-        }
-
-        const codec = pgFieldCodec ?? pgResource?.codec;
-        const isSuitableSource =
-          pgResource && pgResource.codec.attributes && !pgResource.isUnique;
-        const isSuitableCodec =
-          codec &&
-          (isSuitableSource ||
-            (!pgResource && codec?.polymorphism?.mode === "union")) &&
-          codec.attributes;
-
-        if (!isSuitableCodec) {
-          return args;
-        }
-        if (
-          pgResource
-            ? !build.behavior.pgResourceMatches(pgResource, "order")
-            : codec
-              ? !build.behavior.pgCodecMatches(codec, "order")
-              : false
-        ) {
-          return args;
-        }
-
-        const tableTypeName = inflection.tableType(codec);
-        const tableOrderByTypeName = inflection.orderByType(tableTypeName);
-        const TableOrderByType = getTypeByName(
-          tableOrderByTypeName,
-        ) as GraphQLEnumType;
-        if (!TableOrderByType) {
-          return args;
-        }
-
-        // TODO: inflection
-        const argName = "orderBy";
-        return extend(
-          args,
-          {
-            [argName]: {
-              description: build.wrapDescription(
-                `The method to use when ordering \`${tableTypeName}\`.`,
-                "arg",
-              ),
-              type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
-              applyPlan: isPgFieldConnection
-                ? applyOrderByArgToConnection
-                : applyOrderByArg,
-            },
-          } as GrafastFieldConfigArgumentMap,
-          `Adding '${argName}' (orderBy) argument to field '${fieldName}' of '${Self.name}'`,
-        );
-      },
+      GraphQLObjectType_fields_field_args: addOrderByArgument,
+      GraphQLInterfaceType_fields_field_args: addOrderByArgument,
     },
   },
 };
+
+function addOrderByArgument(
+  args: GrafastFieldConfigArgumentMap,
+  build: GraphileBuild.Build,
+  context:
+    | GraphileBuild.ContextObjectFieldsFieldArgs
+    | GraphileBuild.ContextInterfaceFieldsFieldArgs,
+) {
+  const {
+    extend,
+    getTypeByName,
+    graphql: { GraphQLList, GraphQLNonNull },
+    inflection,
+  } = build;
+  const { scope, Self } = context;
+  const {
+    fieldName,
+    isPgFieldConnection,
+    isPgFieldSimpleCollection,
+    pgFieldResource: pgResource,
+    pgFieldCodec,
+  } = scope;
+
+  if (!isPgFieldConnection && !isPgFieldSimpleCollection) {
+    return args;
+  }
+
+  const codec = pgFieldCodec ?? pgResource?.codec;
+  const isSuitableSource =
+    pgResource && pgResource.codec.attributes && !pgResource.isUnique;
+  const isSuitableCodec =
+    codec &&
+    (isSuitableSource ||
+      (!pgResource && codec?.polymorphism?.mode === "union")) &&
+    codec.attributes;
+
+  if (!isSuitableCodec) {
+    return args;
+  }
+  if (
+    pgResource
+      ? !build.behavior.pgResourceMatches(pgResource, "order")
+      : codec
+        ? !build.behavior.pgCodecMatches(codec, "order")
+        : false
+  ) {
+    return args;
+  }
+
+  const tableTypeName = inflection.tableType(codec);
+  const tableOrderByTypeName = inflection.orderByType(tableTypeName);
+  const TableOrderByType = getTypeByName(
+    tableOrderByTypeName,
+  ) as GraphQLEnumType;
+  if (!TableOrderByType) {
+    return args;
+  }
+
+  // TODO: inflection
+  const argName = "orderBy";
+  return extend(
+    args,
+    {
+      [argName]: {
+        description: build.wrapDescription(
+          `The method to use when ordering \`${tableTypeName}\`.`,
+          "arg",
+        ),
+        type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
+        applyPlan: isPgFieldConnection
+          ? applyOrderByArgToConnection
+          : applyOrderByArg,
+      },
+    } as GrafastFieldConfigArgumentMap,
+    `Adding '${argName}' (orderBy) argument to field '${fieldName}' of '${Self.name}'`,
+  );
+}
