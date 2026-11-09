@@ -5,10 +5,10 @@ import type {
   DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
+  IntrospectionOptions,
   IntrospectionPolicy,
   IntrospectionRequest,
   IntrospectionRow,
-  IntrospectionOptions,
   IntrospectOptions,
   Maybe,
   MultipassIntrospectOptions,
@@ -20,6 +20,11 @@ import {
   type EntityType,
   type IntrospectionData,
 } from "./introspection.ts";
+import {
+  DESCRIBED_ENTITIES,
+  NONZERO_COLUMNS,
+  UNIQUE_KEYS,
+} from "./introspectionConstants.ts";
 import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import {
   assertEntityType,
@@ -27,11 +32,6 @@ import {
   defaultEntities,
   makeIntrospectionQuery,
 } from "./query.ts";
-import {
-  DESCRIBED_ENTITIES,
-  UNIQUE_KEYS,
-  NONZERO_COLUMNS,
-} from "./introspectionConstants.ts";
 
 /** Preserve known column types; dynamically selected columns yield unknown. */
 function columnValue<TRow extends object, TColumn extends string>(

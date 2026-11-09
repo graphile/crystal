@@ -1,7 +1,7 @@
 import type {
   IntrospectionDataForEntities,
-  IntrospectionPruneDetails,
   IntrospectionOptions,
+  IntrospectionPruneDetails,
 } from "./interfaces.ts";
 import { ENTITY_TYPES, type EntityType } from "./introspection.ts";
 import { defaultEntities } from "./query.ts";

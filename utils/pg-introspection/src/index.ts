@@ -2,15 +2,14 @@ import type {
   DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
+  IntrospectionOptions,
   IntrospectionPolicy,
   IntrospectionPolicyDetails,
   IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectionRow,
-  IntrospectionOptions,
   IntrospectOptions,
   MultipassOptions,
-  RunQuery,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -32,6 +31,7 @@ import type {
   PgType,
   PrunableIntrospectionData,
   PurposeList,
+  RunQuery,
 } from "./interfaces.ts";
 export { defineIntrospectionPolicy } from "./interfaces.ts";
 export { introspect, introspectRaw } from "./multipass.ts";
@@ -67,15 +67,14 @@ export type {
   DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
+  IntrospectionOptions,
   IntrospectionPolicy,
   IntrospectionPolicyDetails,
   IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectionRow,
-  IntrospectionOptions,
   IntrospectOptions,
   MultipassOptions,
-  RunQuery,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -97,6 +96,7 @@ export type {
   PgType,
   PrunableIntrospectionData,
   PurposeList,
+  RunQuery,
 };
 
 export type { AclObject };

@@ -1,5 +1,5 @@
-import { IntrospectionRow } from "./interfaces";
-import { EntityType } from "./introspection";
+import type { IntrospectionRow } from "./interfaces.ts";
+import type { EntityType } from "./introspection.ts";
 
 /** Stable identity columns for collections. */
 export const UNIQUE_KEYS = {
