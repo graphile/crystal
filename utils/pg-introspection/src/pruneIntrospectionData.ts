@@ -1,13 +1,13 @@
 import type {
   IntrospectionDataForEntities,
   IntrospectionPruneDetails,
-  IntrospectOptions,
+  IntrospectionOptions,
 } from "./interfaces.ts";
 import { ENTITY_TYPES, type EntityType } from "./introspection.ts";
 import { defaultEntities } from "./query.ts";
 
 export function pruneIntrospectionData<TEntities extends EntityType>(
-  options: IntrospectOptions<TEntities>,
+  options: IntrospectionOptions<TEntities>,
   result: IntrospectionDataForEntities<TEntities>,
 ): IntrospectionDataForEntities<TEntities> {
   const { prune, onlyEntities = defaultEntities } = options;

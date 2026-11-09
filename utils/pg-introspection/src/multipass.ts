@@ -8,10 +8,12 @@ import type {
   IntrospectionPolicy,
   IntrospectionRequest,
   IntrospectionRow,
+  IntrospectionOptions,
   IntrospectOptions,
   Maybe,
   MultipassIntrospectOptions,
   PurposeList,
+  SQLVal,
 } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
@@ -30,9 +32,6 @@ import {
   UNIQUE_KEYS,
   NONZERO_COLUMNS,
 } from "./introspectionConstants.ts";
-
-type SQLVal = string | string[] | null;
-type RunQuery = (text: string, values: Array<SQLVal>) => Promise<string>;
 
 /** Preserve known column types; dynamically selected columns yield unknown. */
 function columnValue<TRow extends object, TColumn extends string>(
@@ -92,7 +91,7 @@ function addPredicate(
 }
 
 function entrypointQuery<TEntities extends EntityType>(
-  options: IntrospectOptions<TEntities>,
+  options: IntrospectionOptions<TEntities>,
 ) {
   const { multipass } = options;
   if (!multipass) throw new Error("Multipass options required");
@@ -309,13 +308,12 @@ export async function introspectRaw<
   TEntities extends EntityType = DefaultEntities,
 >(
   options: IntrospectOptions<TEntities>,
-  runQuery: RunQuery,
 ): Promise<IntrospectionDataForEntities<TEntities>> {
   if (isMultipassOptions(options)) {
     const context = buildMultipassContext(options);
-    return introspectRawMultipass(context, runQuery);
+    return introspectRawMultipass(context);
   } else {
-    const json = await runQuery(makeIntrospectionQuery(options), []);
+    const json = await options.runQuery(makeIntrospectionQuery(options), []);
     const result: IntrospectionDataForEntities<TEntities> = JSON.parse(json);
     result.introspectionPasses = 1;
     return pruneIntrospectionData(options, result);
@@ -535,8 +533,10 @@ function matchingRows(
 
 async function introspectRawMultipass<TEntities extends EntityType>(
   context: MultipassContext<TEntities>,
-  runQuery: RunQuery,
 ): Promise<IntrospectionDataForEntities<TEntities>> {
+  const {
+    options: { runQuery },
+  } = context;
   // Run the initial query, gather the metadata/etc
   const query = entrypointQuery(context.options);
   const json = await runQuery(query.text, query.values);
@@ -775,10 +775,7 @@ function addPurposes<TEntity extends EntityType>(
 
 export async function introspect<
   TEntities extends EntityType = DefaultEntities,
->(
-  options: IntrospectOptions<TEntities>,
-  runQuery: RunQuery,
-): Promise<Introspection<TEntities>> {
-  const result = await introspectRaw(options, runQuery);
+>(options: IntrospectOptions<TEntities>): Promise<Introspection<TEntities>> {
+  const result = await introspectRaw(options);
   return augmentIntrospectionData<TEntities>(options, result);
 }

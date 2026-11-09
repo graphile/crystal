@@ -62,26 +62,27 @@ it("composes extension pruning with additional callbacks", async () => {
     hide("procs", (proc) => proc.proname === "internal");
   };
   const options: IntrospectOptions = {
+    async runQuery() {
+      return JSON.stringify({
+        ...rawIntrospectionResults,
+        procs: [
+          { _id: "1", pronamespace: "2200", proname: "extension_helper" },
+          { _id: "2", pronamespace: "2200", proname: "temporary" },
+          { _id: "3", pronamespace: "2200", proname: "internal" },
+          { _id: "4", pronamespace: "2200", proname: "public_function" },
+        ],
+        depends: [
+          { classid: "1255", objid: "1", refclassid: "3079", deptype: "e" },
+        ],
+      });
+    },
     prune(data, details) {
       pruneExtensionResources(data, details);
       pruneTemporaryProcedures(data, details);
       pruneInternalProcedures(data, details);
     },
   };
-  const raw = await introspectRaw(options, async () =>
-    JSON.stringify({
-      ...rawIntrospectionResults,
-      procs: [
-        { _id: "1", pronamespace: "2200", proname: "extension_helper" },
-        { _id: "2", pronamespace: "2200", proname: "temporary" },
-        { _id: "3", pronamespace: "2200", proname: "internal" },
-        { _id: "4", pronamespace: "2200", proname: "public_function" },
-      ],
-      depends: [
-        { classid: "1255", objid: "1", refclassid: "3079", deptype: "e" },
-      ],
-    }),
-  );
+  const raw = await introspectRaw(options);
   assert.deepEqual(
     raw.procs.map((proc) => proc._id),
     ["4"],

@@ -22,6 +22,7 @@ import type {
   PgRange,
   PgRoles,
   PgType,
+  RunQuery,
 } from "pg-introspection";
 import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
 
@@ -945,27 +946,13 @@ function introspectPgServices(
         }
         seenPgSettingsKeys.set(pgSettingsKey, i);
       }
-      const options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities> =
-        {
-          filters: { depends: "deptype in ('a', 'e')" },
-          prune: postgraphilePrune,
-          onlyEntities: [...DEFAULT_ENTITIES],
-          multipass:
-            info.resolvedPreset.gather?.pgMultipassIntrospection === false
-              ? false
-              : postgraphileMultipass({ schemas: pgService.schemas }),
-        };
-      await info.process("pgIntrospection_options", {
-        serviceName: name,
-        options,
-      });
 
       // Do the introspection
-      const introspectionData = await withPgClientFromPgService(
+      const { introspectionData, options } = await withPgClientFromPgService(
         pgService,
         pgService.pgSettingsForIntrospection ?? null,
-        (client) =>
-          introspectRaw(options, async (text, values) => {
+        async (client) => {
+          const runQuery: RunQuery = async (text, values) => {
             const {
               rows: [row],
             } = await client.query<[string]>({
@@ -974,7 +961,25 @@ function introspectPgServices(
               arrayMode: true,
             });
             return row?.[0];
-          }),
+          };
+          const options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities> =
+            {
+              runQuery,
+              filters: { depends: "deptype in ('a', 'e')" },
+              prune: postgraphilePrune,
+              onlyEntities: [...DEFAULT_ENTITIES],
+              multipass:
+                info.resolvedPreset.gather?.pgMultipassIntrospection === false
+                  ? false
+                  : postgraphileMultipass({ schemas: pgService.schemas }),
+            };
+          await info.process("pgIntrospection_options", {
+            serviceName: name,
+            options,
+          });
+          const introspectionData = await introspectRaw(options);
+          return { introspectionData, options };
+        },
       );
       return { pgService, introspectionData, options };
     }),

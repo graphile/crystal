@@ -30,8 +30,9 @@ with:
 import { introspection, pruneExtensionResources } from "pg-introspection";
 
 const includeFromExtensions = false;
-const options = includeFromExtensions ? {} : { prune: pruneExtensionResources };
-const introspection = await introspect(options, runQuery);
+const prune = includeFromExtensions ? null : pruneExtensionResources;
+const options = { runQuery, prune };
+const introspection = await introspect(options);
 ```
 
 Where `runQuery` is the function used to execute the SQL using your chosen

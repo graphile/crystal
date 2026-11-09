@@ -6,6 +6,7 @@ import {
   withTestDbPgClientTransaction,
 } from "@localrepo/test-helpers";
 import type { PoolClient } from "pg";
+import { RunQuery } from "../dist/interfaces.js";
 
 /** Postgres pool */
 let testDb: TestDb | undefined;
@@ -24,4 +25,14 @@ export async function withPgClientTransaction<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   return withTestDbPgClientTransaction(testDb, callback);
+}
+
+export function makeRunQuery(client: PoolClient): RunQuery {
+  return async function runQuery(text, values) {
+    const { rows } = await client.query<{ introspection: string }>({
+      text,
+      values,
+    });
+    return rows[0].introspection;
+  };
 }

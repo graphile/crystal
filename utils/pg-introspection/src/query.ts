@@ -1,4 +1,4 @@
-import type { IntrospectOptions } from "./interfaces.ts";
+import type { IntrospectionOptions } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
   type EntityType,
@@ -38,7 +38,7 @@ export function assertEntityType(entity: string): asserts entity is EntityType {
 
 export function makeIntrospectionQuery(
   rawOptions: Pick<
-    IntrospectOptions<EntityType>,
+    IntrospectionOptions<EntityType>,
     "onlyEntities" | "filters"
   > = {},
 ) {

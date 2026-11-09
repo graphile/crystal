@@ -10,12 +10,13 @@ import {
   postgraphileMultipass,
   postgraphilePrune,
 } from "../dist/plugins/PgIntrospectionPolicies.js";
-import { withPgClientTransaction } from "./helpers.ts";
+import { makeRunQuery, withPgClientTransaction } from "./helpers.ts";
 
 test.each([false, true])(
   "preserves extension row type references (multipass: %s)",
   async (multipass) => {
     return withPgClientTransaction(async (client) => {
+      const runQuery = makeRunQuery(client);
       await client.query({ text: "create schema extension_row_type_test" });
       await client.query({
         text: "create extension pg_buffercache with schema extension_row_type_test",
@@ -31,17 +32,13 @@ test.each([false, true])(
       `,
       });
       const options: IntrospectOptions = {
+        runQuery,
         prune: postgraphilePrune,
         multipass: multipass
           ? postgraphileMultipass({ schemas: ["extension_row_type_test"] })
           : false,
       };
-      const raw = await introspectRaw(
-        options,
-        async (text, values) =>
-          (await client.query<{ introspection: string }>({ text, values }))
-            .rows[0].introspection,
-      );
+      const raw = await introspectRaw(options);
       expect(raw.classes.some((row) => row.relname === "pg_buffercache")).toBe(
         false,
       );
@@ -86,6 +83,7 @@ test.each([false, true])(
   "accumulates FK target requirements regardless of arrival order (%s)",
   async (upgrade) => {
     return withPgClientTransaction(async (client) => {
+      const runQuery = makeRunQuery(client);
       await client.query({
         text: `
       create schema purpose_public;
@@ -116,15 +114,11 @@ test.each([false, true])(
           },
         },
       ];
-      const result = await introspect(
-        {
-          prune: postgraphilePrune,
-          multipass,
-        },
-        async (text, values) =>
-          (await client.query<{ introspection: string }>({ text, values }))
-            .rows[0].introspection,
-      );
+      const result = await introspect({
+        runQuery,
+        prune: postgraphilePrune,
+        multipass,
+      });
       const target = result.classes.find((row) => row.relname === "target")!;
       expect(
         target
@@ -139,24 +133,21 @@ test.each([false, true])(
 
 test("does not traverse outgoing FKs of a target-only table", async () => {
   return withPgClientTransaction(async (client) => {
-    await client.query({
-      text: `
+    const runQuery = makeRunQuery(client);
+    await runQuery(
+      `
       create schema purpose_public;
       create schema purpose_private;
       create table purpose_private.unneeded (id integer primary key);
       create table purpose_private.target (id integer primary key, parent_id integer references purpose_private.unneeded(id));
       create table purpose_public.source (id integer primary key, target_id integer references purpose_private.target(id));
     `,
-    });
-    const result = await introspect(
-      {
-        multipass: postgraphileMultipass({ schemas: ["purpose_public"] }),
-        prune: postgraphilePrune,
-      },
-      async (text, values) =>
-        (await client.query<{ introspection: string }>({ text, values }))
-          .rows[0].introspection,
     );
+    const result = await introspect({
+      runQuery,
+      multipass: postgraphileMultipass({ schemas: ["purpose_public"] }),
+      prune: postgraphilePrune,
+    });
     expect(result.classes.some((row) => row.relname === "unneeded")).toBe(
       false,
     );
@@ -172,8 +163,9 @@ test("does not traverse outgoing FKs of a target-only table", async () => {
 
 test("only expands inaccessible row types when required by a resource", async () => {
   return withPgClientTransaction(async (client) => {
-    await client.query({
-      text: `
+    const runQuery = makeRunQuery(client);
+    await runQuery(
+      `
       create role purpose_reader;
       create schema purpose_access;
       grant usage on schema purpose_access to purpose_reader;
@@ -186,15 +178,14 @@ test("only expands inaccessible row types when required by a resource", async ()
         as $$ select null::purpose_access.required $$;
       grant execute on function purpose_access.required_row() to purpose_reader;
     `,
-    });
+    );
     const multipass = postgraphileMultipass({ schemas: ["purpose_access"] });
     multipass.onlyAccessible = { role: "purpose_reader" };
-    const result = await introspect(
-      { multipass, prune: postgraphilePrune },
-      async (text, values) =>
-        (await client.query<{ introspection: string }>({ text, values }))
-          .rows[0].introspection,
-    );
+    const result = await introspect({
+      runQuery,
+      multipass,
+      prune: postgraphilePrune,
+    });
     expect(result.types.some((row) => row.typname === "hidden")).toBe(true);
     expect(result.classes.some((row) => row.relname === "hidden")).toBe(false);
     expect(result.classes.some((row) => row.relname === "visible")).toBe(true);
@@ -213,8 +204,9 @@ test.each(["sys_procs", "event_triggers"] as const)(
   "preserves descriptions and dependencies selected with %s",
   async (entity) => {
     return withPgClientTransaction(async (client) => {
-      await client.query({
-        text: `
+      const runQuery = makeRunQuery(client);
+      await runQuery(
+        `
         create schema purpose_metadata;
         create function purpose_metadata.on_ddl() returns event_trigger
           language plpgsql as $$ begin end $$;
@@ -222,14 +214,13 @@ test.each(["sys_procs", "event_triggers"] as const)(
           execute function purpose_metadata.on_ddl();
         comment on event trigger purpose_metadata_trigger is 'Event description';
       `,
-      });
+      );
       const run = (multipass: false | MultipassOptions) =>
-        introspect(
-          { onlyEntities: [entity, "descriptions", "depends"], multipass },
-          async (text, values) =>
-            (await client.query<{ introspection: string }>({ text, values }))
-              .rows[0].introspection,
-        );
+        introspect({
+          runQuery,
+          onlyEntities: [entity, "descriptions", "depends"],
+          multipass,
+        });
       const single = await run(false);
       const multi = await run({});
       expect(single.descriptions.length).toBeGreaterThan(0);
@@ -243,6 +234,7 @@ test.each([false, true])(
   "preserves range subtype purposes (required by codec: %s)",
   async (codec) => {
     return withPgClientTransaction(async (client) => {
+      const runQuery = makeRunQuery(client);
       await client.query({
         text: `
         create schema purpose_range;
@@ -282,12 +274,7 @@ test.each([false, true])(
           },
         },
       ];
-      await introspectRaw(
-        { multipass },
-        async (text, values) =>
-          (await client.query<{ introspection: string }>({ text, values }))
-            .rows[0].introspection,
-      );
+      await introspectRaw({ runQuery, multipass });
       expect(subtypeCodec).toBe(codec);
       if (!codec) {
         expect(subtypeNavigation).toBe(true);

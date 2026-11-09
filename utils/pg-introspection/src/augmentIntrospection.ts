@@ -12,7 +12,7 @@ import type {
   Introspection,
   IntrospectionDataForEntities,
   IntrospectionLookups,
-  IntrospectOptions,
+  IntrospectionOptions,
 } from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
 import { pruneExtensionResources } from "./pruneExtensionResources.ts";
@@ -239,7 +239,7 @@ function populateLookups<TEntities extends EntityType = DefaultEntities>(
 }
 
 function createCaches<TEntities extends EntityType = DefaultEntities>(
-  _options: IntrospectOptions<TEntities>,
+  _options: IntrospectionOptions<TEntities>,
 ): Introspection["_caches"] {
   return {
     expandRoles: new Map(),
@@ -272,13 +272,13 @@ export function augmentIntrospection(
 /**
  * Adds navigation and other helpers to raw introspection data.
  *
- * `options` must be the exact same options passed to `introspectRaw` when
- * obtaining `introspectionData`.
+ * `options` must be the same options passed to `introspectRaw` when
+ * obtaining `introspectionData` (less the `runQuery` option).
  */
 export function augmentIntrospectionData<
   TEntities extends EntityType = DefaultEntities,
 >(
-  options: IntrospectOptions<TEntities>,
+  options: IntrospectionOptions<TEntities>,
   introspectionData: IntrospectionDataForEntities<TEntities>,
 ): Introspection<TEntities> {
   if ("_lookups" in introspectionData) {

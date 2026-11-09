@@ -10,7 +10,7 @@ import {
 } from "../dist/introspectionHelpers.js";
 import { introspect, introspectRaw } from "../dist/multipass.js";
 import { makeIntrospectionQuery } from "../dist/query.js";
-import { withPgClientTransaction } from "./helpers.ts";
+import { makeRunQuery, withPgClientTransaction } from "./helpers.ts";
 
 it("uses shared predicate exports instead of copied function bodies", () => {
   assert.equal(ENTITY_TYPES.depends.where, dependencyWhere);
@@ -84,6 +84,7 @@ it("uses a false predicate when no relevant catalog objects are selected", () =>
 
 it("executes edge-case selections against PostgreSQL", async () => {
   await withPgClientTransaction(async (client) => {
+    const runQuery = makeRunQuery(client);
     const schema = `introspection_test_${process.pid}`;
     await client.query(`create schema ${schema}`);
     await client.query(
@@ -100,11 +101,12 @@ it("executes edge-case selections against PostgreSQL", async () => {
       procs: "proname = 'starter_fn'",
     };
     for (const multipass of [undefined, false, {}] as const) {
-      const filtered = await introspect(
-        { onlyEntities: ["namespaces", "procs"], filters, multipass },
-        async (text, values) =>
-          (await client.query(text, values)).rows[0].introspection,
-      );
+      const filtered = await introspect({
+        runQuery,
+        onlyEntities: ["namespaces", "procs"],
+        filters,
+        multipass,
+      });
       assert.deepEqual(
         filtered.namespaces.map((n) => n.nspname),
         [schema],
@@ -187,29 +189,24 @@ it("executes edge-case selections against PostgreSQL", async () => {
       ),
       true,
     );
-    const multipassWithTriggers = await introspectRaw(
-      {
-        onlyEntities: ["namespaces", "classes", "procs", "triggers"],
-        multipass: {
-          entrypointFilters: { namespaces: `nspname = '${schema}'` },
-          policies: [
-            {
-              name: "testPolicy0",
-              entity: "procs",
-              select(proc, details) {
-                if (proc.proname === "trigger_fn") {
-                  details.request("procs", { _id: remoteTriggerId }, [
-                    "initial",
-                  ]);
-                }
-              },
+    const multipassWithTriggers = await introspectRaw({
+      runQuery,
+      onlyEntities: ["namespaces", "classes", "procs", "triggers"],
+      multipass: {
+        entrypointFilters: { namespaces: `nspname = '${schema}'` },
+        policies: [
+          {
+            name: "testPolicy0",
+            entity: "procs",
+            select(proc, details) {
+              if (proc.proname === "trigger_fn") {
+                details.request("procs", { _id: remoteTriggerId }, ["initial"]);
+              }
             },
-          ],
-        },
+          },
+        ],
       },
-      async (text, values) =>
-        (await client.query(text, values)).rows[0].introspection,
-    );
+    });
     assert.equal(
       multipassWithTriggers.procs.some((proc) => proc.proname === "trigger_fn"),
       true,
@@ -220,29 +217,24 @@ it("executes edge-case selections against PostgreSQL", async () => {
       ),
       true,
     );
-    const multipassWithoutTriggers = await introspectRaw(
-      {
-        onlyEntities: ["namespaces", "procs"],
-        multipass: {
-          entrypointFilters: { namespaces: `nspname = '${schema}'` },
-          policies: [
-            {
-              name: "testPolicy1",
-              entity: "procs",
-              select(proc, details) {
-                if (proc.proname === "starter_fn") {
-                  details.request("procs", { _id: remoteTriggerId }, [
-                    "initial",
-                  ]);
-                }
-              },
+    const multipassWithoutTriggers = await introspectRaw({
+      runQuery,
+      onlyEntities: ["namespaces", "procs"],
+      multipass: {
+        entrypointFilters: { namespaces: `nspname = '${schema}'` },
+        policies: [
+          {
+            name: "testPolicy1",
+            entity: "procs",
+            select(proc, details) {
+              if (proc.proname === "starter_fn") {
+                details.request("procs", { _id: remoteTriggerId }, ["initial"]);
+              }
             },
-          ],
-        },
+          },
+        ],
       },
-      async (text, values) =>
-        (await client.query(text, values)).rows[0].introspection,
-    );
+    });
     assert.equal(
       multipassWithoutTriggers.procs.some(
         (proc) => proc.proname === "trigger_fn",
@@ -362,15 +354,11 @@ it("executes edge-case selections against PostgreSQL", async () => {
     );
     // This extension installs both a relation and a function; rollback removes it.
     await client.query(`create extension pg_buffercache with schema ${schema}`);
-    const queryCallback = async (text: string, values: any[]) =>
-      (await client.query(text, values)).rows[0].introspection;
     const partialEntities = ["namespaces", "classes", "procs"] as const;
-    const included = await introspect(
-      {
-        onlyEntities: [...partialEntities],
-      },
-      queryCallback,
-    );
+    const included = await introspect({
+      runQuery,
+      onlyEntities: [...partialEntities],
+    });
     assert.ok(
       included.classes.some((entry) => entry.relname === "pg_buffercache"),
     );
@@ -412,33 +400,8 @@ it("fetches the current database after excluding it from initial discovery", asy
     const name = database.rows[0].name;
     let calls = 0;
     const visited: string[] = [];
-    const result = await introspectRaw(
-      {
-        onlyEntities: ["namespaces", "database"],
-        multipass: {
-          entrypointFilters: {
-            database: "false",
-            namespaces: "nspname = 'pg_catalog'",
-          },
-          policies: [
-            {
-              name: "requestDatabase",
-              entity: "namespaces",
-              select(_row, details) {
-                details.request("database", { datname: name }, ["initial"]);
-              },
-            },
-            {
-              name: "observeDatabase",
-              entity: "database",
-              select(row) {
-                visited.push(row.datname);
-              },
-            },
-          ],
-        },
-      },
-      async (text, values) => {
+    const result = await introspectRaw({
+      async runQuery(text, values) {
         const response = await client.query<{ introspection: string }>(
           text,
           values,
@@ -450,7 +413,30 @@ it("fetches the current database after excluding it from initial discovery", asy
         }
         return json;
       },
-    );
+      onlyEntities: ["namespaces", "database"],
+      multipass: {
+        entrypointFilters: {
+          database: "false",
+          namespaces: "nspname = 'pg_catalog'",
+        },
+        policies: [
+          {
+            name: "requestDatabase",
+            entity: "namespaces",
+            select(_row, details) {
+              details.request("database", { datname: name }, ["initial"]);
+            },
+          },
+          {
+            name: "observeDatabase",
+            entity: "database",
+            select(row) {
+              visited.push(row.datname);
+            },
+          },
+        ],
+      },
+    });
     assert.equal(calls, 2);
     assert.equal(result.database.datname, name);
     assert.equal(Array.isArray(result.database), false);
@@ -466,9 +452,13 @@ it("rejects inherited property names as collection names", async () => {
       /Unknown introspection entity/,
     );
     await assert.rejects(
-      introspectRaw({ ...options, multipass: {} }, async () =>
-        assert.fail("Invalid collections must be rejected before querying"),
-      ),
+      introspectRaw({
+        ...options,
+        runQuery() {
+          assert.fail("Invalid collections must be rejected before querying");
+        },
+        multipass: {},
+      }),
       /Unknown introspection entity/,
     );
   }
@@ -476,6 +466,7 @@ it("rejects inherited property names as collection names", async () => {
 
 it("ignores inherited filters and exposes a null-prototype catalogue dictionary", async () => {
   await withPgClientTransaction(async (client) => {
+    const runQuery = makeRunQuery(client);
     const filters: NonNullable<IntrospectOptions["filters"]> = Object.create({
       namespaces: "false",
       attributes: "false",
@@ -489,6 +480,7 @@ it("ignores inherited filters and exposes a null-prototype catalogue dictionary"
       const options: IntrospectOptions<
         "namespaces" | "classes" | "attributes"
       > = {
+        runQuery,
         onlyEntities: ["namespaces", "classes", "attributes"],
         filters,
         multipass: multipass
@@ -517,12 +509,7 @@ it("ignores inherited filters and exposes a null-prototype catalogue dictionary"
             }
           : false,
       };
-      const result = await introspectRaw(
-        options,
-        async (text, values) =>
-          (await client.query<{ introspection: string }>(text, values)).rows[0]
-            .introspection,
-      );
+      const result = await introspectRaw(options);
       assert.ok(result.namespaces.some((row) => row.nspname === "pg_catalog"));
       assert.equal(visits, multipass ? result.namespaces.length : 0);
       if (multipass) {
@@ -534,6 +521,7 @@ it("ignores inherited filters and exposes a null-prototype catalogue dictionary"
 
 it("supports catalogue names that match Object.prototype properties", async () => {
   await withPgClientTransaction(async (client) => {
+    const runQuery = makeRunQuery(client);
     await client.query('create schema "__proto__"');
     await client.query(
       'create table "__proto__"."constructor" ("toString" text)',
@@ -541,16 +529,12 @@ it("supports catalogue names that match Object.prototype properties", async () =
     await client.query(
       `comment on table "__proto__"."constructor" is '@constructor safe'`,
     );
-    const result = await introspect(
-      {
-        onlyEntities: ["namespaces", "classes", "attributes", "descriptions"],
-        filters: { namespaces: "nspname = '__proto__'" },
-        multipass: {},
-      },
-      async (text, values) =>
-        (await client.query<{ introspection: string }>(text, values)).rows[0]
-          .introspection,
-    );
+    const result = await introspect({
+      runQuery,
+      onlyEntities: ["namespaces", "classes", "attributes", "descriptions"],
+      filters: { namespaces: "nspname = '__proto__'" },
+      multipass: {},
+    });
     const namespace = result.getNamespace({ name: "__proto__" });
     assert.ok(namespace);
     const table = namespace.getClass({ name: "constructor" });
@@ -593,14 +577,8 @@ it("expands accessible memberships only for non-superusers", async () => {
       null,
     ]) {
       for (const includeNoInherit of [false, true]) {
-        await introspectRaw(
-          {
-            onlyEntities: [],
-            multipass: {
-              onlyAccessible: { role: role ?? undefined, includeNoInherit },
-            },
-          },
-          async (text, values) => {
+        await introspectRaw({
+          async runQuery(text, values) {
             // Inspect the actual entrypoint CTE independently of entity filtering.
             const prefix = text.slice(
               0,
@@ -641,7 +619,11 @@ it("expands accessible memberships only for non-superusers", async () => {
             assert.deepEqual(actual.rows, expected.rows);
             return (await client.query(text, values)).rows[0].introspection;
           },
-        );
+          onlyEntities: [],
+          multipass: {
+            onlyAccessible: { role: role ?? undefined, includeNoInherit },
+          },
+        });
       }
     }
   });

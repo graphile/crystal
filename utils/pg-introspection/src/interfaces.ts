@@ -111,7 +111,13 @@ export type PruneCallback = (
   details: IntrospectionPruneDetails,
 ) => void;
 
-export interface IntrospectOptions<
+export type SQLVal = string | string[] | null;
+export type RunQuery = (
+  text: string,
+  values?: Array<SQLVal>,
+) => Promise<string>;
+
+export interface IntrospectionOptions<
   TEntities extends EntityType = DefaultEntities,
 > {
   /** @experimental */
@@ -123,6 +129,14 @@ export interface IntrospectOptions<
   multipass?: false | MultipassOptions;
 }
 
+export interface IntrospectOptions<
+  TEntities extends EntityType = DefaultEntities,
+> extends IntrospectionOptions<TEntities> {
+  /** Callback to execute the given text/values against your database. */
+  runQuery: RunQuery;
+}
+
+/** @internal */
 export interface MultipassIntrospectOptions<TEntities extends EntityType>
   extends IntrospectOptions<TEntities> {
   multipass: MultipassOptions;

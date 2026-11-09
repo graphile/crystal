@@ -33,12 +33,12 @@ And please give some love to our featured sponsors 🤩:
 
 ## Usage
 
-Call `introspect` passing options and a `runQuery` callback that should run the
-given text/values using a database adaptor of your choice and return the value
-of the `introspection` column of the first (and only) row returned.
+Call `introspect` passing options including a `runQuery` callback that should
+run the given text/values using a database adaptor of your choice and return the
+value of the `introspection` column of the first (and only) row returned.
 
 ```ts
-const introspection = await introspect({}, runQuery);
+const introspection = await introspect({ runQuery });
 console.log(introspection.database.getDba()?.rolname);
 ```
 

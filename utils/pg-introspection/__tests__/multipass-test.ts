@@ -9,8 +9,8 @@ import {
   type IntrospectionRequest,
   type IntrospectionRow,
   type IntrospectOptions,
-  type MultipassOptions,
 } from "../dist/index.js";
+import type { MultipassOptions } from "../dist/interfaces.js";
 import { introspectRaw } from "../dist/multipass.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
@@ -35,6 +35,18 @@ const metadata = {
 for (const multipass of [undefined, false, {}]) {
   it(`caches hidden dependencies while discarding pruned rows (multipass: ${JSON.stringify(multipass)})`, async () => {
     const options: IntrospectOptions<"namespaces" | "classes"> = {
+      async runQuery() {
+        return JSON.stringify({
+          ...metadata,
+          catalog_by_oid: rawIntrospectionResults.catalog_by_oid,
+          namespaces: [],
+          classes: [
+            { _id: "visible", relname: "visible" },
+            { _id: "hidden", relname: "hidden" },
+            { _id: "discarded", relname: "discarded" },
+          ],
+        });
+      },
       onlyEntities: ["namespaces", "classes"],
       multipass,
       prune(data, { hide }) {
@@ -42,18 +54,7 @@ for (const multipass of [undefined, false, {}]) {
         data.classes = data.classes?.filter((row) => row._id !== "discarded");
       },
     };
-    const raw = await introspectRaw(options, async () =>
-      JSON.stringify({
-        ...metadata,
-        catalog_by_oid: rawIntrospectionResults.catalog_by_oid,
-        namespaces: [],
-        classes: [
-          { _id: "visible", relname: "visible" },
-          { _id: "hidden", relname: "hidden" },
-          { _id: "discarded", relname: "discarded" },
-        ],
-      }),
-    );
+    const raw = await introspectRaw(options);
     assert.deepEqual(
       raw.classes.map((row) => row._id),
       ["visible"],
@@ -81,17 +82,8 @@ for (const multipass of [undefined, false, {}]) {
   it(`prunes raw data to a fixed point (multipass: ${JSON.stringify(multipass)})`, async () => {
     let queries = 0;
     let prunes = 0;
-    const result = await introspectRaw(
-      {
-        onlyEntities: ["namespaces", "classes"],
-        multipass,
-        prune(data) {
-          prunes++;
-          assert.equal("_lookups" in data, false);
-          data.classes?.pop();
-        },
-      },
-      async () => {
+    const result = await introspectRaw({
+      async runQuery() {
         queries++;
         return JSON.stringify({
           ...metadata,
@@ -99,7 +91,14 @@ for (const multipass of [undefined, false, {}]) {
           classes: [{ _id: "1" }, { _id: "2" }],
         });
       },
-    );
+      onlyEntities: ["namespaces", "classes"],
+      multipass,
+      prune(data) {
+        prunes++;
+        assert.equal("_lookups" in data, false);
+        data.classes?.pop();
+      },
+    });
     assert.equal(queries, 1);
     assert.equal(prunes, 3);
     assert.deepEqual(result.classes, []);
@@ -107,21 +106,20 @@ for (const multipass of [undefined, false, {}]) {
 
   it(`rejects pruning that adds rows (multipass: ${JSON.stringify(multipass)})`, async () => {
     await assert.rejects(
-      introspectRaw(
-        {
-          onlyEntities: ["namespaces", "classes"],
-          multipass,
-          prune(data) {
-            data.classes!.push(data.classes![0]);
-          },
-        },
-        async () =>
-          JSON.stringify({
+      introspectRaw({
+        async runQuery() {
+          return JSON.stringify({
             ...metadata,
             namespaces: [],
             classes: [{ _id: "1" }],
-          }),
-      ),
+          });
+        },
+        onlyEntities: ["namespaces", "classes"],
+        multipass,
+        prune(data) {
+          data.classes!.push(data.classes![0]);
+        },
+      }),
       /Introspection pruning must not add entities/,
     );
   });
@@ -130,36 +128,8 @@ for (const multipass of [undefined, false, {}]) {
 it("expands terminal objects reached later, deduplicates requests and terminates cycles", async () => {
   let calls = 0;
   const expanded: string[] = [];
-  const result = await introspectRaw(
-    {
-      onlyEntities: ["namespaces", "types"],
-      multipass: {
-        policies: [
-          {
-            name: "testPolicy0",
-            entity: "types",
-            select(row, details) {
-              if (!details.hasPurpose("initial")) {
-                return;
-              }
-              expanded.push(row._id);
-              if (row._id === "1") {
-                details.request("types", { _id: "2" }, ["terminal"]);
-                details.request("types", { _id: "3" }, ["initial"]);
-                details.request("classes", { _id: "99" }, ["initial"]);
-              } else if (row._id === "3") {
-                details.request("types", { _id: "2" }, ["initial"]);
-                details.request("types", { _id: "4" }, ["initial"]);
-              } else if (row._id === "2") {
-                details.request("types", { _id: "1" }, ["initial"]);
-                details.request("types", { _id: "4" }, ["initial"]);
-              }
-            },
-          },
-        ],
-      },
-    },
-    async (_text, values) => {
+  const result = await introspectRaw({
+    async runQuery(_text, values) {
       calls++;
       if (calls === 1) {
         assert.deepEqual(values, []);
@@ -176,7 +146,33 @@ it("expands terminal objects reached later, deduplicates requests and terminates
       assert.deepEqual(values, [["4"]]);
       return JSON.stringify({ types: [] });
     },
-  );
+    onlyEntities: ["namespaces", "types"],
+    multipass: {
+      policies: [
+        {
+          name: "testPolicy0",
+          entity: "types",
+          select(row, details) {
+            if (!details.hasPurpose("initial")) {
+              return;
+            }
+            expanded.push(row._id);
+            if (row._id === "1") {
+              details.request("types", { _id: "2" }, ["terminal"]);
+              details.request("types", { _id: "3" }, ["initial"]);
+              details.request("classes", { _id: "99" }, ["initial"]);
+            } else if (row._id === "3") {
+              details.request("types", { _id: "2" }, ["initial"]);
+              details.request("types", { _id: "4" }, ["initial"]);
+            } else if (row._id === "2") {
+              details.request("types", { _id: "1" }, ["initial"]);
+              details.request("types", { _id: "4" }, ["initial"]);
+            }
+          },
+        },
+      ],
+    },
+  });
   assert.equal(calls, 3);
   assert.deepEqual(expanded, ["1", "3", "2"]);
   assert.deepEqual(
@@ -189,34 +185,8 @@ it("expands terminal objects reached later, deduplicates requests and terminates
 it("deduplicates repeated collection requests without fetching them again", async () => {
   let calls = 0;
   const expanded: string[] = [];
-  await introspectRaw(
-    {
-      onlyEntities: ["namespaces", "classes", "attributes"],
-      multipass: {
-        policies: [
-          {
-            name: "testPolicy1",
-            entity: "classes",
-            select(row, details) {
-              if (row._id === "1") {
-                details.request("attributes", { attrelid: "2" }, ["initial"]);
-                details.request("classes", { _id: "3" }, ["initial"]);
-              } else if (row._id === "3") {
-                details.request("attributes", { attrelid: "2" }, ["initial"]);
-              }
-            },
-          },
-          {
-            name: "testPolicy2",
-            entity: "attributes",
-            select(row, details) {
-              expanded.push(row.attname);
-            },
-          },
-        ],
-      },
-    },
-    async () => {
+  await introspectRaw({
+    async runQuery() {
       calls++;
       if (calls === 1)
         return JSON.stringify({
@@ -230,34 +200,52 @@ it("deduplicates repeated collection requests without fetching them again", asyn
         attributes: [{ attrelid: "2", attnum: 1, attname: "name" }],
       });
     },
-  );
+    onlyEntities: ["namespaces", "classes", "attributes"],
+    multipass: {
+      policies: [
+        {
+          name: "testPolicy1",
+          entity: "classes",
+          select(row, details) {
+            if (row._id === "1") {
+              details.request("attributes", { attrelid: "2" }, ["initial"]);
+              details.request("classes", { _id: "3" }, ["initial"]);
+            } else if (row._id === "3") {
+              details.request("attributes", { attrelid: "2" }, ["initial"]);
+            }
+          },
+        },
+        {
+          name: "testPolicy2",
+          entity: "attributes",
+          select(row, details) {
+            expanded.push(row.attname);
+          },
+        },
+      ],
+    },
+  });
   assert.equal(calls, 2);
   assert.deepEqual(expanded, ["name"]);
 });
 
 it("preserves the single-pass query when multipass is disabled", async () => {
   let calls = 0;
-  await introspectRaw(
-    { onlyEntities: ["namespaces"] },
-    async (text, values) => {
+  await introspectRaw({
+    async runQuery(text, values) {
       calls++;
       assert.deepEqual(values, []);
       assert.doesNotMatch(text, /any\(\$1/);
       return JSON.stringify({ ...metadata, namespaces: [] });
     },
-  );
+    onlyEntities: ["namespaces"],
+  });
   assert.equal(calls, 1);
 });
 
 it("passes role as a parameter and applies access checks to entrypoints", async () => {
-  await introspectRaw(
-    {
-      onlyEntities: ["classes"],
-      multipass: {
-        onlyAccessible: { role: "a' role", includeNoInherit: true },
-      },
-    },
-    async (text, values) => {
+  await introspectRaw({
+    async runQuery(text, values) {
       assert.deepEqual(values, ["a' role"]);
       assert.doesNotMatch(text, /a' (?:schema|role)/);
       assert.doesNotMatch(text, /pg_has_role/);
@@ -266,34 +254,18 @@ it("passes role as a parameter and applies access checks to entrypoints", async 
       assert.match(text, /has_any_column_privilege/);
       return JSON.stringify({ ...metadata, classes: [] });
     },
-  );
+    onlyEntities: ["classes"],
+    multipass: {
+      onlyAccessible: { role: "a' role", includeNoInherit: true },
+    },
+  });
 });
 
 it("preserves attribute filters in follow-up queries and prunes to a fixed point", async () => {
   let calls = 0;
   let prunes = 0;
-  const result = await introspectRaw(
-    {
-      onlyEntities: ["namespaces", "classes", "attributes"],
-      prune(data) {
-        prunes++;
-        if (data.attributes?.length) {
-          data.attributes.pop();
-        }
-      },
-      multipass: {
-        policies: [
-          {
-            name: "testPolicy3",
-            entity: "classes",
-            select(row, details) {
-              details.request("attributes", { attrelid: "2" }, ["initial"]);
-            },
-          },
-        ],
-      },
-    },
-    async (text) => {
+  const result = await introspectRaw({
+    async runQuery(text) {
       calls++;
       if (calls === 1)
         return JSON.stringify({
@@ -310,7 +282,25 @@ it("preserves attribute filters in follow-up queries and prunes to a fixed point
         ],
       });
     },
-  );
+    onlyEntities: ["namespaces", "classes", "attributes"],
+    prune(data) {
+      prunes++;
+      if (data.attributes?.length) {
+        data.attributes.pop();
+      }
+    },
+    multipass: {
+      policies: [
+        {
+          name: "testPolicy3",
+          entity: "classes",
+          select(row, details) {
+            details.request("attributes", { attrelid: "2" }, ["initial"]);
+          },
+        },
+      ],
+    },
+  });
   assert.equal(calls, 2);
   assert.equal(prunes, 3);
   assert.deepEqual(result.attributes, []);
@@ -319,29 +309,8 @@ it("preserves attribute filters in follow-up queries and prunes to a fixed point
 it("does not refetch a complete collection from the initial query", async () => {
   let calls = 0;
   const expanded: string[] = [];
-  const result = await introspectRaw(
-    {
-      onlyEntities: ["namespaces", "classes", "attributes"],
-      multipass: {
-        policies: [
-          {
-            name: "testPolicy4",
-            entity: "classes",
-            select(row, details) {
-              details.request("attributes", { attrelid: row._id }, ["initial"]);
-            },
-          },
-          {
-            name: "testPolicy5",
-            entity: "attributes",
-            select(row, details) {
-              expanded.push(row.attname);
-            },
-          },
-        ],
-      },
-    },
-    async () => {
+  const result = await introspectRaw({
+    async runQuery() {
       calls++;
       return JSON.stringify({
         ...metadata,
@@ -350,41 +319,47 @@ it("does not refetch a complete collection from the initial query", async () => 
         attributes: [{ attrelid: "1", attnum: 1, attname: "id" }],
       });
     },
-  );
+    onlyEntities: ["namespaces", "classes", "attributes"],
+    multipass: {
+      policies: [
+        {
+          name: "testPolicy4",
+          entity: "classes",
+          select(row, details) {
+            details.request("attributes", { attrelid: row._id }, ["initial"]);
+          },
+        },
+        {
+          name: "testPolicy5",
+          entity: "attributes",
+          select(row, details) {
+            expanded.push(row.attname);
+          },
+        },
+      ],
+    },
+  });
   assert.equal(calls, 1);
   assert.deepEqual(expanded, ["id"]);
   assert.equal(result.attributes.length, 1);
 });
 
 it("does not add parameters for metadata-only selections", async () => {
-  await introspectRaw(
-    { onlyEntities: ["descriptions"], multipass: {} },
-    async (text, values) => {
+  await introspectRaw({
+    async runQuery(text, values) {
       assert.deepEqual(values, []);
       assert.doesNotMatch(text, /\$1/);
       return JSON.stringify({ ...metadata, descriptions: [] });
     },
-  );
+    onlyEntities: ["descriptions"],
+    multipass: {},
+  });
 });
 
 it("applies policies to singular collections", async () => {
   let calls = 0;
-  const result = await introspectRaw(
-    {
-      onlyEntities: ["database", "roles"],
-      multipass: {
-        policies: [
-          {
-            name: "testPolicy6",
-            entity: "database",
-            select(row, details) {
-              details.request("roles", { _id: row.datdba }, ["initial"]);
-            },
-          },
-        ],
-      },
-    },
-    async () => {
+  const result = await introspectRaw({
+    async runQuery() {
       calls++;
       if (calls === 1)
         return JSON.stringify({
@@ -394,7 +369,19 @@ it("applies policies to singular collections", async () => {
         });
       return JSON.stringify({ roles: [{ _id: "2", rolname: "owner" }] });
     },
-  );
+    onlyEntities: ["database", "roles"],
+    multipass: {
+      policies: [
+        {
+          name: "testPolicy6",
+          entity: "database",
+          select(row, details) {
+            details.request("roles", { _id: row.datdba }, ["initial"]);
+          },
+        },
+      ],
+    },
+  });
   assert.equal(calls, 2);
   assert.equal(result.database.datdba, "2");
   assert.equal(result.roles[0].rolname, "owner");
@@ -402,26 +389,8 @@ it("applies policies to singular collections", async () => {
 
 it("applies entrypoint filters only to discovery and retains global filters", async () => {
   let calls = 0;
-  await introspectRaw(
-    {
-      onlyEntities: ["namespaces", "types"],
-      filters: { types: "typname <> 'excluded'" },
-      multipass: {
-        entrypointFilters: { types: "typname <> 'dependency'" },
-        policies: [
-          {
-            name: "testPolicy7",
-            entity: "types",
-            select: (row, details) => {
-              if (row._id === "1") {
-                details.request("types", { _id: "2" }, ["initial"]);
-              }
-            },
-          },
-        ],
-      },
-    },
-    async (text) => {
+  await introspectRaw({
+    async runQuery(text) {
       calls++;
       assert.ok(text.includes("typname <> 'excluded'"));
       if (calls === 1) {
@@ -436,7 +405,23 @@ it("applies entrypoint filters only to discovery and retains global filters", as
         return JSON.stringify({ types: [{ _id: "2" }] });
       }
     },
-  );
+    onlyEntities: ["namespaces", "types"],
+    filters: { types: "typname <> 'excluded'" },
+    multipass: {
+      entrypointFilters: { types: "typname <> 'dependency'" },
+      policies: [
+        {
+          name: "testPolicy7",
+          entity: "types",
+          select: (row, details) => {
+            if (row._id === "1") {
+              details.request("types", { _id: "2" }, ["initial"]);
+            }
+          },
+        },
+      ],
+    },
+  });
   assert.equal(calls, 2);
 });
 
@@ -450,33 +435,8 @@ for (const filtered of ["attributes", "descriptions"] as const) {
       objsubid: 0,
       description: "Table comment",
     };
-    const result = await introspectRaw(
-      {
-        onlyEntities: [
-          "namespaces",
-          "classes",
-          "attributes",
-          "constraints",
-          "descriptions",
-        ],
-        multipass: {
-          entrypointFilters: { [filtered]: "false" },
-          policies: [
-            {
-              name: "testPolicy8",
-              entity: "classes",
-              select: (row, { request }) => {
-                request("attributes", { attrelid: row._id }, ["initial"]);
-                request("constraints", { conrelid: row._id }, ["initial"]);
-                request("descriptions", { classoid: "1259", objoid: row._id }, [
-                  "initial",
-                ]);
-              },
-            },
-          ],
-        },
-      },
-      async (_text, values) => {
+    const result = await introspectRaw({
+      async runQuery(_text, values) {
         calls++;
         if (calls === 1) {
           return JSON.stringify({
@@ -499,7 +459,30 @@ for (const filtered of ["attributes", "descriptions"] as const) {
           });
         }
       },
-    );
+      onlyEntities: [
+        "namespaces",
+        "classes",
+        "attributes",
+        "constraints",
+        "descriptions",
+      ],
+      multipass: {
+        entrypointFilters: { [filtered]: "false" },
+        policies: [
+          {
+            name: "testPolicy8",
+            entity: "classes",
+            select: (row, { request }) => {
+              request("attributes", { attrelid: row._id }, ["initial"]);
+              request("constraints", { conrelid: row._id }, ["initial"]);
+              request("descriptions", { classoid: "1259", objoid: row._id }, [
+                "initial",
+              ]);
+            },
+          },
+        ],
+      },
+    });
     assert.equal(calls, 2);
     assert.deepEqual(result.attributes, [attribute]);
     assert.deepEqual(result.descriptions, [description]);
@@ -509,52 +492,8 @@ for (const filtered of ["attributes", "descriptions"] as const) {
 it("propagates new purposes through satisfied group selectors and only reruns affected policies", async () => {
   const visits: string[] = [];
   let calls = 0;
-  await introspectRaw(
-    {
-      onlyEntities: ["namespaces", "classes", "attributes"],
-      multipass: {
-        policies: [
-          {
-            name: "classKeys",
-            entity: "classes",
-            select(row, details) {
-              details.request("attributes", { attrelid: row._id }, ["keys"]);
-            },
-          },
-          {
-            name: "upgrade",
-            entity: "attributes",
-            select(row, details) {
-              if (!details.hasPurpose("keys")) {
-                return;
-              }
-
-              details.request("attributes", { attrelid: row.attrelid }, [
-                "all",
-                "unrelated",
-              ]);
-            },
-          },
-          {
-            name: "consumer",
-            entity: "attributes",
-            select(row, details) {
-              visits.push(
-                `${row.attnum}:${details.hasPurpose("keys")}:${details.hasPurpose("all")}`,
-              );
-            },
-          },
-          {
-            name: "unconditional",
-            entity: "attributes",
-            select(row, details) {
-              visits.push(`once:${row.attnum}`);
-            },
-          },
-        ],
-      },
-    },
-    async () => {
+  await introspectRaw({
+    async runQuery() {
       calls++;
       return JSON.stringify({
         ...metadata,
@@ -566,7 +505,49 @@ it("propagates new purposes through satisfied group selectors and only reruns af
         ],
       });
     },
-  );
+    onlyEntities: ["namespaces", "classes", "attributes"],
+    multipass: {
+      policies: [
+        {
+          name: "classKeys",
+          entity: "classes",
+          select(row, details) {
+            details.request("attributes", { attrelid: row._id }, ["keys"]);
+          },
+        },
+        {
+          name: "upgrade",
+          entity: "attributes",
+          select(row, details) {
+            if (!details.hasPurpose("keys")) {
+              return;
+            }
+
+            details.request("attributes", { attrelid: row.attrelid }, [
+              "all",
+              "unrelated",
+            ]);
+          },
+        },
+        {
+          name: "consumer",
+          entity: "attributes",
+          select(row, details) {
+            visits.push(
+              `${row.attnum}:${details.hasPurpose("keys")}:${details.hasPurpose("all")}`,
+            );
+          },
+        },
+        {
+          name: "unconditional",
+          entity: "attributes",
+          select(row, details) {
+            visits.push(`once:${row.attnum}`);
+          },
+        },
+      ],
+    },
+  });
   assert.equal(calls, 1);
   assert.equal(visits.filter((v) => v.startsWith("once:")).length, 2);
   assert.ok(visits.includes("1:true:true"));
@@ -602,22 +583,8 @@ for (const [name, match, expectedCalls] of [
 ] as const) {
   it(`only skips fetching an existing unique match: ${name}`, async () => {
     let calls = 0;
-    await introspectRaw(
-      {
-        onlyEntities: ["attributes"],
-        multipass: {
-          policies: [
-            defineIntrospectionPolicy({
-              name: "requestAttribute",
-              entity: "attributes",
-              select(_row, details) {
-                details.request("attributes", match, ["keys"]);
-              },
-            }),
-          ],
-        },
-      },
-      async () => {
+    await introspectRaw({
+      async runQuery() {
         calls++;
         return JSON.stringify(
           calls === 1
@@ -635,7 +602,19 @@ for (const [name, match, expectedCalls] of [
             : { attributes: [] },
         );
       },
-    );
+      onlyEntities: ["attributes"],
+      multipass: {
+        policies: [
+          defineIntrospectionPolicy({
+            name: "requestAttribute",
+            entity: "attributes",
+            select(_row, details) {
+              details.request("attributes", match, ["keys"]);
+            },
+          }),
+        ],
+      },
+    });
     assert.equal(calls, expectedCalls);
   });
 }
@@ -656,15 +635,15 @@ for (const invalid of ["empty", "duplicate"] as const) {
       },
     };
     await assert.rejects(
-      introspectRaw(
-        {
-          onlyEntities: ["namespaces"],
-          multipass: {
-            policies: invalid === "duplicate" ? [policy, policy] : [policy],
-          },
+      introspectRaw({
+        async runQuery() {
+          return JSON.stringify({ ...metadata, namespaces: [{ _id: "1" }] });
         },
-        async () => JSON.stringify({ ...metadata, namespaces: [{ _id: "1" }] }),
-      ),
+        onlyEntities: ["namespaces"],
+        multipass: {
+          policies: invalid === "duplicate" ? [policy, policy] : [policy],
+        },
+      }),
       /badPolicy/,
     );
   });
@@ -703,27 +682,8 @@ it("merges overlapping requests independently of policy order", async () => {
       },
     ];
     const observed: Record<string, boolean[]> = {};
-    await introspectRaw(
-      {
-        onlyEntities: ["namespaces", "classes", "attributes"],
-        multipass: {
-          entrypointFilters: { attributes: "false" },
-          policies: [
-            ...(reverse ? policies.reverse() : policies),
-            {
-              name: "observe",
-              entity: "attributes",
-              select(row, details) {
-                observed[row.attnum] = [
-                  details.hasPurpose("keys"),
-                  details.hasPurpose("all"),
-                ];
-              },
-            },
-          ],
-        },
-      },
-      async () => {
+    await introspectRaw({
+      async runQuery() {
         calls++;
         return calls === 1
           ? JSON.stringify({
@@ -739,7 +699,24 @@ it("merges overlapping requests independently of policy order", async () => {
               ],
             });
       },
-    );
+      onlyEntities: ["namespaces", "classes", "attributes"],
+      multipass: {
+        entrypointFilters: { attributes: "false" },
+        policies: [
+          ...(reverse ? policies.reverse() : policies),
+          {
+            name: "observe",
+            entity: "attributes",
+            select(row, details) {
+              observed[row.attnum] = [
+                details.hasPurpose("keys"),
+                details.hasPurpose("all"),
+              ];
+            },
+          },
+        ],
+      },
+    });
     assert.equal(calls, 2);
     return observed;
   };
@@ -760,28 +737,26 @@ for (const value of [0, "0"]) {
   ] as const) {
     it(`${skipped ? "skips" : "retains"} ${entity}.${column} = ${JSON.stringify(value)} requests`, async () => {
       let calls = 0;
-      await introspectRaw(
-        {
-          onlyEntities: ["namespaces", entity],
-          multipass: {
-            policies: [
-              {
-                name: "zeroSelector",
-                entity: "namespaces",
-                select(_row, details) {
-                  details.request(entity, { [column]: value }, ["keys"]);
-                },
-              },
-            ],
-          },
-        },
-        async () => {
+      await introspectRaw({
+        async runQuery() {
           calls++;
           return JSON.stringify(
             calls === 1 ? { ...metadata, namespaces: [{ _id: "1" }] } : {},
           );
         },
-      );
+        onlyEntities: ["namespaces", entity],
+        multipass: {
+          policies: [
+            {
+              name: "zeroSelector",
+              entity: "namespaces",
+              select(_row, details) {
+                details.request(entity, { [column]: value }, ["keys"]);
+              },
+            },
+          ],
+        },
+      });
       assert.equal(calls, skipped ? 1 : 2);
     });
   }

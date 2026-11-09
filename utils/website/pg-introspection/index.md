@@ -11,13 +11,13 @@ your editor.
 
 ## Usage
 
-Call `introspect(options, runQuery)`.
+Call `introspect(options)`.
 
 ```ts
 import { introspect } from "pg-introspection";
 import { runQuery } from "./runQuery.ts";
 
-const introspection = await introspect({}, runQuery);
+const introspection = await introspect({ runQuery });
 console.log(introspection.database.getDba()?.rolname);
 ```
 
@@ -36,7 +36,22 @@ If you were using the deprecated `makeIntrospectionQuery` and
 `parseIntrospectionResults` functions, see [Migrating v1 to v2](./v1-to-v2.md)
 for a migration guide.
 
-## runQuery
+## `options`
+
+Out of the box pg-introspection sets the options it thinks are generally useful
+for many applications; however you can pass various options to influence
+pg-introspection's behaviors. For example, if you only need to know about
+certain types of entities (tables and columns, for example) you can use
+`onlyEntities`, or if you want to minimize the amount of data returned from
+introspection (at the cost of potentially more than one query to the database)
+you can use `multipass`.
+
+Any SQL you pass via options is treated as trusted; it is simply interpolated so
+do not feed any untrusted input into it or you risk SQL injection.
+
+### `runQuery`
+
+This is the only required option.
 
 This library does not make connections to PostgreSQL on its own, to do so you
 pass a `runQuery` callback. This callback is given SQL text and parameter values
@@ -56,19 +71,6 @@ export async function runQuery(text: string, values: unknown[]) {
   return rows[0].introspection;
 }
 ```
-
-## `options`
-
-Out of the box pg-introspection sets the options it thinks are generally useful
-for many applications; however you can pass various options to influence
-pg-introspection's behaviors. For example, if you only need to know about
-certain types of entities (tables and columns, for example) you can use
-`onlyEntities`, or if you want to minimize the amount of data returned from
-introspection (at the cost of potentially more than one query to the database)
-you can use `multipass`.
-
-Any SQL you pass via options is treated as trusted; it is simply interpolated so
-do not feed any untrusted input into it or you risk SQL injection.
 
 ### `onlyEntites`
 
@@ -160,14 +162,13 @@ for a complete policy example, purposes, permission filtering and pruning.
 
 ## Raw data and caching
 
-`introspectRaw(options, runQuery)` returns plain data without navigation helpers.
+`introspectRaw(options)` returns plain data without navigation helpers.
 Use it to cache introspection results, then augment a fresh clone for each
 consumer:
 
 ```ts
 import type { IntrospectionData, IntrospectOptions } from "pg-introspection";
 import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
-import { runQuery } from "./runQuery.ts";
 
 // You might cache elsewhere; WeakMap is just an example.
 const cache = new WeakMap<IntrospectOptions, Promise<IntrospectionData>>();

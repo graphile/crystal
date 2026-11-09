@@ -67,19 +67,14 @@ const pool = new Pool({
 
 async function main() {
   try {
-    const data = await introspectRaw(
-      {
-        onlyEntities: ["namespaces", "procs", "types"],
-        multipass: {
-          entrypointFilters: { namespaces: "nspname = 'app_public'" },
-          policies: [returnTypes],
-        },
+    const data = await introspectRaw({
+      runQuery,
+      onlyEntities: ["namespaces", "procs", "types"],
+      multipass: {
+        entrypointFilters: { namespaces: "nspname = 'app_public'" },
+        policies: [returnTypes],
       },
-      async (text, values) => {
-        const { rows } = await pool.query(text, values);
-        return rows[0].introspection;
-      },
-    );
+    });
     console.log(data.procs.length, data.types.length);
   } finally {
     await pool.end();
