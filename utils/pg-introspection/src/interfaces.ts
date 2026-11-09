@@ -205,9 +205,16 @@ export type Introspection<TEntities extends EntityType = DefaultEntities> =
       getConstraint(by: { id: string }): PgConstraint | undefined;
       getProc(by: { id: string }): PgProc | undefined;
       getRoles(by: { id: string }): PgRoles | undefined;
-      getType(by: { id: string }): PgType | undefined;
+      getType(
+        by:
+          | { id: string }
+          | { schemaName: string; name: string }
+          | { arrayId: string },
+      ): PgType | undefined;
       getEnum(by: { id: string }): PgEnum | undefined;
-      getExtension(by: { id: string }): PgExtension | undefined;
+      getExtension(
+        by: { id: string } | { name: string },
+      ): PgExtension | undefined;
       getIndex(by: { id: string }): PgIndex | undefined;
       getLanguage(by: { id: string }): PgLanguage | undefined;
     };

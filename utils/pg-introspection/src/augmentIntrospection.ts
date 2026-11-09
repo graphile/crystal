@@ -458,17 +458,45 @@ export function augmentIntrospectionData<
       assertExists(lookups.roleById, "roles");
       return lookups.roleById.get(by.id);
     },
-    getType: (by: { id: string }) => {
+    getType: (
+      by:
+        | { id: string }
+        | { schemaName: string; name: string }
+        | { arrayId: string },
+    ) => {
       assertExists(lookups.typeById, "types");
-      return lookups.typeById.get(by.id);
+      if ("id" in by) {
+        return lookups.typeById.get(by.id);
+      } else {
+        for (const type of lookups.typeById.values()) {
+          if (
+            "arrayId" in by
+              ? type.typarray === by.arrayId
+              : type.typname === by.name &&
+                type.getNamespace()?.nspname === by.schemaName
+          ) {
+            return type;
+          }
+        }
+        return undefined;
+      }
     },
     getEnum: (by: { id: string }) => {
       assertExists(lookups.enumById, "enums");
       return lookups.enumById.get(by.id);
     },
-    getExtension: (by: { id: string }) => {
+    getExtension: (by: { id: string } | { name: string }) => {
       assertExists(lookups.extensionById, "extensions");
-      return lookups.extensionById.get(by.id);
+      if ("id" in by) {
+        return lookups.extensionById.get(by.id);
+      } else {
+        for (const extension of lookups.extensionById.values()) {
+          if (extension.extname === by.name) {
+            return extension;
+          }
+        }
+        return undefined;
+      }
     },
     getIndex: (by: { id: string }) => {
       assertExists(lookups.indexById, "indexes");
