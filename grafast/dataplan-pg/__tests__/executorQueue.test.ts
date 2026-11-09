@@ -1,5 +1,6 @@
 import { EXPORTABLE } from "../dist/datasource.js";
 import { PgExecutor } from "../dist/executor.js";
+
 function makeExecutor() {
   return EXPORTABLE(
     (PgExecutor) =>
@@ -10,22 +11,12 @@ function makeExecutor() {
 
 function makeContext(query: (opts: any, clientNumber: number) => Promise<any>) {
   let clientCount = 0;
-  const seen: Array<{
-    clientNumber: number;
-    text: string;
-    name?: string;
-    values: readonly unknown[];
-  }> = [];
+  const seen: Array<{ clientNumber: number; text: string; name?: string }> = [];
   const withPgClient = jest.fn(async (_settings, callback) => {
     const clientNumber = ++clientCount;
     const client = {
       query: async (opts: any) => {
-        seen.push({
-          clientNumber,
-          text: opts.text,
-          name: opts.name,
-          values: opts.values,
-        });
+        seen.push({ clientNumber, text: opts.text, name: opts.name });
         return query(opts, clientNumber);
       },
       withTransaction: async (callback: any) => callback(client),

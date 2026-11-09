@@ -180,7 +180,6 @@ export function executeLoad<
       executeLoadBatch,
       unaryDependencies,
       batchSpecs,
-      "strict",
     );
     return (async () => {
       const loaded = await loadResults;

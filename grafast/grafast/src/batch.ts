@@ -84,26 +84,22 @@ export function batchInMeta<
       resolve: resolve as (values: readonly unknown[]) => void,
       reject,
     };
-    let family = families!.find((candidate) =>
+    const family = families.find((candidate) =>
       familyMatches(candidate, callback, unaryDependencies, keysetEquality),
     );
     if (family != null) {
       family.calls.push(call);
     } else {
-      family = {
+      const newFamily: BatchFamily = {
         callback,
         unaryDependencies,
         keysetEquality,
         calls: [call],
       };
-      families!.push(family);
+      families.push(newFamily);
       queueMicrotask(() => {
-        const currentFamilies = typedMeta[batchesSymbol];
-        const index = currentFamilies?.indexOf(family!);
-        if (index !== undefined && index !== -1) {
-          currentFamilies!.splice(index, 1);
-        }
-        void executeFamily(family!);
+        families.splice(families.indexOf(newFamily), 1);
+        void executeFamily(newFamily);
       });
     }
   });
