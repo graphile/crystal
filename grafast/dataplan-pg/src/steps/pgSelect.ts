@@ -64,11 +64,6 @@ import type {
 } from "../interfaces.ts";
 import { parseArray } from "../parseArray.ts";
 import { PgLocker } from "../pgLocker.ts";
-import {
-  executePgStepBatch,
-  getPgStepBatchInfo,
-  pgStepBatchMetaKey,
-} from "./pgStepBatch.ts";
 import type {
   PlantimeEmbeddable,
   RuntimeEmbeddable,
@@ -88,6 +83,11 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import {
+  executePgStepBatch,
+  getPgStepBatchInfo,
+  pgStepBatchMetaKey,
+} from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,

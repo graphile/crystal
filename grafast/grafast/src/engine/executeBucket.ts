@@ -1,6 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
+import { batchInMeta } from "../batch.ts";
 import type { Bucket, RequestTools, SharedBucketState } from "../bucket.ts";
 import {
   $$streamMore,
@@ -13,7 +14,6 @@ import {
   NO_FLAGS,
 } from "../constants.ts";
 import { isDev } from "../dev.ts";
-import { batchInMeta } from "../batch.ts";
 import { flagError, isFlaggedValue, SafeError } from "../error.ts";
 import { inspect } from "../inspect.ts";
 import type {

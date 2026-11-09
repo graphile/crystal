@@ -41,11 +41,6 @@ import type {
   ReadonlyArrayOrDirect,
 } from "../interfaces.ts";
 import { PgLocker } from "../pgLocker.ts";
-import {
-  executePgStepBatch,
-  getPgStepBatchInfo,
-  pgStepBatchMetaKey,
-} from "./pgStepBatch.ts";
 import type { PlantimeEmbeddable, RuntimeSQLThunk } from "../utils.ts";
 import { makeScopedSQL, runtimeScopedSQL } from "../utils.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
@@ -59,6 +54,11 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import {
+  executePgStepBatch,
+  getPgStepBatchInfo,
+  pgStepBatchMetaKey,
+} from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,

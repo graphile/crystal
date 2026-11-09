@@ -1,4 +1,5 @@
-import type { BatchCallback, ExecutionEventEmitter } from "grafast";
+import type { BatchCallback } from "grafast";
+
 import type {
   PgExecutor,
   PgExecutorContext,
