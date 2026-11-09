@@ -1066,7 +1066,7 @@ on (${sql.indent(
         ? {
             values: await executionDetails.batch(
               executePgStepBatch,
-              [getPgStepBatchInfo(this.executor, context, common)],
+              [getPgStepBatchInfo(extra.meta!, this.executor, context, common)],
               specs.map(({ queryValues }) => queryValues),
               "tuple",
             ),

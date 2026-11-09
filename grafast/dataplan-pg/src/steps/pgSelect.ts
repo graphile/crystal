@@ -1323,18 +1323,26 @@ export class PgSelectStep<
         eventEmitter,
         useTransaction: isMutation,
       };
-      const executionResult = specs.length
-        ? executeMethod === "executeWithCache" && !isMutation
-          ? {
-              values: await executionDetails.batch(
-                executePgStepBatch,
-                [getPgStepBatchInfo(this.resource.executor, context, common)],
-                specs.map(({ queryValues }) => queryValues),
-                "tuple",
-              ),
-            }
-          : await this.resource[executeMethod](specs, common)
-        : null;
+      const executionResult =
+        specs.length > 0
+          ? executeMethod === "executeWithCache" && !isMutation
+            ? {
+                values: await executionDetails.batch(
+                  executePgStepBatch,
+                  [
+                    getPgStepBatchInfo(
+                      extra.meta!,
+                      this.resource.executor,
+                      context,
+                      common,
+                    ),
+                  ],
+                  specs.map(({ queryValues }) => queryValues),
+                  "tuple",
+                ),
+              }
+            : await this.resource[executeMethod](specs, common)
+          : null;
       // debugExecute("%s; result: %c", this, executionResult);
 
       return indexMap((i) => {

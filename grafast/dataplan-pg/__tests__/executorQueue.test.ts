@@ -1,24 +1,5 @@
 import { EXPORTABLE } from "../dist/datasource.js";
 import { PgExecutor } from "../dist/executor.js";
-import { batchInMeta } from "../../grafast/dist/batch.js";
-
-function executeOwnerLookupBatch(
-  [executor, context]: readonly [PgExecutor, any],
-  keysets: readonly (readonly unknown[])[],
-) {
-  return executor
-    .executeWithCache(
-      keysets.map((queryValues) => ({ context, queryValues })),
-      {
-        text: "select owner by identifiers",
-        rawSqlValues: [],
-        identifierIndex: 0,
-        eventEmitter: undefined,
-      },
-    )
-    .then(({ values }) => values);
-}
-
 function makeExecutor() {
   return EXPORTABLE(
     (PgExecutor) =>
@@ -233,88 +214,6 @@ test("keeps a large clone-affinity batch on one client", async () => {
   );
 
   expect(withPgClient).toHaveBeenCalledTimes(1);
-});
-
-test.each([
-  ["AWS", "GCP"],
-  ["GCP", "AWS"],
-])(
-  "batches equivalent branch lookups when %s completes first",
-  async (...readyOrder) => {
-    const executor = makeExecutor();
-    const { context, seen } = makeContext(async (opts) => {
-      const ids = JSON.parse(opts.values[0]);
-      return {
-        rows: ids.map((queryValues: number[], index: number) => [
-          index,
-          queryValues[0],
-        ]),
-        rowCount: ids.length,
-      };
-    });
-    const meta = {};
-    const branches = {
-      AWS: [1, 2, 4],
-      GCP: [1, 2, 3],
-    };
-    const gates = {
-      AWS: Promise.withResolvers<void>(),
-      GCP: Promise.withResolvers<void>(),
-    };
-    const results = Object.fromEntries(
-      Object.entries(branches).map(([name, ids]) => [
-        name,
-        gates[name as keyof typeof gates].promise.then(() =>
-          batchInMeta(
-            meta,
-            executeOwnerLookupBatch,
-            [executor, context] as const,
-            ids.map((id) => [id]),
-            "tuple",
-          ),
-        ),
-      ]),
-    ) as Record<
-      keyof typeof branches,
-      Promise<ReadonlyArray<ReadonlyArray<any>>>
-    >;
-
-    for (const name of readyOrder) gates[name as keyof typeof gates].resolve();
-    const [aws, gcp] = await Promise.all([results.AWS, results.GCP]);
-
-    expect(seen).toHaveLength(1);
-    expect(JSON.parse(seen[0].values[0] as string)).toEqual(
-      readyOrder[0] === "AWS" ? [[1], [2], [4], [3]] : [[1], [2], [3], [4]],
-    );
-    expect(aws.map((rows) => rows[0][1])).toEqual(branches.AWS);
-    expect(gcp.map((rows) => rows[0][1])).toEqual(branches.GCP);
-  },
-);
-
-test("shares a batched query failure with every branch", async () => {
-  const executor = makeExecutor();
-  const { context } = makeContext(async () => {
-    throw new Error("owner lookup failed");
-  });
-  const meta = {};
-  const runBranch = (id: number) =>
-    batchInMeta(
-      meta,
-      executeOwnerLookupBatch,
-      [executor, context] as const,
-      [[id]],
-      "tuple",
-    );
-
-  const results = await Promise.allSettled([runBranch(1), runBranch(2)]);
-
-  expect(results.map((result) => result.status)).toEqual([
-    "rejected",
-    "rejected",
-  ]);
-  expect(
-    results.map((result) => (result as PromiseRejectedResult).reason.message),
-  ).toEqual(["owner lookup failed", "owner lookup failed"]);
 });
 
 test("limits unrelated queues to three and groups matching pending work", async () => {

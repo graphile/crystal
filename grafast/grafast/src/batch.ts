@@ -19,44 +19,27 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 
 const batchesSymbol = Symbol("Grafast tick batches");
 
-function keysetsMatch(
-  left: unknown,
-  right: unknown,
-  mode: BatchKeysetEquality,
-): boolean {
-  if (mode === "strict") return left === right;
+type KeyIndex = { children: Map<unknown, KeyIndex>; index?: number };
 
+function keyParts(
+  keyset: unknown,
+  mode: BatchKeysetEquality,
+): readonly unknown[] {
+  if (mode === "strict") {
+    return [keyset];
+  }
   if (mode === "tuple") {
-    if (!Array.isArray(left) || !Array.isArray(right)) {
+    if (!Array.isArray(keyset)) {
       throw new Error("batch(..., 'tuple') requires array keysets");
     }
-    return (
-      left.length === right.length &&
-      left.every((value, index) => value === right[index])
-    );
+    return keyset;
   }
-
-  if (
-    typeof left !== "object" ||
-    left === null ||
-    Array.isArray(left) ||
-    typeof right !== "object" ||
-    right === null ||
-    Array.isArray(right)
-  ) {
+  if (typeof keyset !== "object" || keyset === null || Array.isArray(keyset)) {
     throw new Error("batch(..., 'object') requires object keysets");
   }
-  const leftKeys = Object.keys(left);
-  const rightKeys = Object.keys(right);
-  return (
-    leftKeys.length === rightKeys.length &&
-    leftKeys.every(
-      (key) =>
-        Object.prototype.hasOwnProperty.call(right, key) &&
-        (left as Record<string, unknown>)[key] ===
-          (right as Record<string, unknown>)[key],
-    )
-  );
+  return Object.keys(keyset)
+    .sort()
+    .flatMap((key) => [key, (keyset as Record<string, unknown>)[key]]);
 }
 
 function familyMatches(
@@ -91,7 +74,9 @@ export function batchInMeta<
 
   const typedMeta = meta as BatchMeta;
   let families = typedMeta[batchesSymbol];
-  if (!families) typedMeta[batchesSymbol] = families = [];
+  if (families == null) {
+    typedMeta[batchesSymbol] = families = [];
+  }
 
   return new Promise<ReadonlyArray<TResult>>((resolve, reject) => {
     const call: PendingCall = {
@@ -102,7 +87,7 @@ export function batchInMeta<
     let family = families!.find((candidate) =>
       familyMatches(candidate, callback, unaryDependencies, keysetEquality),
     );
-    if (family) {
+    if (family != null) {
       family.calls.push(call);
     } else {
       family = {
@@ -128,14 +113,26 @@ async function executeFamily(family: BatchFamily): Promise<void> {
   try {
     const uniqueKeysets: unknown[] = [];
     const resultIndexes: number[][] = [];
+    const root: KeyIndex = { children: new Map() };
     for (const call of family.calls) {
       const indexes: number[] = [];
       for (const keyset of call.keysets) {
-        let index = uniqueKeysets.findIndex((existing) =>
-          keysetsMatch(existing, keyset, family.keysetEquality),
-        );
-        if (index === -1) {
+        let node = root;
+        for (const part of keyParts(keyset, family.keysetEquality)) {
+          // Map treats NaN as equal to itself, unlike the strict equality used here.
+          const key =
+            typeof part === "number" && Number.isNaN(part) ? Symbol() : part;
+          let child = node.children.get(key);
+          if (child == null) {
+            child = { children: new Map() };
+            node.children.set(key, child);
+          }
+          node = child;
+        }
+        let index = node.index;
+        if (index === undefined) {
           index = uniqueKeysets.push(keyset) - 1;
+          node.index = index;
         }
         indexes.push(index);
       }

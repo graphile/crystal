@@ -104,6 +104,9 @@ into 4 main categories based on the root folders, each of which have a
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
   verbs.
 - Always use a block body for `if`, `for`, and `while` statements.
+- Prefer explicit checks over implicit boolean coercion: use `foo.length > 0`
+  rather than `foo.length`, and use `foo == null` to check for non-existence
+  rather than `!foo`.
 - Prefer `if`/`else if`/`else` over early return in general, but not when
   determining if a hook or middleware should apply, and not where it would cause
   deep nesting. (In hooks/middleware we want to return ASAP if the hook isn't
