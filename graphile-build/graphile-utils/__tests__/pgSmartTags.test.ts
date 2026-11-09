@@ -11,7 +11,7 @@ import type {
   PgProc,
   PgType,
 } from "pg-introspection";
-import { makeSchema } from "postgraphile";
+import { makeSchema, watchSchema } from "postgraphile";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
@@ -19,6 +19,7 @@ import { jsonPgSmartTags, pgSmartTags } from "../dist/index.js";
 import {
   type PgSmartTagRule,
   pgSmartTagRulesFromJSON,
+  type UpdatePgSmartTagRulesCallback,
 } from "../dist/makePgSmartTagsPlugin.js";
 
 declare global {
@@ -430,4 +431,117 @@ it("pgSmartTagRulesFromJSON validates version", () => {
   expect(() =>
     pgSmartTagRulesFromJSON({ version: 2, config: {} } as any),
   ).toThrow(/only supports the version 1 smart tags JSON format/);
+});
+
+it.each([
+  ["a name", "graphile_utils.pets"],
+  ["a function", (rel: { relname: string }) => rel.relname === "pets"],
+] as const)(
+  "pgSmartTags @foreignKey rules matched by %s discover targets outside the introspected schemas",
+  async (_description, match) => {
+    const introspection = await getIntrospectionWithSmartTags(
+      [
+        {
+          kind: "class",
+          match,
+          tags: {
+            foreignKey: "(type) references smart_tags_hidden.pet_type (type)",
+          },
+        },
+      ],
+      {
+        setupSql: [
+          "create schema smart_tags_hidden;",
+          "create table smart_tags_hidden.pet_type (type text primary key);",
+          "create table smart_tags_hidden.unrelated (id int primary key);",
+        ],
+        teardownSql: ["drop schema smart_tags_hidden cascade;"],
+      },
+    );
+    const fake = introspection.constraints.find(
+      (con) =>
+        con.contype === "f" &&
+        con.getClass()?.relname === "pets" &&
+        con.getForeignClass()?.relname === "pet_type",
+    );
+    expect(fake).toBeDefined();
+    expect(fake!.getForeignClass()!.getNamespace()!.nspname).toEqual(
+      "smart_tags_hidden",
+    );
+    expect(
+      introspection.classes.some((rel) => rel.relname === "unrelated"),
+    ).toBe(false);
+  },
+);
+
+it("pgSmartTags rediscovers @foreignKey targets when watched rules change", async () => {
+  await pgPool!.query(
+    "create schema smart_tags_watch; create table smart_tags_watch.pet_type (type text primary key);",
+  );
+  const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+  let update: UpdatePgSmartTagRulesCallback | null = null;
+  const introspections: Introspection[] = [];
+  const waiters: Array<() => void> = [];
+  const nextIntrospection = (count: number) =>
+    new Promise<void>((resolve) => {
+      if (introspections.length >= count) resolve();
+      else waiters.push(resolve);
+    });
+  const InspectSmartTagsPlugin: GraphileConfig.Plugin = {
+    name: "InspectSmartTagsPlugin",
+    after: ["smart-tags"],
+    gather: {
+      hooks: {
+        pgIntrospection_introspection(_info, event) {
+          introspections.push(event.introspection);
+          waiters.splice(0).forEach((resolve) => resolve());
+        },
+      },
+    },
+  };
+  const fakeForeignKey = (introspection: Introspection) =>
+    introspection.constraints.find(
+      (con) =>
+        con.contype === "f" &&
+        con.getClass()?.relname === "pets" &&
+        con.getForeignClass()?.relname === "pet_type",
+    );
+  // Watch mode LISTENs via the service's subscriber until it is released.
+  const pgService = makePgService({
+    pool: pgPool!,
+    schemas: ["graphile_utils"],
+  });
+  let stop: (() => void) | undefined;
+  try {
+    stop = await watchSchema(
+      {
+        ...makePreset([
+          pgSmartTags([], (callback) => {
+            update = callback;
+          }),
+          InspectSmartTagsPlugin,
+        ]),
+        pgServices: [pgService],
+      },
+      (error) => {
+        if (error) throw error;
+      },
+    );
+    await nextIntrospection(1);
+    expect(fakeForeignKey(introspections[0])).toBeUndefined();
+    update!({
+      kind: "class",
+      match: "graphile_utils.pets",
+      tags: {
+        foreignKey: "(type) references smart_tags_watch.pet_type (type)",
+      },
+    });
+    await nextIntrospection(2);
+    expect(fakeForeignKey(introspections[1])).toBeDefined();
+  } finally {
+    stop?.();
+    await pgService.release?.();
+    warn.mockRestore();
+    await pgPool!.query("drop schema smart_tags_watch cascade;");
+  }
 });

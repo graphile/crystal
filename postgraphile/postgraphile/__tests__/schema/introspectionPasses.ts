@@ -1,7 +1,7 @@
 /** Maximum observed query counts for each schema fixture. */
 const maximumPasses: Record<string, number> = {
   "a,b,c": 4,
-  b: 5,
+  b: 8,
   c: 8,
   cjk: 4,
   d: 4,

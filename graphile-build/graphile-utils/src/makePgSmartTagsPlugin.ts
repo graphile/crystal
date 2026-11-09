@@ -6,6 +6,8 @@ import { inspect } from "node:util";
 import { gatherConfig } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type {
+  IntrospectionContinuationDetails,
+  IntrospectionPolicy,
   PgAttribute,
   PgClass,
   PgConstraint,
@@ -198,6 +200,8 @@ interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
   kind: TKind;
   match: PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+  /** For 'class' rules matched by name; usable before introspection completes. */
+  matchName?: (schemaName: string, name: string) => boolean;
   tags?: PgSmartTagTags;
   description?: string;
 }
@@ -228,6 +232,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   }
 
   let match: PgSmartTagFilterFunction<any>;
+  let matchName: CompiledPgSmartTagRule<TKind>["matchName"];
   if (typeof incomingMatch === "function") {
     // User supplied a match function; use that:
     match = incomingMatch;
@@ -257,6 +262,9 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
       switch (rule.kind) {
         case "class": {
           const [schemaName, tableName] = digest(2);
+          matchName = (nspname, relname) =>
+            relname === tableName &&
+            (schemaName === undefined || nspname === schemaName);
           match = (rel: PgClass) => {
             if (rel.relname !== tableName) return false;
             if (schemaName === undefined) return true;
@@ -337,6 +345,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   return {
     kind,
     match,
+    matchName,
     ...rest,
   };
 }
@@ -367,6 +376,8 @@ export type SubscribeToPgSmartTagUpdatesCallback<
 
 interface Cache {
   rulesPromise: PromiseOrDirect<PgSmartTagRule[]>;
+  /** Identifies the rules used by the cached multipass discovery, if any. */
+  discoveryKey: string | null;
 }
 interface State {
   rules: PgSmartTagRule[];
@@ -387,6 +398,64 @@ async function resolveRules(
   return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
 }
 
+function isForeignKeyRule(
+  rule: Pick<PgSmartTagRule, "kind" | "tags">,
+): boolean {
+  return rule.kind === "class" && rule.tags?.foreignKey != null;
+}
+
+/** Changes when the tables multipass discovery requests for these rules may. */
+function foreignKeyDiscoveryKey(rules: PgSmartTagRule[]): string {
+  return JSON.stringify(
+    rules
+      .filter(isForeignKeyRule)
+      .map((rule) => [
+        rule.serviceName ?? null,
+        typeof rule.match === "string" ? rule.match : null,
+        rule.tags!.foreignKey,
+      ]),
+  );
+}
+
+/** Requests the `@foreignKey` targets of the rules matching each initial class. */
+function foreignKeyTargetsPolicy(
+  name: string,
+  foreignKeyRules: CompiledPgSmartTagRule<PgSmartTagSupportedKinds>[],
+  requestTargets: (
+    details: IntrospectionContinuationDetails,
+    schemaName: string,
+    foreignKey: unknown,
+  ) => void,
+): IntrospectionPolicy<"classes"> {
+  return {
+    name,
+    entity: "classes",
+    select(row, details) {
+      if (!details.hasPurpose("initial")) {
+        return;
+      }
+      const namespace = details.request(
+        "namespaces",
+        { _id: row.relnamespace },
+        ["catalogNavigation"],
+      );
+      details.after([namespace], ([[namespaceRow]], next) => {
+        if (!namespaceRow) {
+          return;
+        }
+        // Rules matched by a function are assumed to match.
+        const matching = foreignKeyRules.filter(
+          (rule) =>
+            rule.matchName?.(namespaceRow.nspname, row.relname) !== false,
+        );
+        for (const rule of matching) {
+          requestTargets(next, namespaceRow.nspname, rule.tags!.foreignKey);
+        }
+      });
+    },
+  };
+}
+
 let counter = 0;
 export function pgSmartTags<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
@@ -400,8 +469,9 @@ export function pgSmartTags<
   details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;
+  const name = details?.name ?? `PgSmartTagsPlugin_${id}`;
   return {
-    name: details?.name ?? `PgSmartTagsPlugin_${id}`,
+    name,
     description: details?.description,
     version: details?.version ?? "0.0.0",
     before: ["smart-tags"],
@@ -411,7 +481,7 @@ export function pgSmartTags<
         `pgSmartTags_${id}` as any /* Cannot make type safe because dynamic */,
       helpers: {},
       initialCache() {
-        return { rulesPromise: resolveRules(initialRules) };
+        return { rulesPromise: resolveRules(initialRules), discoveryKey: null };
       },
       async initialState(cache) {
         return {
@@ -419,6 +489,42 @@ export function pgSmartTags<
         };
       },
       hooks: {
+        // Multipass introspection only discovers what policies request, so
+        // fetch the targets of any `@foreignKey` tags these rules add.
+        pgIntrospection_options(info, event) {
+          const { multipass } = event.options;
+          if (!multipass) {
+            return;
+          }
+          info.cache.discoveryKey = foreignKeyDiscoveryKey(info.state.rules);
+          const [rules] = rulesFrom(info.state.rules);
+          const foreignKeyRules = rules.filter(
+            (rule) =>
+              isForeignKeyRule(rule) &&
+              (rule.serviceName == null ||
+                rule.serviceName === event.serviceName),
+          );
+          if (foreignKeyRules.length === 0) {
+            return;
+          }
+          const { serviceName } = event;
+          const { requestForeignKeyTagTargets } = info.helpers.pgIntrospection;
+          multipass.policies = [
+            ...(multipass.policies ?? []),
+            foreignKeyTargetsPolicy(
+              `${name}_foreignKeyTargets`,
+              foreignKeyRules,
+              (details, schemaName, foreignKey) =>
+                requestForeignKeyTagTargets(
+                  serviceName,
+                  details,
+                  schemaName,
+                  foreignKey,
+                ),
+            ),
+          ];
+        },
+
         // Run in the 'introspection' phase before anything uses the tags
         pgIntrospection_introspection(info, event) {
           const { introspection, serviceName } = event;
@@ -489,8 +595,16 @@ export function pgSmartTags<
               await subscribeToUpdatesCallback((newRuleOrRules) => {
                 const promise = resolveRules(newRuleOrRules);
                 promise.then(
-                  () => {
+                  (rules) => {
                     info.cache.rulesPromise = promise;
+                    const { discoveryKey } = info.cache;
+                    if (
+                      discoveryKey != null &&
+                      discoveryKey !== foreignKeyDiscoveryKey(rules)
+                    ) {
+                      info.cache.discoveryKey = null;
+                      info.helpers.pgIntrospection?.invalidateIntrospection();
+                    }
                     callback();
                   },
                   (e) => {

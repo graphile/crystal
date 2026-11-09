@@ -266,6 +266,38 @@ const parseSqlAttributeString = (str: string) => {
   return removeQuotes(str);
 };
 
+/**
+ * Parses an `@foreignKey` smart tag value, returning null if its syntax is
+ * invalid. A null `foreignSchema` refers to the tagged table's schema.
+ */
+export function parseForeignKeyTag(rawSpec: string) {
+  const [spec, extraDescription] = parseConstraintSpec(rawSpec);
+  const matches = spec.match(
+    /^\(([^()]+)\) references ([^().]+)(?:\.([^().]+))?(?:\s*\(([^()]+)\))?$/i,
+  );
+  if (!matches) {
+    return null;
+  }
+  const [
+    ,
+    rawAttributes,
+    rawSchemaOrTable,
+    rawTableOnly,
+    rawForeignAttributes,
+  ] = matches;
+  return {
+    attributes: parseSqlAttributeArray(rawAttributes),
+    foreignSchema: rawTableOnly
+      ? parseSqlAttributeString(rawSchemaOrTable)
+      : null,
+    foreignTable: parseSqlAttributeString(rawTableOnly || rawSchemaOrTable),
+    foreignAttributes: rawForeignAttributes
+      ? parseSqlAttributeArray(rawForeignAttributes)
+      : null,
+    extraDescription,
+  };
+}
+
 async function processFk(
   info: GatherPluginContext<State, Cache>,
   event: {
@@ -285,32 +317,15 @@ async function processFk(
       `Invalid '@foreignKey' smart tag on ${identity()}; expected a string`,
     );
   }
-  const [spec, extraDescription] = parseConstraintSpec(rawSpec);
-  const matches = spec.match(
-    /^\(([^()]+)\) references ([^().]+)(?:\.([^().]+))?(?:\s*\(([^()]+)\))?$/i,
-  );
-  if (!matches) {
+  const parsed = parseForeignKeyTag(rawSpec);
+  if (!parsed) {
     throw new Error(
-      `Invalid @foreignKey syntax on '${identity()}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${spec}'`,
+      `Invalid @foreignKey syntax on '${identity()}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${parseConstraintSpec(rawSpec)[0]}'`,
     );
   }
-  const [
-    ,
-    rawAttributes,
-    rawSchemaOrTable,
-    rawTableOnly,
-    rawForeignAttributes,
-  ] = matches;
-  const rawSchema = rawTableOnly
-    ? rawSchemaOrTable
-    : `"${pgClass.getNamespace()!.nspname}"`;
-  const rawTable = rawTableOnly || rawSchemaOrTable;
-  const attributes: string[] = parseSqlAttributeArray(rawAttributes);
-  const foreignSchema: string = parseSqlAttributeString(rawSchema);
-  const foreignTable: string = parseSqlAttributeString(rawTable);
-  const foreignAttributes: string[] | null = rawForeignAttributes
-    ? parseSqlAttributeArray(rawForeignAttributes)
-    : null;
+  const { attributes, foreignTable, foreignAttributes, extraDescription } =
+    parsed;
+  const foreignSchema = parsed.foreignSchema ?? pgClass.getNamespace()!.nspname;
 
   const foreignPgClass = await info.helpers.pgIntrospection.getClassByName(
     serviceName,

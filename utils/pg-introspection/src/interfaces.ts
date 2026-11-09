@@ -59,7 +59,24 @@ export type IntrospectionRequest<TEntity extends EntityType = EntityType> =
       }
     : never;
 
-export interface IntrospectionPolicyDetails {
+/** Identifies a requested selector so its rows can be inspected with `after`. */
+export interface IntrospectionToken<TEntity extends EntityType = EntityType> {
+  readonly entity: TEntity;
+  readonly match: IntrospectionRequest<TEntity>["match"];
+}
+
+/** The rows matched by each token, in the order the tokens were given. */
+export type IntrospectionTokenRows<
+  TTokens extends readonly IntrospectionToken[],
+> = {
+  -readonly [K in keyof TTokens]: TTokens[K] extends IntrospectionToken<
+    infer TEntity
+  >
+    ? ReadonlyArray<IntrospectionRow<TEntity>>
+    : never;
+};
+
+export interface IntrospectionContinuationDetails {
   /**
    * Queue a dependency immediately; repeated selectors are merged.
    * Zero selectors for columns that always identify an object are ignored.
@@ -68,11 +85,26 @@ export interface IntrospectionPolicyDetails {
     entity: TEntity,
     match: IntrospectionRequest<NoInfer<TEntity>>["match"],
     purposes: PurposeList,
+  ): IntrospectionToken<TEntity>;
+  /**
+   * Call `callback` with every row matching each token once all of the
+   * tokens' selectors have been fetched. Rows are read-only.
+   */
+  after<const TTokens extends readonly IntrospectionToken[]>(
+    tokens: TTokens,
+    callback: (
+      rows: IntrospectionTokenRows<TTokens>,
+      details: IntrospectionContinuationDetails,
+    ) => void,
   ): void;
-  /** False results subscribe this policy to run again when the purpose is added. */
-  hasPurpose(purpose: PgIntrospection.Purpose): boolean;
   /** Immutable metadata captured before dependency discovery begins. */
   catalogByOid: Readonly<Record<string, string>>;
+}
+
+export interface IntrospectionPolicyDetails
+  extends IntrospectionContinuationDetails {
+  /** False results subscribe this policy to run again when the purpose is added. */
+  hasPurpose(purpose: PgIntrospection.Purpose): boolean;
 }
 
 export type Maybe<T> = T | null | undefined;
@@ -105,7 +137,19 @@ export interface MultipassOptions {
   }[EntityType][];
   /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
   entrypointFilters?: Partial<Record<EntityType, string>>;
+  /**
+   * Objects to discover with the `initial` purpose regardless of entrypoint
+   * filters and privilege checks, identified by schema and name.
+   */
+  include?: readonly MultipassInclude[];
 }
+
+/** `[collection, schemaName, name]`; every procedure overload is included. */
+export type MultipassInclude = readonly [
+  "classes" | "procs" | "types",
+  string,
+  string,
+];
 export type PruneCallback = (
   data: PrunableIntrospectionData,
   details: IntrospectionPruneDetails,

@@ -300,14 +300,116 @@ const compoundKeyCodec = recordCodec({
   },
   executor: executor
 });
-const emailCodec = domainOfCodec(TYPES.text, "email", sql.identifier("b", "email"), {
+const jwtTokenCodec = recordCodec({
+  name: "jwtToken",
+  identifier: sql.identifier("b", "jwt_token"),
+  attributes: {
+    __proto__: null,
+    role: {
+      codec: TYPES.text
+    },
+    exp: {
+      codec: TYPES.bigint
+    },
+    a: {
+      codec: TYPES.int
+    },
+    b: {
+      codec: TYPES.numeric
+    },
+    c: {
+      codec: TYPES.bigint
+    }
+  },
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "jwt_token"
+    }
+  },
+  executor: executor
+});
+const colorCodec = enumCodec({
+  name: "color",
+  identifier: sql.identifier("b", "color"),
+  values: ["red", "green", "blue"],
+  description: "Represents the colours red, green and blue.",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
-      name: "email"
+      name: "color"
     }
   }
+});
+const enumCapsCodec = enumCodec({
+  name: "enumCaps",
+  identifier: sql.identifier("b", "enum_caps"),
+  values: ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"],
+  description: undefined,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "enum_caps"
+    }
+  }
+});
+const enumWithEmptyStringCodec = enumCodec({
+  name: "enumWithEmptyString",
+  identifier: sql.identifier("b", "enum_with_empty_string"),
+  values: ["", "one", "two"],
+  description: undefined,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "enum_with_empty_string"
+    }
+  }
+});
+const compoundTypeCodec = recordCodec({
+  name: "compoundType",
+  identifier: sql.identifier("c", "compound_type"),
+  attributes: {
+    __proto__: null,
+    a: {
+      codec: TYPES.int
+    },
+    b: {
+      codec: TYPES.text
+    },
+    c: {
+      codec: colorCodec
+    },
+    d: {
+      codec: TYPES.uuid
+    },
+    e: {
+      codec: enumCapsCodec
+    },
+    f: {
+      codec: enumWithEmptyStringCodec
+    },
+    g: {
+      codec: TYPES.interval
+    },
+    foo_bar: {
+      codec: TYPES.int
+    }
+  },
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "compound_type"
+    }
+  },
+  executor: executor,
+  description: "Awesome feature!"
 });
 const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifier("b", "not_null_url"), {
   extensions: {
@@ -318,6 +420,15 @@ const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifie
     }
   },
   notNull: true
+});
+const emailCodec = domainOfCodec(TYPES.text, "email", sql.identifier("b", "email"), {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "email"
+    }
+  }
 });
 const wrappedUrlCodec = recordCodec({
   name: "wrappedUrl",
@@ -335,6 +446,35 @@ const wrappedUrlCodec = recordCodec({
       serviceName: "main",
       schemaName: "b",
       name: "wrapped_url"
+    }
+  },
+  executor: executor
+});
+const authPayloadCodec = recordCodec({
+  name: "authPayload",
+  identifier: sql.identifier("b", "auth_payload"),
+  attributes: {
+    __proto__: null,
+    jwt: {
+      codec: jwtTokenCodec
+    },
+    id: {
+      codec: TYPES.int
+    },
+    admin: {
+      codec: TYPES.boolean
+    }
+  },
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "auth_payload"
+    },
+    tags: {
+      __proto__: null,
+      foreignKey: "(id) references c.person"
     }
   },
   executor: executor
@@ -663,16 +803,135 @@ const registry = makeRegistry({
     float8: TYPES.float,
     json: TYPES.json,
     compoundKey: compoundKeyCodec,
+    jwtToken: jwtTokenCodec,
+    int8: TYPES.bigint,
+    numeric: TYPES.numeric,
+    compoundType: compoundTypeCodec,
+    color: colorCodec,
+    uuid: TYPES.uuid,
+    enumCaps: enumCapsCodec,
+    enumWithEmptyString: enumWithEmptyStringCodec,
+    interval: TYPES.interval,
+    notNullUrl: notNullUrlCodec,
     varchar: TYPES.varchar,
     textArray: LIST_TYPES.text,
     email: emailCodec,
     wrappedUrl: wrappedUrlCodec,
-    notNullUrl: notNullUrlCodec,
     hstore: TYPES.hstore,
     inet: TYPES.inet,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr,
     timestamp: TYPES.timestamp,
+    tablefuncCrosstab2: recordCodec({
+      name: "tablefuncCrosstab2",
+      identifier: sql.identifier("a", "tablefunc_crosstab_2"),
+      attributes: {
+        __proto__: null,
+        row_name: {
+          codec: TYPES.text
+        },
+        category_1: {
+          codec: TYPES.text
+        },
+        category_2: {
+          codec: TYPES.text
+        }
+      },
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "tablefunc_crosstab_2"
+        }
+      },
+      executor: executor
+    }),
+    tablefuncCrosstab3: recordCodec({
+      name: "tablefuncCrosstab3",
+      identifier: sql.identifier("a", "tablefunc_crosstab_3"),
+      attributes: {
+        __proto__: null,
+        row_name: {
+          codec: TYPES.text
+        },
+        category_1: {
+          codec: TYPES.text
+        },
+        category_2: {
+          codec: TYPES.text
+        },
+        category_3: {
+          codec: TYPES.text
+        }
+      },
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "tablefunc_crosstab_3"
+        }
+      },
+      executor: executor
+    }),
+    tablefuncCrosstab4: recordCodec({
+      name: "tablefuncCrosstab4",
+      identifier: sql.identifier("a", "tablefunc_crosstab_4"),
+      attributes: {
+        __proto__: null,
+        row_name: {
+          codec: TYPES.text
+        },
+        category_1: {
+          codec: TYPES.text
+        },
+        category_2: {
+          codec: TYPES.text
+        },
+        category_3: {
+          codec: TYPES.text
+        },
+        category_4: {
+          codec: TYPES.text
+        }
+      },
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "tablefunc_crosstab_4"
+        }
+      },
+      executor: executor
+    }),
+    authPayload: authPayloadCodec,
+    nestedCompoundType: recordCodec({
+      name: "nestedCompoundType",
+      identifier: sql.identifier("b", "nested_compound_type"),
+      attributes: {
+        __proto__: null,
+        a: {
+          codec: compoundTypeCodec
+        },
+        b: {
+          codec: compoundTypeCodec
+        },
+        baz_buz: {
+          codec: TYPES.int
+        }
+      },
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "nested_compound_type"
+        }
+      },
+      executor: executor
+    }),
     person: personCodec,
     personSecret: personSecretCodec
   },
@@ -804,6 +1063,16 @@ const registry = makeRegistry({
         localCodec: postCodec,
         remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["author_id"],
+        remoteAttributes: ["id"],
+        isUnique: true
+      }
+    },
+    authPayload: {
+      __proto__: null,
+      personByMyId: {
+        localCodec: authPayloadCodec,
+        remoteResourceOptions: person_resourceOptionsConfig,
+        localAttributes: ["id"],
         remoteAttributes: ["id"],
         isUnique: true
       }

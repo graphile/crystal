@@ -135,6 +135,77 @@ To make a request terminal, emit a purpose for which the target policies request
 no further dependencies. In the return-type example, no policy follows types,
 so the requested return types do not cause further expansion.
 
+## Continuations
+
+`details.request` returns a token identifying the requested selector. Pass one
+or more tokens to `details.after(tokens, callback)` to inspect the matching rows
+once all of their selectors have been fetched, for example to find an object by
+name when its namespace OID is not yet known:
+
+```ts
+const namedTargets = defineIntrospectionPolicy({
+  name: "namedTargets",
+  entity: "classes",
+  select(table, details) {
+    if (!details.hasPurpose("initial")) {
+      return;
+    }
+    const namespace = details.request(
+      "namespaces",
+      { nspname: "app_private" },
+      ["procedureReturnType"],
+    );
+    details.after([namespace], ([namespaces], next) => {
+      for (const { _id } of namespaces) {
+        next.request("classes", { relnamespace: _id, relname: "lookup" }, [
+          "procedureReturnType",
+        ]);
+      }
+    });
+  },
+});
+```
+
+The callback receives the rows for each token, in the order the tokens were
+given, and its own `request` and `after` functions so discovery can proceed in
+stages. It runs as soon as every token is satisfied: immediately if the rows are
+already known to be complete, or after the pass that fetches them. Tokens for
+unselected collections, or for OID zero, are satisfied with no rows.
+Continuations cannot call `hasPurpose`; check purposes in `select` and capture
+the results. The same rules apply as for `select`: do not mutate the rows, and
+depend only on the rows, captured purposes and fixed configuration. When a
+policy reruns, any continuations it registers run again; repeated requests are
+merged as usual.
+
+`requestByName(details, collection, schemaName, name, purposes)` implements this
+pattern for `classes`, `procs` and `types`. It requests the namespace with the
+built-in `resolveName` purpose and then every matching object (every overload,
+for procedures) with the given purposes.
+
+## Including specific objects
+
+`multipass.include` lists objects to discover as if they had matched the
+entrypoint, whatever the entrypoint filters and privilege checks say:
+
+```js
+const multipass = {
+  entrypointFilters: { namespaces: "nspname = 'app_public'" },
+  include: [
+    ["classes", "app_private", "status"],
+    ["procs", "utils", "my_util_function"],
+  ],
+  policies: [
+    /* application relationship policies */
+  ],
+};
+```
+
+Each entry is `[collection, schemaName, name]`, where the collection is
+`classes`, `procs` or `types`. Included objects receive the `initial` purpose,
+so your policies treat them like the rest of initial discovery. Top-level
+`filters` still apply. Include `namespaces` in `onlyEntities` when using this
+option.
+
 ## Global filters and entrypoint filters
 
 | Option                        | Initial query | Dependency queries |
@@ -251,7 +322,8 @@ const multipass = {
 
 The check includes schema USAGE plus relevant object privileges: table or column
 privileges for relations, sequence privileges for sequences, EXECUTE for
-procedures and USAGE for types. The role is passed as a query parameter.
+procedures and USAGE for types, including the row types of standalone composite
+types. The role is passed as a query parameter.
 `includeNoInherit: true` also considers roles reachable through memberships
 that do not inherit privileges.
 

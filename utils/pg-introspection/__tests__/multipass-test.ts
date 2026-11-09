@@ -875,3 +875,152 @@ it("types policy rows according to their entity", () => {
   void policies;
   void invalid;
 });
+
+it("runs continuations once their tokens are satisfied", async () => {
+  const queries: unknown[] = [];
+  const seen: unknown[] = [];
+  const result = await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      if (queries.length === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      if (queries.length === 2) {
+        return JSON.stringify({
+          namespaces: [{ _id: "20", nspname: "other" }],
+        });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "2", relnamespace: "20", relname: "target" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "followNamedTarget",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            const self = details.request("classes", { _id: "1" }, ["terminal"]);
+            details.after([self], ([selves]) => {
+              seen.push(["self", selves.map((cls) => cls.relname)]);
+            });
+            const namespace = details.request(
+              "namespaces",
+              { nspname: "other" },
+              ["terminal"],
+            );
+            const missing = details.request("types", { _id: "99" }, [
+              "terminal",
+            ]);
+            details.after([namespace, missing], ([namespaces, types], next) => {
+              seen.push(["namespaces", namespaces.map((ns) => ns._id)]);
+              seen.push(["types", types.length]);
+              for (const ns of namespaces) {
+                const target = next.request(
+                  "classes",
+                  { relnamespace: ns._id, relname: "target" },
+                  ["terminal"],
+                );
+                next.after([target], ([targets]) => {
+                  seen.push(["targets", targets.map((cls) => cls._id)]);
+                });
+              }
+            });
+          },
+        }),
+      ],
+    },
+  });
+  assert.deepEqual(queries, [[], [["other"]], [["target"], ["20"]]]);
+  assert.deepEqual(seen, [
+    ["self", ["source"]],
+    ["namespaces", ["20"]],
+    ["types", 0],
+    ["targets", ["2"]],
+  ]);
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["1", "2"],
+  );
+});
+
+it("discovers included objects as initial rows by schema and name", async () => {
+  const queries: unknown[] = [];
+  const purposes: Record<string, string[]> = {};
+  const observe = (entity: "namespaces" | "classes" | "procs") =>
+    defineIntrospectionPolicy({
+      name: `observe_${entity}`,
+      entity,
+      select(row: { _id: string }, details: IntrospectionPolicyDetails) {
+        purposes[row._id] = (["initial", "resolveName"] as const).filter(
+          (purpose) => details.hasPurpose(purpose),
+        );
+      },
+    });
+  const result = await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      if (queries.length === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [],
+          procs: [],
+        });
+      }
+      if (queries.length === 2) {
+        return JSON.stringify({
+          namespaces: [{ _id: "5", nspname: "enums" }],
+        });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "7", relnamespace: "5", relname: "colour" }],
+        procs: [{ _id: "8", pronamespace: "5", proname: "helper" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "procs"],
+    multipass: {
+      include: [
+        ["classes", "enums", "colour"],
+        ["procs", "enums", "helper"],
+      ],
+      policies: [observe("namespaces"), observe("classes"), observe("procs")],
+    },
+  });
+  assert.deepEqual(queries, [
+    [],
+    [["enums"]],
+    [["colour"], ["5"], ["helper"], ["5"]],
+  ]);
+  assert.deepEqual(purposes, {
+    "5": ["resolveName"],
+    "7": ["initial"],
+    "8": ["initial"],
+  });
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["7"],
+  );
+});
+
+it("rejects invalid multipass.include entries", async () => {
+  await assert.rejects(
+    introspectRaw({
+      async runQuery() {
+        return JSON.stringify({ ...metadata, namespaces: [], attributes: [] });
+      },
+      onlyEntities: ["namespaces", "attributes"],
+      multipass: {
+        // @ts-expect-error Only namespaced collections can be included
+        include: [["attributes", "app", "name"]],
+      },
+    }),
+    /Invalid multipass\.include entry/,
+  );
+});

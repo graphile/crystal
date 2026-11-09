@@ -4,6 +4,7 @@ import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
   Introspection,
+  IntrospectionContinuationDetails,
   IntrospectionDataForEntities,
   IntrospectOptions,
   PgAttribute,
@@ -31,6 +32,7 @@ import { watchFixtures } from "../watchFixtures.ts";
 import {
   postgraphileMultipass,
   postgraphilePrune,
+  requestForeignKeyTagTargets,
 } from "./PgIntrospectionPolicies.ts";
 
 declare global {
@@ -247,6 +249,24 @@ declare global {
           serviceName: string,
           extensionName: string,
         ): Promise<PgExtension | undefined>;
+        /**
+         * For use in multipass introspection policies: requests the tables
+         * referenced by an `@foreignKey` smart tag value (a string or list of
+         * strings) that are outside the service's schemas, resolving
+         * unqualified references against `schemaName`.
+         */
+        requestForeignKeyTagTargets(
+          serviceName: string,
+          details: IntrospectionContinuationDetails,
+          schemaName: string,
+          foreignKey: unknown,
+        ): void;
+        /**
+         * Discard cached introspection results so the next gather introspects
+         * again; call this before triggering a regather when configuration
+         * that affects multipass discovery changes.
+         */
+        invalidateIntrospection(): void;
       };
     }
 
@@ -601,6 +621,32 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       async getExtensionByName(info, serviceName, extensionName) {
         const introspection = await getIntrospection(info, serviceName);
         return introspection.getExtension({ name: extensionName });
+      },
+
+      requestForeignKeyTagTargets(
+        info,
+        serviceName,
+        details,
+        schemaName,
+        foreignKey,
+      ) {
+        const pgService = info.resolvedPreset.pgServices?.find(
+          (service) => service.name === serviceName,
+        );
+        if (!pgService) {
+          throw new Error(`Could not find '${serviceName}' in 'pgServices'`);
+        }
+        requestForeignKeyTagTargets(
+          details,
+          pgService.schemas ?? ["public"],
+          schemaName,
+          foreignKey,
+        );
+      },
+
+      invalidateIntrospection(info) {
+        info.cache.introspectionResultsPromise = null;
+        info.cache.dirty = true;
       },
 
       getIntrospection(info) {

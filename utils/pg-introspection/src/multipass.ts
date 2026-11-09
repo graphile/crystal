@@ -4,13 +4,16 @@ import { augmentIntrospectionData } from "./augmentIntrospection.ts";
 import type {
   DefaultEntities,
   Introspection,
+  IntrospectionContinuationDetails,
   IntrospectionDataForEntities,
   IntrospectionOptions,
   IntrospectionPolicy,
   IntrospectionRequest,
   IntrospectionRow,
+  IntrospectionToken,
   IntrospectOptions,
   Maybe,
+  MultipassInclude,
   MultipassIntrospectOptions,
   PurposeList,
   SQLVal,
@@ -179,6 +182,8 @@ function entrypointQuery<TEntities extends EntityType>(
         )
         when relkind = 'S'
         then pg_catalog.has_sequence_privilege(ar.oid, pg_class.oid, 'USAGE,SELECT,UPDATE')
+        when relkind = 'c'
+        then pg_catalog.has_type_privilege(ar.oid, pg_class.reltype, 'USAGE')
         else false
       end
     )`;
@@ -356,7 +361,34 @@ interface MultipassContext<TEntities extends EntityType> {
   >;
   /** New rows or rows with added purposes awaiting policy execution. */
   frontier: Array<[EntityType, IntrospectionRow]>;
+  /** Requests to fetch in the next pass, keyed by selector. */
+  pending: Map<string, IntrospectionRequest>;
+  /** Callbacks awaiting the rows of their tokens' selectors. */
+  continuations: Continuation[];
 }
+
+interface Continuation {
+  policy: IntrospectionPolicy;
+  tokens: readonly IntrospectionToken[];
+  callback: (
+    rows: ReadonlyArray<readonly IntrospectionRow[]>,
+    details: IntrospectionContinuationDetails,
+  ) => void;
+}
+
+/** Attributes requests made to resolve `multipass.include` in error messages. */
+const INCLUDE_POLICY: IntrospectionPolicy = {
+  name: "multipass.include",
+  entity: "namespaces",
+  select() {},
+};
+
+const NAMED_ENTITY_COLUMNS = {
+  classes: ["relnamespace", "relname"],
+  procs: ["pronamespace", "proname"],
+  types: ["typnamespace", "typname"],
+} as const;
+type NamedEntity = MultipassInclude[0];
 
 function buildMultipassContext<TEntities extends EntityType>(
   options: MultipassIntrospectOptions<TEntities>,
@@ -371,6 +403,8 @@ function buildMultipassContext<TEntities extends EntityType>(
     purposes: new Map(),
     policySubscriptions: new Map(),
     frontier: [],
+    pending: new Map(),
+    continuations: [],
     selected: new Set([...onlyEntities]),
     policiesByEntity: new Map(),
     rowsByIdentity: new Map(),
@@ -546,15 +580,23 @@ async function introspectRawMultipass<TEntities extends EntityType>(
 
   // Apply our initial result to the context
   initializeMultipassContext(context, query, result);
+  requestIncludes(context);
 
-  const { frontier, completedSelectors } = context;
+  const { frontier, pending, completedSelectors } = context;
 
-  while (frontier.length > 0) {
-    // Drains the frontier, calling select for applicable policies (using
-    // policySubscriptions to determine which policies need to run again).
-    const requests = pendingRequestsFromFrontier(context);
+  for (;;) {
+    // Run policies on new rows and purposes, and continuations whose tokens
+    // are satisfied, until only fetching can make progress.
+    do {
+      drainFrontier(context);
+    } while (runReadyContinuations(context));
     assert.equal(frontier.length, 0);
+
+    const requests = [...pending.values()];
+    pending.clear();
     if (requests.length === 0) {
+      // Every unsatisfied token has a pending request.
+      assert.equal(context.continuations.length, 0);
       break;
     }
 
@@ -621,17 +663,10 @@ function coerceToRows<TEntity extends EntityType>(
   return source == null ? [] : Array.isArray(source) ? source : [source];
 }
 
-function pendingRequestsFromFrontier<TEntity extends EntityType>(
+function drainFrontier<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
 ) {
-  const pending = new Map<string, IntrospectionRequest>();
-  const {
-    frontier,
-    purposes,
-    policySubscriptions,
-    policiesByEntity,
-    catalogByOid,
-  } = context;
+  const { frontier, purposes, policySubscriptions, policiesByEntity } = context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length > 0) {
     const batch = frontier.splice(0);
@@ -652,7 +687,7 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
         }
         const subscribeTo = new Set<PgIntrospection.Purpose>();
         policy.select(row, {
-          catalogByOid,
+          ...continuationDetails(context, policy),
           hasPurpose(purpose) {
             if (!snapshot.has(purpose)) {
               subscribeTo.add(purpose);
@@ -661,31 +696,146 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
               return true;
             }
           },
-          request(entity, match, purposes) {
-            // The generic request API keeps these parameters correlated.
-            const request = {
-              entity,
-              match,
-              purposes,
-            } as IntrospectionRequest;
-
-            requestDependency(context, pending, policy, request);
-          },
         });
         subscriptions.set(policy, subscribeTo);
       }
     }
   }
-  return [...pending.values()];
+}
+
+function continuationDetails<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  policy: IntrospectionPolicy,
+): IntrospectionContinuationDetails {
+  return {
+    catalogByOid: context.catalogByOid,
+    request(entity, match, purposes) {
+      // The generic request API keeps these parameters correlated.
+      const request = { entity, match, purposes } as IntrospectionRequest;
+      requestDependency(context, policy, request);
+      return { entity, match };
+    },
+    after(tokens, callback) {
+      context.continuations.push({
+        policy,
+        tokens,
+        // Rows are supplied in token order, matching each token's entity.
+        callback: callback as Continuation["callback"],
+      });
+    },
+  };
+}
+
+/** Whether every row matching the token's selector is known. */
+function isSatisfied<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  token: IntrospectionToken,
+): boolean {
+  if (!context.selected.has(token.entity) || canShortcutRequest(token)) {
+    return true;
+  }
+  if (context.completedSelectors.has(selectorKey(token))) {
+    return true;
+  }
+  return selectsUniqueRow(token) && matchingRows(context, token).length > 0;
+}
+
+function tokenRows<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  token: IntrospectionToken,
+): readonly IntrospectionRow[] {
+  if (!context.selected.has(token.entity) || canShortcutRequest(token)) {
+    return [];
+  }
+  return [...matchingRows(context, token)];
+}
+
+/** Returns true if any continuation ran. */
+function runReadyContinuations<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+): boolean {
+  const ready: Continuation[] = [];
+  const waiting: Continuation[] = [];
+  for (const continuation of context.continuations) {
+    const satisfied = continuation.tokens.every((token) =>
+      isSatisfied(context, token),
+    );
+    (satisfied ? ready : waiting).push(continuation);
+  }
+  if (ready.length === 0) {
+    return false;
+  }
+  context.continuations = waiting;
+  for (const { policy, tokens, callback } of ready) {
+    callback(
+      tokens.map((token) => tokenRows(context, token)),
+      continuationDetails(context, policy),
+    );
+  }
+  return true;
+}
+
+function requestIncludes<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+) {
+  const include = context.options.multipass.include ?? [];
+  if (include.length === 0) {
+    return;
+  }
+  if (!context.selected.has("namespaces")) {
+    throw new Error(
+      "multipass.include requires the 'namespaces' collection to be selected",
+    );
+  }
+  const details = continuationDetails(context, INCLUDE_POLICY);
+  for (const entry of include) {
+    const [entity, schemaName, name] = entry;
+    if (
+      !Object.hasOwn(NAMED_ENTITY_COLUMNS, entity) ||
+      typeof schemaName !== "string" ||
+      typeof name !== "string"
+    ) {
+      throw new Error(
+        `Invalid multipass.include entry ${JSON.stringify(entry)}; expected [collection, schemaName, name] where collection is one of ${Object.keys(NAMED_ENTITY_COLUMNS).join(", ")}`,
+      );
+    }
+    requestByName(details, entity, schemaName, name, ["initial"]);
+  }
+}
+
+/**
+ * Request the objects named `name` in schema `schemaName`, first fetching the
+ * namespace (with the `resolveName` purpose) if necessary. Every procedure
+ * overload matches.
+ */
+export function requestByName(
+  details: IntrospectionContinuationDetails,
+  entity: NamedEntity,
+  schemaName: string,
+  name: string,
+  purposes: PurposeList,
+): void {
+  const namespace = details.request("namespaces", { nspname: schemaName }, [
+    "resolveName",
+  ]);
+  details.after([namespace], ([namespaces], next) => {
+    const [namespaceColumn, nameColumn] = NAMED_ENTITY_COLUMNS[entity];
+    for (const { _id } of namespaces) {
+      next.request(
+        entity,
+        { [namespaceColumn]: _id, [nameColumn]: name },
+        purposes,
+      );
+    }
+  });
 }
 
 function requestDependency<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
-  pending: Map<string, IntrospectionRequest>,
   policy: IntrospectionPolicy,
   request: IntrospectionRequest,
 ) {
-  const { selected, completedSelectors } = context;
+  const { selected, completedSelectors, pending } = context;
   const { entity, purposes } = request;
   assertValidRequest(policy, request);
 
@@ -737,7 +887,10 @@ function assertValidRequest(
   }
 }
 
-function canShortcutRequest({ entity, match }: IntrospectionRequest) {
+function canShortcutRequest({
+  entity,
+  match,
+}: Pick<IntrospectionRequest, "entity" | "match">) {
   for (const [column, value] of Object.entries(match)) {
     if (value === 0 || value === "0") {
       if (sqlColumnName(column) === "oid") {

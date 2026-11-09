@@ -6,6 +6,7 @@ import {
   type MultipassOptions,
 } from "pg-introspection";
 
+import type {} from "../dist/index.js";
 import {
   postgraphileMultipass,
   postgraphilePrune,
@@ -328,6 +329,54 @@ test.each([false, true])(
         "b",
       ]);
       expect(result.classes.some((row) => row.relname === "hidden_pair")).toBe(
+        !multipass,
+      );
+    });
+  },
+);
+
+test.each([false, true])(
+  "discovers @foreignKey targets outside the exposed schemas (multipass: %s)",
+  async (multipass) => {
+    return withPgClientTransaction(async (client) => {
+      const runQuery = makeRunQuery(client);
+      await client.query(
+        `
+        create schema smart_fk_exposed;
+        create schema "Smart FK Hidden";
+        create table "Smart FK Hidden"."Kind" (type text primary key, parent text references "Smart FK Hidden"."Kind");
+        comment on table "Smart FK Hidden"."Kind" is E'@enum';
+        create table "Smart FK Hidden".unrelated (id integer primary key);
+        create table smart_fk_exposed.local_target (id integer primary key);
+        create table smart_fk_exposed.thing (id integer primary key, kind text, local_id integer);
+        comment on table smart_fk_exposed.thing is E'@foreignKey (kind) references "Smart FK Hidden"."Kind" (type)\\n@foreignKey (local_id) references local_target';
+      `,
+      );
+      const result = await introspect({
+        runQuery,
+        prune: postgraphilePrune,
+        multipass: multipass
+          ? postgraphileMultipass({ schemas: ["smart_fk_exposed"] })
+          : false,
+      });
+      const kind = result.classes.find((row) => row.relname === "Kind");
+      expect(kind?.getNamespace()?.nspname).toBe("Smart FK Hidden");
+      expect(kind!.getAttributes().map((row) => row.attname)).toEqual([
+        "type",
+        "parent",
+      ]);
+      expect(
+        kind!
+          .getConstraints()
+          .map((row) => row.contype)
+          .filter((type) => type !== "n")
+          .sort(),
+      ).toEqual(multipass ? ["p"] : ["f", "p"]);
+      expect(kind!.getTagsAndDescription().tags.enum).toBe(true);
+      expect(result.classes.some((row) => row.relname === "local_target")).toBe(
+        true,
+      );
+      expect(result.classes.some((row) => row.relname === "unrelated")).toBe(
         !multipass,
       );
     });

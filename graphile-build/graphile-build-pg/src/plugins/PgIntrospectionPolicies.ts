@@ -1,39 +1,46 @@
 import type {
+  IntrospectionContinuationDetails,
   IntrospectionPolicy,
   IntrospectionPolicyDetails,
   IntrospectOptions,
   MultipassOptions,
 } from "pg-introspection";
-import { pruneExtensionResources } from "pg-introspection";
+import {
+  parseSmartComment,
+  pruneExtensionResources,
+  requestByName,
+} from "pg-introspection";
 
 import { invertKeyAndValue } from "../utils.ts";
+import { parseForeignKeyTag } from "./PgFakeConstraintsPlugin.ts";
 
-declare global {
-  namespace PgIntrospection {
-    interface PurposeRegistry {
-      /** Build codecs for column, function, array, domain and composite values. */
-      registryCodec: true;
-      /** Build relations from foreign keys on exposed resources. */
-      registryRelation: true;
-      /** Discover foreign keys from the initially exposed resources. */
-      discoverResourceRelations: true;
-      /** Populate catalog metadata navigation without requesting a codec. */
-      catalogNavigation: true;
-      /** Populate type navigation without requesting another resource codec. */
-      completeTypeNavigation: true;
-      /** Supply constraint information needed to construct a resource. */
-      registryResourceUnique: true;
-      /** Infer resource behaviour from row security. */
-      inferRowSecurityBehaviour: true;
-      /** Build the allowed values of a PostgreSQL enum codec. */
-      registryEnumCodec: true;
-      /** Apply smart tags and GraphQL descriptions. */
-      smartTagsAndDescriptions: true;
-      /** Exclude extension-owned resources and identify automatic dependencies. */
-      pruneExtensionResources: true;
-      /** Detect and build codecs from tables or unique constraints tagged `@enum`. */
-      enumTables: true;
+/**
+ * Requests the tables outside `introspectedSchemas` referenced by an
+ * `@foreignKey` smart tag value so that PgFakeConstraintsPlugin can find them.
+ * Invalid specs are ignored here; PgFakeConstraintsPlugin reports them.
+ */
+export function requestForeignKeyTagTargets(
+  details: IntrospectionContinuationDetails,
+  introspectedSchemas: readonly string[],
+  schemaName: string,
+  foreignKey: unknown,
+): void {
+  for (const rawSpec of Array.isArray(foreignKey) ? foreignKey : [foreignKey]) {
+    if (typeof rawSpec !== "string") continue;
+    let parsed: ReturnType<typeof parseForeignKeyTag>;
+    try {
+      parsed = parseForeignKeyTag(rawSpec);
+    } catch {
+      continue;
     }
+    if (!parsed) continue;
+    const foreignSchema = parsed.foreignSchema ?? schemaName;
+    // Initial discovery covers the accessible tables in these schemas.
+    if (introspectedSchemas.includes(foreignSchema)) continue;
+    requestByName(details, "classes", foreignSchema, parsed.foreignTable, [
+      "registryRelation",
+      "enumTables",
+    ]);
   }
 }
 
@@ -201,6 +208,51 @@ const DEFAULT_POLICIES = (() => {
   return Object.freeze(policies);
 })();
 
+function smartForeignKeyTargets(
+  schemas: readonly string[],
+): IntrospectionPolicy<"classes"> {
+  return {
+    name: "smartForeignKeyTargets",
+    entity: "classes",
+    select(row, details) {
+      if (!details.hasPurpose("initial")) {
+        return;
+      }
+      const catalogId = invertKeyAndValue(details.catalogByOid)["pg_class"];
+      if (catalogId == null) {
+        return;
+      }
+      const descriptions = details.request(
+        "descriptions",
+        { classoid: catalogId, objoid: row._id },
+        ["smartTagsAndDescriptions"],
+      );
+      const namespace = details.request(
+        "namespaces",
+        { _id: row.relnamespace },
+        ["catalogNavigation"],
+      );
+      details.after(
+        [descriptions, namespace],
+        ([descriptionRows, [namespaceRow]], next) => {
+          const description = descriptionRows.find(
+            (description) => description.objsubid === 0,
+          )?.description;
+          if (!namespaceRow || !description?.includes("@foreignKey")) {
+            return;
+          }
+          requestForeignKeyTagTargets(
+            next,
+            schemas,
+            namespaceRow.nspname,
+            parseSmartComment(description).tags.foreignKey,
+          );
+        },
+      );
+    },
+  };
+}
+
 // Exclude extension resources from initial discovery, but retain dependencies
 // referenced by user resources.
 const notExtension = (catalog: string, oid: string) =>
@@ -254,7 +306,10 @@ export function postgraphileMultipass(options: {
 }): MultipassOptions {
   const { schemas = ["public"] } = options;
   return {
-    policies: DEFAULT_POLICIES.map(clonePolicy),
+    policies: [
+      ...DEFAULT_POLICIES.map(clonePolicy),
+      smartForeignKeyTargets(schemas),
+    ],
     entrypointFilters: {
       namespaces:
         schemas.length > 0
