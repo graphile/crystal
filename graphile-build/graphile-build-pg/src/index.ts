@@ -225,6 +225,16 @@ declare global {
       pruneExtensionResources: true;
       /** Detect and build codecs from tables or unique constraints tagged `@enum`. */
       enumTables: true;
+      /**
+       * The row's smart tags, including any merged by plugins, are complete;
+       * read them with `details.getTagsAndDescription`.
+       */
+      smartTags: true;
+      /**
+       * Referenced by an `@foreignKey` smart tag from outside the
+       * introspected schemas; fetched to check whether it is tagged `@enum`.
+       */
+      smartForeignKeyTarget: true;
     }
   }
 }

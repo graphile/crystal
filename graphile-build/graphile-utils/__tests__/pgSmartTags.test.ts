@@ -433,50 +433,80 @@ it("pgSmartTagRulesFromJSON validates version", () => {
   ).toThrow(/only supports the version 1 smart tags JSON format/);
 });
 
-it.each([
-  ["a name", "graphile_utils.pets"],
-  ["a function", (rel: { relname: string }) => rel.relname === "pets"],
-] as const)(
-  "pgSmartTags @foreignKey rules matched by %s discover targets outside the introspected schemas",
-  async (_description, match) => {
-    const introspection = await getIntrospectionWithSmartTags(
-      [
-        {
-          kind: "class",
-          match,
-          tags: {
-            foreignKey: "(type) references smart_tags_hidden.pet_type (type)",
-          },
-        },
-      ],
+const hiddenPetTypeSql = {
+  setupSql: [
+    "create schema smart_tags_hidden;",
+    "create table smart_tags_hidden.pet_type (type text primary key);",
+    "insert into smart_tags_hidden.pet_type values ('cat'), ('dog'), ('goldfish');",
+    "create table smart_tags_hidden.unrelated (id int primary key);",
+  ],
+  teardownSql: ["drop schema smart_tags_hidden cascade;"],
+};
+
+const petTypeForeignKey = (introspection: Introspection) =>
+  introspection.constraints.find(
+    (con) =>
+      con.contype === "f" &&
+      con.getClass()?.relname === "pets" &&
+      con.getForeignClass()?.relname === "pet_type",
+  );
+
+it("pgSmartTags rules matched by name drive multipass discovery of @enum @foreignKey targets", async () => {
+  const introspection = await getIntrospectionWithSmartTags(
+    [
       {
-        setupSql: [
-          "create schema smart_tags_hidden;",
-          "create table smart_tags_hidden.pet_type (type text primary key);",
-          "create table smart_tags_hidden.unrelated (id int primary key);",
-        ],
-        teardownSql: ["drop schema smart_tags_hidden cascade;"],
+        kind: "class",
+        match: "graphile_utils.pets",
+        tags: {
+          foreignKey: "(type) references smart_tags_hidden.pet_type (type)",
+        },
       },
-    );
-    const fake = introspection.constraints.find(
-      (con) =>
-        con.contype === "f" &&
-        con.getClass()?.relname === "pets" &&
-        con.getForeignClass()?.relname === "pet_type",
-    );
-    expect(fake).toBeDefined();
-    expect(fake!.getForeignClass()!.getNamespace()!.nspname).toEqual(
-      "smart_tags_hidden",
-    );
-    expect(
-      introspection.classes.some((rel) => rel.relname === "unrelated"),
-    ).toBe(false);
-  },
-);
+      {
+        kind: "class",
+        match: "smart_tags_hidden.pet_type",
+        tags: { enum: true },
+      },
+    ],
+    hiddenPetTypeSql,
+  );
+  const fake = petTypeForeignKey(introspection);
+  expect(fake).toBeDefined();
+  expect(
+    fake!
+      .getForeignClass()!
+      .getAttributes()
+      .map((attr) => attr.attname),
+  ).toEqual(["type"]);
+  expect(introspection.classes.some((rel) => rel.relname === "unrelated")).toBe(
+    false,
+  );
+});
+
+it("pgSmartTags rules matched by a function do not drive multipass discovery", async () => {
+  const introspection = await getIntrospectionWithSmartTags(
+    [
+      {
+        kind: "class",
+        match: (rel) => rel.relname === "pets",
+        tags: {
+          foreignKey: "(type) references smart_tags_hidden.pet_type (type)",
+        },
+      },
+    ],
+    hiddenPetTypeSql,
+  );
+  expect(petTypeForeignKey(introspection)).toBeUndefined();
+  expect(introspection.classes.some((rel) => rel.relname === "pet_type")).toBe(
+    false,
+  );
+});
 
 it("pgSmartTags rediscovers @foreignKey targets when watched rules change", async () => {
   await pgPool!.query(
-    "create schema smart_tags_watch; create table smart_tags_watch.pet_type (type text primary key);",
+    `create schema smart_tags_watch;
+    create table smart_tags_watch.pet_type (type text primary key);
+    comment on table smart_tags_watch.pet_type is E'@enum';
+    insert into smart_tags_watch.pet_type values ('cat'), ('dog'), ('goldfish');`,
   );
   const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
   let update: UpdatePgSmartTagRulesCallback | null = null;
@@ -499,13 +529,6 @@ it("pgSmartTags rediscovers @foreignKey targets when watched rules change", asyn
       },
     },
   };
-  const fakeForeignKey = (introspection: Introspection) =>
-    introspection.constraints.find(
-      (con) =>
-        con.contype === "f" &&
-        con.getClass()?.relname === "pets" &&
-        con.getForeignClass()?.relname === "pet_type",
-    );
   // Watch mode LISTENs via the service's subscriber until it is released.
   const pgService = makePgService({
     pool: pgPool!,
@@ -528,7 +551,7 @@ it("pgSmartTags rediscovers @foreignKey targets when watched rules change", asyn
       },
     );
     await nextIntrospection(1);
-    expect(fakeForeignKey(introspections[0])).toBeUndefined();
+    expect(petTypeForeignKey(introspections[0])).toBeUndefined();
     update!({
       kind: "class",
       match: "graphile_utils.pets",
@@ -537,7 +560,7 @@ it("pgSmartTags rediscovers @foreignKey targets when watched rules change", asyn
       },
     });
     await nextIntrospection(2);
-    expect(fakeForeignKey(introspections[1])).toBeDefined();
+    expect(petTypeForeignKey(introspections[1])).toBeDefined();
   } finally {
     stop?.();
     await pgService.release?.();

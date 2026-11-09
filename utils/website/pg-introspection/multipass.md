@@ -182,6 +182,20 @@ pattern for `classes`, `procs` and `types`. It requests the namespace with the
 built-in `resolveName` purpose and then every matching object (every overload,
 for procedures) with the given purposes.
 
+### Smart tags during discovery
+
+`details.getTagsAndDescription(collection, row)` parses the smart tags and
+description of a row whose descriptions (the `{ classoid, objoid }` selector)
+have been fetched; it throws otherwise, so call it from a continuation awaiting
+that request, or once a purpose your application adds after such a continuation
+is present. The result is shared by every policy for the rest of the
+introspection run, so a policy may merge further tags into it, for example tags
+from configuration rather than database comments. These merges are ephemeral:
+they only guide discovery and are discarded when the run ends. Entities in the
+returned introspection parse their tags afresh from the database comments, so
+tags that should also affect the schema must be merged again after
+introspection, as `pgSmartTags` does.
+
 ## Including specific objects
 
 `multipass.include` lists objects to discover as if they had matched the

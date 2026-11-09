@@ -36,6 +36,7 @@ import type {
   PrunableIntrospectionData,
   PurposeList,
   RunQuery,
+  TaggedEntity,
 } from "./interfaces.ts";
 export { defineIntrospectionPolicy } from "./interfaces.ts";
 export { introspect, introspectRaw, requestByName } from "./multipass.ts";
@@ -105,6 +106,7 @@ export type {
   PrunableIntrospectionData,
   PurposeList,
   RunQuery,
+  TaggedEntity,
 };
 
 export type { AclObject };

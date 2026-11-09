@@ -336,7 +336,7 @@ test.each([false, true])(
 );
 
 test.each([false, true])(
-  "discovers @foreignKey targets outside the exposed schemas (multipass: %s)",
+  "discovers @enum @foreignKey targets outside the exposed schemas (multipass: %s)",
   async (multipass) => {
     return withPgClientTransaction(async (client) => {
       const runQuery = makeRunQuery(client);
@@ -347,9 +347,10 @@ test.each([false, true])(
         create table "Smart FK Hidden"."Kind" (type text primary key, parent text references "Smart FK Hidden"."Kind");
         comment on table "Smart FK Hidden"."Kind" is E'@enum';
         create table "Smart FK Hidden".unrelated (id integer primary key);
+        create table "Smart FK Hidden".plain (id integer primary key, unrelated_id integer references "Smart FK Hidden".unrelated);
         create table smart_fk_exposed.local_target (id integer primary key);
-        create table smart_fk_exposed.thing (id integer primary key, kind text, local_id integer);
-        comment on table smart_fk_exposed.thing is E'@foreignKey (kind) references "Smart FK Hidden"."Kind" (type)\\n@foreignKey (local_id) references local_target';
+        create table smart_fk_exposed.thing (id integer primary key, kind text, plain_id integer, local_id integer);
+        comment on table smart_fk_exposed.thing is E'@foreignKey (kind) references "Smart FK Hidden"."Kind" (type)\\n@foreignKey (plain_id) references "Smart FK Hidden".plain\\n@foreignKey (local_id) references local_target';
       `,
       );
       const result = await introspect({
@@ -373,6 +374,12 @@ test.each([false, true])(
           .sort(),
       ).toEqual(multipass ? ["p"] : ["f", "p"]);
       expect(kind!.getTagsAndDescription().tags.enum).toBe(true);
+      // Non-enum targets outside the exposed schemas are only checked for `@enum`.
+      const plain = result.classes.find((row) => row.relname === "plain");
+      expect(plain).toBeDefined();
+      expect(plain!.getAttributes().map((row) => row.attname)).toEqual(
+        multipass ? [] : ["id", "unrelated_id"],
+      );
       expect(result.classes.some((row) => row.relname === "local_target")).toBe(
         true,
       );

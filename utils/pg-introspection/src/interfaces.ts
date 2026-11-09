@@ -15,6 +15,7 @@ import type {
   PgRangeData,
   PgTypeData,
 } from "./introspection.ts";
+import type { DESCRIBED_ENTITIES } from "./introspectionConstants.ts";
 import type { defaultEntities } from "./query.ts";
 import type {
   PgSmartTagsAndDescription,
@@ -97,9 +98,28 @@ export interface IntrospectionContinuationDetails {
       details: IntrospectionContinuationDetails,
     ) => void,
   ): void;
+  /**
+   * The smart tags and description of `row`, whose descriptions (selector
+   * `{ classoid, objoid }`) must already have been fetched. The result is
+   * shared by every policy for the rest of this introspection run, so a
+   * policy may merge additional tags into it.
+   *
+   * Merged tags are ephemeral: they only guide discovery and are discarded
+   * when the run ends. Entities in the resulting introspection parse their
+   * tags afresh from the database comments, so anything that should affect
+   * the schema must also be merged after introspection (as `pgSmartTags`
+   * does).
+   */
+  getTagsAndDescription<TEntity extends TaggedEntity>(
+    entity: TEntity,
+    row: IntrospectionRow<TEntity>,
+  ): PgSmartTagsAndDescription;
   /** Immutable metadata captured before dependency discovery begins. */
   catalogByOid: Readonly<Record<string, string>>;
 }
+
+/** Collections whose rows can be described with `comment on`. */
+export type TaggedEntity = (typeof DESCRIBED_ENTITIES)[number] | "attributes";
 
 export interface IntrospectionPolicyDetails
   extends IntrospectionContinuationDetails {

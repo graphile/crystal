@@ -6,7 +6,6 @@ import { inspect } from "node:util";
 import { gatherConfig } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type {
-  IntrospectionContinuationDetails,
   IntrospectionPolicy,
   PgAttribute,
   PgClass,
@@ -398,58 +397,66 @@ async function resolveRules(
   return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
 }
 
-function isForeignKeyRule(
-  rule: Pick<PgSmartTagRule, "kind" | "tags">,
+/** Class rules matched by name, which multipass discovery can apply. */
+function isDiscoveryRule(
+  rule: Pick<PgSmartTagRule, "kind" | "match" | "tags">,
 ): boolean {
-  return rule.kind === "class" && rule.tags?.foreignKey != null;
-}
-
-/** Changes when the tables multipass discovery requests for these rules may. */
-function foreignKeyDiscoveryKey(rules: PgSmartTagRule[]): string {
-  return JSON.stringify(
-    rules
-      .filter(isForeignKeyRule)
-      .map((rule) => [
-        rule.serviceName ?? null,
-        typeof rule.match === "string" ? rule.match : null,
-        rule.tags!.foreignKey,
-      ]),
+  return (
+    rule.kind === "class" && typeof rule.match === "string" && rule.tags != null
   );
 }
 
-/** Requests the `@foreignKey` targets of the rules matching each initial class. */
-function foreignKeyTargetsPolicy(
+/** Changes when the tags these rules contribute to discovery may. */
+function rulesDiscoveryKey(rules: PgSmartTagRule[]): string {
+  return JSON.stringify(
+    rules
+      .filter(isDiscoveryRule)
+      .map((rule) => [rule.serviceName ?? null, rule.match, rule.tags]),
+  );
+}
+
+/**
+ * Merges the tags of name-matched class rules into the tags multipass
+ * policies see. Rules matched by a function cannot be applied to raw rows, so
+ * they only take effect after introspection.
+ */
+function mergeTagsPolicy(
   name: string,
-  foreignKeyRules: CompiledPgSmartTagRule<PgSmartTagSupportedKinds>[],
-  requestTargets: (
-    details: IntrospectionContinuationDetails,
-    schemaName: string,
-    foreignKey: unknown,
-  ) => void,
+  rules: CompiledPgSmartTagRule<PgSmartTagSupportedKinds>[],
 ): IntrospectionPolicy<"classes"> {
   return {
     name,
     entity: "classes",
     select(row, details) {
-      if (!details.hasPurpose("initial")) {
+      const pgClassId = Object.keys(details.catalogByOid).find(
+        (oid) => details.catalogByOid[oid] === "pg_class",
+      );
+      if (pgClassId == null) {
         return;
       }
+      const descriptions = details.request(
+        "descriptions",
+        { classoid: pgClassId, objoid: row._id },
+        ["smartTagsAndDescriptions"],
+      );
       const namespace = details.request(
         "namespaces",
         { _id: row.relnamespace },
         ["catalogNavigation"],
       );
-      details.after([namespace], ([[namespaceRow]], next) => {
+      details.after([descriptions, namespace], ([, [namespaceRow]], next) => {
         if (!namespaceRow) {
           return;
         }
-        // Rules matched by a function are assumed to match.
-        const matching = foreignKeyRules.filter(
-          (rule) =>
-            rule.matchName?.(namespaceRow.nspname, row.relname) !== false,
+        const matching = rules.filter((rule) =>
+          rule.matchName?.(namespaceRow.nspname, row.relname),
         );
+        if (matching.length === 0) {
+          return;
+        }
+        const { tags } = next.getTagsAndDescription("classes", row);
         for (const rule of matching) {
-          requestTargets(next, namespaceRow.nspname, rule.tags!.foreignKey);
+          Object.assign(tags, rule.tags);
         }
       });
     },
@@ -489,39 +496,28 @@ export function pgSmartTags<
         };
       },
       hooks: {
-        // Multipass introspection only discovers what policies request, so
-        // fetch the targets of any `@foreignKey` tags these rules add.
+        // Multipass introspection decides what to fetch partly from smart
+        // tags (e.g. `@foreignKey`, `@enum`), so apply these rules there too.
         pgIntrospection_options(info, event) {
           const { multipass } = event.options;
           if (!multipass) {
             return;
           }
-          info.cache.discoveryKey = foreignKeyDiscoveryKey(info.state.rules);
+          info.cache.discoveryKey = rulesDiscoveryKey(info.state.rules);
           const [rules] = rulesFrom(info.state.rules);
-          const foreignKeyRules = rules.filter(
+          const discoveryRules = rules.filter(
             (rule) =>
-              isForeignKeyRule(rule) &&
+              rule.matchName != null &&
+              rule.tags != null &&
               (rule.serviceName == null ||
                 rule.serviceName === event.serviceName),
           );
-          if (foreignKeyRules.length === 0) {
+          if (discoveryRules.length === 0) {
             return;
           }
-          const { serviceName } = event;
-          const { requestForeignKeyTagTargets } = info.helpers.pgIntrospection;
           multipass.policies = [
             ...(multipass.policies ?? []),
-            foreignKeyTargetsPolicy(
-              `${name}_foreignKeyTargets`,
-              foreignKeyRules,
-              (details, schemaName, foreignKey) =>
-                requestForeignKeyTagTargets(
-                  serviceName,
-                  details,
-                  schemaName,
-                  foreignKey,
-                ),
-            ),
+            mergeTagsPolicy(`${name}_mergeTags`, discoveryRules),
           ];
         },
 
@@ -600,7 +596,7 @@ export function pgSmartTags<
                     const { discoveryKey } = info.cache;
                     if (
                       discoveryKey != null &&
-                      discoveryKey !== foreignKeyDiscoveryKey(rules)
+                      discoveryKey !== rulesDiscoveryKey(rules)
                     ) {
                       info.cache.discoveryKey = null;
                       info.helpers.pgIntrospection?.invalidateIntrospection();

@@ -1024,3 +1024,74 @@ it("rejects invalid multipass.include entries", async () => {
     /Invalid multipass\.include entry/,
   );
 });
+
+it("shares smart tags between policies once descriptions are fetched", async () => {
+  const seen: unknown[] = [];
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          catalog_by_oid: { "1259": "pg_class" },
+          namespaces: [],
+          classes: [{ _id: "1", relname: "tagged" }],
+          descriptions: [],
+        });
+      }
+      return JSON.stringify({
+        descriptions: [
+          {
+            classoid: "1259",
+            objoid: "1",
+            objsubid: 0,
+            description: "@fromComment\nHello",
+          },
+        ],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "descriptions"],
+    multipass: {
+      // Leaves the initial descriptions incomplete so they must be refetched.
+      entrypointFilters: { descriptions: "false" },
+      policies: (["merge", "read"] as const).map((name) =>
+        defineIntrospectionPolicy({
+          name,
+          entity: "classes",
+          select(row, details) {
+            if (name === "read") {
+              assert.throws(
+                () => details.getTagsAndDescription("classes", row),
+                /have not been fetched/,
+              );
+            }
+            const descriptions = details.request(
+              "descriptions",
+              { classoid: "1259", objoid: row._id },
+              ["terminal"],
+            );
+            details.after([descriptions], (_rows, next) => {
+              const result = next.getTagsAndDescription("classes", row);
+              if (name === "merge") {
+                result.tags.fromPolicy = true;
+              } else {
+                seen.push(result);
+              }
+            });
+          },
+        }),
+      ),
+    },
+  });
+  assert.equal(queries, 2);
+  assert.deepEqual(seen, [
+    {
+      tags: Object.assign(Object.create(null), {
+        fromComment: true,
+        fromPolicy: true,
+      }),
+      description: "Hello",
+    },
+  ]);
+});

@@ -5,44 +5,10 @@ import type {
   IntrospectOptions,
   MultipassOptions,
 } from "pg-introspection";
-import {
-  parseSmartComment,
-  pruneExtensionResources,
-  requestByName,
-} from "pg-introspection";
+import { pruneExtensionResources, requestByName } from "pg-introspection";
 
 import { invertKeyAndValue } from "../utils.ts";
 import { parseForeignKeyTag } from "./PgFakeConstraintsPlugin.ts";
-
-/**
- * Requests the tables outside `introspectedSchemas` referenced by an
- * `@foreignKey` smart tag value so that PgFakeConstraintsPlugin can find them.
- * Invalid specs are ignored here; PgFakeConstraintsPlugin reports them.
- */
-export function requestForeignKeyTagTargets(
-  details: IntrospectionContinuationDetails,
-  introspectedSchemas: readonly string[],
-  schemaName: string,
-  foreignKey: unknown,
-): void {
-  for (const rawSpec of Array.isArray(foreignKey) ? foreignKey : [foreignKey]) {
-    if (typeof rawSpec !== "string") continue;
-    let parsed: ReturnType<typeof parseForeignKeyTag>;
-    try {
-      parsed = parseForeignKeyTag(rawSpec);
-    } catch {
-      continue;
-    }
-    if (!parsed) continue;
-    const foreignSchema = parsed.foreignSchema ?? schemaName;
-    // Initial discovery covers the accessible tables in these schemas.
-    if (introspectedSchemas.includes(foreignSchema)) continue;
-    requestByName(details, "classes", foreignSchema, parsed.foreignTable, [
-      "registryRelation",
-      "enumTables",
-    ]);
-  }
-}
 
 type Entity = IntrospectionPolicy["entity"];
 type TemplateIntrospectionPolicy = Readonly<IntrospectionPolicy<any>>;
@@ -208,6 +174,68 @@ const DEFAULT_POLICIES = (() => {
   return Object.freeze(policies);
 })();
 
+function requestForeignKeyTagTargets(
+  details: IntrospectionContinuationDetails,
+  introspectedSchemas: readonly string[],
+  schemaName: string,
+  foreignKey: unknown,
+): void {
+  for (const rawSpec of Array.isArray(foreignKey) ? foreignKey : [foreignKey]) {
+    if (typeof rawSpec !== "string") continue;
+    let parsed: ReturnType<typeof parseForeignKeyTag>;
+    try {
+      parsed = parseForeignKeyTag(rawSpec);
+    } catch {
+      // PgFakeConstraintsPlugin reports invalid specs.
+      continue;
+    }
+    if (!parsed) continue;
+    const foreignSchema = parsed.foreignSchema ?? schemaName;
+    // Initial discovery covers the accessible tables in these schemas.
+    if (introspectedSchemas.includes(foreignSchema)) continue;
+    requestByName(details, "classes", foreignSchema, parsed.foreignTable, [
+      "smartForeignKeyTarget",
+    ]);
+  }
+}
+
+/**
+ * Smart tags matter to discovery for exposed tables and for the targets of
+ * their `@foreignKey` tags. Policies that merge extra tags into
+ * `getTagsAndDescription` must do so in a continuation awaiting only the
+ * table's descriptions and namespace; `smartTags` is added after those
+ * continuations have run.
+ */
+const classSmartTags: IntrospectionPolicy<"classes"> = {
+  name: "classSmartTags",
+  entity: "classes",
+  select(row, details) {
+    if (
+      !details.hasPurpose("initial") &&
+      !details.hasPurpose("smartForeignKeyTarget")
+    ) {
+      return;
+    }
+    const catalogId = invertKeyAndValue(details.catalogByOid)["pg_class"];
+    if (catalogId == null) {
+      return;
+    }
+    const descriptions = details.request(
+      "descriptions",
+      { classoid: catalogId, objoid: row._id },
+      ["smartTagsAndDescriptions"],
+    );
+    const namespace = details.request("namespaces", { _id: row.relnamespace }, [
+      "catalogNavigation",
+    ]);
+    details.after([descriptions, namespace], (_rows, next) => {
+      next.after([], (_rows, last) => {
+        last.request("classes", { _id: row._id }, ["smartTags"]);
+      });
+    });
+  },
+};
+
 function smartForeignKeyTargets(
   schemas: readonly string[],
 ): IntrospectionPolicy<"classes"> {
@@ -215,43 +243,45 @@ function smartForeignKeyTargets(
     name: "smartForeignKeyTargets",
     entity: "classes",
     select(row, details) {
-      if (!details.hasPurpose("initial")) {
+      if (!details.hasPurpose("initial") || !details.hasPurpose("smartTags")) {
         return;
       }
-      const catalogId = invertKeyAndValue(details.catalogByOid)["pg_class"];
-      if (catalogId == null) {
+      const { foreignKey } = details.getTagsAndDescription("classes", row).tags;
+      if (foreignKey == null) {
         return;
       }
-      const descriptions = details.request(
-        "descriptions",
-        { classoid: catalogId, objoid: row._id },
-        ["smartTagsAndDescriptions"],
-      );
       const namespace = details.request(
         "namespaces",
         { _id: row.relnamespace },
         ["catalogNavigation"],
       );
-      details.after(
-        [descriptions, namespace],
-        ([descriptionRows, [namespaceRow]], next) => {
-          const description = descriptionRows.find(
-            (description) => description.objsubid === 0,
-          )?.description;
-          if (!namespaceRow || !description?.includes("@foreignKey")) {
-            return;
-          }
+      details.after([namespace], ([[namespaceRow]], next) => {
+        if (namespaceRow) {
           requestForeignKeyTagTargets(
             next,
             schemas,
             namespaceRow.nspname,
-            parseSmartComment(description).tags.foreignKey,
+            foreignKey,
           );
-        },
-      );
+        }
+      });
     },
   };
 }
+
+const smartEnumTargets: IntrospectionPolicy<"classes"> = {
+  name: "smartEnumTargets",
+  entity: "classes",
+  select(row, details) {
+    if (
+      details.hasPurpose("smartForeignKeyTarget") &&
+      details.hasPurpose("smartTags") &&
+      details.getTagsAndDescription("classes", row).tags.enum
+    ) {
+      details.request("classes", { _id: row._id }, ["enumTables"]);
+    }
+  },
+};
 
 // Exclude extension resources from initial discovery, but retain dependencies
 // referenced by user resources.
@@ -308,7 +338,9 @@ export function postgraphileMultipass(options: {
   return {
     policies: [
       ...DEFAULT_POLICIES.map(clonePolicy),
+      classSmartTags,
       smartForeignKeyTargets(schemas),
+      smartEnumTargets,
     ],
     entrypointFilters: {
       namespaces:

@@ -332,17 +332,23 @@ async function processFk(
     foreignSchema,
     foreignTable,
   );
+  const multipass =
+    info.resolvedPreset.gather?.pgMultipassIntrospection !== false;
+  let external = false;
+  if (multipass) {
+    const pgService = info.resolvedPreset.pgServices?.find(
+      (service) => service.name === serviceName,
+    );
+    if (!pgService) {
+      throw new Error(`Could not find '${serviceName}' in 'pgServices'`);
+    }
+    external = !(pgService.schemas ?? ["public"]).includes(foreignSchema);
+  }
   if (!foreignPgClass) {
-    if (info.resolvedPreset.gather?.pgMultipassIntrospection !== false) {
-      const pgService = info.resolvedPreset.pgServices?.find(
-        (service) => service.name === serviceName,
-      );
-      if (!pgService) {
-        throw new Error(`Could not find '${serviceName}' in 'pgServices'`);
-      }
-      if (!(pgService.schemas ?? ["public"]).includes(foreignSchema)) {
-        return;
-      }
+    if (external) {
+      return;
+    }
+    if (multipass) {
       console.error(
         `Invalid @foreignKey on '${identity()}'; table/view '${foreignSchema}.${foreignTable}' was not found in the introspection results. Check the database names and permissions. (${rawSpec})`,
       );
@@ -351,6 +357,10 @@ async function processFk(
     throw new Error(
       `Invalid @foreignKey on '${identity()}'; referenced non-existent table/view '${foreignSchema}.${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${rawSpec})`,
     );
+  }
+  // Multipass introspection only fetches the details of external `@enum` targets.
+  if (external && !foreignPgClass.getTagsAndDescription().tags.enum) {
+    return;
   }
   const keyAttibutes = attributesByNames(
     pgClass,

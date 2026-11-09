@@ -17,6 +17,7 @@ import type {
   MultipassIntrospectOptions,
   PurposeList,
   SQLVal,
+  TaggedEntity,
 } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
@@ -35,6 +36,10 @@ import {
   defaultEntities,
   makeIntrospectionQuery,
 } from "./query.ts";
+import {
+  parseSmartComment,
+  type PgSmartTagsAndDescription,
+} from "./smartComments.ts";
 
 /** Preserve known column types; dynamically selected columns yield unknown. */
 function columnValue<TRow extends object, TColumn extends string>(
@@ -365,6 +370,8 @@ interface MultipassContext<TEntities extends EntityType> {
   pending: Map<string, IntrospectionRequest>;
   /** Callbacks awaiting the rows of their tokens' selectors. */
   continuations: Continuation[];
+  /** Smart tags shared by policies for the rest of this run. */
+  tags: WeakMap<IntrospectionRow, PgSmartTagsAndDescription>;
 }
 
 interface Continuation {
@@ -405,6 +412,7 @@ function buildMultipassContext<TEntities extends EntityType>(
     frontier: [],
     pending: new Map(),
     continuations: [],
+    tags: new WeakMap(),
     selected: new Set([...onlyEntities]),
     policiesByEntity: new Map(),
     rowsByIdentity: new Map(),
@@ -715,6 +723,9 @@ function continuationDetails<TEntity extends EntityType>(
       requestDependency(context, policy, request);
       return { entity, match };
     },
+    getTagsAndDescription(entity, row) {
+      return tagsAndDescription(context, entity, row);
+    },
     after(tokens, callback) {
       context.continuations.push({
         policy,
@@ -724,6 +735,44 @@ function continuationDetails<TEntity extends EntityType>(
       });
     },
   };
+}
+
+function tagsAndDescription<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  entity: TaggedEntity,
+  row: IntrospectionRow<TaggedEntity>,
+): PgSmartTagsAndDescription {
+  const existing = context.tags.get(row);
+  if (existing) {
+    return existing;
+  }
+  const catalog =
+    "attrelid" in row ? "pg_class" : ENTITY_TYPES[entity].tableName;
+  const classoid = Object.keys(context.catalogByOid).find(
+    (oid) => context.catalogByOid[oid] === catalog,
+  );
+  const objoid = "attrelid" in row ? row.attrelid : rowOid(entity, row);
+  const objsubid = "attrelid" in row ? row.attnum : 0;
+  let description: string | undefined;
+  if (context.selected.has("descriptions") && classoid && objoid) {
+    const fetched = context.completedSelectors.has(
+      selectorKey({ entity: "descriptions", match: { classoid, objoid } }),
+    );
+    if (!fetched) {
+      throw new Error(
+        `The descriptions of ${entity} '${objoid}' have not been fetched; request them and read the tags in a continuation`,
+      );
+    }
+    const [match] = matchingRows(context, {
+      entity: "descriptions",
+      match: { classoid, objoid, objsubid },
+    });
+    description =
+      match && "description" in match ? match.description : undefined;
+  }
+  const result = parseSmartComment(description);
+  context.tags.set(row, result);
+  return result;
 }
 
 /** Whether every row matching the token's selector is known. */
