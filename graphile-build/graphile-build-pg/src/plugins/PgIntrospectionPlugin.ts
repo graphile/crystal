@@ -247,6 +247,12 @@ declare global {
           serviceName: string,
           extensionName: string,
         ): Promise<PgExtension | undefined>;
+        /**
+         * Discard cached introspection results so the next gather introspects
+         * again; call this before triggering a regather when configuration
+         * that affects multipass discovery changes.
+         */
+        invalidateIntrospection(): void;
       };
     }
 
@@ -601,6 +607,11 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       async getExtensionByName(info, serviceName, extensionName) {
         const introspection = await getIntrospection(info, serviceName);
         return introspection.getExtension({ name: extensionName });
+      },
+
+      invalidateIntrospection(info) {
+        info.cache.introspectionResultsPromise = null;
+        info.cache.dirty = true;
       },
 
       getIntrospection(info) {

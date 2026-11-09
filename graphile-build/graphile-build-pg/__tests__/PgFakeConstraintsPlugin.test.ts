@@ -12,6 +12,7 @@ function makeContext(
     schemas?: string[];
     multipass?: boolean;
     target?: boolean;
+    targetTags?: Record<string, true>;
     tag?: string;
   } = {},
 ) {
@@ -22,7 +23,7 @@ function makeContext(
   const target = {
     _id: "2",
     getNamespace: () => ({ nspname: "private" }),
-    getTagsAndDescription: () => ({ tags: {} }),
+    getTagsAndDescription: () => ({ tags: options.targetTags ?? {} }),
     getAttributes: () => [foreignAttribute],
     getConstraints: () => [
       { contype: "p", getAttributes: () => [foreignAttribute] },
@@ -99,11 +100,20 @@ test("retains the missing-table error in single-pass mode", async () => {
   ).rejects.toThrow(/referenced non-existent table\/view 'private.parent'/);
 });
 
-test("creates the constraint when the external target was discovered", async () => {
-  const { info, introspection } = makeContext({ target: true });
+test("creates the constraint when an external @enum target was discovered", async () => {
+  const { info, introspection } = makeContext({
+    target: true,
+    targetTags: { enum: true },
+  });
   await hook(info as never, { serviceName: "main", introspection } as never);
   expect(introspection.constraints).toHaveLength(1);
   expect(introspection.constraints[0].confrelid).toBe("2");
+});
+
+test("ignores an external target that is not an @enum table", async () => {
+  const { info, introspection } = makeContext({ target: true });
+  await hook(info as never, { serviceName: "main", introspection } as never);
+  expect(introspection.constraints).toHaveLength(0);
 });
 
 test("still rejects invalid smart-tag syntax", async () => {

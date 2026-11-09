@@ -25,8 +25,9 @@ error will be reported when a required collection was not included.
 NEW! Multipass introspection (opt-in with `multipass: { policies: [...] }`)
 allows pg-introspection to minimize the amount of data it pulls from the
 database to just the parts you're interested in, significantly reducing memory
-usage. Supports configurable discovery policies, role-based filtering,
-entrypoint filters and pruning. See the
+usage. Supports configurable discovery policies (including staged discovery via
+continuations, and smart tags shared between policies), role-based filtering,
+entrypoint filters, explicitly included objects and pruning. See the
 [multipass guide](https://star.graphile.org/pg-introspection/multipass).
 
 NEW! Top-level `filters` accepts trusted SQL predicates keyed by collection.

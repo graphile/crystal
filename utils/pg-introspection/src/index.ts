@@ -1,6 +1,7 @@
 import type {
   DefaultEntities,
   Introspection,
+  IntrospectionContinuationDetails,
   IntrospectionDataForEntities,
   IntrospectionOptions,
   IntrospectionPolicy,
@@ -8,7 +9,10 @@ import type {
   IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectionRow,
+  IntrospectionToken,
+  IntrospectionTokenRows,
   IntrospectOptions,
+  MultipassInclude,
   MultipassOptions,
   PgAttribute,
   PgAuthMembers,
@@ -32,9 +36,10 @@ import type {
   PrunableIntrospectionData,
   PurposeList,
   RunQuery,
+  TaggedEntity,
 } from "./interfaces.ts";
 export { defineIntrospectionPolicy } from "./interfaces.ts";
-export { introspect, introspectRaw } from "./multipass.ts";
+export { introspect, introspectRaw, requestByName } from "./multipass.ts";
 import type { AclObject } from "./acl.ts";
 import {
   aclContainsRole,
@@ -66,6 +71,7 @@ export { pruneExtensionResources } from "./pruneExtensionResources.ts";
 export type {
   DefaultEntities,
   Introspection,
+  IntrospectionContinuationDetails,
   IntrospectionDataForEntities,
   IntrospectionOptions,
   IntrospectionPolicy,
@@ -73,7 +79,10 @@ export type {
   IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectionRow,
+  IntrospectionToken,
+  IntrospectionTokenRows,
   IntrospectOptions,
+  MultipassInclude,
   MultipassOptions,
   PgAttribute,
   PgAuthMembers,
@@ -97,6 +106,7 @@ export type {
   PrunableIntrospectionData,
   PurposeList,
   RunQuery,
+  TaggedEntity,
 };
 
 export type { AclObject };
@@ -116,6 +126,8 @@ declare global {
   namespace PgIntrospection {
     interface PurposeRegistry {
       initial: true;
+      /** Resolve the schema of an object requested by name. */
+      resolveName: true;
     }
     type Purpose = keyof PurposeRegistry;
   }

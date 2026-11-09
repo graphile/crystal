@@ -15,6 +15,7 @@ import type {
   PgRangeData,
   PgTypeData,
 } from "./introspection.ts";
+import type { DESCRIBED_ENTITIES } from "./introspectionConstants.ts";
 import type { defaultEntities } from "./query.ts";
 import type {
   PgSmartTagsAndDescription,
@@ -59,7 +60,24 @@ export type IntrospectionRequest<TEntity extends EntityType = EntityType> =
       }
     : never;
 
-export interface IntrospectionPolicyDetails {
+/** Identifies a requested selector so its rows can be inspected with `after`. */
+export interface IntrospectionToken<TEntity extends EntityType = EntityType> {
+  readonly entity: TEntity;
+  readonly match: IntrospectionRequest<TEntity>["match"];
+}
+
+/** The rows matched by each token, in the order the tokens were given. */
+export type IntrospectionTokenRows<
+  TTokens extends readonly IntrospectionToken[],
+> = {
+  -readonly [K in keyof TTokens]: TTokens[K] extends IntrospectionToken<
+    infer TEntity
+  >
+    ? ReadonlyArray<IntrospectionRow<TEntity>>
+    : never;
+};
+
+export interface IntrospectionContinuationDetails {
   /**
    * Queue a dependency immediately; repeated selectors are merged.
    * Zero selectors for columns that always identify an object are ignored.
@@ -68,11 +86,45 @@ export interface IntrospectionPolicyDetails {
     entity: TEntity,
     match: IntrospectionRequest<NoInfer<TEntity>>["match"],
     purposes: PurposeList,
+  ): IntrospectionToken<TEntity>;
+  /**
+   * Call `callback` with every row matching each token once all of the
+   * tokens' selectors have been fetched. Rows are read-only.
+   */
+  after<const TTokens extends readonly IntrospectionToken[]>(
+    tokens: TTokens,
+    callback: (
+      rows: IntrospectionTokenRows<TTokens>,
+      details: IntrospectionContinuationDetails,
+    ) => void,
   ): void;
-  /** False results subscribe this policy to run again when the purpose is added. */
-  hasPurpose(purpose: PgIntrospection.Purpose): boolean;
+  /**
+   * The smart tags and description of `row`, whose descriptions (selector
+   * `{ classoid, objoid }`) must already have been fetched. The result is
+   * shared by every policy for the rest of this introspection run, so a
+   * policy may merge additional tags into it.
+   *
+   * Merged tags are ephemeral: they only guide discovery and are discarded
+   * when the run ends. Entities in the resulting introspection parse their
+   * tags afresh from the database comments, so anything that should affect
+   * the schema must also be merged after introspection (as `pgSmartTags`
+   * does).
+   */
+  getTagsAndDescription<TEntity extends TaggedEntity>(
+    entity: TEntity,
+    row: IntrospectionRow<TEntity>,
+  ): PgSmartTagsAndDescription;
   /** Immutable metadata captured before dependency discovery begins. */
   catalogByOid: Readonly<Record<string, string>>;
+}
+
+/** Collections whose rows can be described with `comment on`. */
+export type TaggedEntity = (typeof DESCRIBED_ENTITIES)[number] | "attributes";
+
+export interface IntrospectionPolicyDetails
+  extends IntrospectionContinuationDetails {
+  /** False results subscribe this policy to run again when the purpose is added. */
+  hasPurpose(purpose: PgIntrospection.Purpose): boolean;
 }
 
 export type Maybe<T> = T | null | undefined;
@@ -105,7 +157,19 @@ export interface MultipassOptions {
   }[EntityType][];
   /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
   entrypointFilters?: Partial<Record<EntityType, string>>;
+  /**
+   * Objects to discover with the `initial` purpose regardless of entrypoint
+   * filters and privilege checks, identified by schema and name.
+   */
+  include?: readonly MultipassInclude[];
 }
+
+/** `[collection, schemaName, name]`; every procedure overload is included. */
+export type MultipassInclude = readonly [
+  "classes" | "procs" | "types",
+  string,
+  string,
+];
 export type PruneCallback = (
   data: PrunableIntrospectionData,
   details: IntrospectionPruneDetails,
