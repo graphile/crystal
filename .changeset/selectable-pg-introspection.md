@@ -2,6 +2,14 @@
 "pg-introspection": major
 ---
 
+The focus of this release was allowing you to (severely!) limit the amount of
+data you pull from introspection, whilst also allowing you to introspect more
+database resources!
+
+See https://star.graphile.org/pg-introspection/v1-to-v2 for a migration guide
+(the legacy APIs remain supported, but move to the new APIs to make use of the
+new features!)
+
 NEW! Use `introspect` and `introspectRaw` to run introspection using a supplied
 database query callback, rather than building the query and running it yourself.
 `introspect` returns full introspection results (including navigation helpers);
@@ -39,42 +47,5 @@ their dependency data. Standalone extension types are unaffected.
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated in favour of either `introspect` or the
 `introspectRaw`/`augmentIntrospectionData` combo; the deprecated methods do not
-gain any of this new functionality. To move to the new APIs, replace the old
-query/parse pattern:
-
-```js
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
-const includeExtensionResources = false;
-
-const text = makeIntrospectionQuery();
-const result = await runSql(text);
-const introspection = parseIntrospectionResults(
-  result,
-  includeExtensionResources,
-);
-```
-
-with the new `introspect` method:
-
-```ts
-import { pruneExtensionResources, introspect } from "pg-introspection";
-const includeExtensionResources = false;
-
-const introspection = await introspect(
-  includeExtensionResources ? {} : { prune: pruneExtensionResources },
-  runSql,
-);
-```
-
-Where `runSql` abstracts away the client you use to issue SQL to the database;
-for example using the `pg` module it might be:
-
-```ts
-async function runSql(sql: string, placeholders: any[]) {
-  const { rows } = await client.query(sql, placeholders);
-  return rows[0].introspection;
-}
-```
+gain any of this new functionality. See
+https://star.graphile.org/pg-introspection/v1-to-v2 for a migration guide.
