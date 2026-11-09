@@ -365,7 +365,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
       init(_, build) {
         const {
           inflection,
-          graphql: { GraphQLString, GraphQLNonNull, GraphQLID },
+          graphql: { GraphQLString, GraphQLNonNull, GraphQLID, isInputType },
         } = build;
 
         const process = (
@@ -562,8 +562,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     fields() {
                       const TablePatch =
                         mode === "resource:update"
-                          ? build.getInputTypeByName(tablePatchName!)!
+                          ? build.getTypeByName(tablePatchName!)
                           : null;
+
                       return Object.assign(
                         {
                           clientMutationId: {
@@ -607,7 +608,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 Object.create(null),
                               )),
                         },
-                        mode === "resource:update" && TablePatch
+                        mode === "resource:update" && isInputType(TablePatch)
                           ? {
                               [inflection.patchField(
                                 inflection.tableFieldName(resource),
