@@ -488,6 +488,22 @@ lateral (
   ) __applications__
 ) as __union_result__;
 
+with __aws_applications_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __aws_applications_result__.*
+from __aws_applications_identifiers__,
+lateral (
+  select
+    __aws_applications__."name" as "0",
+    __aws_applications__."id"::text as "1",
+    __aws_applications_identifiers__.idx as "2"
+  from "polymorphic"."aws_applications" as __aws_applications__
+  where (
+    __aws_applications__."id" = __aws_applications_identifiers__."id0"
+  )
+) as __aws_applications_result__;
+
 with __gcp_applications_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
@@ -503,6 +519,69 @@ lateral (
     __gcp_applications__."id" = __gcp_applications_identifiers__."id0"
   )
 ) as __gcp_applications_result__;
+
+with __union_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __union_result__.*
+from __union_identifiers__,
+lateral (
+  select
+    __vulnerabilities__."0" as "0",
+    __vulnerabilities__."1"::text as "1",
+    __union_identifiers__.idx as "2"
+  from (
+      select
+        __first_party_vulnerabilities__."0",
+        __first_party_vulnerabilities__."1",
+        "n"
+      from (
+        select
+          'FirstPartyVulnerability' as "0",
+          json_build_array((__first_party_vulnerabilities__."id")::text) as "1",
+          row_number() over (
+            order by
+              __first_party_vulnerabilities__."id" asc
+          ) as "n"
+        from "polymorphic"."aws_application_first_party_vulnerabilities" as __aws_application_first_party_vulnerabilities__
+        inner join "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+        on (
+          __first_party_vulnerabilities__."id" = __aws_application_first_party_vulnerabilities__."first_party_vulnerability_id"
+        )
+        where __aws_application_first_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
+        order by
+          __first_party_vulnerabilities__."id" asc
+        limit 2
+      ) as __first_party_vulnerabilities__
+    union all
+      select
+        __third_party_vulnerabilities__."0",
+        __third_party_vulnerabilities__."1",
+        "n"
+      from (
+        select
+          'ThirdPartyVulnerability' as "0",
+          json_build_array((__third_party_vulnerabilities__."id")::text) as "1",
+          row_number() over (
+            order by
+              __third_party_vulnerabilities__."id" asc
+          ) as "n"
+        from "polymorphic"."aws_application_third_party_vulnerabilities" as __aws_application_third_party_vulnerabilities__
+        inner join "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
+        on (
+          __third_party_vulnerabilities__."id" = __aws_application_third_party_vulnerabilities__."third_party_vulnerability_id"
+        )
+        where __aws_application_third_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
+        order by
+          __third_party_vulnerabilities__."id" asc
+        limit 2
+      ) as __third_party_vulnerabilities__
+    order by
+      "0" asc,
+      "n" asc
+    limit 2
+  ) __vulnerabilities__
+) as __union_result__;
 
 with __union_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
