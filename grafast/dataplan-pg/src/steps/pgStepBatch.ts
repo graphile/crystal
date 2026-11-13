@@ -49,6 +49,15 @@ export function getPgStepBatchInfo(
   if (bySignature == null) {
     byContext.set(context, (bySignature = new Map()));
   }
+  let scopedContext = state.contexts?.get(context);
+  if (scopedContext == null) {
+    const contexts = (state.contexts ??= new WeakMap());
+    scopedContext = {
+      pgSettings: context.pgSettings,
+      withPgClient: context.withPgClient,
+    };
+    contexts.set(context, scopedContext);
+  }
 
   const signature = JSON.stringify([
     options.text,
@@ -61,7 +70,14 @@ export function getPgStepBatchInfo(
   ]);
   let info = bySignature.get(signature);
   if (info == null) {
-    info = { executor, context, options };
+    // Executor caches belong to this execution metadata lifetime. The input
+    // context can survive subscription events and mutation fields, whereas
+    // metadata is reset at each of those boundaries.
+    info = {
+      executor,
+      context: scopedContext,
+      options,
+    };
     bySignature.set(signature, info);
   }
   return info;
