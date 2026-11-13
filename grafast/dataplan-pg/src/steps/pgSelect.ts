@@ -83,6 +83,11 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import {
+  executePgStepBatch,
+  getPgStepBatchInfo,
+  pgStepBatchMetaKey,
+} from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -713,6 +718,7 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
+    this.metaKey = pgStepBatchMetaKey;
     if (!options.resource) {
       throw new Error(
         `Resource passed to \`pgSelect(...)\` was ${inspect(options.resource)} - perhaps you used the wrong resource name when looking it up in the registry?`,
@@ -1185,12 +1191,8 @@ export class PgSelectStep<
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastResultsList<PgSelectStepResult>> {
-    const {
-      indexMap,
-      count,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
+    const { indexMap, count, values, extra } = executionDetails;
+    const { eventEmitter } = extra;
     const {
       meta,
       text,
@@ -1232,7 +1234,7 @@ export class PgSelectStep<
     }
     const context = values[this.contextId].unaryValue();
 
-    const isMutation = this.mode === "mutation";
+    const isMutation = this.mode === "mutation" || this.hasSideEffects;
     /**
      * If we know one of the identifiers is `null`, can we skip execution?
      *
@@ -1240,7 +1242,7 @@ export class PgSelectStep<
      * least one row (rather than zero) and the expressions may be null or
      * non-null (e.g. `count(*)` is `0` even over the empty set).
      */
-    const isSkippable = this.mode === "normal";
+    const isSkippable = this.mode === "normal" && !this.hasSideEffects;
 
     if (streamInitialCount == null) {
       const specs: PgExecutorInput<any>[] = [];
@@ -1309,21 +1311,34 @@ export class PgSelectStep<
           return specIdx;
         });
       }
-      const executeMethod =
-        this.operationPlan.operation.operation === "query"
-          ? "executeWithCache"
-          : "executeWithoutCache";
+      const common = {
+        text,
+        rawSqlValues,
+        identifierIndex,
+        name,
+        affinity: this.executionAffinity,
+        eventEmitter,
+        useTransaction: isMutation,
+      };
       const executionResult =
         specs.length > 0
-          ? await this.resource[executeMethod](specs, {
-              text,
-              rawSqlValues,
-              identifierIndex,
-              name,
-              affinity: this.executionAffinity,
-              eventEmitter,
-              useTransaction: isMutation,
-            })
+          ? isMutation
+            ? await this.resource.executeWithoutCache(specs, common)
+            : {
+                values: await executionDetails.batch(
+                  executePgStepBatch,
+                  [
+                    getPgStepBatchInfo(
+                      extra.meta!,
+                      this.resource.executor,
+                      context,
+                      common,
+                    ),
+                  ],
+                  specs.map(({ queryValues }) => queryValues),
+                  "tuple",
+                ),
+              }
           : null;
       // debugExecute("%s; result: %c", this, executionResult);
 

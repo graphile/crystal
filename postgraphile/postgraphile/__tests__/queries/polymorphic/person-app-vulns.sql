@@ -486,40 +486,6 @@ select __first_party_vulnerabilities_result__.*
 from __first_party_vulnerabilities_identifiers__,
 lateral (
   select
-    __first_party_vulnerabilities__."cvss_score"::text as "0",
-    __first_party_vulnerabilities__."id"::text as "1",
-    __first_party_vulnerabilities__."name" as "2",
-    __first_party_vulnerabilities_identifiers__.idx as "3"
-  from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-  where (
-    __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
-  )
-) as __first_party_vulnerabilities_result__;
-
-with __third_party_vulnerabilities_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __third_party_vulnerabilities_result__.*
-from __third_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __third_party_vulnerabilities__."cvss_score"::text as "0",
-    __third_party_vulnerabilities__."id"::text as "1",
-    __third_party_vulnerabilities__."name" as "2",
-    __third_party_vulnerabilities_identifiers__.idx as "3"
-  from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
-  where (
-    __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
-  )
-) as __third_party_vulnerabilities_result__;
-
-with __first_party_vulnerabilities_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __first_party_vulnerabilities_result__.*
-from __first_party_vulnerabilities_identifiers__,
-lateral (
-  select
     __first_party_vulnerabilities__."team_name" as "0",
     __first_party_vulnerabilities__."id"::text as "1",
     __first_party_vulnerabilities__."cvss_score"::text as "2",
@@ -543,6 +509,40 @@ lateral (
     __third_party_vulnerabilities__."cvss_score"::text as "2",
     __third_party_vulnerabilities__."name" as "3",
     __third_party_vulnerabilities_identifiers__.idx as "4"
+  from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
+  where (
+    __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
+  )
+) as __third_party_vulnerabilities_result__;
+
+with __first_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __first_party_vulnerabilities_result__.*
+from __first_party_vulnerabilities_identifiers__,
+lateral (
+  select
+    __first_party_vulnerabilities__."cvss_score"::text as "0",
+    __first_party_vulnerabilities__."id"::text as "1",
+    __first_party_vulnerabilities__."name" as "2",
+    __first_party_vulnerabilities_identifiers__.idx as "3"
+  from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+  where (
+    __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
+  )
+) as __first_party_vulnerabilities_result__;
+
+with __third_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __third_party_vulnerabilities_result__.*
+from __third_party_vulnerabilities_identifiers__,
+lateral (
+  select
+    __third_party_vulnerabilities__."cvss_score"::text as "0",
+    __third_party_vulnerabilities__."id"::text as "1",
+    __third_party_vulnerabilities__."name" as "2",
+    __third_party_vulnerabilities_identifiers__.idx as "3"
   from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
   where (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"

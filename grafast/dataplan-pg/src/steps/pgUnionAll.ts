@@ -54,6 +54,11 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import {
+  executePgStepBatch,
+  getPgStepBatchInfo,
+  pgStepBatchMetaKey,
+} from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -580,6 +585,7 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
+    this.metaKey = pgStepBatchMetaKey;
     {
       this.mode = spec.mode ?? "normal";
 
@@ -974,11 +980,8 @@ on (${sql.indent(
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastValuesList<any>> {
-    const {
-      indexMap,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
+    const { indexMap, values, extra } = executionDetails;
+    const { eventEmitter } = extra;
     const { fetchOneExtra } = this;
     const {
       meta,
@@ -1046,19 +1049,25 @@ on (${sql.indent(
             : EMPTY_ARRAY,
       };
     });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
-    const executionResult = await this.executor[executeMethod](specs, {
+    const common = {
       text,
       rawSqlValues,
       identifierIndex,
       name,
       affinity: this.executionAffinity,
       eventEmitter,
-      useTransaction: false,
-    });
+      useTransaction: this.hasSideEffects,
+    };
+    const executionResult = this.hasSideEffects
+      ? await this.executor.executeWithoutCache(specs, common)
+      : {
+          values: await executionDetails.batch(
+            executePgStepBatch,
+            [getPgStepBatchInfo(extra.meta!, this.executor, context, common)],
+            specs.map(({ queryValues }) => queryValues),
+            "tuple",
+          ),
+        };
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {

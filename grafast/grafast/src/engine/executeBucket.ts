@@ -1,6 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
+import { batchInMeta } from "../batch.ts";
 import type { Bucket, RequestTools, SharedBucketState } from "../bucket.ts";
 import {
   $$streamMore,
@@ -829,6 +830,14 @@ export function executeBucket(
     const executeDetails: ExecutionDetails<readonly any[]> = {
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
+      batch: (callback, unaryDependencies, keysets, keysetEquality) =>
+        batchInMeta(
+          (extra.meta ??= {}),
+          callback,
+          unaryDependencies,
+          keysets,
+          keysetEquality,
+        ),
       count,
       values,
       extra,

@@ -151,6 +151,75 @@ loop yourself, the `details.indexMap` helper will call the given callback with
 each index in the batch in turn; this is commonly used when returning the result
 of the execute method.
 
+#### details.batch
+
+`details.batch` combines compatible work submitted by step executions that are
+ready in the same tick. It deduplicates keysets before calling your batch
+function, then returns results in the original order, including duplicates.
+This can combine work across branches of an operation as well as within a
+single step execution.
+
+```ts
+details.batch(callback, unaryDependencies, keysets, keysetEquality?)
+```
+
+The callback receives the unary dependencies and the unique keysets, and must
+return one result for each keyset in the same order. It can return an array or a
+promise of an array. `details.batch` returns a promise; if the callback throws
+or rejects, each caller in that batch receives the error. An empty keyset list
+returns an empty result without calling the callback.
+
+To combine calls, set the same [`metaKey`](#metakey) on the steps and use the
+same callback function, equality mode, and unary dependency values. Unary
+dependencies are compared with `===`, so objects must have the same identity.
+Define the callback outside `execute` and pass all values that affect its work
+through the unary dependencies. Without a shared `metaKey`, calls from separate
+step executions do not share a batch.
+
+For example, given a service whose `getUsers` method returns one result per ID:
+
+```ts
+import { Step, type ExecutionDetails } from "grafast";
+import { userService } from "./services/users";
+
+const userBatchMetaKey = Symbol("user batches");
+
+function fetchUsers(
+  [service]: readonly [typeof userService],
+  ids: readonly string[],
+) {
+  return service.getUsers(ids);
+}
+
+class UserStep extends Step {
+  private idDepIndex: number;
+
+  constructor($id: Step<string>) {
+    super();
+    this.metaKey = userBatchMetaKey;
+    this.idDepIndex = this.addDependency($id);
+  }
+
+  execute(details: ExecutionDetails) {
+    const idEv = details.values[this.idDepIndex];
+    const ids = details.indexMap((i) => idEv.at(i) as string);
+    return details.batch(fetchUsers, [userService] as const, ids);
+  }
+}
+```
+
+The optional equality mode controls how keysets are deduplicated:
+
+- `"strict"` (the default) compares each keyset using `===`.
+- `"tuple"` compares arrays by length and each element using `===`.
+- `"object"` compares the enumerable string keys of objects, regardless of key
+  order, and compares their values using `===`.
+
+These comparisons are shallow: nested objects and arrays are compared by
+identity. Select a mode that matches the inputs your callback treats as
+equivalent. Batching is limited to compatible calls ready in the same tick; it
+is not a cache of results for later calls.
+
 #### details.values
 
 `details.values` is also critical: an ordered array of execution values, one for
