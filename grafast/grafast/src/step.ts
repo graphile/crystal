@@ -284,7 +284,65 @@ export /* abstract */ class Step<TData = any> {
    * Set this true for plans that implement mutations; this will prevent them
    * from being tree-shaken.
    */
-  public hasSideEffects: boolean;
+  get hasSideEffects(): boolean {
+    return this.#hasSideEffects;
+  }
+
+  set hasSideEffects(value: boolean) {
+    if (value === this.#hasSideEffects) {
+      // No change necessary
+      return;
+    }
+
+    /**
+     * If steps were created after this step, an this step doesn't depend
+     * on them, then it's no longer safe to change hasSideEffects.
+     */
+    let nonDependentSteps: Step[] | null = null;
+
+    const stepTracker = this.layerPlan.operationPlan.stepTracker;
+    const maxStepId = stepTracker.stepCount - 1;
+    if (this.id === maxStepId) {
+      // All good - no more steps were created
+    } else {
+      // If the step created them during initialization and is dependent on
+      // them, that's fine too.
+      for (let id = this.id + 1; id <= maxStepId; id++) {
+        const step = stepTracker.getStepById(id);
+        // Allow steps that aren't in our layer plan
+        if (step.layerPlan !== this.layerPlan) continue;
+        if (stepADependsOnStepB(this, step)) continue;
+        if (nonDependentSteps === null) {
+          nonDependentSteps = [step];
+        } else {
+          nonDependentSteps.push(step);
+        }
+      }
+    }
+    if (nonDependentSteps === null) {
+      this.#hasSideEffects = value;
+      if (value === true) {
+        this.layerPlan.latestSideEffectStep = this;
+        this.operationPlan.resetCache();
+      }
+    } else if (value) {
+      throw new Error(
+        `Attempted to mark ${this} as having side effects, but other non-dependent steps (${nonDependentSteps
+          .map(String)
+          .join(", ")}) have already been created.`,
+      );
+    }
+  }
+
+  /**
+   * The value behind `hasSideEffects`. A `#private` field lives in the
+   * instance's own property storage, which every step instance populates in
+   * the same order, so all steps of a class share one hidden class and V8
+   * keeps their properties fast. Defining `hasSideEffects` on each instance
+   * with `Object.defineProperty` instead adds a differently-shaped property
+   * to every step and forces the whole object into dictionary mode.
+   */
+  #hasSideEffects = false;
 
   /**
    * Set this to `true` if this step might return an iterable or async iterable
@@ -340,65 +398,7 @@ export /* abstract */ class Step<TData = any> {
     this._isSelectiveStep = false;
 
     this.implicitSideEffectStep = layerPlan.latestSideEffectStep;
-    this.hasSideEffects ??= false;
     this.cloneStreams = false;
-    let hasSideEffects = false;
-    const stepTracker = this.layerPlan.operationPlan.stepTracker;
-    Object.defineProperty(this, "hasSideEffects", {
-      get(this: Step<TData>) {
-        return hasSideEffects;
-      },
-      set(this: Step<TData>, value) {
-        if (value === hasSideEffects) {
-          // No change necessary
-          return;
-        }
-
-        /**
-         * If steps were created after this step, an this step doesn't depend
-         * on them, then it's no longer safe to change hasSideEffects.
-         */
-        let nonDependentSteps: Step[] | null = null;
-
-        const maxStepId = stepTracker.stepCount - 1;
-        if (this.id === maxStepId) {
-          // All good - no more steps were created
-        } else {
-          // If the step created them during initialization and is dependent on
-          // them, that's fine too.
-          for (let id = this.id + 1; id <= maxStepId; id++) {
-            const step = stepTracker.getStepById(id);
-            // Allow steps that aren't in our layer plan
-            if (step.layerPlan !== this.layerPlan) continue;
-            if (stepADependsOnStepB(this, step)) continue;
-            if (nonDependentSteps === null) {
-              nonDependentSteps = [step];
-            } else {
-              nonDependentSteps.push(step);
-            }
-          }
-        }
-        if (nonDependentSteps === null) {
-          hasSideEffects = value;
-          if (value === true) {
-            this.layerPlan.latestSideEffectStep = this;
-            this.operationPlan.resetCache();
-          } else if (value !== true && hasSideEffects === true) {
-            throw new Error(
-              `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
-            );
-          }
-        } else if (value) {
-          throw new Error(
-            `Attempted to mark ${this} as having side effects, but other non-dependent steps (${nonDependentSteps
-              .map(String)
-              .join(", ")}) have already been created.`,
-          );
-        }
-      },
-      enumerable: true,
-      configurable: false,
-    });
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
