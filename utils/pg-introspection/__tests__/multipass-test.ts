@@ -924,3 +924,86 @@ it("hides rows fetched only for purposes starting with _", async () => {
     ["20"],
   );
 });
+
+it("returns peeked rows once fetched, selecting the policy again", async () => {
+  const queries: unknown[] = [];
+  const selections: Array<Record<string, string[] | "pending">> = [];
+  const ids = (rows: ReadonlyArray<{ _id: string }> | undefined) =>
+    rows ? rows.map((row) => row._id) : "pending";
+  const result = await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      if (queries.length === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      if (queries.length === 2) {
+        return JSON.stringify({
+          namespaces: [{ _id: "20", nspname: "other" }],
+        });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "2", relnamespace: "20", relname: "target" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "followNamedTarget",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            assert.throws(
+              () => details.peek("classes", { _id: "1" }, ["terminal"]),
+              /cannot peek with purpose 'terminal'/,
+            );
+            const selection: (typeof selections)[number] = {};
+            selections.push(selection);
+            selection.known = ids(
+              details.peek("classes", { _id: "1" }, ["_peek"]),
+            );
+            selection.unselected = ids(
+              details.peek("types", { _id: "99" }, ["_peek"]),
+            );
+            const namespaces = details.peek(
+              "namespaces",
+              { nspname: "other" },
+              ["_peek"],
+            );
+            selection.namespaces = ids(namespaces);
+            if (!namespaces) return;
+            selection.targets = ids(
+              details.peek(
+                "classes",
+                { relnamespace: namespaces[0]._id, relname: "target" },
+                ["_peek"],
+              ),
+            );
+          },
+        }),
+      ],
+    },
+  });
+  assert.deepEqual(queries, [[], [["other"]], [["target"], ["20"]]]);
+  assert.deepEqual(selections, [
+    // Initial rows: the namespace must be fetched.
+    { known: ["1"], unselected: [], namespaces: "pending" },
+    // After fetching the namespace: the target must be fetched.
+    { known: ["1"], unselected: [], namespaces: ["20"], targets: "pending" },
+    // After fetching the target.
+    { known: ["1"], unselected: [], namespaces: ["20"], targets: ["2"] },
+  ]);
+  // Rows that were only peeked at are hidden.
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["1"],
+  );
+  assert.deepEqual(
+    result.hidden?.classes?.map((row) => row._id),
+    ["2"],
+  );
+});

@@ -359,6 +359,13 @@ interface MultipassContext<TEntities extends EntityType> {
   frontier: Array<[EntityType, IntrospectionRow]>;
   /** Requests to fetch in the next pass, keyed by selector. */
   pending: Map<string, IntrospectionRequest>;
+  /** Rows and policies to select again once a pending selector is fetched. */
+  waiting: Map<
+    string,
+    Array<[EntityType, IntrospectionRow, IntrospectionPolicy]>
+  >;
+  /** Policies to select again for a row regardless of its purposes. */
+  reruns: Map<IntrospectionRow, Set<IntrospectionPolicy>>;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
@@ -375,6 +382,8 @@ function buildMultipassContext<TEntities extends EntityType>(
     policySubscriptions: new Map(),
     frontier: [],
     pending: new Map(),
+    waiting: new Map(),
+    reruns: new Map(),
     selected: new Set([...onlyEntities]),
     policiesByEntity: new Map(),
     rowsByIdentity: new Map(),
@@ -567,14 +576,18 @@ async function introspectRawMultipass<TEntities extends EntityType>(
 
     mergeFetchedRows(context, result, fetched);
     for (const request of requests) {
-      completedSelectors.add(selectorKey(request));
+      const key = selectorKey(request);
+      completedSelectors.add(key);
       for (const row of matchingRows(context, request)) {
         // Adds the purposes for which each fetched row was fetched, adding
         // impacted rows to the frontier ready for policy selection.
         addPurposes(context, request.entity, row, request.purposes);
       }
+      wakeWaiting(context, key);
     }
   }
+  // Every request that returned `undefined` has since been fetched.
+  assert.equal(context.waiting.size, 0);
 
   hideDiscoveryOnlyRows(context, result);
   return pruneIntrospectionData(context.options, result);
@@ -670,6 +683,7 @@ function drainFrontier<TEntity extends EntityType>(
     policySubscriptions,
     policiesByEntity,
     catalogByOid,
+    reruns,
   } = context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length > 0) {
@@ -684,9 +698,15 @@ function drainFrontier<TEntity extends EntityType>(
         policySubscriptions.set(row, subscriptions);
       }
       const snapshot = snapshots.get(row)!;
+      const rerun = reruns.get(row);
+      reruns.delete(row);
       for (const policy of policiesByEntity.get(entity) ?? []) {
         const waiting = subscriptions.get(policy);
-        if (waiting && waiting.isDisjointFrom(snapshot)) {
+        if (
+          waiting &&
+          waiting.isDisjointFrom(snapshot) &&
+          !rerun?.has(policy)
+        ) {
           continue;
         }
         const subscribeTo = new Set<PgIntrospection.Purpose>();
@@ -702,13 +722,27 @@ function drainFrontier<TEntity extends EntityType>(
           },
           request(entity, match, purposes) {
             // The generic request API keeps these parameters correlated.
+            const request = { entity, match, purposes } as IntrospectionRequest;
+            requestDependency(context, policy, request);
+          },
+          peek(requestEntity, match, purposes) {
+            assertDiscoveryPurposes(policy, "peek with", purposes);
+            // The generic request API keeps these parameters correlated.
             const request = {
-              entity,
+              entity: requestEntity,
               match,
               purposes,
             } as IntrospectionRequest;
-
-            requestDependency(context, policy, request);
+            const rows = requestDependency(context, policy, request);
+            if (!rows) {
+              const key = selectorKey(request);
+              const waiters = context.waiting.get(key) ?? [];
+              waiters.push([entity, row, policy]);
+              context.waiting.set(key, waiters);
+            }
+            return rows as
+              | ReadonlyArray<IntrospectionRow<typeof requestEntity>>
+              | undefined;
           },
         });
         subscriptions.set(policy, subscribeTo);
@@ -717,20 +751,41 @@ function drainFrontier<TEntity extends EntityType>(
   }
 }
 
+/** Select the policies waiting on this (now fetched) selector again. */
+function wakeWaiting<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  key: string,
+) {
+  const { waiting, reruns, frontier } = context;
+  for (const [entity, row, policy] of waiting.get(key) ?? []) {
+    const policies = reruns.get(row);
+    if (policies) {
+      policies.add(policy);
+    } else {
+      reruns.set(row, new Set([policy]));
+      frontier.push([entity, row]);
+    }
+  }
+  waiting.delete(key);
+}
+
+/**
+ * Queue the request unless its rows are already known, and return them if so.
+ */
 function requestDependency<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
   policy: IntrospectionPolicy,
   request: IntrospectionRequest,
-) {
+): readonly IntrospectionRow[] | undefined {
   const { selected, completedSelectors, pending } = context;
   const { entity, purposes } = request;
   assertValidRequest(policy, request);
 
   if (!selected.has(entity)) {
-    return;
+    return [];
   }
   if (canShortcutRequest(request)) {
-    return;
+    return [];
   }
   const key = selectorKey(request);
   const matches = matchingRows(context, request);
@@ -738,10 +793,10 @@ function requestDependency<TEntity extends EntityType>(
     addPurposes(context, entity, match, purposes);
   }
   if (completedSelectors.has(key)) {
-    return;
+    return matches;
   }
   if (matches.length > 0 && selectsUniqueRow(request)) {
-    return;
+    return matches;
   }
   const previous = pending.get(key);
   /** Definitely contains at least one element */
@@ -749,6 +804,20 @@ function requestDependency<TEntity extends EntityType>(
   const [first, ...rest] = allPurposes;
   const newPurposes: PurposeList = [first, ...rest];
   pending.set(key, { ...request, purposes: newPurposes });
+  return undefined;
+}
+
+function assertDiscoveryPurposes(
+  policy: IntrospectionPolicy,
+  action: string,
+  purposes: PurposeList,
+) {
+  const purpose = purposes.find((purpose) => !purpose.startsWith("_"));
+  if (purpose !== undefined) {
+    throw new Error(
+      `Introspection policy '${policy.name}' cannot ${action} purpose '${purpose}'; only purposes starting with '_' are allowed`,
+    );
+  }
 }
 
 function assertValidRequest(

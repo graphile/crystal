@@ -140,6 +140,50 @@ discovery. Rows whose purposes all start with `_` are moved into the `hidden`
 collections before `prune` runs, so navigation can still reach them but they
 are not exposed; a row with any other purpose is exposed as usual.
 
+## Peeking at rows
+
+`details.request` only queues a dependency. When a policy needs to inspect rows,
+for example to find an object by name when its namespace OID is not yet known,
+or to decide whether it wants an object at all, use `details.peek`. It takes the
+same arguments, except that every purpose must start with `_`, and returns every
+matching row once they are all known:
+
+```ts
+const lookupTables = defineIntrospectionPolicy({
+  name: "lookupTables",
+  entity: "classes",
+  select(table, details) {
+    if (!details.hasPurpose("initial")) {
+      return;
+    }
+    const [namespace] =
+      details.peek("namespaces", { nspname: "app_private" }, [
+        "_lookupTables",
+      ]) ?? [];
+    if (!namespace) {
+      return;
+    }
+    const [lookup] =
+      details.peek(
+        "classes",
+        { relnamespace: namespace._id, relname: "lookup" },
+        ["_lookupTables"],
+      ) ?? [];
+    if (lookup?.relkind === "r") {
+      details.request("classes", { _id: lookup._id }, ["procedureReturnType"]);
+    }
+  },
+});
+```
+
+Until the rows are known, `peek` returns `undefined`. Return from the callback:
+once the rows have been fetched the policy is selected again for the same row,
+and the same call returns them. Collections that are not selected, and selectors
+for OID zero, return no rows. A peeked row stays hidden unless something
+requests it with a purpose that does not start with `_`, as `lookupTables` does
+above. A policy is only selected again for the rows it peeked at, so use
+`request` when you do not need to inspect them.
+
 ## Global filters and entrypoint filters
 
 | Option                        | Initial query | Dependency queries |

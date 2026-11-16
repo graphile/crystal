@@ -41,13 +41,14 @@ type IntrospectionRowType = {
 export type IntrospectionRow<TEntity extends EntityType = EntityType> =
   IntrospectionRowType[TEntity];
 
-type IntrospectionMatch<TEntity extends EntityType> = TEntity extends EntityType
-  ? Partial<{
-      [TColumn in keyof IntrospectionRow<TEntity>]: NonNullable<
-        IntrospectionRow<TEntity>[TColumn]
-      >;
-    }>
-  : never;
+export type IntrospectionMatch<TEntity extends EntityType> =
+  TEntity extends EntityType
+    ? Partial<{
+        [TColumn in keyof IntrospectionRow<TEntity>]: NonNullable<
+          IntrospectionRow<TEntity>[TColumn]
+        >;
+      }>
+    : never;
 
 /** Keep each entity paired with its own selector when entities form a union. */
 export type IntrospectionRequest<TEntity extends EntityType = EntityType> =
@@ -66,9 +67,21 @@ export interface IntrospectionPolicyDetails {
    */
   request<TEntity extends EntityType>(
     entity: TEntity,
-    match: IntrospectionRequest<NoInfer<TEntity>>["match"],
+    match: IntrospectionMatch<NoInfer<TEntity>>,
     purposes: PurposeList,
   ): void;
+  /**
+   * As `request`, but returns every matching row once they are all known, so
+   * the policy can inspect them; every purpose must start with `_`. Until the
+   * rows are known it returns `undefined`, and this policy will be selected
+   * again for the current row once they have been fetched. Collections that
+   * are not selected, and zero selectors, return no rows.
+   */
+  peek<TEntity extends EntityType>(
+    entity: TEntity,
+    match: IntrospectionMatch<NoInfer<TEntity>>,
+    purposes: PurposeList,
+  ): ReadonlyArray<IntrospectionRow<TEntity>> | undefined;
   /** False results subscribe this policy to run again when the purpose is added. */
   hasPurpose(purpose: PgIntrospection.Purpose): boolean;
   /** Immutable metadata captured before dependency discovery begins. */
