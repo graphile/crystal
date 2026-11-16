@@ -59,6 +59,10 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       fakeId: 0,
     }),
     hooks: {
+      // TODO:v6: build these fake constraints inside pg-introspection via a
+      // multipass policy, so discovery follows them like real constraints
+      // (making `foreignKeyEnumTargets` unnecessary), rather than here after
+      // introspection.
       // We detect "fake" foreign key constraints during the "introspection"
       // phase (which runs first) because we need it to already be established
       // for _all_ classes by the time pgTables_PgResourceOptions_relations is
@@ -343,8 +347,13 @@ async function processFk(
     foreignSchema,
     foreignTable,
   );
+  const multipass = info.options.pgMultipassIntrospection !== false;
+  // Multipass introspection may only peek at a target, without its attributes.
+  if (multipass && foreignPgClass && !foreignPgClass.getAttributes().length) {
+    return;
+  }
   if (!foreignPgClass) {
-    if (info.resolvedPreset.gather?.pgMultipassIntrospection !== false) {
+    if (multipass) {
       const pgService = info.resolvedPreset.pgServices?.find(
         (service) => service.name === serviceName,
       );

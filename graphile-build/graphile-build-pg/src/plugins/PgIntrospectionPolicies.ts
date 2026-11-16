@@ -7,6 +7,7 @@ import type {
 import { pruneExtensionResources } from "pg-introspection";
 
 import { invertKeyAndValue } from "../utils.ts";
+import { parseForeignKeyTag } from "./PgFakeConstraintsPlugin.ts";
 
 type Entity = IntrospectionPolicy["entity"];
 type TemplateIntrospectionPolicy = Readonly<IntrospectionPolicy<any>>;
@@ -169,8 +170,54 @@ const DEFAULT_POLICIES = (() => {
       details.request("classes", { _id: row.confrelid }, ["enumTables"]);
     }
   });
+  // Follow `@foreignKey` smart tags on exposed classes, requesting the
+  // targets tagged `@enum`.
+  rule("foreignKeyEnumTargets", "classes", (row, details) => {
+    const foreignKey = details.getTagsAndDescription("classes", row)?.tags
+      .foreignKey;
+    if (foreignKey == null) {
+      return;
+    }
+    const [namespace] =
+      details.peek("namespaces", { _id: row.relnamespace }, [
+        "_foreignKeyTarget",
+      ]) ?? [];
+    if (!namespace) {
+      return;
+    }
+    const specs = Array.isArray(foreignKey) ? foreignKey : [foreignKey];
+    for (const rawSpec of specs) {
+      const target = parseForeignKeyTarget(rawSpec, namespace.nspname);
+      if (!target) {
+        continue;
+      }
+      const targetClass = details.peekByName(
+        "classes",
+        [target.foreignSchema, target.foreignTable],
+        ["_foreignKeyTarget"],
+      );
+      if (
+        targetClass &&
+        details.getTagsAndDescription("classes", targetClass)?.tags.enum
+      ) {
+        details.request("classes", { _id: targetClass._id }, ["enumTables"]);
+      }
+    }
+  });
   return Object.freeze(policies);
 })();
+
+/** Invalid specs are reported by PgFakeConstraintsPlugin, so ignore them here. */
+function parseForeignKeyTarget(rawSpec: unknown, schemaName: string) {
+  if (typeof rawSpec !== "string") {
+    return null;
+  }
+  try {
+    return parseForeignKeyTag(rawSpec, schemaName);
+  } catch {
+    return null;
+  }
+}
 
 // Exclude extension resources from initial discovery, but retain dependencies
 // referenced by user resources.

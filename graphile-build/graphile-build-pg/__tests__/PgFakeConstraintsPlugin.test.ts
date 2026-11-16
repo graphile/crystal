@@ -12,6 +12,7 @@ function makeContext(
     schemas?: string[];
     multipass?: boolean;
     target?: boolean;
+    targetAttributes?: boolean;
     tag?: string;
   } = {},
 ) {
@@ -23,7 +24,8 @@ function makeContext(
     _id: "2",
     getNamespace: () => ({ nspname: "private" }),
     getTagsAndDescription: () => ({ tags: {} }),
-    getAttributes: () => [foreignAttribute],
+    getAttributes: () =>
+      options.targetAttributes === false ? [] : [foreignAttribute],
     getConstraints: () => [
       { contype: "p", getAttributes: () => [foreignAttribute] },
     ],
@@ -49,12 +51,12 @@ function makeContext(
     constraints: [] as any[],
   };
   const info = {
+    options:
+      options.multipass === undefined
+        ? {}
+        : { pgMultipassIntrospection: options.multipass },
     resolvedPreset: {
       pgServices: [{ name: "main", schemas: options.schemas ?? ["app"] }],
-      gather:
-        options.multipass === undefined
-          ? {}
-          : { pgMultipassIntrospection: options.multipass },
     },
     helpers: {
       pgIntrospection: {
@@ -105,6 +107,21 @@ test("creates the constraint when the external target was discovered", async () 
   expect(introspection.constraints).toHaveLength(1);
   expect(introspection.constraints[0].confrelid).toBe("2");
 });
+
+test.each([{ schemas: ["app"] }, { schemas: ["app", "private"] }])(
+  "ignores a target whose attributes were not introspected (schemas: $schemas)",
+  async ({ schemas }) => {
+    const { info, introspection } = makeContext({
+      schemas,
+      target: true,
+      targetAttributes: false,
+    });
+    const log = jest.spyOn(console, "error").mockImplementation(() => {});
+    await hook(info as never, { serviceName: "main", introspection } as never);
+    expect(log).not.toHaveBeenCalled();
+    expect(introspection.constraints).toHaveLength(0);
+  },
+);
 
 test("still rejects invalid smart-tag syntax", async () => {
   const { info, introspection } = makeContext({ tag: "invalid" });

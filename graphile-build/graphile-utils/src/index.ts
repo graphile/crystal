@@ -123,4 +123,11 @@ declare global {
       wrapPlans: true;
     }
   }
+
+  namespace PgIntrospection {
+    interface PurposeRegistry {
+      /** Peeked to merge `pgSmartTags` rules into the tags policies see. */
+      _pgSmartTags: true;
+    }
+  }
 }

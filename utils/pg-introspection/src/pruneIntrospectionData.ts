@@ -1,9 +1,15 @@
 import type {
+  CollectionEntity,
   IntrospectionDataForEntities,
   IntrospectionOptions,
   IntrospectionPruneDetails,
+  PrunableIntrospectionData,
 } from "./interfaces.ts";
-import { ENTITY_TYPES, type EntityType } from "./introspection.ts";
+import {
+  ENTITY_TYPES,
+  type EntityType,
+  type IntrospectionData,
+} from "./introspection.ts";
 import { defaultEntities } from "./query.ts";
 
 export function pruneIntrospectionData<TEntities extends EntityType>(
@@ -15,32 +21,7 @@ export function pruneIntrospectionData<TEntities extends EntityType>(
     const data = result as Record<string, any>;
     const details: IntrospectionPruneDetails = {
       hide(entity, matches) {
-        const collection = data[entity];
-        if (!Array.isArray(collection)) {
-          return;
-        }
-        const moved = [];
-        const hiddenIndexes = new Set<number>();
-        for (let i = collection.length - 1; i >= 0; i--) {
-          if (matches(collection[i])) {
-            moved.push(collection[i]);
-            hiddenIndexes.add(i);
-          }
-        }
-        if (moved.length > 0) {
-          let write = 0;
-          for (let read = 0; read < collection.length; read++) {
-            if (!hiddenIndexes.has(read)) {
-              collection[write++] = collection[read];
-            }
-          }
-          collection.length = write;
-          const retained = (result.hidden ??= {}) as Record<string, any[]>;
-          const target = (retained[entity] ??= []);
-          for (const row of moved.reverse()) {
-            target.push(row);
-          }
-        }
+        hideRows(result, entity, matches);
       },
     };
     const countRows = (includeHidden: boolean) =>
@@ -68,4 +49,39 @@ export function pruneIntrospectionData<TEntities extends EntityType>(
     } while (after < before);
   }
   return result;
+}
+
+/** Move matching rows out of exposed collections, retaining them for navigation. */
+export function hideRows<T extends CollectionEntity>(
+  result: PrunableIntrospectionData,
+  entity: T,
+  matches: (row: IntrospectionData[T][number]) => boolean,
+): void {
+  const data = result as Record<string, any>;
+  const collection = data[entity];
+  if (!Array.isArray(collection)) {
+    return;
+  }
+  const moved = [];
+  const hiddenIndexes = new Set<number>();
+  for (let i = collection.length - 1; i >= 0; i--) {
+    if (matches(collection[i])) {
+      moved.push(collection[i]);
+      hiddenIndexes.add(i);
+    }
+  }
+  if (moved.length > 0) {
+    let write = 0;
+    for (let read = 0; read < collection.length; read++) {
+      if (!hiddenIndexes.has(read)) {
+        collection[write++] = collection[read];
+      }
+    }
+    collection.length = write;
+    const retained = (result.hidden ??= {}) as Record<string, any[]>;
+    const target = (retained[entity] ??= []);
+    for (const row of moved.reverse()) {
+      target.push(row);
+    }
+  }
 }

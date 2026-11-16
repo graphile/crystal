@@ -2,9 +2,11 @@ import type {
   DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
+  IntrospectionMatch,
   IntrospectionOptions,
   IntrospectionPolicy,
   IntrospectionPolicyDetails,
+  IntrospectionPreviewDetails,
   IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectionRow,
@@ -32,6 +34,7 @@ import type {
   PrunableIntrospectionData,
   PurposeList,
   RunQuery,
+  TaggedEntity,
 } from "./interfaces.ts";
 export { defineIntrospectionPolicy } from "./interfaces.ts";
 export { introspect, introspectRaw } from "./multipass.ts";
@@ -67,9 +70,11 @@ export type {
   DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
+  IntrospectionMatch,
   IntrospectionOptions,
   IntrospectionPolicy,
   IntrospectionPolicyDetails,
+  IntrospectionPreviewDetails,
   IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectionRow,
@@ -97,6 +102,7 @@ export type {
   PrunableIntrospectionData,
   PurposeList,
   RunQuery,
+  TaggedEntity,
 };
 
 export type { AclObject };
@@ -116,6 +122,10 @@ declare global {
   namespace PgIntrospection {
     interface PurposeRegistry {
       initial: true;
+      /** Fetched only to resolve the identity given to `requestByName`. */
+      _resolveName: true;
+      /** Fetched to read a row's smart tags with `getTagsAndDescription`. */
+      _smartTags: true;
     }
     type Purpose = keyof PurposeRegistry;
   }

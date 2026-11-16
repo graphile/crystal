@@ -6,6 +6,7 @@ import {
   defineIntrospectionPolicy,
   type IntrospectionPolicy,
   type IntrospectionPolicyDetails,
+  type IntrospectionPreviewDetails,
   type IntrospectionRequest,
   type IntrospectionRow,
   type IntrospectOptions,
@@ -18,6 +19,7 @@ declare global {
   namespace PgIntrospection {
     interface PurposeRegistry {
       terminal: true;
+      _peek: true;
       keys: true;
       all: true;
       unrelated: true;
@@ -874,4 +876,588 @@ it("types policy rows according to their entity", () => {
   void typed;
   void policies;
   void invalid;
+});
+
+it("hides rows fetched only for purposes starting with _", async () => {
+  let queries = 0;
+  const result = await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      return JSON.stringify({
+        namespaces: [
+          { _id: "20", nspname: "peeked" },
+          { _id: "30", nspname: "kept" },
+        ],
+      });
+    },
+    onlyEntities: ["namespaces", "classes"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "peek",
+          entity: "classes",
+          select(_row, details) {
+            details.request("namespaces", { _id: "20" }, ["_peek"]);
+            details.request("namespaces", { _id: "30" }, ["_peek", "terminal"]);
+          },
+        }),
+      ],
+    },
+  });
+  assert.equal(queries, 2);
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["1"],
+  );
+  assert.deepEqual(
+    result.namespaces.map((row) => row._id),
+    ["30"],
+  );
+  assert.deepEqual(
+    result.hidden?.namespaces?.map((row) => row._id),
+    ["20"],
+  );
+});
+
+it("returns peeked rows once fetched, selecting the policy again", async () => {
+  const queries: unknown[] = [];
+  const selections: Array<Record<string, string[] | "pending">> = [];
+  const ids = (rows: ReadonlyArray<{ _id: string }> | undefined) =>
+    rows ? rows.map((row) => row._id) : "pending";
+  const result = await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      if (queries.length === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      if (queries.length === 2) {
+        return JSON.stringify({
+          namespaces: [{ _id: "20", nspname: "other" }],
+        });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "2", relnamespace: "20", relname: "target" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "followNamedTarget",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            assert.throws(
+              () => details.peek("classes", { _id: "1" }, ["terminal"]),
+              /cannot peek with purpose 'terminal'/,
+            );
+            const selection: (typeof selections)[number] = {};
+            selections.push(selection);
+            selection.known = ids(
+              details.peek("classes", { _id: "1" }, ["_peek"]),
+            );
+            selection.unselected = ids(
+              details.peek("types", { _id: "99" }, ["_peek"]),
+            );
+            const namespaces = details.peek(
+              "namespaces",
+              { nspname: "other" },
+              ["_peek"],
+            );
+            selection.namespaces = ids(namespaces);
+            if (!namespaces) return;
+            selection.targets = ids(
+              details.peek(
+                "classes",
+                { relnamespace: namespaces[0]._id, relname: "target" },
+                ["_peek"],
+              ),
+            );
+          },
+        }),
+      ],
+    },
+  });
+  assert.deepEqual(queries, [[], [["other"]], [["target"], ["20"]]]);
+  assert.deepEqual(selections, [
+    // Initial rows: the namespace must be fetched.
+    { known: ["1"], unselected: [], namespaces: "pending" },
+    // After fetching the namespace: the target must be fetched.
+    { known: ["1"], unselected: [], namespaces: ["20"], targets: "pending" },
+    // After fetching the target.
+    { known: ["1"], unselected: [], namespaces: ["20"], targets: ["2"] },
+  ]);
+  // Rows that were only peeked at are hidden.
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["1"],
+  );
+  assert.deepEqual(
+    result.hidden?.classes?.map((row) => row._id),
+    ["2"],
+  );
+});
+
+it("previews every row before selecting rows that are not discovery-only", async () => {
+  const log: string[] = [];
+  let queries = 0;
+  const result = await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1" }, { _id: "3" }],
+        });
+      }
+      return JSON.stringify({ classes: [{ _id: "2" }] });
+    },
+    onlyEntities: ["namespaces", "classes"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "promoteTarget",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            const [target] =
+              details.peek("classes", { _id: "2" }, ["_peek"]) ?? [];
+            log.push(`promote 1: ${target?._id ?? "pending"}`);
+            if (target) {
+              details.request("classes", { _id: target._id }, ["terminal"]);
+            }
+          },
+        }),
+        defineIntrospectionPolicy({
+          name: "observe",
+          entity: "classes",
+          preview(row, details) {
+            log.push(`preview ${row._id}`);
+            assert.throws(
+              // @ts-expect-error Previews may only peek
+              () => details.request("classes", { _id: "2" }, ["_peek"]),
+              /cannot request from preview; use peek$/,
+            );
+            assert.throws(
+              // @ts-expect-error Previews may only peek
+              () => details.requestByName("classes", "app.thing", ["_peek"]),
+              /cannot request from preview; use peekByName/,
+            );
+          },
+          select(row) {
+            log.push(`select ${row._id}`);
+          },
+        }),
+      ],
+    },
+  });
+  assert.deepEqual(log, [
+    // Every preview in a round runs before any select.
+    "preview 1",
+    "preview 3",
+    "promote 1: pending",
+    "select 1",
+    "select 3",
+    // Class 2 was only peeked at, so it is previewed but not selected...
+    "preview 2",
+    "promote 1: 2",
+    // ...until it is requested with a purpose that does not start with `_`.
+    "select 2",
+  ]);
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["1", "3", "2"],
+  );
+});
+
+it("requires policies to define select or preview", async () => {
+  await assert.rejects(
+    introspectRaw({
+      async runQuery() {
+        return JSON.stringify({ ...metadata, namespaces: [] });
+      },
+      onlyEntities: ["namespaces"],
+      multipass: { policies: [{ name: "empty", entity: "namespaces" }] },
+    }),
+    /'empty' must define select or preview/,
+  );
+});
+
+it("requests objects by name, resolving their namespace and class", async () => {
+  const queries: unknown[] = [];
+  const purposes: Record<string, string[]> = {};
+  const observe = (
+    entity: "namespaces" | "classes" | "attributes" | "procs",
+    id: (row: any) => string,
+  ) =>
+    defineIntrospectionPolicy({
+      name: `observe_${entity}`,
+      entity,
+      preview(row: object, details: IntrospectionPreviewDetails) {
+        purposes[id(row)] = (["_resolveName", "terminal"] as const).filter(
+          (purpose) => details.hasPurpose(purpose),
+        );
+      },
+    });
+  await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      switch (queries.length) {
+        case 1:
+          return JSON.stringify({
+            ...metadata,
+            namespaces: [],
+            classes: [{ _id: "1", relnamespace: "2", relname: "source" }],
+            attributes: [],
+            procs: [],
+          });
+        case 2:
+          return JSON.stringify({ namespaces: [{ _id: "5", nspname: "app" }] });
+        case 3:
+          return JSON.stringify({
+            classes: [{ _id: "7", relnamespace: "5", relname: "my.table" }],
+            procs: [{ _id: "8", pronamespace: "5", proname: "fn" }],
+          });
+        default:
+          return JSON.stringify({
+            attributes: [{ attrelid: "7", attnum: 1, attname: "col" }],
+          });
+      }
+    },
+    onlyEntities: ["namespaces", "classes", "attributes", "procs"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "byName",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            details.requestByName("attributes", 'app."my.table".col', [
+              "terminal",
+            ]);
+            details.requestByName("procs", ["app", "fn"], ["terminal"]);
+            assert.throws(
+              () => details.requestByName("classes", "app", ["terminal"]),
+              /Invalid classes identity "app"; expected 2 part/,
+            );
+            assert.throws(
+              () =>
+                // @ts-expect-error Only nameable collections can be requested
+                details.requestByName("indexes", "app.name", ["terminal"]),
+              /Cannot request 'indexes' by name/,
+            );
+          },
+        }),
+        observe("namespaces", (row) => `namespace ${row._id}`),
+        observe("classes", (row) => `class ${row._id}`),
+        observe("attributes", (row) => `attribute ${row.attname}`),
+        observe("procs", (row) => `proc ${row._id}`),
+      ],
+    },
+  });
+  assert.deepEqual(queries, [
+    [],
+    [["app"]],
+    [["my.table"], ["5"], ["fn"], ["5"]],
+    [["col"], ["7"]],
+  ]);
+  assert.deepEqual(purposes, {
+    "class 1": [],
+    "namespace 5": ["_resolveName"],
+    "class 7": ["_resolveName"],
+    "proc 8": ["terminal"],
+    "attribute col": ["terminal"],
+  });
+});
+
+it("selects null-entity policies at the start, without a row", async () => {
+  const queries: unknown[] = [];
+  const rows: unknown[] = [];
+  const purposes: Record<string, string[]> = {};
+  const observe = (entity: "namespaces" | "classes" | "procs") =>
+    defineIntrospectionPolicy({
+      name: `observe_${entity}`,
+      entity,
+      preview(row: { _id: string }, details: IntrospectionPreviewDetails) {
+        purposes[row._id] = (["initial", "_resolveName"] as const).filter(
+          (purpose) => details.hasPurpose(purpose),
+        );
+      },
+    });
+  const result = await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      if (queries.length === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [],
+          procs: [],
+        });
+      }
+      if (queries.length === 2) {
+        return JSON.stringify({
+          namespaces: [{ _id: "5", nspname: "enums" }],
+        });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "7", relnamespace: "5", relname: "colour" }],
+        procs: [{ _id: "8", pronamespace: "5", proname: "helper" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "procs"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "inclusions",
+          entity: null,
+          select(row, details) {
+            rows.push(row);
+            assert.throws(
+              () => details.hasPurpose("initial"),
+              /'inclusions' has no row, so it cannot call hasPurpose/,
+            );
+            details.requestByName("classes", "enums.colour", ["initial"]);
+            details.requestByName("procs", ["enums", "helper"], ["initial"]);
+          },
+        }),
+        observe("namespaces"),
+        observe("classes"),
+        observe("procs"),
+      ],
+    },
+  });
+  // Selected at the start, and again once the namespace has been fetched.
+  assert.deepEqual(rows, [null, null]);
+  assert.deepEqual(queries, [
+    [],
+    [["enums"]],
+    [["colour"], ["5"], ["helper"], ["5"]],
+  ]);
+  assert.deepEqual(purposes, {
+    "5": ["_resolveName"],
+    "7": ["initial"],
+    "8": ["initial"],
+  });
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["7"],
+  );
+});
+
+it("shares smart tags between policies once descriptions are fetched", async () => {
+  const seen: unknown[] = [];
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          catalog_by_oid: { "1259": "pg_class" },
+          namespaces: [],
+          classes: [
+            { _id: "1", relname: "tagged" },
+            { _id: "2", relname: "untagged" },
+          ],
+          descriptions: [],
+        });
+      }
+      return JSON.stringify({
+        descriptions: [
+          {
+            classoid: "1259",
+            objoid: "1",
+            objsubid: 0,
+            description: "@fromComment\nHello",
+          },
+        ],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "descriptions"],
+    multipass: {
+      // Leaves the initial descriptions incomplete so they must be fetched.
+      entrypointFilters: { descriptions: "false" },
+      // Listed first, but previews still run before selects in each round.
+      policies: [
+        defineIntrospectionPolicy({
+          name: "read",
+          entity: "classes",
+          select(row, details) {
+            const result = details.getTagsAndDescription("classes", row);
+            seen.push([row._id, result ?? "pending"]);
+          },
+        }),
+        defineIntrospectionPolicy({
+          name: "merge",
+          entity: "classes",
+          preview(row, details) {
+            const result = details.getTagsAndDescription("classes", row);
+            if (result && row._id === "1") {
+              result.tags.fromPolicy = true;
+            }
+          },
+        }),
+      ],
+    },
+  });
+  assert.equal(queries, 2);
+  assert.deepEqual(seen, [
+    ["1", "pending"],
+    ["2", "pending"],
+    [
+      "1",
+      {
+        tags: Object.assign(Object.create(null), {
+          fromComment: true,
+          fromPolicy: true,
+        }),
+        description: "Hello",
+      },
+    ],
+    // Fetched, but without a comment.
+    ["2", { tags: Object.create(null), description: undefined }],
+  ]);
+});
+
+it("falls back to a class's row type description for its smart tags", async () => {
+  const seen: Record<string, unknown> = {};
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          catalog_by_oid: { "1259": "pg_class", "1247": "pg_type" },
+          namespaces: [],
+          classes: [
+            { _id: "1", relname: "typed", reltype: "2" },
+            { _id: "3", relname: "both", reltype: "4" },
+          ],
+          descriptions: [],
+        });
+      }
+      return JSON.stringify({
+        descriptions: [
+          {
+            classoid: "1247",
+            objoid: "2",
+            objsubid: 0,
+            description: "@fromType",
+          },
+          {
+            classoid: "1259",
+            objoid: "3",
+            objsubid: 0,
+            description: "@fromClass",
+          },
+          {
+            classoid: "1247",
+            objoid: "4",
+            objsubid: 0,
+            description: "@fromType",
+          },
+        ],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "descriptions"],
+    multipass: {
+      // Leaves the initial descriptions incomplete so they must be fetched.
+      entrypointFilters: { descriptions: "false" },
+      policies: [
+        defineIntrospectionPolicy({
+          name: "read",
+          entity: "classes",
+          select(row, details) {
+            const result = details.getTagsAndDescription("classes", row);
+            if (result) {
+              seen[row.relname] = { ...result.tags };
+            }
+          },
+        }),
+      ],
+    },
+  });
+  // Both descriptions are fetched together.
+  assert.equal(queries, 2);
+  assert.deepEqual(seen, {
+    typed: { fromType: true },
+    both: { fromClass: true },
+  });
+});
+
+it("peeks at objects by name, distinguishing pending from missing", async () => {
+  const selections: Array<Record<string, string | null>> = [];
+  const describe = (row: { _id: string } | null | undefined) =>
+    row === undefined ? "pending" : row === null ? null : row._id;
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      if (queries === 2) {
+        return JSON.stringify({ namespaces: [{ _id: "5", nspname: "app" }] });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "7", relnamespace: "5", relname: "target" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "procs"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "byName",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            assert.throws(
+              () => details.peekByName("classes", "app.target", ["terminal"]),
+              /cannot peek with purpose 'terminal'/,
+            );
+            assert.throws(
+              // @ts-expect-error Procedures are not unique by name
+              () => details.peekByName("procs", "app.fn", ["_peek"]),
+              /Cannot peek at procedures by name/,
+            );
+            selections.push({
+              target: describe(
+                details.peekByName("classes", "app.target", ["_peek"]),
+              ),
+              missing: describe(
+                details.peekByName("classes", "app.missing", ["_peek"]),
+              ),
+              nowhere: describe(
+                details.peekByName("namespaces", "nowhere", ["_peek"]),
+              ),
+            });
+          },
+        }),
+      ],
+    },
+  });
+  assert.equal(queries, 3);
+  assert.deepEqual(selections, [
+    { target: "pending", missing: "pending", nowhere: "pending" },
+    { target: "pending", missing: "pending", nowhere: null },
+    { target: "7", missing: null, nowhere: null },
+  ]);
 });

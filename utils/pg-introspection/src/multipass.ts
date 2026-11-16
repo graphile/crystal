@@ -2,18 +2,22 @@ import assert from "node:assert";
 
 import { augmentIntrospectionData } from "./augmentIntrospection.ts";
 import type {
+  CollectionEntity,
   DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
   IntrospectionOptions,
   IntrospectionPolicy,
+  IntrospectionPolicyDetails,
   IntrospectionRequest,
   IntrospectionRow,
   IntrospectOptions,
   Maybe,
   MultipassIntrospectOptions,
+  NamedEntity,
   PurposeList,
   SQLVal,
+  TaggedEntity,
 } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
@@ -25,13 +29,18 @@ import {
   NONZERO_COLUMNS,
   UNIQUE_KEYS,
 } from "./introspectionConstants.ts";
-import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
+import { parseIdentifierParts } from "./parseIdentifierParts.ts";
+import { hideRows, pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import {
   assertEntityType,
   buildIntrospectionQuery,
   defaultEntities,
   makeIntrospectionQuery,
 } from "./query.ts";
+import {
+  parseSmartComment,
+  type PgSmartTagsAndDescription,
+} from "./smartComments.ts";
 
 /** Preserve known column types; dynamically selected columns yield unknown. */
 function columnValue<TRow extends object, TColumn extends string>(
@@ -69,13 +78,16 @@ function sqlColumnName(column: string): string {
   return column === "_id" ? "oid" : column;
 }
 
+/** Identifies a selector (its entity and match); see `selectorKey`. */
+type SelectorKey = string & { readonly tsBrand: unique symbol };
+
 function selectorKey(
   request: Pick<IntrospectionRequest, "entity" | "match">,
-): string {
+): SelectorKey {
   return JSON.stringify([
     request.entity,
     Object.entries(request.match).sort(([a], [b]) => a.localeCompare(b)),
-  ]);
+  ]) as SelectorKey;
 }
 
 /** Combine override predicates without losing earlier conditions. */
@@ -332,13 +344,19 @@ interface SelectorBatch {
   requests: IntrospectionRequest[];
 }
 
+type AnyPolicy = IntrospectionPolicy<EntityType | null>;
+
+/** The row of null-entity policies; `select` receives `null` instead. */
+const SENTINEL: IntrospectionRow = Object.freeze(Object.create(null));
+
 interface MultipassContext<TEntities extends EntityType> {
   /** Configuration shared by query construction and final result pruning. */
   options: MultipassIntrospectOptions<TEntities>;
   /** Limits discovery and policy execution to the requested entity types. */
   selected: Set<EntityType>;
-  /** Policies grouped by entity so each row runs only applicable policies. */
-  policiesByEntity: Map<EntityType, IntrospectionPolicy[]>;
+  /** Callbacks grouped by entity so each row runs only applicable policies. */
+  previewsByEntity: Map<EntityType | null, PolicyCallback[]>;
+  selectsByEntity: Map<EntityType | null, PolicyCallback[]>;
   /** Lets policies translate catalogue OIDs into catalogue names. */
   catalogByOid: Record<string, string>;
   /** Rows indexed by entity and identity to deduplicate and reuse discoveries. */
@@ -346,18 +364,37 @@ interface MultipassContext<TEntities extends EntityType> {
   /** Cached selector indexes avoid rescanning rows for each dependency request. */
   selectorIndexes: Map<EntityType, Map<string, SelectorIndex>>;
   /** Selectors with complete results, including empty results, need no refetch. */
-  completedSelectors: Set<string>;
+  completedSelectors: Set<SelectorKey>;
   /** Accumulated reasons for including each row, used to guide its policies. */
   purposes: Map<IntrospectionRow, Set<PgIntrospection.Purpose>>;
-  /** Missing purposes that would trigger each policy to run again for a row. */
+  /** Missing purposes that would trigger each callback to run again for a row. */
   policySubscriptions: Map<
     IntrospectionRow,
-    Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
+    Map<PolicyCallback, Set<PgIntrospection.Purpose>>
   >;
   /** New rows or rows with added purposes awaiting policy execution. */
-  frontier: Array<[EntityType, IntrospectionRow]>;
+  frontier: Array<[EntityType | null, IntrospectionRow]>;
   /** Requests to fetch in the next pass, keyed by selector. */
-  pending: Map<string, IntrospectionRequest>;
+  pending: Map<SelectorKey, IntrospectionRequest>;
+  /** Rows and callbacks to run again once a pending selector is fetched. */
+  waiting: Map<
+    SelectorKey,
+    Array<[EntityType | null, IntrospectionRow, PolicyCallback]>
+  >;
+  /** Callbacks to run again for a row regardless of its purposes. */
+  reruns: Map<IntrospectionRow, Set<PolicyCallback>>;
+  /** Smart tags shared by policies for the rest of this run. */
+  tags: WeakMap<IntrospectionRow, PgSmartTagsAndDescription>;
+}
+
+/** A policy's `preview` or `select` callback, each selected independently. */
+interface PolicyCallback {
+  policy: AnyPolicy;
+  preview: boolean;
+  run: (
+    row: IntrospectionRow | null,
+    details: IntrospectionPolicyDetails,
+  ) => void;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
@@ -374,15 +411,19 @@ function buildMultipassContext<TEntities extends EntityType>(
     policySubscriptions: new Map(),
     frontier: [],
     pending: new Map(),
+    waiting: new Map(),
+    reruns: new Map(),
+    tags: new WeakMap(),
     selected: new Set([...onlyEntities]),
-    policiesByEntity: new Map(),
+    previewsByEntity: new Map(),
+    selectsByEntity: new Map(),
     rowsByIdentity: new Map(),
     completedSelectors: new Set(),
     catalogByOid: Object.create(null),
     selectorIndexes: new Map(),
   };
 
-  const { selected, policiesByEntity } = context;
+  const { selected, previewsByEntity, selectsByEntity } = context;
   const names = new Set<string>();
   for (const policy of policies) {
     if (names.has(policy.name)) {
@@ -392,11 +433,24 @@ function buildMultipassContext<TEntities extends EntityType>(
     if (!policy.name?.trim()) {
       throw new Error(`Invalid introspection policy name '${policy.name}'`);
     }
-    if (!selected.has(policy.entity)) continue;
-    const list = policiesByEntity.get(policy.entity) ?? [];
-    // The map groups policies by entity; dispatch supplies a row from that entity.
-    list.push(policy as IntrospectionPolicy);
-    policiesByEntity.set(policy.entity, list);
+    if (!policy.select && !policy.preview) {
+      throw new Error(
+        `Introspection policy '${policy.name}' must define select or preview`,
+      );
+    }
+    if (policy.entity !== null && !selected.has(policy.entity)) continue;
+    // The maps group callbacks by entity; dispatch supplies a row from that entity.
+    const generic = policy as AnyPolicy;
+    for (const [byEntity, run, preview] of [
+      [previewsByEntity, generic.preview, true],
+      [selectsByEntity, generic.select, false],
+    ] as const) {
+      if (run) {
+        const list = byEntity.get(policy.entity) ?? [];
+        list.push({ policy: generic, preview, run });
+        byEntity.set(policy.entity, list);
+      }
+    }
   }
 
   return context;
@@ -411,6 +465,10 @@ function initializeMultipassContext<TEntities extends EntityType>(
   const { catalogByOid, selected, rowsByIdentity, completedSelectors } =
     context;
   Object.assign(catalogByOid, initialResult.catalog_by_oid);
+
+  if (context.previewsByEntity.has(null) || context.selectsByEntity.has(null)) {
+    context.frontier.push([null, SENTINEL]);
+  }
 
   for (const entity of selected) {
     const collection = initialResult[entity];
@@ -566,15 +624,20 @@ async function introspectRawMultipass<TEntities extends EntityType>(
 
     mergeFetchedRows(context, result, fetched);
     for (const request of requests) {
-      completedSelectors.add(selectorKey(request));
+      const key = selectorKey(request);
+      completedSelectors.add(key);
       for (const row of matchingRows(context, request)) {
         // Adds the purposes for which each fetched row was fetched, adding
         // impacted rows to the frontier ready for policy selection.
         addPurposes(context, request.entity, row, request.purposes);
       }
+      wakeWaiting(context, key);
     }
   }
+  // Every request that returned `undefined` has since been fetched.
+  assert.equal(context.waiting.size, 0);
 
+  hideDiscoveryOnlyRows(context, result);
   return pruneIntrospectionData(context.options, result);
 }
 
@@ -614,6 +677,27 @@ function mergeFetchedRows<TEntities extends EntityType>(
   }
 }
 
+/**
+ * Hide rows whose purposes all start with `_`, which mark rows needed only to
+ * guide discovery; navigation can still reach them.
+ */
+function hideDiscoveryOnlyRows<TEntities extends EntityType>(
+  context: MultipassContext<TEntities>,
+  result: IntrospectionDataForEntities<TEntities>,
+) {
+  const discoveryOnly = (row: IntrospectionRow) =>
+    isDiscoveryOnly(context.purposes.get(row) ?? []);
+  for (const entity of context.selected) {
+    if (isCollectionEntity(entity)) {
+      hideRows(result, entity, discoveryOnly);
+    }
+  }
+}
+
+function isCollectionEntity(entity: EntityType): entity is CollectionEntity {
+  return !ENTITY_TYPES[entity].singular;
+}
+
 function coerceToRows<TEntity extends EntityType>(
   source: Maybe<IntrospectionRow<TEntity>[] | IntrospectionRow<TEntity>>,
 ): IntrospectionRow<TEntity>[] {
@@ -639,73 +723,376 @@ function collectRequests<TEntity extends EntityType>(
 function drainFrontier<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
 ) {
-  const {
-    frontier,
-    purposes,
-    policySubscriptions,
-    policiesByEntity,
-    catalogByOid,
-  } = context;
+  const { frontier, purposes, previewsByEntity, selectsByEntity, reruns } =
+    context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length > 0) {
-    const batch = frontier.splice(0);
-    const snapshots = new Map(
-      batch.map(([, row]) => [row, new Set(purposes.get(row))]),
+    const batch = new Map(
+      frontier.splice(0).map(([entity, row]) => {
+        const snapshot = new Set(purposes.get(row));
+        const rerun = reruns.get(row);
+        return [row, { entity, snapshot, rerun }];
+      }),
     );
-    for (const [entity, row] of batch) {
-      let subscriptions = policySubscriptions.get(row);
-      if (!subscriptions) {
-        subscriptions = new Map();
-        policySubscriptions.set(row, subscriptions);
-      }
-      const snapshot = snapshots.get(row)!;
-      for (const policy of policiesByEntity.get(entity) ?? []) {
-        const waiting = subscriptions.get(policy);
-        if (waiting && waiting.isDisjointFrom(snapshot)) {
+    for (const row of batch.keys()) {
+      reruns.delete(row);
+    }
+    // Previews run first so selects see, for example, the smart tags they merge.
+    for (const callbacksByEntity of [previewsByEntity, selectsByEntity]) {
+      for (const [row, { entity, snapshot, rerun }] of batch) {
+        if (
+          callbacksByEntity === selectsByEntity &&
+          entity !== null &&
+          isDiscoveryOnly(snapshot)
+        ) {
           continue;
         }
-        const subscribeTo = new Set<PgIntrospection.Purpose>();
-        policy.select(row, {
-          catalogByOid,
-          hasPurpose(purpose) {
-            if (!snapshot.has(purpose)) {
-              subscribeTo.add(purpose);
-              return false;
-            } else {
-              return true;
-            }
-          },
-          request(entity, match, purposes) {
-            // The generic request API keeps these parameters correlated.
-            const request = {
-              entity,
-              match,
-              purposes,
-            } as IntrospectionRequest;
-
-            requestDependency(context, policy, request);
-          },
-        });
-        subscriptions.set(policy, subscribeTo);
+        for (const callback of callbacksByEntity.get(entity) ?? []) {
+          const isRerun = rerun?.has(callback) ?? false;
+          runCallback(context, entity, row, callback, snapshot, isRerun);
+        }
       }
     }
   }
 }
 
+function runCallback<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  entity: EntityType | null,
+  row: IntrospectionRow,
+  callback: PolicyCallback,
+  snapshot: ReadonlySet<PgIntrospection.Purpose>,
+  rerun: boolean,
+) {
+  const { policySubscriptions, catalogByOid } = context;
+  const { policy, preview } = callback;
+  let subscriptions = policySubscriptions.get(row);
+  if (!subscriptions) {
+    subscriptions = new Map();
+    policySubscriptions.set(row, subscriptions);
+  }
+  const waiting = subscriptions.get(callback);
+  if (waiting && waiting.isDisjointFrom(snapshot) && !rerun) {
+    return;
+  }
+  const subscribeTo = new Set<PgIntrospection.Purpose>();
+  const details: IntrospectionPolicyDetails = {
+    catalogByOid,
+    hasPurpose(purpose) {
+      if (entity === null) {
+        throw new Error(
+          `Introspection policy '${policy.name}' has no row, so it cannot call hasPurpose`,
+        );
+      }
+      if (!snapshot.has(purpose)) {
+        subscribeTo.add(purpose);
+        return false;
+      } else {
+        return true;
+      }
+    },
+    request(entity, match, purposes) {
+      if (preview) {
+        throw new Error(
+          `Introspection policy '${policy.name}' cannot request from preview; use peek`,
+        );
+      }
+      // The generic request API keeps these parameters correlated.
+      const request = { entity, match, purposes } as IntrospectionRequest;
+      void requestDependency(context, policy, request);
+    },
+    peek(requestEntity, match, purposes) {
+      assertDiscoveryPurposes(policy, "peek with", purposes);
+      // The generic request API keeps these parameters correlated.
+      const request = {
+        entity: requestEntity,
+        match,
+        purposes,
+      } as IntrospectionRequest;
+      const rows = requestDependency(context, policy, request);
+      if (!rows) {
+        const key = selectorKey(request);
+        const waiters = context.waiting.get(key) ?? [];
+        waiters.push([entity, row, callback]);
+        context.waiting.set(key, waiters);
+      }
+      return rows as
+        | ReadonlyArray<IntrospectionRow<typeof requestEntity>>
+        | undefined;
+    },
+    requestByName(entity, identity, purposes) {
+      if (preview) {
+        throw new Error(
+          `Introspection policy '${policy.name}' cannot request from preview; use peekByName`,
+        );
+      }
+      requestObjectsByName(details, entity, identity, purposes);
+    },
+    peekByName(requestEntity, identity, purposes) {
+      assertDiscoveryPurposes(policy, "peek with", purposes);
+      // The generic API keeps the entity and the returned row correlated.
+      return peekObjectByName(details, requestEntity, identity, purposes) as
+        | IntrospectionRow<typeof requestEntity>
+        | null
+        | undefined;
+    },
+    getTagsAndDescription(entity, row) {
+      return tagsAndDescription(context, details, entity, row);
+    },
+  };
+  callback.run(row === SENTINEL ? null : row, details);
+  subscriptions.set(callback, subscribeTo);
+}
+
+/** Whether every purpose starts with `_`, marking rows needed only for discovery. */
+function isDiscoveryOnly(purposes: Iterable<PgIntrospection.Purpose>) {
+  for (const purpose of purposes) {
+    if (!purpose.startsWith("_")) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/** The number of parts in the identity of each nameable collection. */
+const NAME_PARTS = {
+  namespaces: 1,
+  classes: 2,
+  procs: 2,
+  types: 2,
+  attributes: 3,
+} as const satisfies Record<NamedEntity, number>;
+
+function identityParts(
+  entity: NamedEntity,
+  identity: string | readonly string[],
+): readonly string[] {
+  if (!Object.hasOwn(NAME_PARTS, entity)) {
+    throw new Error(
+      `Cannot request '${entity}' by name; expected one of ${Object.keys(NAME_PARTS).join(", ")}`,
+    );
+  }
+  const parts =
+    typeof identity === "string" ? parseIdentifierParts(identity) : identity;
+  if (parts.length !== NAME_PARTS[entity]) {
+    throw new Error(
+      `Invalid ${entity} identity ${JSON.stringify(identity)}; expected ${NAME_PARTS[entity]} part(s)`,
+    );
+  }
+  return parts;
+}
+
+/** The only row of a unique selector: `undefined` until known, `null` if none. */
+function onlyRow<TRow>(rows: ReadonlyArray<TRow> | undefined) {
+  if (rows === undefined) {
+    return undefined;
+  }
+  return rows.length > 0 ? rows[0] : null;
+}
+
+function peekObjectByName(
+  details: IntrospectionPolicyDetails,
+  entity: NamedEntity,
+  identity: string | readonly string[],
+  purposes: PurposeList,
+): IntrospectionRow | null | undefined {
+  if (entity === "procs") {
+    throw new Error(
+      "Cannot peek at procedures by name; overloads share a name",
+    );
+  }
+  const [nspname, name, attname] = identityParts(entity, identity);
+  if (entity === "namespaces") {
+    return onlyRow(details.peek("namespaces", { nspname }, purposes));
+  }
+  const namespace = onlyRow(
+    details.peek("namespaces", { nspname }, ["_resolveName"]),
+  );
+  if (namespace == null) {
+    return namespace;
+  }
+  const { _id } = namespace;
+  switch (entity) {
+    case "classes": {
+      return onlyRow(
+        details.peek("classes", { relnamespace: _id, relname: name }, purposes),
+      );
+    }
+    case "types": {
+      return onlyRow(
+        details.peek("types", { typnamespace: _id, typname: name }, purposes),
+      );
+    }
+    case "attributes": {
+      const table = onlyRow(
+        details.peek("classes", { relnamespace: _id, relname: name }, [
+          "_resolveName",
+        ]),
+      );
+      if (table == null) {
+        return table;
+      }
+      return onlyRow(
+        details.peek("attributes", { attrelid: table._id, attname }, purposes),
+      );
+    }
+    default: {
+      const never: never = entity;
+      throw new Error(`Entity type ${never} not expected!`);
+    }
+  }
+}
+
+function requestObjectsByName(
+  details: IntrospectionPolicyDetails,
+  entity: NamedEntity,
+  identity: string | readonly string[],
+  purposes: PurposeList,
+) {
+  const [nspname, name, attname] = identityParts(entity, identity);
+  if (entity === "namespaces") {
+    details.request("namespaces", { nspname }, purposes);
+    return;
+  }
+  const [namespace] =
+    details.peek("namespaces", { nspname }, ["_resolveName"]) ?? [];
+  if (!namespace) {
+    return;
+  }
+  const { _id } = namespace;
+  switch (entity) {
+    case "classes": {
+      details.request(
+        "classes",
+        { relnamespace: _id, relname: name },
+        purposes,
+      );
+      return;
+    }
+    case "procs": {
+      details.request("procs", { pronamespace: _id, proname: name }, purposes);
+      return;
+    }
+    case "types": {
+      details.request("types", { typnamespace: _id, typname: name }, purposes);
+      return;
+    }
+    case "attributes": {
+      const [table] =
+        details.peek("classes", { relnamespace: _id, relname: name }, [
+          "_resolveName",
+        ]) ?? [];
+      if (table) {
+        details.request(
+          "attributes",
+          { attrelid: table._id, attname },
+          purposes,
+        );
+      }
+      return;
+    }
+    default: {
+      const never: never = entity;
+      throw new Error(`Entity type ${never} not expected!`);
+    }
+  }
+}
+
+function tagsAndDescription<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  details: IntrospectionPolicyDetails,
+  entity: TaggedEntity,
+  row: IntrospectionRow<TaggedEntity>,
+): PgSmartTagsAndDescription | undefined {
+  const existing = context.tags.get(row);
+  if (existing) {
+    return existing;
+  }
+  const own =
+    "attrelid" in row
+      ? peekDescription(context, details, "pg_class", row.attrelid, row.attnum)
+      : peekDescription(
+          context,
+          details,
+          ENTITY_TYPES[entity].tableName,
+          rowOid(entity, row),
+          0,
+        );
+  // As with `PgClass.getTagsAndDescription`, a class falls back to its row
+  // type's description.
+  const rowType =
+    "reltype" in row
+      ? peekDescription(context, details, "pg_type", row.reltype, 0)
+      : { description: undefined };
+  if (!own || !rowType) {
+    return undefined;
+  }
+  const result = parseSmartComment(own.description ?? rowType.description);
+  context.tags.set(row, result);
+  return result;
+}
+
+/** An object's description, or `undefined` until its descriptions are known. */
+function peekDescription<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  details: IntrospectionPolicyDetails,
+  catalog: string,
+  objoid: string | undefined,
+  objsubid: number,
+): { description: string | undefined } | undefined {
+  const classoid = Object.keys(context.catalogByOid).find(
+    (oid) => context.catalogByOid[oid] === catalog,
+  );
+  if (!context.selected.has("descriptions") || !classoid || !objoid) {
+    return { description: undefined };
+  }
+  const descriptions = details.peek("descriptions", { classoid, objoid }, [
+    "_smartTags",
+  ]);
+  return (
+    descriptions && {
+      description: descriptions.find(
+        (candidate) => candidate.objsubid === objsubid,
+      )?.description,
+    }
+  );
+}
+
+/** Run the callbacks waiting on this (now fetched) selector again. */
+function wakeWaiting<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  key: SelectorKey,
+) {
+  const { waiting, reruns, frontier } = context;
+  for (const [entity, row, callback] of waiting.get(key) ?? []) {
+    const callbacks = reruns.get(row);
+    if (callbacks) {
+      callbacks.add(callback);
+    } else {
+      reruns.set(row, new Set([callback]));
+      frontier.push([entity, row]);
+    }
+  }
+  waiting.delete(key);
+}
+
+/**
+ * Queue the request unless its rows are already known, and return them if so.
+ */
 function requestDependency<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
-  policy: IntrospectionPolicy,
+  policy: AnyPolicy,
   request: IntrospectionRequest,
-) {
+): readonly IntrospectionRow[] | undefined {
   const { selected, completedSelectors, pending } = context;
   const { entity, purposes } = request;
   assertValidRequest(policy, request);
 
   if (!selected.has(entity)) {
-    return;
+    return [];
   }
   if (canShortcutRequest(request)) {
-    return;
+    return [];
   }
   const key = selectorKey(request);
   const matches = matchingRows(context, request);
@@ -713,10 +1100,10 @@ function requestDependency<TEntity extends EntityType>(
     addPurposes(context, entity, match, purposes);
   }
   if (completedSelectors.has(key)) {
-    return;
+    return matches;
   }
   if (matches.length > 0 && selectsUniqueRow(request)) {
-    return;
+    return matches;
   }
   const previous = pending.get(key);
   /** Definitely contains at least one element */
@@ -724,12 +1111,23 @@ function requestDependency<TEntity extends EntityType>(
   const [first, ...rest] = allPurposes;
   const newPurposes: PurposeList = [first, ...rest];
   pending.set(key, { ...request, purposes: newPurposes });
+  return undefined;
 }
 
-function assertValidRequest(
-  policy: IntrospectionPolicy,
-  request: IntrospectionRequest,
+function assertDiscoveryPurposes(
+  policy: AnyPolicy,
+  action: string,
+  purposes: PurposeList,
 ) {
+  const purpose = purposes.find((purpose) => !purpose.startsWith("_"));
+  if (purpose !== undefined) {
+    throw new Error(
+      `Introspection policy '${policy.name}' cannot ${action} purpose '${purpose}'; only purposes starting with '_' are allowed`,
+    );
+  }
+}
+
+function assertValidRequest(policy: AnyPolicy, request: IntrospectionRequest) {
   assertEntityType(request.entity);
   if (!Array.isArray(request.purposes) || request.purposes.length === 0) {
     throw new Error(
