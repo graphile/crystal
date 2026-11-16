@@ -199,8 +199,12 @@ interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
   kind: TKind;
   match: PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
-  /** For 'class' rules matched by name; usable before introspection completes. */
-  className?: { schemaName: string | undefined; relname: string };
+  /**
+   * The parts of a string `match`, padded with leading `undefined`s to the
+   * kind's length (or empty, matching everything), or `null` for a `match`
+   * function; usable before introspection completes.
+   */
+  parts: ReadonlyArray<string | undefined> | null;
   tags?: PgSmartTagTags;
   description?: string;
 }
@@ -231,10 +235,11 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   }
 
   let match: PgSmartTagFilterFunction<any>;
-  let className: CompiledPgSmartTagRule<TKind>["className"];
+  let parts: ReadonlyArray<string | undefined> | null;
   if (typeof incomingMatch === "function") {
     // User supplied a match function; use that:
     match = incomingMatch;
+    parts = null;
   } else if (typeof incomingMatch === "string") {
     const rawParts = Object.freeze(parseIdentifierParts(incomingMatch));
     const length = rawParts.length;
@@ -256,12 +261,12 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
       return result;
     }
     if (length === 0) {
+      parts = [];
       match = () => true;
     } else {
       switch (rule.kind) {
         case "class": {
-          const [schemaName, tableName] = digest(2);
-          className = { schemaName, relname: tableName };
+          const [schemaName, tableName] = (parts = digest(2));
           match = (rel: PgClass) => {
             if (rel.relname !== tableName) return false;
             if (schemaName === undefined) return true;
@@ -272,7 +277,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "attribute": {
-          const [schemaName, tableName, colName] = digest(3);
+          const [schemaName, tableName, colName] = (parts = digest(3));
           match = (attr: PgAttribute) => {
             if (attr.attname !== colName) return false;
             if (tableName === undefined) return true;
@@ -287,7 +292,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "constraint": {
-          const [schemaName, tableName, conName] = digest(3);
+          const [schemaName, tableName, conName] = (parts = digest(3));
           match = (con: PgConstraint) => {
             if (con.conname !== conName) return false;
             if (tableName === undefined) return true;
@@ -302,7 +307,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "procedure": {
-          const [schemaName, procName] = digest(2);
+          const [schemaName, procName] = (parts = digest(2));
           match = (proc: PgProc) => {
             if (proc.proname !== procName) return false;
             if (schemaName === undefined) return true;
@@ -313,7 +318,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "type": {
-          const [schemaName, typeName] = digest(2);
+          const [schemaName, typeName] = (parts = digest(2));
           match = (type: PgType) => {
             if (type.typname !== typeName) return false;
             if (schemaName === undefined) return true;
@@ -324,7 +329,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "namespace": {
-          const [schemaName] = digest(1);
+          const [schemaName] = (parts = digest(1));
           match = (nsp: PgNamespace) => nsp.nspname === schemaName;
           break;
         }
@@ -342,7 +347,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   return {
     kind,
     match,
-    className,
+    parts,
     ...rest,
   };
 }
@@ -402,7 +407,7 @@ function mergeTagsPolicy(
   name: string,
   rules: ReadonlyArray<{
     schemaName: string | undefined;
-    relname: string;
+    relname: string | undefined;
     tags: PgSmartTagTags;
   }>,
 ): IntrospectionPolicy<"classes"> {
@@ -410,7 +415,9 @@ function mergeTagsPolicy(
     name,
     entity: "classes",
     preview(row, details) {
-      const candidates = rules.filter((rule) => rule.relname === row.relname);
+      const candidates = rules.filter(
+        (rule) => rule.relname === undefined || rule.relname === row.relname,
+      );
       if (candidates.length === 0) {
         return;
       }
@@ -476,12 +483,18 @@ export function pgSmartTags<
           }
           const [rules] = rulesFrom(info.state.rules);
           const discoveryRules = rules.flatMap(
-            ({ serviceName, className, tags }) =>
-              className != null &&
-              tags != null &&
-              (serviceName == null || serviceName === event.serviceName)
-                ? [{ ...className, tags }]
-                : [],
+            ({ serviceName, kind, parts, tags }) => {
+              if (
+                kind !== "class" ||
+                parts == null ||
+                tags == null ||
+                (serviceName != null && serviceName !== event.serviceName)
+              ) {
+                return [];
+              }
+              const [schemaName, relname] = parts;
+              return [{ schemaName, relname, tags }];
+            },
           );
           if (discoveryRules.length === 0) {
             return;
