@@ -605,3 +605,59 @@ it("traps errors thrown in side effects in the chain and allows pass-through", a
     },
   });
 });
+
+/** A side-effect step whose whole execution rejects, as a failed write does. */
+class FailingWriteStep extends Step<number> {
+  constructor() {
+    super();
+    this.hasSideEffects = true;
+  }
+
+  async execute(): Promise<never> {
+    throw new Error("Write refused");
+  }
+}
+
+it("traps the error of a side-effect step whose whole execution rejected", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      type Query {
+        ok: Boolean
+      }
+      type Mutation {
+        write: String
+      }
+    `,
+    objects: {
+      Mutation: {
+        plans: {
+          write() {
+            const $trapped = trap(new FailingWriteStep(), TRAP_ERROR, {
+              valueForError: "PASS_THROUGH",
+            });
+            return lambda(
+              $trapped,
+              (value) =>
+                value instanceof Error
+                  ? `trapped: ${value.message}`
+                  : "written",
+              true,
+            );
+          },
+        },
+      },
+    },
+    enableDeferStream: false,
+  });
+  const result = await grafast({
+    source: /* GraphQL */ `
+      mutation {
+        write
+      }
+    `,
+    schema,
+    resolvedPreset,
+    requestContext,
+  });
+  expect(result).to.deep.equal({ data: { write: "trapped: Write refused" } });
+});

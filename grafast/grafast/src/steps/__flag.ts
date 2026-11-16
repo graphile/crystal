@@ -6,6 +6,7 @@ import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
+  FLAG_STOPPED,
   NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../constants.ts";
@@ -146,8 +147,16 @@ export class __FlagStep<TStep extends Step>
       // error.
       // TODO: should we be handling this in Grafast core?
       !trapsErrors;
+    // A step whose whole execution failed flags its error FLAG_STOPPED too;
+    // when trapping errors we must still receive that error to trap it.
+    const dependencyAcceptFlags = trapsErrors
+      ? TRAPPABLE_FLAGS | FLAG_STOPPED
+      : TRAPPABLE_FLAGS;
+    if (trapsErrors) {
+      this.__trappableFlags = dependencyAcceptFlags;
+    }
     if (!this.canBeInlined) {
-      this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
+      this.addDependency({ step, acceptFlags: dependencyAcceptFlags });
       if ($cond) {
         this.ifDep = this.addDependency($cond);
       }
@@ -175,7 +184,7 @@ export class __FlagStep<TStep extends Step>
       // We'll also make our implicit side effect explicit
       this.implicitErrorDep = this.addDependency({
         step: this.implicitSideEffectStep!,
-        acceptFlags: TRAPPABLE_FLAGS,
+        acceptFlags: dependencyAcceptFlags,
       });
       sudo(this).implicitSideEffectStep = null;
     }
@@ -308,7 +317,13 @@ export class __FlagStep<TStep extends Step>
       // Search for "f2b3b1b3" for similar block
       const dataFlags = dataEv._flagsAt(i);
       const implictErrorFlags = implicitErrorEv?._flagsAt(i) ?? NO_FLAGS;
-      const flags = dataFlags | implictErrorFlags;
+      const rawFlags = dataFlags | implictErrorFlags;
+      // An error is an error whether or not its step's whole execution
+      // stopped; without an error, FLAG_STOPPED still rejects.
+      const flags =
+        (rawFlags & FLAG_ERROR) === FLAG_ERROR
+          ? rawFlags & ~FLAG_STOPPED
+          : rawFlags;
       const disallowedFlags = flags & forbiddenFlags;
       if (disallowedFlags !== NO_FLAGS) {
         let resultFlags = NO_FLAGS;
