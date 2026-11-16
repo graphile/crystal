@@ -356,6 +356,8 @@ interface MultipassContext<TEntities extends EntityType> {
   >;
   /** New rows or rows with added purposes awaiting policy execution. */
   frontier: Array<[EntityType, IntrospectionRow]>;
+  /** Requests to fetch in the next pass, keyed by selector. */
+  pending: Map<string, IntrospectionRequest>;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
@@ -371,6 +373,7 @@ function buildMultipassContext<TEntities extends EntityType>(
     purposes: new Map(),
     policySubscriptions: new Map(),
     frontier: [],
+    pending: new Map(),
     selected: new Set([...onlyEntities]),
     policiesByEntity: new Map(),
     rowsByIdentity: new Map(),
@@ -547,17 +550,13 @@ async function introspectRawMultipass<TEntities extends EntityType>(
   // Apply our initial result to the context
   initializeMultipassContext(context, query, result);
 
-  const { frontier, completedSelectors } = context;
+  const { completedSelectors } = context;
 
-  while (frontier.length > 0) {
-    // Drains the frontier, calling select for applicable policies (using
-    // policySubscriptions to determine which policies need to run again).
-    const requests = pendingRequestsFromFrontier(context);
-    assert.equal(frontier.length, 0);
+  while (true) {
+    const requests = collectRequests(context);
     if (requests.length === 0) {
       break;
     }
-
     const fetch = makeFetchQuery(context, requests);
     const json = await runQuery(fetch.text, fetch.values);
     const fetched: {
@@ -621,10 +620,25 @@ function coerceToRows<TEntity extends EntityType>(
   return source == null ? [] : Array.isArray(source) ? source : [source];
 }
 
-function pendingRequestsFromFrontier<TEntity extends EntityType>(
+/**
+ * Run policies until only fetching can make progress, returning the requests
+ * to fetch next.
+ */
+function collectRequests<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+): IntrospectionRequest[] {
+  // Drains the frontier, calling select for applicable policies (using
+  // policySubscriptions to determine which policies need to run again).
+  drainFrontier(context);
+  assert.equal(context.frontier.length, 0);
+  const requests = [...context.pending.values()];
+  context.pending.clear();
+  return requests;
+}
+
+function drainFrontier<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
 ) {
-  const pending = new Map<string, IntrospectionRequest>();
   const {
     frontier,
     purposes,
@@ -669,23 +683,21 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
               purposes,
             } as IntrospectionRequest;
 
-            requestDependency(context, pending, policy, request);
+            requestDependency(context, policy, request);
           },
         });
         subscriptions.set(policy, subscribeTo);
       }
     }
   }
-  return [...pending.values()];
 }
 
 function requestDependency<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
-  pending: Map<string, IntrospectionRequest>,
   policy: IntrospectionPolicy,
   request: IntrospectionRequest,
 ) {
-  const { selected, completedSelectors } = context;
+  const { selected, completedSelectors, pending } = context;
   const { entity, purposes } = request;
   assertValidRequest(policy, request);
 

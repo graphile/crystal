@@ -6,6 +6,7 @@ import {
   type MultipassOptions,
 } from "pg-introspection";
 
+import type {} from "../dist/index.js";
 import {
   postgraphileMultipass,
   postgraphilePrune,
