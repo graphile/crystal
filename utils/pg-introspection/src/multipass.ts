@@ -17,6 +17,7 @@ import type {
   NamedEntity,
   PurposeList,
   SQLVal,
+  TaggedEntity,
 } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
@@ -36,6 +37,10 @@ import {
   defaultEntities,
   makeIntrospectionQuery,
 } from "./query.ts";
+import {
+  parseSmartComment,
+  type PgSmartTagsAndDescription,
+} from "./smartComments.ts";
 
 /** Preserve known column types; dynamically selected columns yield unknown. */
 function columnValue<TRow extends object, TColumn extends string>(
@@ -375,6 +380,8 @@ interface MultipassContext<TEntities extends EntityType> {
   >;
   /** Callbacks to run again for a row regardless of its purposes. */
   reruns: Map<IntrospectionRow, Set<PolicyCallback>>;
+  /** Smart tags shared by policies for the rest of this run. */
+  tags: WeakMap<IntrospectionRow, PgSmartTagsAndDescription>;
 }
 
 /** A policy's `preview` or `select` callback, each selected independently. */
@@ -403,6 +410,7 @@ function buildMultipassContext<TEntities extends EntityType>(
     pending: new Map(),
     waiting: new Map(),
     reruns: new Map(),
+    tags: new WeakMap(),
     selected: new Set([...onlyEntities]),
     previewsByEntity: new Map(),
     selectsByEntity: new Map(),
@@ -813,6 +821,9 @@ function runCallback<TEntity extends EntityType>(
     requestByName(entity, identity, purposes) {
       requestObjectsByName(details, entity, identity, purposes);
     },
+    getTagsAndDescription(entity, row) {
+      return tagsAndDescription(context, details, entity, row);
+    },
   };
   callback.run(row === SENTINEL ? null : row, details);
   subscriptions.set(callback, subscribeTo);
@@ -905,6 +916,40 @@ function requestObjectsByName(
       return;
     }
   }
+}
+
+function tagsAndDescription<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  details: IntrospectionPolicyDetails,
+  entity: TaggedEntity,
+  row: IntrospectionRow<TaggedEntity>,
+): PgSmartTagsAndDescription | undefined {
+  const existing = context.tags.get(row);
+  if (existing) {
+    return existing;
+  }
+  const [catalog, objoid, objsubid] =
+    "attrelid" in row
+      ? ["pg_class", row.attrelid, row.attnum]
+      : [ENTITY_TYPES[entity].tableName, rowOid(entity, row), 0];
+  const classoid = Object.keys(context.catalogByOid).find(
+    (oid) => context.catalogByOid[oid] === catalog,
+  );
+  let description: string | undefined;
+  if (context.selected.has("descriptions") && classoid && objoid) {
+    const descriptions = details.peek("descriptions", { classoid, objoid }, [
+      "_smartTags",
+    ]);
+    if (!descriptions) {
+      return undefined;
+    }
+    description = descriptions.find(
+      (candidate) => candidate.objsubid === objsubid,
+    )?.description;
+  }
+  const result = parseSmartComment(description);
+  context.tags.set(row, result);
+  return result;
 }
 
 /** Run the callbacks waiting on this (now fetched) selector again. */

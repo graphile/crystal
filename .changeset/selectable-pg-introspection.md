@@ -27,9 +27,9 @@ allows pg-introspection to minimize the amount of data it pulls from the
 database to just the parts you're interested in, significantly reducing memory
 usage. Supports configurable discovery policies (which may peek at rows before
 deciding whether to request them, preview rows fetched only to guide discovery,
-or run without a row to include specific objects), role-based filtering,
-entrypoint filters and pruning. Rows fetched only for purposes starting with `_`
-are hidden from the results. See the
+share smart tags, or run without a row to include specific objects), role-based
+filtering, entrypoint filters and pruning. Rows fetched only for purposes
+starting with `_` are hidden from the results. See the
 [multipass guide](https://star.graphile.org/pg-introspection/multipass).
 
 NEW! Top-level `filters` accepts trusted SQL predicates keyed by collection.

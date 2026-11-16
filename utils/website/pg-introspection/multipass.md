@@ -206,6 +206,20 @@ runs for every row, but may only `request` and `peek` with purposes starting
 with `_`. In each round every `preview` runs before any `select`, so a `select`
 that peeks at a row sees the effects of that row's previews.
 
+### Smart tags during discovery
+
+`details.getTagsAndDescription(collection, row)` returns the smart tags and
+description of a row. Like `peek`, it fetches the row's descriptions (with the
+built-in `_smartTags` purpose) and returns `undefined` until they are known; a
+row without a comment has no tags. The result is shared by every policy for the
+rest of the introspection run, so a `preview` may merge further tags into it,
+for example tags from configuration rather than database comments; any `select`
+that reads the tags after the descriptions arrive sees those merges. These
+merges are ephemeral: they only guide discovery and are discarded when the run
+ends. Entities in the returned introspection parse their tags afresh from the
+database comments, so tags that should also affect the schema must be merged
+again after introspection, as `pgSmartTags` does.
+
 ## Policies without a row
 
 A policy with `entity: null` is not tied to a row. It is selected once at the

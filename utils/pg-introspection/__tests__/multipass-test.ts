@@ -1249,3 +1249,78 @@ it("selects null-entity policies at the start, without a row", async () => {
     ["7"],
   );
 });
+
+it("shares smart tags between policies once descriptions are fetched", async () => {
+  const seen: unknown[] = [];
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          catalog_by_oid: { "1259": "pg_class" },
+          namespaces: [],
+          classes: [
+            { _id: "1", relname: "tagged" },
+            { _id: "2", relname: "untagged" },
+          ],
+          descriptions: [],
+        });
+      }
+      return JSON.stringify({
+        descriptions: [
+          {
+            classoid: "1259",
+            objoid: "1",
+            objsubid: 0,
+            description: "@fromComment\nHello",
+          },
+        ],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "descriptions"],
+    multipass: {
+      // Leaves the initial descriptions incomplete so they must be fetched.
+      entrypointFilters: { descriptions: "false" },
+      // Listed first, but previews still run before selects in each round.
+      policies: [
+        defineIntrospectionPolicy({
+          name: "read",
+          entity: "classes",
+          select(row, details) {
+            const result = details.getTagsAndDescription("classes", row);
+            seen.push([row._id, result ?? "pending"]);
+          },
+        }),
+        defineIntrospectionPolicy({
+          name: "merge",
+          entity: "classes",
+          preview(row, details) {
+            const result = details.getTagsAndDescription("classes", row);
+            if (result && row._id === "1") {
+              result.tags.fromPolicy = true;
+            }
+          },
+        }),
+      ],
+    },
+  });
+  assert.equal(queries, 2);
+  assert.deepEqual(seen, [
+    ["1", "pending"],
+    ["2", "pending"],
+    [
+      "1",
+      {
+        tags: Object.assign(Object.create(null), {
+          fromComment: true,
+          fromPolicy: true,
+        }),
+        description: "Hello",
+      },
+    ],
+    // Fetched, but without a comment.
+    ["2", { tags: Object.create(null), description: undefined }],
+  ]);
+});
