@@ -1132,6 +1132,42 @@ function addRelations(
               isMutationPayload ?? false,
             );
           }
+          if (
+            !isMutationPayload &&
+            ref.paths.length === 1 &&
+            ref.paths[0].length === 2
+          ) {
+            const [firstLayer, finalLayer] = paths[0].layers;
+            const attributes = resource.codec.attributes;
+            // When this record exposes the final relation's local attributes
+            // via the first relation (as relational polymorphism does for the
+            // base table's attributes), plan the final relation from this
+            // record: every type sharing the first relation then plans the
+            // same steps, which Grafast deduplicates. (Mutation payloads
+            // cannot read `via` attributes, so they keep the join.)
+            const readsThroughFirstLayer = finalLayer.localAttributes.every(
+              (attributeName) => {
+                const attribute = attributes?.[attributeName];
+                const via = attribute?.via ?? attribute?.identicalVia;
+                if (via == null) {
+                  return false;
+                }
+                const resolved = resource.resolveVia(via, attributeName);
+                return (
+                  resolved.relationName === firstLayer.relationName &&
+                  resolved.attributeName === attributeName
+                );
+              },
+            );
+            if (readsThroughFirstLayer) {
+              return makeRelationPlans(
+                finalLayer.localAttributes,
+                finalLayer.remoteAttributes,
+                finalLayer.resource,
+                false,
+              );
+            }
+          }
           if (!sharedFinalResource) {
             throw new Error(
               `Non-polymorphic type must target a single resource`,
