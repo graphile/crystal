@@ -156,20 +156,22 @@ const lookupTables = defineIntrospectionPolicy({
     if (!details.hasPurpose("initial")) {
       return;
     }
-    const [namespace] =
-      details.peek("namespaces", { nspname: "app_private" }, [
-        "_lookupTables",
-      ]) ?? [];
-    if (!namespace) {
-      return;
-    }
-    const [lookup] =
-      details.peek(
-        "classes",
-        { relnamespace: namespace._id, relname: "lookup" },
-        ["_lookupTables"],
-      ) ?? [];
-    if (lookup?.relkind === "r") {
+
+    const schemas = details.peek("namespaces", { nspname: "app_private" }, [
+      "_lookupTables",
+    ]);
+    if (!schemas) return; // This function will run again once `schemas` exists
+    const [appPrivate] = schemas;
+    if (appPrivate == null) return; // Namespace doesn't exist (unlikely!)
+
+    const classes = details.peek(
+      "classes",
+      { relnamespace: appPrivate._id, relname: "lookup" },
+      ["_lookupTables"],
+    );
+    if (!classes) return; // This function will run again once `classes` exists
+    const [lookup] = classes;
+    if (lookup != null && lookup.relkind === "r") {
       details.request("classes", { _id: lookup._id }, ["procedureReturnType"]);
     }
   },
