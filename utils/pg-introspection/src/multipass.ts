@@ -78,13 +78,16 @@ function sqlColumnName(column: string): string {
   return column === "_id" ? "oid" : column;
 }
 
+/** Identifies a selector (its entity and match); see `selectorKey`. */
+type SelectorKey = string & { readonly tsBrand: unique symbol };
+
 function selectorKey(
   request: Pick<IntrospectionRequest, "entity" | "match">,
-): string {
+): SelectorKey {
   return JSON.stringify([
     request.entity,
     Object.entries(request.match).sort(([a], [b]) => a.localeCompare(b)),
-  ]);
+  ]) as SelectorKey;
 }
 
 /** Combine override predicates without losing earlier conditions. */
@@ -361,7 +364,7 @@ interface MultipassContext<TEntities extends EntityType> {
   /** Cached selector indexes avoid rescanning rows for each dependency request. */
   selectorIndexes: Map<EntityType, Map<string, SelectorIndex>>;
   /** Selectors with complete results, including empty results, need no refetch. */
-  completedSelectors: Set<string>;
+  completedSelectors: Set<SelectorKey>;
   /** Accumulated reasons for including each row, used to guide its policies. */
   purposes: Map<IntrospectionRow, Set<PgIntrospection.Purpose>>;
   /** Missing purposes that would trigger each callback to run again for a row. */
@@ -372,10 +375,10 @@ interface MultipassContext<TEntities extends EntityType> {
   /** New rows or rows with added purposes awaiting policy execution. */
   frontier: Array<[EntityType | null, IntrospectionRow]>;
   /** Requests to fetch in the next pass, keyed by selector. */
-  pending: Map<string, IntrospectionRequest>;
+  pending: Map<SelectorKey, IntrospectionRequest>;
   /** Rows and callbacks to run again once a pending selector is fetched. */
   waiting: Map<
-    string,
+    SelectorKey,
     Array<[EntityType | null, IntrospectionRow, PolicyCallback]>
   >;
   /** Callbacks to run again for a row regardless of its purposes. */
@@ -955,7 +958,7 @@ function tagsAndDescription<TEntity extends EntityType>(
 /** Run the callbacks waiting on this (now fetched) selector again. */
 function wakeWaiting<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
-  key: string,
+  key: SelectorKey,
 ) {
   const { waiting, reruns, frontier } = context;
   for (const [entity, row, callback] of waiting.get(key) ?? []) {
