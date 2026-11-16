@@ -846,7 +846,7 @@ const NAME_PARTS = {
   procs: 2,
   types: 2,
   attributes: 3,
-} as const;
+} as const satisfies Record<NamedEntity, number>;
 
 function identityParts(
   entity: NamedEntity,
@@ -914,6 +914,10 @@ function requestObjectsByName(
         );
       }
       return;
+    }
+    default: {
+      const never: never = entity;
+      throw new Error(`Entity type ${never} not expected!`);
     }
   }
 }
