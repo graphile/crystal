@@ -343,8 +343,14 @@ async function processFk(
     foreignSchema,
     foreignTable,
   );
+  const multipass =
+    info.resolvedPreset.gather?.pgMultipassIntrospection !== false;
+  // Multipass introspection may only peek at a target, without its attributes.
+  if (multipass && foreignPgClass && !foreignPgClass.getAttributes().length) {
+    return;
+  }
   if (!foreignPgClass) {
-    if (info.resolvedPreset.gather?.pgMultipassIntrospection !== false) {
+    if (multipass) {
       const pgService = info.resolvedPreset.pgServices?.find(
         (service) => service.name === serviceName,
       );
