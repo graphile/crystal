@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/interfaces-relational/relation"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 199, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 17, 18, 59<br />4: PgSelect[60]<br />5: PgSelectRows[65]<br />ᐳ: First[64], PgSelectSingle[66]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 195, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 17, 18, 59<br />4: PgSelect[60]<br />5: PgSelectRows[65]<br />ᐳ: First[64], PgSelectSingle[66]"):::bucket
     Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[18]<br />Deps: 18, 10, 14, 66"):::bucket
     Bucket2("Bucket 2 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 10, 14, 66<br />ᐳRelationalTopic<br /><br />1: PgSelect[20]<br />2: PgSelectRows[25]<br />ᐳ: First[24], PgSelectSingle[26]"):::bucket
     Bucket3("Bucket 3 (polymorphicPartition)<br />|RelationalPost<br />Deps: 10, 14, 66<br />ᐳRelationalPost<br /><br />1: PgSelect[28]<br />2: PgSelectRows[33]<br />ᐳ: First[32], PgSelectSingle[34]"):::bucket
@@ -22,11 +22,8 @@ graph TD
     Bucket11("Bucket 11 (polymorphicPartition)<br />|RelationalDivider<br />Deps: 10, 104, 161<br />(5) ...ᐳRelationalDivider<br /><br />1: PgSelect[126]<br />2: PgSelectRows[131]<br />ᐳ: First[130], PgSelectSingle[132]"):::bucket
     Bucket12("Bucket 12 (polymorphicPartition)<br />|RelationalChecklist<br />Deps: 10, 104, 161<br />(5) ...ᐳRelationalChecklist<br /><br />1: PgSelect[134]<br />2: PgSelectRows[139]<br />ᐳ: First[138], PgSelectSingle[140]"):::bucket
     Bucket13("Bucket 13 (polymorphicPartition)<br />|RelationalChecklistItem<br />Deps: 10, 104, 161<br />(5) ...ᐳRelationalChecklistItem<br /><br />1: PgSelect[142]<br />2: PgSelectRows[147]<br />ᐳ: First[146], PgSelectSingle[148]"):::bucket
-    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 161<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[161]"):::bucket
+    Bucket14("Bucket 14 (combined)<br />Deps: 161"):::bucket
     Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 161<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[161]"):::bucket
-    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 161<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[161]"):::bucket
-    Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 161<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[161]"):::bucket
-    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 161<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[161]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6
@@ -38,13 +35,14 @@ graph TD
     Bucket7 --> Bucket8
     Bucket8 --> Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13
     Bucket9 --> Bucket14
-    Bucket10 --> Bucket15
-    Bucket11 --> Bucket16
-    Bucket12 --> Bucket17
-    Bucket13 --> Bucket18
+    Bucket10 --> Bucket14
+    Bucket11 --> Bucket14
+    Bucket12 --> Bucket14
+    Bucket13 --> Bucket14
+    Bucket14 --> Bucket15
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ15ᐳ[199]"]]:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ15ᐳ[195]"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 13"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -168,16 +166,8 @@ graph TD
     PgSelect142 --> PgSelectRows147
     PgSelectSingle148{{"PgSelectSingle[148∈13] ➊^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First146 --> PgSelectSingle148
-    PgClassExpression194{{"PgClassExpression[194∈14] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalTopic"}}:::plan
+    PgClassExpression194{{"PgClassExpression[194∈15] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalTopic<br />(5) ...ᐳRelationalPost<br />(5) ...ᐳRelationalDivider<br />(5) ...ᐳRelationalChecklist<br />(5) ...ᐳRelationalChecklistItem"}}:::plan
     PgSelectSingle161 --> PgClassExpression194
-    PgClassExpression195{{"PgClassExpression[195∈15] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalPost"}}:::plan
-    PgClassExpression194 o--o PgClassExpression195
-    PgClassExpression196{{"PgClassExpression[196∈16] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalDivider"}}:::plan
-    PgClassExpression195 o--o PgClassExpression196
-    PgClassExpression197{{"PgClassExpression[197∈17] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalChecklist"}}:::plan
-    PgClassExpression196 o--o PgClassExpression197
-    PgClassExpression198{{"PgClassExpression[198∈18] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalChecklistItem"}}:::plan
-    PgClassExpression197 o--o PgClassExpression198
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -209,13 +199,7 @@ graph TD
     classDef bucket13 stroke:#3cb371
     class Bucket13,PgSelect142,First146,PgSelectRows147,PgSelectSingle148 bucket13
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,PgClassExpression194 bucket14
+    class Bucket14 bucket14
     classDef bucket15 stroke:#ff00ff
-    class Bucket15,PgClassExpression195 bucket15
-    classDef bucket16 stroke:#f5deb3
-    class Bucket16,PgClassExpression196 bucket16
-    classDef bucket17 stroke:#696969
-    class Bucket17,PgClassExpression197 bucket17
-    classDef bucket18 stroke:#00bfff
-    class Bucket18,PgClassExpression198 bucket18
+    class Bucket15,PgClassExpression194 bucket15
 
