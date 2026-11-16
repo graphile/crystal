@@ -172,14 +172,20 @@ export interface IntrospectionPolicy<
   ) => void;
   /**
    * Selected for every row, including those fetched only to guide discovery.
-   * It may only request and peek with purposes starting with `_`. In each
-   * round, every `preview` runs before any `select`.
+   * It may only peek, not request. In each round, every `preview` runs before
+   * any `select`.
    */
   preview?: (
     row: PolicyRow<TEntity>,
-    details: IntrospectionPolicyDetails,
+    details: IntrospectionPreviewDetails,
   ) => void;
 }
+
+/** The details given to `preview`, which may only peek. */
+export type IntrospectionPreviewDetails = Omit<
+  IntrospectionPolicyDetails,
+  "request" | "requestByName"
+>;
 
 /** The row a policy receives; `null` for policies with `entity: null`. */
 type PolicyRow<TEntity extends EntityType | null> = TEntity extends EntityType

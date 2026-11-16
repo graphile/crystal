@@ -222,8 +222,8 @@ if (lookup.relkind === "r") {
 A policy defines `select`, `preview` or both. `select` only runs for rows with
 at least one purpose that does not start with `_` (the rows that will be
 exposed), so it never runs for rows fetched only to guide discovery. `preview`
-runs for every row, but may only `request` and `peek` with purposes starting
-with `_`. In each round every `preview` runs before any `select`, so a `select`
+runs for every row, but may only peek (with `peek`, `peekByName` and
+`getTagsAndDescription`), not request. In each round every `preview` runs before any `select`, so a `select`
 that peeks at a row sees the effects of that row's previews.
 
 ### Smart tags during discovery

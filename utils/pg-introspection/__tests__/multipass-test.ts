@@ -6,6 +6,7 @@ import {
   defineIntrospectionPolicy,
   type IntrospectionPolicy,
   type IntrospectionPolicyDetails,
+  type IntrospectionPreviewDetails,
   type IntrospectionRequest,
   type IntrospectionRow,
   type IntrospectOptions,
@@ -1045,8 +1046,14 @@ it("previews every row before selecting rows that are not discovery-only", async
           preview(row, details) {
             log.push(`preview ${row._id}`);
             assert.throws(
-              () => details.request("classes", { _id: "2" }, ["terminal"]),
-              /cannot request from preview with purpose 'terminal'/,
+              // @ts-expect-error Previews may only peek
+              () => details.request("classes", { _id: "2" }, ["_peek"]),
+              /cannot request from preview; use peek$/,
+            );
+            assert.throws(
+              // @ts-expect-error Previews may only peek
+              () => details.requestByName("classes", "app.thing", ["_peek"]),
+              /cannot request from preview; use peekByName/,
             );
           },
           select(row) {
@@ -1098,7 +1105,7 @@ it("requests objects by name, resolving their namespace and class", async () => 
     defineIntrospectionPolicy({
       name: `observe_${entity}`,
       entity,
-      preview(row: object, details: IntrospectionPolicyDetails) {
+      preview(row: object, details: IntrospectionPreviewDetails) {
         purposes[id(row)] = (["_resolveName", "terminal"] as const).filter(
           (purpose) => details.hasPurpose(purpose),
         );
@@ -1183,7 +1190,7 @@ it("selects null-entity policies at the start, without a row", async () => {
     defineIntrospectionPolicy({
       name: `observe_${entity}`,
       entity,
-      preview(row: { _id: string }, details: IntrospectionPolicyDetails) {
+      preview(row: { _id: string }, details: IntrospectionPreviewDetails) {
         purposes[row._id] = (["initial", "_resolveName"] as const).filter(
           (purpose) => details.hasPurpose(purpose),
         );

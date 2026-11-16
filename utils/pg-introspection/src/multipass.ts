@@ -793,7 +793,9 @@ function runCallback<TEntity extends EntityType>(
     },
     request(entity, match, purposes) {
       if (preview) {
-        assertDiscoveryPurposes(policy, "request from preview with", purposes);
+        throw new Error(
+          `Introspection policy '${policy.name}' cannot request from preview; use peek`,
+        );
       }
       // The generic request API keeps these parameters correlated.
       const request = { entity, match, purposes } as IntrospectionRequest;
@@ -819,6 +821,11 @@ function runCallback<TEntity extends EntityType>(
         | undefined;
     },
     requestByName(entity, identity, purposes) {
+      if (preview) {
+        throw new Error(
+          `Introspection policy '${policy.name}' cannot request from preview; use peekByName`,
+        );
+      }
       requestObjectsByName(details, entity, identity, purposes);
     },
     peekByName(requestEntity, identity, purposes) {
