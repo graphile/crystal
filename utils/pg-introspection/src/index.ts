@@ -118,6 +118,8 @@ declare global {
   namespace PgIntrospection {
     interface PurposeRegistry {
       initial: true;
+      /** Fetched only to resolve the identity given to `requestByName`. */
+      _resolveName: true;
     }
     type Purpose = keyof PurposeRegistry;
   }

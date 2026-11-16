@@ -184,6 +184,19 @@ requests it with a purpose that does not start with `_`, as `lookupTables` does
 above. A policy is only selected again for the rows it peeked at, so use
 `request` when you do not need to inspect them.
 
+`details.requestByName(collection, identity, purposes)` implements this pattern
+for `namespaces`, `classes`, `attributes`, `procs` and `types`. The identity is
+dot-separated, such as `app_private.lookup` or `app_private.lookup.id`; quote a
+part containing `.` or `"` (escaping `"` as `""`), or pass the parts as an
+array. Namespaces and classes fetched only to resolve the identity receive the
+built-in `_resolveName` purpose, so they are hidden unless another purpose needs
+them, and every matching object (every overload, for procedures) receives
+`purposes`:
+
+```ts
+details.requestByName("classes", "app_private.lookup", ["procedureReturnType"]);
+```
+
 ## Previews
 
 A policy defines `select`, `preview` or both. `select` only runs for rows with

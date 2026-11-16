@@ -1087,3 +1087,90 @@ it("requires policies to define select or preview", async () => {
     /'empty' must define select or preview/,
   );
 });
+
+it("requests objects by name, resolving their namespace and class", async () => {
+  const queries: unknown[] = [];
+  const purposes: Record<string, string[]> = {};
+  const observe = (
+    entity: "namespaces" | "classes" | "attributes" | "procs",
+    id: (row: any) => string,
+  ) =>
+    defineIntrospectionPolicy({
+      name: `observe_${entity}`,
+      entity,
+      preview(row: object, details: IntrospectionPolicyDetails) {
+        purposes[id(row)] = (["_resolveName", "terminal"] as const).filter(
+          (purpose) => details.hasPurpose(purpose),
+        );
+      },
+    });
+  await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      switch (queries.length) {
+        case 1:
+          return JSON.stringify({
+            ...metadata,
+            namespaces: [],
+            classes: [{ _id: "1", relnamespace: "2", relname: "source" }],
+            attributes: [],
+            procs: [],
+          });
+        case 2:
+          return JSON.stringify({ namespaces: [{ _id: "5", nspname: "app" }] });
+        case 3:
+          return JSON.stringify({
+            classes: [{ _id: "7", relnamespace: "5", relname: "my.table" }],
+            procs: [{ _id: "8", pronamespace: "5", proname: "fn" }],
+          });
+        default:
+          return JSON.stringify({
+            attributes: [{ attrelid: "7", attnum: 1, attname: "col" }],
+          });
+      }
+    },
+    onlyEntities: ["namespaces", "classes", "attributes", "procs"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "byName",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            details.requestByName("attributes", 'app."my.table".col', [
+              "terminal",
+            ]);
+            details.requestByName("procs", ["app", "fn"], ["terminal"]);
+            assert.throws(
+              () => details.requestByName("classes", "app", ["terminal"]),
+              /Invalid classes identity "app"; expected 2 part/,
+            );
+            assert.throws(
+              () =>
+                // @ts-expect-error Only nameable collections can be requested
+                details.requestByName("indexes", "app.name", ["terminal"]),
+              /Cannot request 'indexes' by name/,
+            );
+          },
+        }),
+        observe("namespaces", (row) => `namespace ${row._id}`),
+        observe("classes", (row) => `class ${row._id}`),
+        observe("attributes", (row) => `attribute ${row.attname}`),
+        observe("procs", (row) => `proc ${row._id}`),
+      ],
+    },
+  });
+  assert.deepEqual(queries, [
+    [],
+    [["app"]],
+    [["my.table"], ["5"], ["fn"], ["5"]],
+    [["col"], ["7"]],
+  ]);
+  assert.deepEqual(purposes, {
+    "class 1": [],
+    "namespace 5": ["_resolveName"],
+    "class 7": ["_resolveName"],
+    "proc 8": ["terminal"],
+    "attribute col": ["terminal"],
+  });
+});

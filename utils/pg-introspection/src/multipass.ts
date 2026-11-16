@@ -14,6 +14,7 @@ import type {
   IntrospectOptions,
   Maybe,
   MultipassIntrospectOptions,
+  NamedEntity,
   PurposeList,
   SQLVal,
 } from "./interfaces.ts";
@@ -27,6 +28,7 @@ import {
   NONZERO_COLUMNS,
   UNIQUE_KEYS,
 } from "./introspectionConstants.ts";
+import { parseIdentifierParts } from "./parseIdentifierParts.ts";
 import { hideRows, pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import {
   assertEntityType,
@@ -750,7 +752,7 @@ function runCallback<TEntity extends EntityType>(
     return;
   }
   const subscribeTo = new Set<PgIntrospection.Purpose>();
-  callback.run(row, {
+  const details: IntrospectionPolicyDetails = {
     catalogByOid,
     hasPurpose(purpose) {
       if (!snapshot.has(purpose)) {
@@ -787,7 +789,11 @@ function runCallback<TEntity extends EntityType>(
         | ReadonlyArray<IntrospectionRow<typeof requestEntity>>
         | undefined;
     },
-  });
+    requestByName(entity, identity, purposes) {
+      requestObjectsByName(details, entity, identity, purposes);
+    },
+  };
+  callback.run(row, details);
   subscriptions.set(callback, subscribeTo);
 }
 
@@ -799,6 +805,85 @@ function isDiscoveryOnly(purposes: Iterable<PgIntrospection.Purpose>) {
     }
   }
   return true;
+}
+
+/** The number of parts in the identity of each nameable collection. */
+const NAME_PARTS = {
+  namespaces: 1,
+  classes: 2,
+  procs: 2,
+  types: 2,
+  attributes: 3,
+} as const;
+
+function identityParts(
+  entity: NamedEntity,
+  identity: string | readonly string[],
+): readonly string[] {
+  if (!Object.hasOwn(NAME_PARTS, entity)) {
+    throw new Error(
+      `Cannot request '${entity}' by name; expected one of ${Object.keys(NAME_PARTS).join(", ")}`,
+    );
+  }
+  const parts =
+    typeof identity === "string" ? parseIdentifierParts(identity) : identity;
+  if (parts.length !== NAME_PARTS[entity]) {
+    throw new Error(
+      `Invalid ${entity} identity ${JSON.stringify(identity)}; expected ${NAME_PARTS[entity]} part(s)`,
+    );
+  }
+  return parts;
+}
+
+function requestObjectsByName(
+  details: IntrospectionPolicyDetails,
+  entity: NamedEntity,
+  identity: string | readonly string[],
+  purposes: PurposeList,
+) {
+  const [nspname, name, attname] = identityParts(entity, identity);
+  if (entity === "namespaces") {
+    details.request("namespaces", { nspname }, purposes);
+    return;
+  }
+  const [namespace] =
+    details.peek("namespaces", { nspname }, ["_resolveName"]) ?? [];
+  if (!namespace) {
+    return;
+  }
+  const { _id } = namespace;
+  switch (entity) {
+    case "classes": {
+      details.request(
+        "classes",
+        { relnamespace: _id, relname: name },
+        purposes,
+      );
+      return;
+    }
+    case "procs": {
+      details.request("procs", { pronamespace: _id, proname: name }, purposes);
+      return;
+    }
+    case "types": {
+      details.request("types", { typnamespace: _id, typname: name }, purposes);
+      return;
+    }
+    case "attributes": {
+      const [table] =
+        details.peek("classes", { relnamespace: _id, relname: name }, [
+          "_resolveName",
+        ]) ?? [];
+      if (table) {
+        details.request(
+          "attributes",
+          { attrelid: table._id, attname },
+          purposes,
+        );
+      }
+      return;
+    }
+  }
 }
 
 /** Run the callbacks waiting on this (now fetched) selector again. */

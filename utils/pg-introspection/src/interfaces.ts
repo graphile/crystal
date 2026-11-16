@@ -82,11 +82,31 @@ export interface IntrospectionPolicyDetails {
     match: IntrospectionMatch<NoInfer<TEntity>>,
     purposes: PurposeList,
   ): ReadonlyArray<IntrospectionRow<TEntity>> | undefined;
+  /**
+   * Request the objects with the given identity, such as `app.users` for a
+   * class or `app.users.id` for an attribute; pass the parts as an array to
+   * avoid quoting. Every procedure overload matches. Namespaces and classes
+   * fetched only to resolve the identity get the `_resolveName` purpose, so
+   * are hidden unless another purpose needs them.
+   */
+  requestByName(
+    entity: NamedEntity,
+    identity: string | readonly string[],
+    purposes: PurposeList,
+  ): void;
   /** False results subscribe this policy to run again when the purpose is added. */
   hasPurpose(purpose: PgIntrospection.Purpose): boolean;
   /** Immutable metadata captured before dependency discovery begins. */
   catalogByOid: Readonly<Record<string, string>>;
 }
+
+/** Collections whose objects can be requested by name. */
+export type NamedEntity =
+  | "namespaces"
+  | "classes"
+  | "attributes"
+  | "procs"
+  | "types";
 
 export type Maybe<T> = T | null | undefined;
 export type ReadonlyArrayOrDirect<T> = T | readonly T[];
