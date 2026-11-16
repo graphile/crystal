@@ -142,7 +142,7 @@ export interface MultipassIntrospectOptions<TEntities extends EntityType>
   multipass: MultipassOptions;
 }
 
-type CollectionEntity = {
+export type CollectionEntity = {
   [T in EntityType]: IntrospectionData[T] extends readonly unknown[]
     ? T
     : never;
