@@ -1,5 +1,6 @@
 import LRU from "@graphile/lru";
 import type {
+  ConstValueNode,
   FieldNode,
   FragmentDefinitionNode,
   GraphQLArgument,
@@ -1856,11 +1857,13 @@ export class OperationPlan {
         }
       }
 
-      // A field whose step is shared by several polymorphic partitions (for
-      // example a field of the interface that every type plans to the same
-      // step) is planned once: combine the partitions and plan the field's
-      // return type in the combined layer plan, so its nullable boundaries,
-      // list items and nested polymorphism are not repeated per partition.
+      // A field planned directly in several polymorphic partitions to the
+      // same step (for example a field of the interface that every type
+      // plans to the same step) is planned once: combine the partitions and
+      // plan the field's return type in the combined layer plan, so its
+      // nullable boundaries, list items and nested polymorphism are not
+      // repeated per partition. A step shared deeper (beneath a field each
+      // type plans to its own step) is not combined here.
       for (const tuples of partitionedFieldEntriesByStep.values()) {
         const layerPlans = new Set<LayerPlan>();
         for (const [, entry] of tuples) {
@@ -3264,44 +3267,30 @@ export class OperationPlan {
   }
 
   /**
-   * The same field node planned again (for example once per type of an
-   * abstract position) reuses its argument steps, so `processPlanField` can
-   * group those plannings into one.
+   * One default value node per argument, so that `inputStep`'s cache (keyed
+   * by value node) returns the same step each time the argument is planned.
    */
-  private trackedArgumentsByField = new Map<
-    FieldNode,
-    Map<ReadonlyArray<GraphQLArgument>, TrackedArguments>
+  private defaultValueNodeByArgument = new Map<
+    GraphQLArgument,
+    ConstValueNode | undefined
   >();
 
-  private getTrackedArguments(
-    argumentDefinitions: ReadonlyArray<GraphQLArgument>,
-    field: FieldNode,
-  ): TrackedArguments {
-    let byDefinitions = this.trackedArgumentsByField.get(field);
-    if (byDefinitions === undefined) {
-      byDefinitions = new Map();
-      this.trackedArgumentsByField.set(field, byDefinitions);
+  private defaultValueNode(
+    argumentDefinition: GraphQLArgument,
+  ): ConstValueNode | undefined {
+    if (!argumentDefinition.defaultValue) {
+      return undefined;
     }
-    const existing = byDefinitions.get(argumentDefinitions);
-    if (existing === undefined) {
-      const trackedArguments = this.makeTrackedArguments(
-        argumentDefinitions,
-        field,
+    if (!this.defaultValueNodeByArgument.has(argumentDefinition)) {
+      this.defaultValueNodeByArgument.set(
+        argumentDefinition,
+        defaultValueToValueNode(
+          argumentDefinition.type,
+          argumentDefinition.defaultValue,
+        ),
       );
-      byDefinitions.set(argumentDefinitions, trackedArguments);
-      return trackedArguments;
-    } else {
-      // Deduplication may have replaced the steps since they were created
-      for (const argumentName of Object.keys(existing)) {
-        const $current = this.stepTracker.getStepById(
-          existing[argumentName].id,
-        );
-        if ($current !== existing[argumentName]) {
-          (existing as Record<string, Step>)[argumentName] = $current;
-        }
-      }
-      return existing;
     }
+    return this.defaultValueNodeByArgument.get(argumentDefinition);
   }
 
   /**
@@ -3310,7 +3299,7 @@ export class OperationPlan {
    *
    * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
    */
-  private makeTrackedArguments(
+  private getTrackedArguments(
     argumentDefinitions: ReadonlyArray<GraphQLArgument>,
     field: FieldNode,
   ): TrackedArguments {
@@ -3325,9 +3314,7 @@ export class OperationPlan {
         );
       }
       const argumentType = argumentDefinition.type;
-      const defaultValue = argumentDefinition.defaultValue
-        ? defaultValueToValueNode(argumentType, argumentDefinition.defaultValue)
-        : undefined;
+      const defaultValue = this.defaultValueNode(argumentDefinition);
       const argumentValue = argumentValues?.find(
         (v) => v.name.value === argumentName,
       );
