@@ -26,9 +26,9 @@ NEW! Multipass introspection (opt-in with `multipass: { policies: [...] }`)
 allows pg-introspection to minimize the amount of data it pulls from the
 database to just the parts you're interested in, significantly reducing memory
 usage. Supports configurable discovery policies (which may peek at rows before
-deciding whether to request them), role-based filtering, entrypoint filters and
-pruning. Rows fetched only for purposes starting with `_` are hidden from the
-results. See the
+deciding whether to request them, and preview rows fetched only to guide
+discovery), role-based filtering, entrypoint filters and pruning. Rows fetched
+only for purposes starting with `_` are hidden from the results. See the
 [multipass guide](https://star.graphile.org/pg-introspection/multipass).
 
 NEW! Top-level `filters` accepts trusted SQL predicates keyed by collection.

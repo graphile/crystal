@@ -94,11 +94,25 @@ export type ReadonlyArrayOrDirect<T> = T | readonly T[];
 /**
  * Policies must depend only on the row, inspected purposes and fixed configuration.
  * Requests are additive: later purposes cannot retract requests already issued.
+ * A policy defines `select`, `preview` or both.
  */
 export interface IntrospectionPolicy<TEntity extends EntityType = EntityType> {
   name: string;
   entity: TEntity;
-  select: (
+  /**
+   * Selected for rows with at least one purpose that does not start with `_`,
+   * that is, rows that will be exposed.
+   */
+  select?: (
+    row: IntrospectionRow<TEntity>,
+    details: IntrospectionPolicyDetails,
+  ) => void;
+  /**
+   * Selected for every row, including those fetched only to guide discovery.
+   * It may only request and peek with purposes starting with `_`. In each
+   * round, every `preview` runs before any `select`.
+   */
+  preview?: (
     row: IntrospectionRow<TEntity>,
     details: IntrospectionPolicyDetails,
   ) => void;

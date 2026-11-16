@@ -8,6 +8,7 @@ import type {
   IntrospectionDataForEntities,
   IntrospectionOptions,
   IntrospectionPolicy,
+  IntrospectionPolicyDetails,
   IntrospectionRequest,
   IntrospectionRow,
   IntrospectOptions,
@@ -338,8 +339,9 @@ interface MultipassContext<TEntities extends EntityType> {
   options: MultipassIntrospectOptions<TEntities>;
   /** Limits discovery and policy execution to the requested entity types. */
   selected: Set<EntityType>;
-  /** Policies grouped by entity so each row runs only applicable policies. */
-  policiesByEntity: Map<EntityType, IntrospectionPolicy[]>;
+  /** Callbacks grouped by entity so each row runs only applicable policies. */
+  previewsByEntity: Map<EntityType, PolicyCallback[]>;
+  selectsByEntity: Map<EntityType, PolicyCallback[]>;
   /** Lets policies translate catalogue OIDs into catalogue names. */
   catalogByOid: Record<string, string>;
   /** Rows indexed by entity and identity to deduplicate and reuse discoveries. */
@@ -350,22 +352,26 @@ interface MultipassContext<TEntities extends EntityType> {
   completedSelectors: Set<string>;
   /** Accumulated reasons for including each row, used to guide its policies. */
   purposes: Map<IntrospectionRow, Set<PgIntrospection.Purpose>>;
-  /** Missing purposes that would trigger each policy to run again for a row. */
+  /** Missing purposes that would trigger each callback to run again for a row. */
   policySubscriptions: Map<
     IntrospectionRow,
-    Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
+    Map<PolicyCallback, Set<PgIntrospection.Purpose>>
   >;
   /** New rows or rows with added purposes awaiting policy execution. */
   frontier: Array<[EntityType, IntrospectionRow]>;
   /** Requests to fetch in the next pass, keyed by selector. */
   pending: Map<string, IntrospectionRequest>;
-  /** Rows and policies to select again once a pending selector is fetched. */
-  waiting: Map<
-    string,
-    Array<[EntityType, IntrospectionRow, IntrospectionPolicy]>
-  >;
-  /** Policies to select again for a row regardless of its purposes. */
-  reruns: Map<IntrospectionRow, Set<IntrospectionPolicy>>;
+  /** Rows and callbacks to run again once a pending selector is fetched. */
+  waiting: Map<string, Array<[EntityType, IntrospectionRow, PolicyCallback]>>;
+  /** Callbacks to run again for a row regardless of its purposes. */
+  reruns: Map<IntrospectionRow, Set<PolicyCallback>>;
+}
+
+/** A policy's `preview` or `select` callback, each selected independently. */
+interface PolicyCallback {
+  policy: IntrospectionPolicy;
+  preview: boolean;
+  run: (row: IntrospectionRow, details: IntrospectionPolicyDetails) => void;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
@@ -385,14 +391,15 @@ function buildMultipassContext<TEntities extends EntityType>(
     waiting: new Map(),
     reruns: new Map(),
     selected: new Set([...onlyEntities]),
-    policiesByEntity: new Map(),
+    previewsByEntity: new Map(),
+    selectsByEntity: new Map(),
     rowsByIdentity: new Map(),
     completedSelectors: new Set(),
     catalogByOid: Object.create(null),
     selectorIndexes: new Map(),
   };
 
-  const { selected, policiesByEntity } = context;
+  const { selected, previewsByEntity, selectsByEntity } = context;
   const names = new Set<string>();
   for (const policy of policies) {
     if (names.has(policy.name)) {
@@ -402,11 +409,24 @@ function buildMultipassContext<TEntities extends EntityType>(
     if (!policy.name?.trim()) {
       throw new Error(`Invalid introspection policy name '${policy.name}'`);
     }
+    if (!policy.select && !policy.preview) {
+      throw new Error(
+        `Introspection policy '${policy.name}' must define select or preview`,
+      );
+    }
     if (!selected.has(policy.entity)) continue;
-    const list = policiesByEntity.get(policy.entity) ?? [];
-    // The map groups policies by entity; dispatch supplies a row from that entity.
-    list.push(policy as IntrospectionPolicy);
-    policiesByEntity.set(policy.entity, list);
+    // The maps group callbacks by entity; dispatch supplies a row from that entity.
+    const generic = policy as IntrospectionPolicy;
+    for (const [byEntity, run, preview] of [
+      [previewsByEntity, generic.preview, true],
+      [selectsByEntity, generic.select, false],
+    ] as const) {
+      if (run) {
+        const list = byEntity.get(policy.entity) ?? [];
+        list.push({ policy: generic, preview, run });
+        byEntity.set(policy.entity, list);
+      }
+    }
   }
 
   return context;
@@ -638,9 +658,7 @@ function hideDiscoveryOnlyRows<TEntities extends EntityType>(
   result: IntrospectionDataForEntities<TEntities>,
 ) {
   const discoveryOnly = (row: IntrospectionRow) =>
-    [...(context.purposes.get(row) ?? [])].every((purpose) =>
-      purpose.startsWith("_"),
-    );
+    isDiscoveryOnly(context.purposes.get(row) ?? []);
   for (const entity of context.selected) {
     if (isCollectionEntity(entity)) {
       hideRows(result, entity, discoveryOnly);
@@ -677,92 +695,124 @@ function collectRequests<TEntity extends EntityType>(
 function drainFrontier<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
 ) {
-  const {
-    frontier,
-    purposes,
-    policySubscriptions,
-    policiesByEntity,
-    catalogByOid,
-    reruns,
-  } = context;
+  const { frontier, purposes, previewsByEntity, selectsByEntity, reruns } =
+    context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length > 0) {
-    const batch = frontier.splice(0);
-    const snapshots = new Map(
-      batch.map(([, row]) => [row, new Set(purposes.get(row))]),
+    const batch = new Map(
+      frontier.splice(0).map(([entity, row]) => [row, entity]),
     );
-    for (const [entity, row] of batch) {
-      let subscriptions = policySubscriptions.get(row);
-      if (!subscriptions) {
-        subscriptions = new Map();
-        policySubscriptions.set(row, subscriptions);
-      }
-      const snapshot = snapshots.get(row)!;
-      const rerun = reruns.get(row);
+    const snapshots = new Map(
+      [...batch.keys()].map((row) => [row, new Set(purposes.get(row))]),
+    );
+    const batchReruns = new Map(
+      [...batch.keys()].map((row) => [row, reruns.get(row)]),
+    );
+    for (const row of batch.keys()) {
       reruns.delete(row);
-      for (const policy of policiesByEntity.get(entity) ?? []) {
-        const waiting = subscriptions.get(policy);
+    }
+    // Previews run first so selects see, for example, the smart tags they merge.
+    for (const callbacksByEntity of [previewsByEntity, selectsByEntity]) {
+      for (const [row, entity] of batch) {
+        const snapshot = snapshots.get(row)!;
         if (
-          waiting &&
-          waiting.isDisjointFrom(snapshot) &&
-          !rerun?.has(policy)
+          callbacksByEntity === selectsByEntity &&
+          isDiscoveryOnly(snapshot)
         ) {
           continue;
         }
-        const subscribeTo = new Set<PgIntrospection.Purpose>();
-        policy.select(row, {
-          catalogByOid,
-          hasPurpose(purpose) {
-            if (!snapshot.has(purpose)) {
-              subscribeTo.add(purpose);
-              return false;
-            } else {
-              return true;
-            }
-          },
-          request(entity, match, purposes) {
-            // The generic request API keeps these parameters correlated.
-            const request = { entity, match, purposes } as IntrospectionRequest;
-            requestDependency(context, policy, request);
-          },
-          peek(requestEntity, match, purposes) {
-            assertDiscoveryPurposes(policy, "peek with", purposes);
-            // The generic request API keeps these parameters correlated.
-            const request = {
-              entity: requestEntity,
-              match,
-              purposes,
-            } as IntrospectionRequest;
-            const rows = requestDependency(context, policy, request);
-            if (!rows) {
-              const key = selectorKey(request);
-              const waiters = context.waiting.get(key) ?? [];
-              waiters.push([entity, row, policy]);
-              context.waiting.set(key, waiters);
-            }
-            return rows as
-              | ReadonlyArray<IntrospectionRow<typeof requestEntity>>
-              | undefined;
-          },
-        });
-        subscriptions.set(policy, subscribeTo);
+        for (const callback of callbacksByEntity.get(entity) ?? []) {
+          const rerun = batchReruns.get(row)?.has(callback) ?? false;
+          runCallback(context, entity, row, callback, snapshot, rerun);
+        }
       }
     }
   }
 }
 
-/** Select the policies waiting on this (now fetched) selector again. */
+function runCallback<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  entity: EntityType,
+  row: IntrospectionRow,
+  callback: PolicyCallback,
+  snapshot: ReadonlySet<PgIntrospection.Purpose>,
+  rerun: boolean,
+) {
+  const { policySubscriptions, catalogByOid } = context;
+  const { policy, preview } = callback;
+  let subscriptions = policySubscriptions.get(row);
+  if (!subscriptions) {
+    subscriptions = new Map();
+    policySubscriptions.set(row, subscriptions);
+  }
+  const waiting = subscriptions.get(callback);
+  if (waiting && waiting.isDisjointFrom(snapshot) && !rerun) {
+    return;
+  }
+  const subscribeTo = new Set<PgIntrospection.Purpose>();
+  callback.run(row, {
+    catalogByOid,
+    hasPurpose(purpose) {
+      if (!snapshot.has(purpose)) {
+        subscribeTo.add(purpose);
+        return false;
+      } else {
+        return true;
+      }
+    },
+    request(entity, match, purposes) {
+      if (preview) {
+        assertDiscoveryPurposes(policy, "request from preview with", purposes);
+      }
+      // The generic request API keeps these parameters correlated.
+      const request = { entity, match, purposes } as IntrospectionRequest;
+      requestDependency(context, policy, request);
+    },
+    peek(requestEntity, match, purposes) {
+      assertDiscoveryPurposes(policy, "peek with", purposes);
+      // The generic request API keeps these parameters correlated.
+      const request = {
+        entity: requestEntity,
+        match,
+        purposes,
+      } as IntrospectionRequest;
+      const rows = requestDependency(context, policy, request);
+      if (!rows) {
+        const key = selectorKey(request);
+        const waiters = context.waiting.get(key) ?? [];
+        waiters.push([entity, row, callback]);
+        context.waiting.set(key, waiters);
+      }
+      return rows as
+        | ReadonlyArray<IntrospectionRow<typeof requestEntity>>
+        | undefined;
+    },
+  });
+  subscriptions.set(callback, subscribeTo);
+}
+
+/** Whether every purpose starts with `_`, marking rows needed only for discovery. */
+function isDiscoveryOnly(purposes: Iterable<PgIntrospection.Purpose>) {
+  for (const purpose of purposes) {
+    if (!purpose.startsWith("_")) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/** Run the callbacks waiting on this (now fetched) selector again. */
 function wakeWaiting<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
   key: string,
 ) {
   const { waiting, reruns, frontier } = context;
-  for (const [entity, row, policy] of waiting.get(key) ?? []) {
-    const policies = reruns.get(row);
-    if (policies) {
-      policies.add(policy);
+  for (const [entity, row, callback] of waiting.get(key) ?? []) {
+    const callbacks = reruns.get(row);
+    if (callbacks) {
+      callbacks.add(callback);
     } else {
-      reruns.set(row, new Set([policy]));
+      reruns.set(row, new Set([callback]));
       frontier.push([entity, row]);
     }
   }

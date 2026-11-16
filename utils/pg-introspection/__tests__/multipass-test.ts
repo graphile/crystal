@@ -1007,3 +1007,83 @@ it("returns peeked rows once fetched, selecting the policy again", async () => {
     ["2"],
   );
 });
+
+it("previews every row before selecting rows that are not discovery-only", async () => {
+  const log: string[] = [];
+  let queries = 0;
+  const result = await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1" }, { _id: "3" }],
+        });
+      }
+      return JSON.stringify({ classes: [{ _id: "2" }] });
+    },
+    onlyEntities: ["namespaces", "classes"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "promoteTarget",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            const [target] =
+              details.peek("classes", { _id: "2" }, ["_peek"]) ?? [];
+            log.push(`promote 1: ${target?._id ?? "pending"}`);
+            if (target) {
+              details.request("classes", { _id: target._id }, ["terminal"]);
+            }
+          },
+        }),
+        defineIntrospectionPolicy({
+          name: "observe",
+          entity: "classes",
+          preview(row, details) {
+            log.push(`preview ${row._id}`);
+            assert.throws(
+              () => details.request("classes", { _id: "2" }, ["terminal"]),
+              /cannot request from preview with purpose 'terminal'/,
+            );
+          },
+          select(row) {
+            log.push(`select ${row._id}`);
+          },
+        }),
+      ],
+    },
+  });
+  assert.deepEqual(log, [
+    // Every preview in a round runs before any select.
+    "preview 1",
+    "preview 3",
+    "promote 1: pending",
+    "select 1",
+    "select 3",
+    // Class 2 was only peeked at, so it is previewed but not selected...
+    "preview 2",
+    "promote 1: 2",
+    // ...until it is requested with a purpose that does not start with `_`.
+    "select 2",
+  ]);
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["1", "3", "2"],
+  );
+});
+
+it("requires policies to define select or preview", async () => {
+  await assert.rejects(
+    introspectRaw({
+      async runQuery() {
+        return JSON.stringify({ ...metadata, namespaces: [] });
+      },
+      onlyEntities: ["namespaces"],
+      multipass: { policies: [{ name: "empty", entity: "namespaces" }] },
+    }),
+    /'empty' must define select or preview/,
+  );
+});
