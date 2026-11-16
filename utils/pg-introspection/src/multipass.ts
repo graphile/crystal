@@ -797,7 +797,7 @@ function runCallback<TEntity extends EntityType>(
       }
       // The generic request API keeps these parameters correlated.
       const request = { entity, match, purposes } as IntrospectionRequest;
-      requestDependency(context, policy, request);
+      void requestDependency(context, policy, request);
     },
     peek(requestEntity, match, purposes) {
       assertDiscoveryPurposes(policy, "peek with", purposes);
