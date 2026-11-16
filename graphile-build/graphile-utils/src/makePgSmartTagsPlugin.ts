@@ -491,6 +491,11 @@ export function pgSmartTags<
                 promise.then(
                   () => {
                     info.cache.rulesPromise = promise;
+
+                    // Smart tags impact introspection discovery, so invalidate
+                    // introspection just before we kick off a new gather
+                    info.helpers.pgIntrospection.invalidateIntrospection();
+
                     callback();
                   },
                   (e) => {
