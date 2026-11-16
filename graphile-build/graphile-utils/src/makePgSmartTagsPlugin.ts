@@ -400,8 +400,9 @@ export function pgSmartTags<
   details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;
+  const name = details?.name ?? `PgSmartTagsPlugin_${id}`;
   return {
-    name: details?.name ?? `PgSmartTagsPlugin_${id}`,
+    name,
     description: details?.description,
     version: details?.version ?? "0.0.0",
     before: ["smart-tags"],
