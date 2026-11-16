@@ -3184,12 +3184,53 @@ export class OperationPlan {
   }
 
   /**
+   * The same field node planned again (for example once per type of an
+   * abstract position) reuses its argument steps, so `processPlanField` can
+   * group those plannings into one.
+   */
+  private trackedArgumentsByField = new Map<
+    FieldNode,
+    Map<ReadonlyArray<GraphQLArgument>, TrackedArguments>
+  >();
+
+  private getTrackedArguments(
+    argumentDefinitions: ReadonlyArray<GraphQLArgument>,
+    field: FieldNode,
+  ): TrackedArguments {
+    let byDefinitions = this.trackedArgumentsByField.get(field);
+    if (byDefinitions === undefined) {
+      byDefinitions = new Map();
+      this.trackedArgumentsByField.set(field, byDefinitions);
+    }
+    const existing = byDefinitions.get(argumentDefinitions);
+    if (existing === undefined) {
+      const trackedArguments = this.makeTrackedArguments(
+        argumentDefinitions,
+        field,
+      );
+      byDefinitions.set(argumentDefinitions, trackedArguments);
+      return trackedArguments;
+    } else {
+      // Deduplication may have replaced the steps since they were created
+      for (const argumentName of Object.keys(existing)) {
+        const $current = this.stepTracker.getStepById(
+          existing[argumentName].id,
+        );
+        if ($current !== existing[argumentName]) {
+          (existing as Record<string, Step>)[argumentName] = $current;
+        }
+      }
+      return existing;
+    }
+  }
+
+  /**
    * A replacement for GraphQL's
    * `CoerceArgumentValues` that factors in tracked variables.
    *
    * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
    */
-  private getTrackedArguments(
+  private makeTrackedArguments(
     argumentDefinitions: ReadonlyArray<GraphQLArgument>,
     field: FieldNode,
   ): TrackedArguments {
