@@ -10,7 +10,7 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-create.single-hardcoded"
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21, 53, 49, 57<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 20, 53, 22, 49, 57<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 23, 26, 54, 25<br />2: PgSelect[27]<br />ᐳ: Access[50]<br />3: Connection[32], Connection[43]<br />4: 34, 45<br />ᐳ: 33, 44, 51, 52, 55, 56, 37, 48"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 20, 53, 22, 49, 57<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 23, 26, 54, 25<br />2: PgSelect[27]<br />ᐳ: Access[50]<br />3: Connection[32]<br />4: ConnectionItems[34]<br />ᐳ: 33, 51, 52, 55, 56, 37, 48"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 55, 57, 51<br /><br />ROOT Edge{2}[37]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 48, 56, 57, 52<br /><br />ROOT Edge{2}[48]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 49, 54<br /><br />ROOT Constantᐸ[HIDDEN]ᐳ[49]"):::bucket
@@ -50,12 +50,11 @@ graph TD
     PgCursor51{{"PgCursor[51∈2] ➊"}}:::plan
     First33 & PgCursor51 --> Edge37
     Edge48{{"Edge[48∈2] ➊"}}:::plan
-    First44{{"First[44∈2] ➊"}}:::plan
     PgCursor52{{"PgCursor[52∈2] ➊"}}:::plan
-    First44 & PgCursor52 --> Edge48
+    First33 & PgCursor52 --> Edge48
     Access50{{"Access[50∈2] ➊<br />ᐸ27.cursorDetailsᐳ"}}:::plan
     First33 & Access50 --> PgCursor51
-    First44 & Access50 --> PgCursor52
+    First33 & Access50 --> PgCursor52
     Access23{{"Access[23∈2] ➊<br />ᐸ17.m.clientMutationIdᐳ"}}:::plan
     Object22 o--o Access23
     Access26{{"Access[26∈2] ➊<br />ᐸ17.tᐳ"}}:::plan
@@ -66,17 +65,12 @@ graph TD
     ConnectionItems34[["ConnectionItems[34∈2] ➊"]]:::plan
     ConnectionItems34 --> First33
     Connection32 --> ConnectionItems34
-    Connection43[["Connection[43∈2] ➊<br />ᐸ27ᐳ"]]:::plan
-    PgSelect27 --> Connection43
-    ConnectionItems45[["ConnectionItems[45∈2] ➊"]]:::plan
-    ConnectionItems45 --> First44
-    Connection43 --> ConnectionItems45
     PgSelect27 --> Access50
     Lambda54{{"Lambda[54∈2] ➊<br />ᐸrawEncodeᐳ<br />More deps:<br />- Constantᐸ'query'ᐳ[53]"}}:::plan
     PgSelectSingle55{{"PgSelectSingle[55∈2] ➊<br />ᐸpersonᐳ"}}:::plan
     First33 --> PgSelectSingle55
     PgSelectSingle56{{"PgSelectSingle[56∈2] ➊<br />ᐸpersonᐳ"}}:::plan
-    First44 --> PgSelectSingle56
+    First33 --> PgSelectSingle56
     List59{{"List[59∈8] ➊<br />ᐸ57,58ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[57]"}}:::plan
     PgClassExpression58{{"PgClassExpression[58∈8] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression58 --> List59
@@ -100,7 +94,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle17,Object22 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access23,PgClassExpression25,Access26,PgSelect27,Connection32,First33,ConnectionItems34,Edge37,Connection43,First44,ConnectionItems45,Edge48,Access50,PgCursor51,PgCursor52,Lambda54,PgSelectSingle55,PgSelectSingle56 bucket2
+    class Bucket2,Access23,PgClassExpression25,Access26,PgSelect27,Connection32,First33,ConnectionItems34,Edge37,Edge48,Access50,PgCursor51,PgCursor52,Lambda54,PgSelectSingle55,PgSelectSingle56 bucket2
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     classDef bucket6 stroke:#ff1493

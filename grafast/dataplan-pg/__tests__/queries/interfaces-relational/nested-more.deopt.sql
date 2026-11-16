@@ -35,24 +35,6 @@ lateral (
   order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
-with __people_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __people_result__.*
-from __people_identifiers__,
-lateral (
-  select
-    __people__."username" as "0",
-    __people_identifiers__.idx as "1"
-  from interfaces_and_unions.people as __people__
-  where
-    (
-      __people__."person_id" = __people_identifiers__."id0"
-    ) and (
-      true /* authorization checks */
-    )
-) as __people_result__;
-
 with __relational_topics_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
@@ -160,6 +142,24 @@ lateral (
       true /* authorization checks */
     )
 ) as __relational_items_result__;
+
+with __people_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __people_result__.*
+from __people_identifiers__,
+lateral (
+  select
+    __people__."username" as "0",
+    __people_identifiers__.idx as "1"
+  from interfaces_and_unions.people as __people__
+  where
+    (
+      __people__."person_id" = __people_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
+    )
+) as __people_result__;
 
 select
   __relational_posts__."id"::text as "0"
