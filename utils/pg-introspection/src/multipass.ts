@@ -728,21 +728,18 @@ function drainFrontier<TEntity extends EntityType>(
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length > 0) {
     const batch = new Map(
-      frontier.splice(0).map(([entity, row]) => [row, entity]),
-    );
-    const snapshots = new Map(
-      [...batch.keys()].map((row) => [row, new Set(purposes.get(row))]),
-    );
-    const batchReruns = new Map(
-      [...batch.keys()].map((row) => [row, reruns.get(row)]),
+      frontier.splice(0).map(([entity, row]) => {
+        const snapshot = new Set(purposes.get(row));
+        const rerun = reruns.get(row);
+        return [row, { entity, snapshot, rerun }];
+      }),
     );
     for (const row of batch.keys()) {
       reruns.delete(row);
     }
     // Previews run first so selects see, for example, the smart tags they merge.
     for (const callbacksByEntity of [previewsByEntity, selectsByEntity]) {
-      for (const [row, entity] of batch) {
-        const snapshot = snapshots.get(row)!;
+      for (const [row, { entity, snapshot, rerun }] of batch) {
         if (
           callbacksByEntity === selectsByEntity &&
           entity !== null &&
@@ -751,8 +748,8 @@ function drainFrontier<TEntity extends EntityType>(
           continue;
         }
         for (const callback of callbacksByEntity.get(entity) ?? []) {
-          const rerun = batchReruns.get(row)?.has(callback) ?? false;
-          runCallback(context, entity, row, callback, snapshot, rerun);
+          const isRerun = rerun?.has(callback) ?? false;
+          runCallback(context, entity, row, callback, snapshot, isRerun);
         }
       }
     }
