@@ -2,6 +2,7 @@ import assert from "node:assert";
 
 import { augmentIntrospectionData } from "./augmentIntrospection.ts";
 import type {
+  CollectionEntity,
   DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
@@ -25,7 +26,7 @@ import {
   NONZERO_COLUMNS,
   UNIQUE_KEYS,
 } from "./introspectionConstants.ts";
-import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
+import { hideRows, pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import {
   assertEntityType,
   buildIntrospectionQuery,
@@ -575,6 +576,7 @@ async function introspectRawMultipass<TEntities extends EntityType>(
     }
   }
 
+  hideDiscoveryOnlyRows(context, result);
   return pruneIntrospectionData(context.options, result);
 }
 
@@ -612,6 +614,29 @@ function mergeFetchedRows<TEntities extends EntityType>(
       }
     }
   }
+}
+
+/**
+ * Hide rows whose purposes all start with `_`, which mark rows needed only to
+ * guide discovery; navigation can still reach them.
+ */
+function hideDiscoveryOnlyRows<TEntities extends EntityType>(
+  context: MultipassContext<TEntities>,
+  result: IntrospectionDataForEntities<TEntities>,
+) {
+  const discoveryOnly = (row: IntrospectionRow) =>
+    [...(context.purposes.get(row) ?? [])].every((purpose) =>
+      purpose.startsWith("_"),
+    );
+  for (const entity of context.selected) {
+    if (isCollectionEntity(entity)) {
+      hideRows(result, entity, discoveryOnly);
+    }
+  }
+}
+
+function isCollectionEntity(entity: EntityType): entity is CollectionEntity {
+  return !ENTITY_TYPES[entity].singular;
 }
 
 function coerceToRows<TEntity extends EntityType>(

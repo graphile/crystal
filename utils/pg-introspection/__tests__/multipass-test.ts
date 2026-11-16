@@ -18,6 +18,7 @@ declare global {
   namespace PgIntrospection {
     interface PurposeRegistry {
       terminal: true;
+      _peek: true;
       keys: true;
       all: true;
       unrelated: true;
@@ -874,4 +875,52 @@ it("types policy rows according to their entity", () => {
   void typed;
   void policies;
   void invalid;
+});
+
+it("hides rows fetched only for purposes starting with _", async () => {
+  let queries = 0;
+  const result = await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      return JSON.stringify({
+        namespaces: [
+          { _id: "20", nspname: "peeked" },
+          { _id: "30", nspname: "kept" },
+        ],
+      });
+    },
+    onlyEntities: ["namespaces", "classes"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "peek",
+          entity: "classes",
+          select(_row, details) {
+            details.request("namespaces", { _id: "20" }, ["_peek"]);
+            details.request("namespaces", { _id: "30" }, ["_peek", "terminal"]);
+          },
+        }),
+      ],
+    },
+  });
+  assert.equal(queries, 2);
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["1"],
+  );
+  assert.deepEqual(
+    result.namespaces.map((row) => row._id),
+    ["30"],
+  );
+  assert.deepEqual(
+    result.hidden?.namespaces?.map((row) => row._id),
+    ["20"],
+  );
 });

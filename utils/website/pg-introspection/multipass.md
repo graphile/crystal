@@ -135,6 +135,11 @@ To make a request terminal, emit a purpose for which the target policies request
 no further dependencies. In the return-type example, no policy follows types,
 so the requested return types do not cause further expansion.
 
+Purposes whose names start with `_` mark rows that are only needed to guide
+discovery. Rows whose purposes all start with `_` are moved into the `hidden`
+collections before `prune` runs, so navigation can still reach them but they
+are not exposed; a row with any other purpose is exposed as usual.
+
 ## Global filters and entrypoint filters
 
 | Option                        | Initial query | Dependency queries |
