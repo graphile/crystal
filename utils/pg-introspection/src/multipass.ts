@@ -336,14 +336,19 @@ interface SelectorBatch {
   requests: IntrospectionRequest[];
 }
 
+type AnyPolicy = IntrospectionPolicy<EntityType | null>;
+
+/** The row of null-entity policies; `select` receives `null` instead. */
+const SENTINEL: IntrospectionRow = Object.freeze(Object.create(null));
+
 interface MultipassContext<TEntities extends EntityType> {
   /** Configuration shared by query construction and final result pruning. */
   options: MultipassIntrospectOptions<TEntities>;
   /** Limits discovery and policy execution to the requested entity types. */
   selected: Set<EntityType>;
   /** Callbacks grouped by entity so each row runs only applicable policies. */
-  previewsByEntity: Map<EntityType, PolicyCallback[]>;
-  selectsByEntity: Map<EntityType, PolicyCallback[]>;
+  previewsByEntity: Map<EntityType | null, PolicyCallback[]>;
+  selectsByEntity: Map<EntityType | null, PolicyCallback[]>;
   /** Lets policies translate catalogue OIDs into catalogue names. */
   catalogByOid: Record<string, string>;
   /** Rows indexed by entity and identity to deduplicate and reuse discoveries. */
@@ -360,20 +365,26 @@ interface MultipassContext<TEntities extends EntityType> {
     Map<PolicyCallback, Set<PgIntrospection.Purpose>>
   >;
   /** New rows or rows with added purposes awaiting policy execution. */
-  frontier: Array<[EntityType, IntrospectionRow]>;
+  frontier: Array<[EntityType | null, IntrospectionRow]>;
   /** Requests to fetch in the next pass, keyed by selector. */
   pending: Map<string, IntrospectionRequest>;
   /** Rows and callbacks to run again once a pending selector is fetched. */
-  waiting: Map<string, Array<[EntityType, IntrospectionRow, PolicyCallback]>>;
+  waiting: Map<
+    string,
+    Array<[EntityType | null, IntrospectionRow, PolicyCallback]>
+  >;
   /** Callbacks to run again for a row regardless of its purposes. */
   reruns: Map<IntrospectionRow, Set<PolicyCallback>>;
 }
 
 /** A policy's `preview` or `select` callback, each selected independently. */
 interface PolicyCallback {
-  policy: IntrospectionPolicy;
+  policy: AnyPolicy;
   preview: boolean;
-  run: (row: IntrospectionRow, details: IntrospectionPolicyDetails) => void;
+  run: (
+    row: IntrospectionRow | null,
+    details: IntrospectionPolicyDetails,
+  ) => void;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
@@ -416,9 +427,9 @@ function buildMultipassContext<TEntities extends EntityType>(
         `Introspection policy '${policy.name}' must define select or preview`,
       );
     }
-    if (!selected.has(policy.entity)) continue;
+    if (policy.entity !== null && !selected.has(policy.entity)) continue;
     // The maps group callbacks by entity; dispatch supplies a row from that entity.
-    const generic = policy as IntrospectionPolicy;
+    const generic = policy as AnyPolicy;
     for (const [byEntity, run, preview] of [
       [previewsByEntity, generic.preview, true],
       [selectsByEntity, generic.select, false],
@@ -443,6 +454,10 @@ function initializeMultipassContext<TEntities extends EntityType>(
   const { catalogByOid, selected, rowsByIdentity, completedSelectors } =
     context;
   Object.assign(catalogByOid, initialResult.catalog_by_oid);
+
+  if (context.previewsByEntity.has(null) || context.selectsByEntity.has(null)) {
+    context.frontier.push([null, SENTINEL]);
+  }
 
   for (const entity of selected) {
     const collection = initialResult[entity];
@@ -719,6 +734,7 @@ function drainFrontier<TEntity extends EntityType>(
         const snapshot = snapshots.get(row)!;
         if (
           callbacksByEntity === selectsByEntity &&
+          entity !== null &&
           isDiscoveryOnly(snapshot)
         ) {
           continue;
@@ -734,7 +750,7 @@ function drainFrontier<TEntity extends EntityType>(
 
 function runCallback<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
-  entity: EntityType,
+  entity: EntityType | null,
   row: IntrospectionRow,
   callback: PolicyCallback,
   snapshot: ReadonlySet<PgIntrospection.Purpose>,
@@ -755,6 +771,11 @@ function runCallback<TEntity extends EntityType>(
   const details: IntrospectionPolicyDetails = {
     catalogByOid,
     hasPurpose(purpose) {
+      if (entity === null) {
+        throw new Error(
+          `Introspection policy '${policy.name}' has no row, so it cannot call hasPurpose`,
+        );
+      }
       if (!snapshot.has(purpose)) {
         subscribeTo.add(purpose);
         return false;
@@ -793,7 +814,7 @@ function runCallback<TEntity extends EntityType>(
       requestObjectsByName(details, entity, identity, purposes);
     },
   };
-  callback.run(row, details);
+  callback.run(row === SENTINEL ? null : row, details);
   subscriptions.set(callback, subscribeTo);
 }
 
@@ -909,7 +930,7 @@ function wakeWaiting<TEntity extends EntityType>(
  */
 function requestDependency<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
-  policy: IntrospectionPolicy,
+  policy: AnyPolicy,
   request: IntrospectionRequest,
 ): readonly IntrospectionRow[] | undefined {
   const { selected, completedSelectors, pending } = context;
@@ -943,7 +964,7 @@ function requestDependency<TEntity extends EntityType>(
 }
 
 function assertDiscoveryPurposes(
-  policy: IntrospectionPolicy,
+  policy: AnyPolicy,
   action: string,
   purposes: PurposeList,
 ) {
@@ -955,10 +976,7 @@ function assertDiscoveryPurposes(
   }
 }
 
-function assertValidRequest(
-  policy: IntrospectionPolicy,
-  request: IntrospectionRequest,
-) {
+function assertValidRequest(policy: AnyPolicy, request: IntrospectionRequest) {
   assertEntityType(request.entity);
   if (!Array.isArray(request.purposes) || request.purposes.length === 0) {
     throw new Error(

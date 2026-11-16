@@ -206,6 +206,29 @@ runs for every row, but may only `request` and `peek` with purposes starting
 with `_`. In each round every `preview` runs before any `select`, so a `select`
 that peeks at a row sees the effects of that row's previews.
 
+## Policies without a row
+
+A policy with `entity: null` is not tied to a row. It is selected once at the
+start, receiving `null` in place of a row, and again once any rows it peeked at
+have been fetched. Its `select` runs even though it has no purposes. It has no purposes, so
+`details.hasPurpose` throws. Use one to include objects your application needs
+that nothing else references, whatever the entrypoint filters and privilege
+checks say:
+
+```ts
+const inclusions = defineIntrospectionPolicy({
+  name: "inclusions",
+  entity: null,
+  select(_row, details) {
+    details.requestByName("classes", "app_private.status", ["initial"]);
+    details.requestByName("procs", "utils.my_util_function", ["initial"]);
+  },
+});
+```
+
+Objects requested with the `initial` purpose are treated like the rest of
+initial discovery. Top-level `filters` still apply.
+
 ## Global filters and entrypoint filters
 
 | Option                        | Initial query | Dependency queries |

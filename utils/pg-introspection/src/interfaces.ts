@@ -94,7 +94,10 @@ export interface IntrospectionPolicyDetails {
     identity: string | readonly string[],
     purposes: PurposeList,
   ): void;
-  /** False results subscribe this policy to run again when the purpose is added. */
+  /**
+   * False results subscribe this policy to run again when the purpose is
+   * added. Throws in policies with `entity: null`, which have no row.
+   */
   hasPurpose(purpose: PgIntrospection.Purpose): boolean;
   /** Immutable metadata captured before dependency discovery begins. */
   catalogByOid: Readonly<Record<string, string>>;
@@ -116,15 +119,22 @@ export type ReadonlyArrayOrDirect<T> = T | readonly T[];
  * Requests are additive: later purposes cannot retract requests already issued.
  * A policy defines `select`, `preview` or both.
  */
-export interface IntrospectionPolicy<TEntity extends EntityType = EntityType> {
+export interface IntrospectionPolicy<
+  TEntity extends EntityType | null = EntityType,
+> {
   name: string;
+  /**
+   * The collection whose rows this policy is selected for. With `null`, the
+   * policy is selected once at the start with `null` in place of a row (and
+   * again once rows it peeked at have been fetched).
+   */
   entity: TEntity;
   /**
    * Selected for rows with at least one purpose that does not start with `_`,
    * that is, rows that will be exposed.
    */
   select?: (
-    row: IntrospectionRow<TEntity>,
+    row: PolicyRow<TEntity>,
     details: IntrospectionPolicyDetails,
   ) => void;
   /**
@@ -133,13 +143,18 @@ export interface IntrospectionPolicy<TEntity extends EntityType = EntityType> {
    * round, every `preview` runs before any `select`.
    */
   preview?: (
-    row: IntrospectionRow<TEntity>,
+    row: PolicyRow<TEntity>,
     details: IntrospectionPolicyDetails,
   ) => void;
 }
 
+/** The row a policy receives; `null` for policies with `entity: null`. */
+type PolicyRow<TEntity extends EntityType | null> = TEntity extends EntityType
+  ? IntrospectionRow<TEntity>
+  : null;
+
 /** Infer a policy's row type from its source collection. */
-export function defineIntrospectionPolicy<TEntity extends EntityType>(
+export function defineIntrospectionPolicy<TEntity extends EntityType | null>(
   policy: IntrospectionPolicy<TEntity>,
 ): IntrospectionPolicy<TEntity> {
   return policy;
@@ -147,9 +162,10 @@ export function defineIntrospectionPolicy<TEntity extends EntityType>(
 
 export interface MultipassOptions {
   onlyAccessible?: { role?: string; includeNoInherit?: boolean };
-  policies?: readonly {
-    [TEntity in EntityType]: IntrospectionPolicy<TEntity>;
-  }[EntityType][];
+  policies?: readonly (
+    | { [TEntity in EntityType]: IntrospectionPolicy<TEntity> }[EntityType]
+    | IntrospectionPolicy<null>
+  )[];
   /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
   entrypointFilters?: Partial<Record<EntityType, string>>;
 }

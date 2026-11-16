@@ -1174,3 +1174,78 @@ it("requests objects by name, resolving their namespace and class", async () => 
     "attribute col": ["terminal"],
   });
 });
+
+it("selects null-entity policies at the start, without a row", async () => {
+  const queries: unknown[] = [];
+  const rows: unknown[] = [];
+  const purposes: Record<string, string[]> = {};
+  const observe = (entity: "namespaces" | "classes" | "procs") =>
+    defineIntrospectionPolicy({
+      name: `observe_${entity}`,
+      entity,
+      preview(row: { _id: string }, details: IntrospectionPolicyDetails) {
+        purposes[row._id] = (["initial", "_resolveName"] as const).filter(
+          (purpose) => details.hasPurpose(purpose),
+        );
+      },
+    });
+  const result = await introspectRaw({
+    async runQuery(_text, values) {
+      queries.push(values);
+      if (queries.length === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [],
+          procs: [],
+        });
+      }
+      if (queries.length === 2) {
+        return JSON.stringify({
+          namespaces: [{ _id: "5", nspname: "enums" }],
+        });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "7", relnamespace: "5", relname: "colour" }],
+        procs: [{ _id: "8", pronamespace: "5", proname: "helper" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "procs"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "inclusions",
+          entity: null,
+          select(row, details) {
+            rows.push(row);
+            assert.throws(
+              () => details.hasPurpose("initial"),
+              /'inclusions' has no row, so it cannot call hasPurpose/,
+            );
+            details.requestByName("classes", "enums.colour", ["initial"]);
+            details.requestByName("procs", ["enums", "helper"], ["initial"]);
+          },
+        }),
+        observe("namespaces"),
+        observe("classes"),
+        observe("procs"),
+      ],
+    },
+  });
+  // Selected at the start, and again once the namespace has been fetched.
+  assert.deepEqual(rows, [null, null]);
+  assert.deepEqual(queries, [
+    [],
+    [["enums"]],
+    [["colour"], ["5"], ["helper"], ["5"]],
+  ]);
+  assert.deepEqual(purposes, {
+    "5": ["_resolveName"],
+    "7": ["initial"],
+    "8": ["initial"],
+  });
+  assert.deepEqual(
+    result.classes.map((row) => row._id),
+    ["7"],
+  );
+});
