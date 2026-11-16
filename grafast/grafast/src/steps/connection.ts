@@ -792,6 +792,35 @@ export class ConnectionStep<
      */
     return this;
   }
+  deduplicate(
+    peers: readonly ConnectionStep<any, any, any, any, any, any>[],
+  ): ConnectionStep<
+    TItem,
+    TNodeStep,
+    TEdgeDataStep,
+    TEdgeStep,
+    TCursorValue,
+    TCollectionStep
+  >[] {
+    // Peers share our dependencies; they're equivalent if those dependencies
+    // play the same roles and the edges are built the same way.
+    return peers.filter(
+      (p) =>
+        p.collectionDepId === this.collectionDepId &&
+        p.paramsDepId === this.paramsDepId &&
+        p._firstDepId === this._firstDepId &&
+        p._lastDepId === this._lastDepId &&
+        p._offsetDepId === this._offsetDepId &&
+        p._beforeDepId === this._beforeDepId &&
+        p._afterDepId === this._afterDepId &&
+        paginationFeaturesMatch(
+          p.collectionPaginationSupport,
+          this.collectionPaginationSupport,
+        ) &&
+        p.edgeDataPlan === this.edgeDataPlan,
+    );
+  }
+
   deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any>) {
     if (this.neededCollection) {
       replacement.neededCollection = true;
@@ -1256,6 +1285,24 @@ export function itemsOrStep<
   return "items" in $step && typeof $step.items === "function"
     ? $step.items()
     : $step;
+}
+
+function paginationFeaturesMatch(
+  a: PaginationFeatures | null,
+  b: PaginationFeatures | null,
+): boolean {
+  if (a === b) {
+    return true;
+  } else if (a === null || b === null) {
+    return false;
+  } else {
+    return (
+      !a.reverse === !b.reverse &&
+      !a.cursor === !b.cursor &&
+      !a.offset === !b.offset &&
+      !a.full === !b.full
+    );
+  }
 }
 
 function encodeNumericCursor(index: number | readonly number[]): string {
