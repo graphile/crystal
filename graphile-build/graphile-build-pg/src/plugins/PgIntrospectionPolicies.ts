@@ -191,21 +191,11 @@ const DEFAULT_POLICIES = (() => {
       if (!target) {
         continue;
       }
-      const [targetNamespace] =
-        details.peek("namespaces", { nspname: target.foreignSchema }, [
-          "_foreignKeyTarget",
-        ]) ?? [];
-      const [targetClass] =
-        (targetNamespace &&
-          details.peek(
-            "classes",
-            {
-              relnamespace: targetNamespace._id,
-              relname: target.foreignTable,
-            },
-            ["_foreignKeyTarget"],
-          )) ??
-        [];
+      const targetClass = details.peekByName(
+        "classes",
+        [target.foreignSchema, target.foreignTable],
+        ["_foreignKeyTarget"],
+      );
       if (
         targetClass &&
         details.getTagsAndDescription("classes", targetClass)?.tags.enum

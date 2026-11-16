@@ -793,7 +793,9 @@ function runCallback<TEntity extends EntityType>(
     },
     request(entity, match, purposes) {
       if (preview) {
-        assertDiscoveryPurposes(policy, "request from preview with", purposes);
+        throw new Error(
+          `Introspection policy '${policy.name}' cannot request from preview; use peek`,
+        );
       }
       // The generic request API keeps these parameters correlated.
       const request = { entity, match, purposes } as IntrospectionRequest;
@@ -819,7 +821,20 @@ function runCallback<TEntity extends EntityType>(
         | undefined;
     },
     requestByName(entity, identity, purposes) {
+      if (preview) {
+        throw new Error(
+          `Introspection policy '${policy.name}' cannot request from preview; use peekByName`,
+        );
+      }
       requestObjectsByName(details, entity, identity, purposes);
+    },
+    peekByName(requestEntity, identity, purposes) {
+      assertDiscoveryPurposes(policy, "peek with", purposes);
+      // The generic API keeps the entity and the returned row correlated.
+      return peekObjectByName(details, requestEntity, identity, purposes) as
+        | IntrospectionRow<typeof requestEntity>
+        | null
+        | undefined;
     },
     getTagsAndDescription(entity, row) {
       return tagsAndDescription(context, details, entity, row);
@@ -865,6 +880,67 @@ function identityParts(
     );
   }
   return parts;
+}
+
+/** The only row of a unique selector: `undefined` until known, `null` if none. */
+function onlyRow<TRow>(rows: ReadonlyArray<TRow> | undefined) {
+  if (rows === undefined) {
+    return undefined;
+  }
+  return rows.length > 0 ? rows[0] : null;
+}
+
+function peekObjectByName(
+  details: IntrospectionPolicyDetails,
+  entity: NamedEntity,
+  identity: string | readonly string[],
+  purposes: PurposeList,
+): IntrospectionRow | null | undefined {
+  if (entity === "procs") {
+    throw new Error(
+      "Cannot peek at procedures by name; overloads share a name",
+    );
+  }
+  const [nspname, name, attname] = identityParts(entity, identity);
+  if (entity === "namespaces") {
+    return onlyRow(details.peek("namespaces", { nspname }, purposes));
+  }
+  const namespace = onlyRow(
+    details.peek("namespaces", { nspname }, ["_resolveName"]),
+  );
+  if (namespace == null) {
+    return namespace;
+  }
+  const { _id } = namespace;
+  switch (entity) {
+    case "classes": {
+      return onlyRow(
+        details.peek("classes", { relnamespace: _id, relname: name }, purposes),
+      );
+    }
+    case "types": {
+      return onlyRow(
+        details.peek("types", { typnamespace: _id, typname: name }, purposes),
+      );
+    }
+    case "attributes": {
+      const table = onlyRow(
+        details.peek("classes", { relnamespace: _id, relname: name }, [
+          "_resolveName",
+        ]),
+      );
+      if (table == null) {
+        return table;
+      }
+      return onlyRow(
+        details.peek("attributes", { attrelid: table._id, attname }, purposes),
+      );
+    }
+    default: {
+      const never: never = entity;
+      throw new Error(`Entity type ${never} not expected!`);
+    }
+  }
 }
 
 function requestObjectsByName(

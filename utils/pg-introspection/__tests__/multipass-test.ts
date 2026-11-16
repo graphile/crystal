@@ -6,6 +6,7 @@ import {
   defineIntrospectionPolicy,
   type IntrospectionPolicy,
   type IntrospectionPolicyDetails,
+  type IntrospectionPreviewDetails,
   type IntrospectionRequest,
   type IntrospectionRow,
   type IntrospectOptions,
@@ -1045,8 +1046,14 @@ it("previews every row before selecting rows that are not discovery-only", async
           preview(row, details) {
             log.push(`preview ${row._id}`);
             assert.throws(
-              () => details.request("classes", { _id: "2" }, ["terminal"]),
-              /cannot request from preview with purpose 'terminal'/,
+              // @ts-expect-error Previews may only peek
+              () => details.request("classes", { _id: "2" }, ["_peek"]),
+              /cannot request from preview; use peek$/,
+            );
+            assert.throws(
+              // @ts-expect-error Previews may only peek
+              () => details.requestByName("classes", "app.thing", ["_peek"]),
+              /cannot request from preview; use peekByName/,
             );
           },
           select(row) {
@@ -1098,7 +1105,7 @@ it("requests objects by name, resolving their namespace and class", async () => 
     defineIntrospectionPolicy({
       name: `observe_${entity}`,
       entity,
-      preview(row: object, details: IntrospectionPolicyDetails) {
+      preview(row: object, details: IntrospectionPreviewDetails) {
         purposes[id(row)] = (["_resolveName", "terminal"] as const).filter(
           (purpose) => details.hasPurpose(purpose),
         );
@@ -1183,7 +1190,7 @@ it("selects null-entity policies at the start, without a row", async () => {
     defineIntrospectionPolicy({
       name: `observe_${entity}`,
       entity,
-      preview(row: { _id: string }, details: IntrospectionPolicyDetails) {
+      preview(row: { _id: string }, details: IntrospectionPreviewDetails) {
         purposes[row._id] = (["initial", "_resolveName"] as const).filter(
           (purpose) => details.hasPurpose(purpose),
         );
@@ -1390,4 +1397,67 @@ it("falls back to a class's row type description for its smart tags", async () =
     typed: { fromType: true },
     both: { fromClass: true },
   });
+});
+
+it("peeks at objects by name, distinguishing pending from missing", async () => {
+  const selections: Array<Record<string, string | null>> = [];
+  const describe = (row: { _id: string } | null | undefined) =>
+    row === undefined ? "pending" : row === null ? null : row._id;
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      if (queries === 2) {
+        return JSON.stringify({ namespaces: [{ _id: "5", nspname: "app" }] });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "7", relnamespace: "5", relname: "target" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "procs"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "byName",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            assert.throws(
+              () => details.peekByName("classes", "app.target", ["terminal"]),
+              /cannot peek with purpose 'terminal'/,
+            );
+            assert.throws(
+              // @ts-expect-error Procedures are not unique by name
+              () => details.peekByName("procs", "app.fn", ["_peek"]),
+              /Cannot peek at procedures by name/,
+            );
+            selections.push({
+              target: describe(
+                details.peekByName("classes", "app.target", ["_peek"]),
+              ),
+              missing: describe(
+                details.peekByName("classes", "app.missing", ["_peek"]),
+              ),
+              nowhere: describe(
+                details.peekByName("namespaces", "nowhere", ["_peek"]),
+              ),
+            });
+          },
+        }),
+      ],
+    },
+  });
+  assert.equal(queries, 3);
+  assert.deepEqual(selections, [
+    { target: "pending", missing: "pending", nowhere: "pending" },
+    { target: "pending", missing: "pending", nowhere: null },
+    { target: "7", missing: null, nowhere: null },
+  ]);
 });
