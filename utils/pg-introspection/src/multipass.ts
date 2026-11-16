@@ -932,28 +932,54 @@ function tagsAndDescription<TEntity extends EntityType>(
   if (existing) {
     return existing;
   }
-  const [catalog, objoid, objsubid] =
+  const own =
     "attrelid" in row
-      ? ["pg_class", row.attrelid, row.attnum]
-      : [ENTITY_TYPES[entity].tableName, rowOid(entity, row), 0];
+      ? peekDescription(context, details, "pg_class", row.attrelid, row.attnum)
+      : peekDescription(
+          context,
+          details,
+          ENTITY_TYPES[entity].tableName,
+          rowOid(entity, row),
+          0,
+        );
+  // As with `PgClass.getTagsAndDescription`, a class falls back to its row
+  // type's description.
+  const rowType =
+    "reltype" in row
+      ? peekDescription(context, details, "pg_type", row.reltype, 0)
+      : { description: undefined };
+  if (!own || !rowType) {
+    return undefined;
+  }
+  const result = parseSmartComment(own.description ?? rowType.description);
+  context.tags.set(row, result);
+  return result;
+}
+
+/** An object's description, or `undefined` until its descriptions are known. */
+function peekDescription<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  details: IntrospectionPolicyDetails,
+  catalog: string,
+  objoid: string | undefined,
+  objsubid: number,
+): { description: string | undefined } | undefined {
   const classoid = Object.keys(context.catalogByOid).find(
     (oid) => context.catalogByOid[oid] === catalog,
   );
-  let description: string | undefined;
-  if (context.selected.has("descriptions") && classoid && objoid) {
-    const descriptions = details.peek("descriptions", { classoid, objoid }, [
-      "_smartTags",
-    ]);
-    if (!descriptions) {
-      return undefined;
-    }
-    description = descriptions.find(
-      (candidate) => candidate.objsubid === objsubid,
-    )?.description;
+  if (!context.selected.has("descriptions") || !classoid || !objoid) {
+    return { description: undefined };
   }
-  const result = parseSmartComment(description);
-  context.tags.set(row, result);
-  return result;
+  const descriptions = details.peek("descriptions", { classoid, objoid }, [
+    "_smartTags",
+  ]);
+  return (
+    descriptions && {
+      description: descriptions.find(
+        (candidate) => candidate.objsubid === objsubid,
+      )?.description,
+    }
+  );
 }
 
 /** Run the callbacks waiting on this (now fetched) selector again. */

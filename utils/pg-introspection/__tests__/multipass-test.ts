@@ -1324,3 +1324,70 @@ it("shares smart tags between policies once descriptions are fetched", async () 
     ["2", { tags: Object.create(null), description: undefined }],
   ]);
 });
+
+it("falls back to a class's row type description for its smart tags", async () => {
+  const seen: Record<string, unknown> = {};
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          catalog_by_oid: { "1259": "pg_class", "1247": "pg_type" },
+          namespaces: [],
+          classes: [
+            { _id: "1", relname: "typed", reltype: "2" },
+            { _id: "3", relname: "both", reltype: "4" },
+          ],
+          descriptions: [],
+        });
+      }
+      return JSON.stringify({
+        descriptions: [
+          {
+            classoid: "1247",
+            objoid: "2",
+            objsubid: 0,
+            description: "@fromType",
+          },
+          {
+            classoid: "1259",
+            objoid: "3",
+            objsubid: 0,
+            description: "@fromClass",
+          },
+          {
+            classoid: "1247",
+            objoid: "4",
+            objsubid: 0,
+            description: "@fromType",
+          },
+        ],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "descriptions"],
+    multipass: {
+      // Leaves the initial descriptions incomplete so they must be fetched.
+      entrypointFilters: { descriptions: "false" },
+      policies: [
+        defineIntrospectionPolicy({
+          name: "read",
+          entity: "classes",
+          select(row, details) {
+            const result = details.getTagsAndDescription("classes", row);
+            if (result) {
+              seen[row.relname] = { ...result.tags };
+            }
+          },
+        }),
+      ],
+    },
+  });
+  // Both descriptions are fetched together.
+  assert.equal(queries, 2);
+  assert.deepEqual(seen, {
+    typed: { fromType: true },
+    both: { fromClass: true },
+  });
+});
