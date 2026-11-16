@@ -51,12 +51,12 @@ function makeContext(
     constraints: [] as any[],
   };
   const info = {
+    options:
+      options.multipass === undefined
+        ? {}
+        : { pgMultipassIntrospection: options.multipass },
     resolvedPreset: {
       pgServices: [{ name: "main", schemas: options.schemas ?? ["app"] }],
-      gather:
-        options.multipass === undefined
-          ? {}
-          : { pgMultipassIntrospection: options.multipass },
     },
     helpers: {
       pgIntrospection: {

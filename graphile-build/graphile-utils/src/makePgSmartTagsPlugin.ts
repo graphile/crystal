@@ -393,15 +393,6 @@ async function resolveRules(
   return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
 }
 
-declare global {
-  namespace PgIntrospection {
-    interface PurposeRegistry {
-      /** Peeked to merge `pgSmartTags` rules into the tags policies see. */
-      _pgSmartTags: true;
-    }
-  }
-}
-
 /**
  * Merges the tags of name-matched class rules into the tags multipass
  * policies see. Rules matched by a function cannot be applied to raw rows, so

@@ -343,8 +343,7 @@ async function processFk(
     foreignSchema,
     foreignTable,
   );
-  const multipass =
-    info.resolvedPreset.gather?.pgMultipassIntrospection !== false;
+  const multipass = info.options.pgMultipassIntrospection !== false;
   // Multipass introspection may only peek at a target, without its attributes.
   if (multipass && foreignPgClass && !foreignPgClass.getAttributes().length) {
     return;
