@@ -6,6 +6,7 @@ import { inspect } from "node:util";
 import { gatherConfig } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type {
+  IntrospectionPolicy,
   PgAttribute,
   PgClass,
   PgConstraint,
@@ -198,6 +199,8 @@ interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
   kind: TKind;
   match: PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+  /** For 'class' rules matched by name; usable before introspection completes. */
+  className?: { schemaName: string | undefined; relname: string };
   tags?: PgSmartTagTags;
   description?: string;
 }
@@ -228,6 +231,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   }
 
   let match: PgSmartTagFilterFunction<any>;
+  let className: CompiledPgSmartTagRule<TKind>["className"];
   if (typeof incomingMatch === "function") {
     // User supplied a match function; use that:
     match = incomingMatch;
@@ -257,6 +261,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
       switch (rule.kind) {
         case "class": {
           const [schemaName, tableName] = digest(2);
+          className = { schemaName, relname: tableName };
           match = (rel: PgClass) => {
             if (rel.relname !== tableName) return false;
             if (schemaName === undefined) return true;
@@ -337,6 +342,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   return {
     kind,
     match,
+    className,
     ...rest,
   };
 }
@@ -387,6 +393,56 @@ async function resolveRules(
   return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
 }
 
+declare global {
+  namespace PgIntrospection {
+    interface PurposeRegistry {
+      /** Peeked to merge `pgSmartTags` rules into the tags policies see. */
+      _pgSmartTags: true;
+    }
+  }
+}
+
+/**
+ * Merges the tags of name-matched class rules into the tags multipass
+ * policies see. Rules matched by a function cannot be applied to raw rows, so
+ * they only take effect after introspection.
+ */
+function mergeTagsPolicy(
+  name: string,
+  rules: ReadonlyArray<{
+    schemaName: string | undefined;
+    relname: string;
+    tags: PgSmartTagTags;
+  }>,
+): IntrospectionPolicy<"classes"> {
+  return {
+    name,
+    entity: "classes",
+    preview(row, details) {
+      const candidates = rules.filter((rule) => rule.relname === row.relname);
+      if (candidates.length === 0) {
+        return;
+      }
+      const tagsAndDescription = details.getTagsAndDescription("classes", row);
+      const namespaces = details.peek("namespaces", { _id: row.relnamespace }, [
+        "_pgSmartTags",
+      ]);
+      if (!tagsAndDescription || !namespaces) {
+        return;
+      }
+      const { tags } = tagsAndDescription;
+      for (const rule of candidates) {
+        if (
+          rule.schemaName === undefined ||
+          rule.schemaName === namespaces[0]?.nspname
+        ) {
+          Object.assign(tags, rule.tags);
+        }
+      }
+    },
+  };
+}
+
 let counter = 0;
 export function pgSmartTags<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
@@ -420,6 +476,31 @@ export function pgSmartTags<
         };
       },
       hooks: {
+        // Multipass introspection decides what to fetch partly from smart
+        // tags (e.g. `@foreignKey`, `@enum`), so apply these rules there too.
+        pgIntrospection_options(info, event) {
+          const { multipass } = event.options;
+          if (!multipass) {
+            return;
+          }
+          const [rules] = rulesFrom(info.state.rules);
+          const discoveryRules = rules.flatMap(
+            ({ serviceName, className, tags }) =>
+              className != null &&
+              tags != null &&
+              (serviceName == null || serviceName === event.serviceName)
+                ? [{ ...className, tags }]
+                : [],
+          );
+          if (discoveryRules.length === 0) {
+            return;
+          }
+          multipass.policies = [
+            ...(multipass.policies ?? []),
+            mergeTagsPolicy(`${name}_mergeTags`, discoveryRules),
+          ];
+        },
+
         // Run in the 'introspection' phase before anything uses the tags
         pgIntrospection_introspection(info, event) {
           const { introspection, serviceName } = event;
