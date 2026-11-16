@@ -225,6 +225,11 @@ declare global {
       pruneExtensionResources: true;
       /** Detect and build codecs from tables or unique constraints tagged `@enum`. */
       enumTables: true;
+      /**
+       * Peeked to follow `@foreignKey` smart tags to their target tables,
+       * checking whether they are tagged `@enum`.
+       */
+      _foreignKeyTarget: true;
     }
   }
 }
