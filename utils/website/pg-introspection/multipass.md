@@ -199,6 +199,24 @@ them, and every matching object (every overload, for procedures) receives
 details.requestByName("classes", "app_private.lookup", ["procedureReturnType"]);
 ```
 
+`details.peekByName(collection, identity, purposes)` is the by-name form of
+`peek`, for `namespaces`, `classes`, `attributes` and `types` (not procedures,
+whose overloads share a name). Every purpose must start with `_`. A name
+identifies at most one object, so it returns that object rather than a list:
+`undefined` until it is known, then the object, or `null` if it does not exist.
+The `lookupTables` example above can be written:
+
+```ts
+const lookup = details.peekByName("classes", "app_private.lookup", [
+  "_lookupTables",
+]);
+if (lookup === undefined) return; // This function will run again once known
+if (lookup === null) return; // No such table
+if (lookup.relkind === "r") {
+  details.request("classes", { _id: lookup._id }, ["procedureReturnType"]);
+}
+```
+
 ## Previews
 
 A policy defines `select`, `preview` or both. `select` only runs for rows with

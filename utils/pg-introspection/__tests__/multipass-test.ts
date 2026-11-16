@@ -1391,3 +1391,66 @@ it("falls back to a class's row type description for its smart tags", async () =
     both: { fromClass: true },
   });
 });
+
+it("peeks at objects by name, distinguishing pending from missing", async () => {
+  const selections: Array<Record<string, string | null>> = [];
+  const describe = (row: { _id: string } | null | undefined) =>
+    row === undefined ? "pending" : row === null ? null : row._id;
+  let queries = 0;
+  await introspectRaw({
+    async runQuery() {
+      queries++;
+      if (queries === 1) {
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1", relnamespace: "10", relname: "source" }],
+        });
+      }
+      if (queries === 2) {
+        return JSON.stringify({ namespaces: [{ _id: "5", nspname: "app" }] });
+      }
+      return JSON.stringify({
+        classes: [{ _id: "7", relnamespace: "5", relname: "target" }],
+      });
+    },
+    onlyEntities: ["namespaces", "classes", "procs"],
+    multipass: {
+      policies: [
+        defineIntrospectionPolicy({
+          name: "byName",
+          entity: "classes",
+          select(row, details) {
+            if (row._id !== "1") return;
+            assert.throws(
+              () => details.peekByName("classes", "app.target", ["terminal"]),
+              /cannot peek with purpose 'terminal'/,
+            );
+            assert.throws(
+              // @ts-expect-error Procedures are not unique by name
+              () => details.peekByName("procs", "app.fn", ["_peek"]),
+              /Cannot peek at procedures by name/,
+            );
+            selections.push({
+              target: describe(
+                details.peekByName("classes", "app.target", ["_peek"]),
+              ),
+              missing: describe(
+                details.peekByName("classes", "app.missing", ["_peek"]),
+              ),
+              nowhere: describe(
+                details.peekByName("namespaces", "nowhere", ["_peek"]),
+              ),
+            });
+          },
+        }),
+      ],
+    },
+  });
+  assert.equal(queries, 3);
+  assert.deepEqual(selections, [
+    { target: "pending", missing: "pending", nowhere: "pending" },
+    { target: "pending", missing: "pending", nowhere: null },
+    { target: "7", missing: null, nowhere: null },
+  ]);
+});

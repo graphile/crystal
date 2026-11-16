@@ -96,6 +96,17 @@ export interface IntrospectionPolicyDetails {
     purposes: PurposeList,
   ): void;
   /**
+   * As `requestByName`, but peeks at the named object, so every purpose must
+   * start with `_`. Returns the object once it is known, `null` if it does not
+   * exist, and `undefined` until then (selecting this policy again once it is
+   * known). Procedures are excluded since overloads share a name.
+   */
+  peekByName<TEntity extends Exclude<NamedEntity, "procs">>(
+    entity: TEntity,
+    identity: string | readonly string[],
+    purposes: PurposeList,
+  ): IntrospectionRow<TEntity> | null | undefined;
+  /**
    * False results subscribe this policy to run again when the purpose is
    * added. Throws in policies with `entity: null`, which have no row.
    */
