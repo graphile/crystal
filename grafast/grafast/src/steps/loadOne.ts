@@ -228,9 +228,15 @@ export class LoadOneStep<
   }
 
   execute(
-    details: ExecutionDetails,
+    details: ExecutionDetails<readonly [UnwrapMultistep<TLookup>, ...any[]]>,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
-    return executeLoad(
+    return executeLoad<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      UnwrapMultistep<TShared>
+    >(
       details,
       this.sharedDepId,
       this.paramDepIdByKey,

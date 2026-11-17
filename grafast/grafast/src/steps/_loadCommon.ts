@@ -1,5 +1,8 @@
-import { defineBatchExecutor } from "../batch.ts";
-import type { ExecutionDetails, PromiseOrDirect } from "../interfaces.ts";
+import type {
+  BatchExecutor,
+  ExecutionDetails,
+  PromiseOrDirect,
+} from "../interfaces.ts";
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
 import type { Step } from "../step.ts";
 import { isListLikeStep, isObjectLikeStep } from "../step.ts";
@@ -82,20 +85,51 @@ export function paramSig(
   );
 }
 
-type LoadCallback = (...args: any[]) => any;
+type LoadCallback<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+> = (
+  specs: readonly TSpec[],
+  info: {
+    attributes: readonly (keyof TItem)[];
+    params: Partial<TParams>;
+    shared: TShared;
+    unary: TShared;
+  },
+) => PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
 
-type LoadBatchOptions = {
-  load: LoadCallback;
-  attributes: readonly unknown[];
+type LoadBatchOptions<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+> = {
+  load: LoadCallback<TSpec, TItem, TData, TParams, TShared>;
+  attributes: readonly (keyof TItem)[];
   parameterNames: readonly string[];
-  shared: unknown;
-  params: Record<string, unknown>;
+  shared: TShared;
+  params: Partial<TParams>;
 };
 
-function executeLoadBatch(
-  { load, attributes, shared, params }: LoadBatchOptions,
-  specs: readonly unknown[],
-): PromiseOrDirect<ReadonlyArray<any>> {
+function executeLoadBatch<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+>(
+  {
+    load,
+    attributes,
+    shared,
+    params,
+  }: LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
+  specs: readonly TSpec[],
+): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>> {
   return load(specs, {
     attributes,
     params,
@@ -104,38 +138,70 @@ function executeLoadBatch(
   });
 }
 
-const loadBatchExecutor = defineBatchExecutor({
-  name: "grafast/load",
-  callback: executeLoadBatch,
-  optionsMatch: (left, right) =>
+function loadOptionsMatch<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+>(
+  left: LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
+  right: LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
+): boolean {
+  return (
     left.load === right.load &&
     left.shared === right.shared &&
     arraysMatch(left.attributes, right.attributes) &&
     arraysMatch(left.parameterNames, right.parameterNames) &&
-    recordsMatch(left.params, right.params),
-});
+    recordsMatch(left.params, right.params)
+  );
+}
 
-export function executeLoad(
-  details: ExecutionDetails,
+// Preserve the generic callbacks: each use specializes this same executor
+// object, without erasing the relationship between its options, keys and data.
+const loadBatchExecutor = Object.freeze({
+  name: "grafast/load",
+  keysetEquality: "strict",
+  callback: executeLoadBatch,
+  optionsMatch: loadOptionsMatch,
+} satisfies BatchExecutor<
+  LoadBatchOptions<unknown, unknown, unknown, Record<string, unknown>, unknown>,
+  unknown,
+  unknown
+>);
+
+export function executeLoad<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+>(
+  details: ExecutionDetails<readonly [TSpec, ...any[]]>,
   sharedDepId: number | null,
   paramDepIdByKey: Record<string, number>,
   baseLoadInfo: {
-    attributes: readonly any[];
+    attributes: readonly (keyof TItem)[];
   },
-  load: LoadCallback,
-) {
+  load: LoadCallback<TSpec, TItem, TData, TParams, TShared>,
+): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>> {
   const { indexMap, values } = details;
   const values0 = values[0];
-  const shared =
-    sharedDepId != null ? values[sharedDepId].unaryValue() : undefined;
+  const shared = (
+    sharedDepId != null ? values[sharedDepId].unaryValue() : undefined
+  ) as TShared;
   const params = Object.fromEntries(
     Object.entries(paramDepIdByKey).map(([key, depId]) => [
       key,
       values[depId].unaryValue(),
     ]),
-  );
+  ) as Partial<TParams>;
 
-  return details.batch(
+  return details.batch<
+    LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
+    TSpec,
+    PromiseOrDirect<TData>
+  >(
     loadBatchExecutor,
     indexMap((i) => values0.at(i)),
     {

@@ -6,8 +6,11 @@ import type {
   BatchFunction,
   ConstantStep,
   DataFromObjectSteps,
+  ExecutionDetails,
   FieldPlanResolver,
   ListStep,
+  LoadManyCallback,
+  LoadOneCallback,
   PromiseOrDirect,
   Step,
 } from "../dist/index.js";
@@ -18,6 +21,7 @@ import {
   get,
   loadOne,
 } from "../dist/index.js";
+import { executeLoad } from "../dist/steps/_loadCommon.js";
 
 type Expected = {
   test: number[];
@@ -54,6 +58,7 @@ const _myPlan: FieldPlanResolver = () => {
   return constant(null);
 };
 
+// Internal adapter types must preserve the same guarantees as the public loaders.
 const _batchTypes = (batch: BatchFunction) => {
   const executor = defineBatchExecutor({
     name: "type-test",
@@ -90,4 +95,68 @@ const _batchTypes = (batch: BatchFunction) => {
     // @ts-expect-error Executors cannot declare tuple options.
     callback: (_options: readonly [string], keys: readonly number[]) => keys,
   });
+};
+
+const _executeLoadTypes = (
+  details: ExecutionDetails<readonly [number, ...unknown[]]>,
+  wrongDetails: ExecutionDetails<readonly [string, ...unknown[]]>,
+  one: LoadOneCallback<
+    number,
+    { id: number },
+    { id: number } | null,
+    { limit: number },
+    { tenant: string }
+  >,
+  many: LoadManyCallback<
+    number,
+    { id: number },
+    readonly { id: number }[],
+    { limit: number },
+    { tenant: string }
+  >,
+) => {
+  type Item = { id: number };
+  type Params = { limit: number };
+  type Shared = { tenant: string };
+  const executeOne = executeLoad<number, Item, Item | null, Params, Shared>;
+  const _result = executeOne(
+    details,
+    1,
+    { limit: 2 },
+    { attributes: ["id"] },
+    one,
+  );
+  assert<
+    Equals<
+      typeof _result,
+      PromiseOrDirect<ReadonlyArray<PromiseOrDirect<Item | null>>>
+    >
+  >();
+  const _inferred = executeLoad(
+    details,
+    1,
+    { limit: 2 },
+    { attributes: ["id"] },
+    one,
+  );
+  assert<Equals<typeof _inferred, typeof _result>>();
+  // @ts-expect-error The lookup dependency must yield the callback's key type.
+  executeOne(wrongDetails, 1, { limit: 2 }, { attributes: ["id"] }, one);
+  // @ts-expect-error Attributes must belong to the loaded item type.
+  executeOne(details, 1, { limit: 2 }, { attributes: ["missing"] }, one);
+  // @ts-expect-error A loadMany callback cannot yield a loadOne result.
+  executeOne(details, 1, { limit: 2 }, { attributes: ["id"] }, many);
+  const _results = executeLoad<number, Item, readonly Item[], Params, Shared>(
+    details,
+    1,
+    { limit: 2 },
+    { attributes: ["id"] },
+    many,
+  );
+  assert<
+    Equals<
+      typeof _results,
+      PromiseOrDirect<ReadonlyArray<PromiseOrDirect<readonly Item[]>>>
+    >
+  >();
 };
