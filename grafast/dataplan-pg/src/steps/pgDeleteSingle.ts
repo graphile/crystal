@@ -20,6 +20,7 @@ import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.ts";
+import { PgExecutor } from "../executor.ts";
 import type {
   PgCodecWithAttributes,
   PgResource,
@@ -143,6 +144,7 @@ export class PgDeleteSingleStep<
     >,
   ) {
     super();
+    this.metaKey = PgExecutor.metaKey;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);
@@ -377,6 +379,7 @@ export class PgDeleteSingleStep<
   async execute({
     indexMap,
     values,
+    extra: { meta: store },
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { alias, contextId, finalizeResults } = this;
     if (!finalizeResults) {
@@ -440,7 +443,7 @@ export class PgDeleteSingleStep<
       };
       const { rows, rowCount, notices } =
         await this.resource.executor.executeMutation(
-          { context, useTransaction: this.wrappers.length > 0 },
+          { context, store, useTransaction: this.wrappers.length > 0 },
           this.wrappers.length > 0
             ? makeWrappedMutationExecute<PgDeleteSingleQueryBuilder, any>(
                 this.wrappers,

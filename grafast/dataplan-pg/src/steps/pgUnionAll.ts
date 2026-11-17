@@ -28,7 +28,8 @@ import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.ts";
 import { TYPES } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
-import type { PgExecutor, PgExecutorInput } from "../executor.ts";
+import type { PgExecutorInput } from "../executor.ts";
+import { PgExecutor } from "../executor.ts";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.ts";
 import type {
   PgCodec,
@@ -580,6 +581,7 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
+    this.metaKey = PgExecutor.metaKey;
     {
       this.mode = spec.mode ?? "normal";
 
@@ -977,7 +979,7 @@ on (${sql.indent(
     const {
       indexMap,
       values,
-      extra: { eventEmitter },
+      extra: { eventEmitter, meta: store },
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {
@@ -1046,18 +1048,18 @@ on (${sql.indent(
             : EMPTY_ARRAY,
       };
     });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
+    const executeMethod = this.hasSideEffects
+      ? "executeWithoutCache"
+      : "executeWithCache";
     const executionResult = await this.executor[executeMethod](specs, {
+      store,
       text,
       rawSqlValues,
       identifierIndex,
       name,
       affinity: this.executionAffinity,
       eventEmitter,
-      useTransaction: false,
+      useTransaction: this.hasSideEffects,
     });
     // debugExecute("%s; result: %c", this, executionResult);
 
