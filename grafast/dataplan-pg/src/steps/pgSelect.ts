@@ -48,6 +48,7 @@ import type {
   PgResourceUnique,
 } from "../datasource.ts";
 import type { PgExecutorContext, PgExecutorInput } from "../executor.ts";
+import { PgExecutor } from "../executor.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -713,7 +714,7 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
-    this.metaKey = "PgSelect";
+    this.metaKey = PgExecutor.metaKey;
     if (!options.resource) {
       throw new Error(
         `Resource passed to \`pgSelect(...)\` was ${inspect(options.resource)} - perhaps you used the wrong resource name when looking it up in the registry?`,

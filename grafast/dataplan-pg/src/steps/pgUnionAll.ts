@@ -28,7 +28,8 @@ import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.ts";
 import { TYPES } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
-import type { PgExecutor, PgExecutorInput } from "../executor.ts";
+import type { PgExecutorInput } from "../executor.ts";
+import { PgExecutor } from "../executor.ts";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.ts";
 import type {
   PgCodec,
@@ -580,7 +581,7 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
-    this.metaKey = "PgUnionAll";
+    this.metaKey = PgExecutor.metaKey;
     {
       this.mode = spec.mode ?? "normal";
 

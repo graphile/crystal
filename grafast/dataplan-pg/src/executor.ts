@@ -278,6 +278,7 @@ function takePending(
 }
 
 export type PgExecutorMutationOptions = {
+  store?: object;
   context: PgExecutorContext;
   /** @defaultValue `true` */
   useTransaction?: boolean;
@@ -302,6 +303,8 @@ export type PgExecutorSubscribeOptions = {
  * caching.
  */
 export class PgExecutor<const TName extends string = string, TSettings = any> {
+  /** Shared execution metadata for PostgreSQL read caches. */
+  public static readonly metaKey = Symbol("PgExecutor cache");
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
   private maxClientQueues: number;
@@ -826,7 +829,7 @@ ${duration}
               // everything.
               const queryResult = common.useTransaction
                 ? await this.executeMutation<PgClientResult<TOutput>>(
-                    { context, useTransaction: common.useTransaction },
+                    { context, store, useTransaction: common.useTransaction },
                     (client) =>
                       this._executeWithClient(
                         client,
@@ -1239,7 +1242,7 @@ ${duration}
     options: PgExecutorMutationOptions,
     maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
-    const { context, useTransaction } = options;
+    const { context, store, useTransaction } = options;
     const { withPgClient, pgSettings } = context;
     let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
