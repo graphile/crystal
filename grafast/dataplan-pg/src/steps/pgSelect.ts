@@ -1323,8 +1323,9 @@ export class PgSelectStep<
         useTransaction: isMutation,
       };
       const executionResult =
-        specs.length > 0
-          ? isMutation
+        specs.length === 0
+          ? null
+          : isMutation
             ? await this.resource.executeWithoutCache(specs, common)
             : {
                 values: await executionDetails.batch(
@@ -1340,8 +1341,7 @@ export class PgSelectStep<
                   specs.map(({ queryValues }) => queryValues),
                   "tuple",
                 ),
-              }
-          : null;
+              };
       // debugExecute("%s; result: %c", this, executionResult);
 
       return indexMap((i) => {
