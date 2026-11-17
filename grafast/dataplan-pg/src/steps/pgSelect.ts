@@ -84,7 +84,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
-import { getPgStepBatchInfo,pgStepBatchExecutor } from "./pgStepBatch.ts";
+import { getPgStepBatchInfo, pgStepBatchExecutor } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
