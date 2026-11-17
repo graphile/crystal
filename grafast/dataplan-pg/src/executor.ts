@@ -139,10 +139,11 @@ export interface WithPgClient<
 }
 
 /**
- * The identity of this object scopes cached read results and in-flight client
- * queues. A batch of requests can share this object; a new one should be used
- * when fresh reads are needed - this is typically handled by
- * `ExecutionExtra.meta` being reset after mutations/etc.
+ * The identity of this object scopes in-flight client queues and cached reads.
+ * With `PgExecutorOptions.store`, cached reads are also scoped to that store.
+ * Built-in steps use execution metadata as the store, so subscription events
+ * and mutation fields have separate caches even when sharing this context.
+ * Callers omitting the store must use a new context when fresh reads are needed.
  */
 export type PgExecutorContext<
   TSettings = any,
@@ -168,6 +169,7 @@ export type PgExecutorInput<TInput> = {
 };
 
 export type PgExecutorOptions = {
+  /** Execution-local cache scope; defaults to context-scoped caching. */
   store?: object;
   text: string;
   rawSqlValues: Array<SQLRawValue>;
@@ -278,6 +280,7 @@ function takePending(
 }
 
 export type PgExecutorMutationOptions = {
+  /** The cache scope used by reads in this execution. */
   store?: object;
   context: PgExecutorContext;
   /** @defaultValue `true` */
