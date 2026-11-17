@@ -1274,11 +1274,14 @@ ${duration}
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
     (context as any)[this.$$cache]?.reset();
+    if (store != null) {
+      this._cache.get(store)?.get(context)?.reset();
+    }
 
     return result;
   }
 
-  cacheFor(
+  private cacheFor(
     useCache: boolean,
     store: object | undefined,
     context: {
