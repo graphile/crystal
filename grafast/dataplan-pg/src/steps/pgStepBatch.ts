@@ -14,7 +14,7 @@ type PgStepBatchOptions = PgExecutorOptions & {
   cacheToken: object;
 };
 
-function getOptions(
+export function pgStepBatchOptions(
   executor: PgExecutor,
   context: PgExecutorContext,
   options: PgExecutorOptions,
@@ -29,8 +29,11 @@ function getOptions(
   };
 }
 
-export const pgStepBatchExecutor = Object.freeze({
-  getOptions,
+export const pgStepBatchExecutor: BatchExecutor<
+  PgStepBatchOptions,
+  readonly unknown[],
+  ReadonlyArray<any>
+> = {
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
   optionsMatch: (left, right) =>
@@ -49,8 +52,4 @@ export const pgStepBatchExecutor = Object.freeze({
     }));
     return (await executor.executeWithCache(inputs, options)).values;
   },
-} satisfies BatchExecutor<
-  PgStepBatchOptions,
-  readonly unknown[],
-  ReadonlyArray<any>
-> & { getOptions: typeof getOptions });
+};

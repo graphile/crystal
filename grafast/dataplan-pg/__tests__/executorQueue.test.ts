@@ -3,7 +3,10 @@ import { grafast, makeGrafastSchema, Step } from "grafast";
 
 import { EXPORTABLE } from "../dist/datasource.js";
 import { PgExecutor } from "../dist/executor.js";
-import { pgStepBatchExecutor } from "../dist/steps/pgStepBatch.js";
+import {
+  pgStepBatchExecutor,
+  pgStepBatchOptions,
+} from "../dist/steps/pgStepBatch.js";
 
 function makeExecutor() {
   return EXPORTABLE(
@@ -392,7 +395,7 @@ test.each([false, true])(
           details.batch(
             pgStepBatchExecutor,
             [[], []],
-            pgStepBatchExecutor.getOptions(executor, context, {
+            pgStepBatchOptions(executor, context, {
               store,
               text: "select value",
               rawSqlValues: [],

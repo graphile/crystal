@@ -84,7 +84,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
-import { pgStepBatchExecutor } from "./pgStepBatch.ts";
+import { pgStepBatchExecutor, pgStepBatchOptions } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -1332,11 +1332,7 @@ export class PgSelectStep<
                 values: await executionDetails.batch(
                   pgStepBatchExecutor,
                   keysets,
-                  pgStepBatchExecutor.getOptions(
-                    this.resource.executor,
-                    context,
-                    common,
-                  ),
+                  pgStepBatchOptions(this.resource.executor, context, common),
                 ),
               };
       // debugExecute("%s; result: %c", this, executionResult);
