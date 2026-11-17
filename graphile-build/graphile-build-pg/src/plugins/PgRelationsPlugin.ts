@@ -1132,6 +1132,51 @@ function addRelations(
               isMutationPayload ?? false,
             );
           }
+          if (
+            !isMutationPayload &&
+            ref.paths.length === 1 &&
+            ref.paths[0].length >= 2
+          ) {
+            const layers = paths[0].layers;
+            const finalLayer = layers[layers.length - 1];
+            // When this record exposes the final relation's local attributes
+            // via every relation before it (as relational polymorphism does
+            // for the base table's attributes), plan the final relation from
+            // this record: the attributes resolve to the base record, so every
+            // type plans the same steps, which Grafast deduplicates, instead
+            // of each type joining the base table again by its own key.
+            // (Mutation payloads cannot read `via` attributes, so they keep
+            // the join.)
+            const readsThroughEveryLayer = finalLayer.localAttributes.every(
+              (attributeName) => {
+                let current: PgResource = resource;
+                for (const layer of layers.slice(0, -1)) {
+                  const attribute = current.codec.attributes?.[attributeName];
+                  const via = attribute?.via ?? attribute?.identicalVia;
+                  if (via == null) {
+                    return false;
+                  }
+                  const resolved = current.resolveVia(via, attributeName);
+                  if (
+                    resolved.relationName !== layer.relationName ||
+                    resolved.attributeName !== attributeName
+                  ) {
+                    return false;
+                  }
+                  current = layer.resource;
+                }
+                return true;
+              },
+            );
+            if (readsThroughEveryLayer) {
+              return makeRelationPlans(
+                finalLayer.localAttributes,
+                finalLayer.remoteAttributes,
+                finalLayer.resource,
+                false,
+              );
+            }
+          }
           if (!sharedFinalResource) {
             throw new Error(
               `Non-polymorphic type must target a single resource`,
