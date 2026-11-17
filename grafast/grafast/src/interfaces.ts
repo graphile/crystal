@@ -726,6 +726,26 @@ export interface UnaryExecutionValue<TData = any>
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
 
+export type BatchKeysetEquality = "strict" | "tuple" | "object";
+export type BatchCallback<
+  TUnaryDependencies extends readonly unknown[],
+  TKeyset,
+  TResult,
+> = (
+  unaryDependencies: TUnaryDependencies,
+  keysets: ReadonlyArray<TKeyset>,
+) => PromiseOrDirect<ReadonlyArray<TResult>>;
+export type BatchFunction = <
+  TUnaryDependencies extends readonly unknown[],
+  TKeyset,
+  TResult,
+>(
+  callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>,
+  unaryDependencies: TUnaryDependencies,
+  keysets: ReadonlyArray<TKeyset>,
+  keysetEquality?: BatchKeysetEquality,
+) => Promise<ReadonlyArray<TResult>>;
+
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;
   initialCount: number;
@@ -749,6 +769,13 @@ export interface ExecutionDetails<
   indexMap: IndexMap;
   /** Helper; calls `callback` for each batchIndex in the batch; no return value */
   indexForEach: IndexForEach;
+
+  /**
+   * Batches equivalent keysets submitted during the current runloop tick.
+   * Callbacks must be static functions; pass all varying or captured values in
+   * `unaryDependencies`.
+   */
+  batch: BatchFunction;
 
   /**
    * If this step is expected to return a stream (e.g. because it's a
