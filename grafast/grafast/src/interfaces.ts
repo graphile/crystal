@@ -757,7 +757,7 @@ export type BatchFunction = <
   ...options: undefined extends TOptions
     ? [options?: NoInfer<TOptions>]
     : [options: NoInfer<TOptions>]
-) => Promise<ReadonlyArray<TResult>>;
+) => PromiseOrDirect<ReadonlyArray<TResult>>;
 
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;
@@ -785,7 +785,8 @@ export interface ExecutionDetails<
 
   /**
    * Batches equivalent keysets across steps in the same execution scope during
-   * the current runloop tick. Mutation fields and subscription events each
+   * the current runloop tick, caching results for the scope's lifetime.
+   * Mutation fields and subscription events each
    * have separate scopes.
    * Define executors outside step execution; pass all varying values in
    * `options`.

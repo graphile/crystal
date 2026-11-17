@@ -1,3 +1,5 @@
+import { createHook } from "node:async_hooks";
+
 import { expect } from "chai";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { it } from "mocha";
@@ -549,4 +551,122 @@ it("preserves per-key promises rather than rejecting an entire batch", async () 
   expect(await results[1]).to.equal(2);
   const cached = await batchInMeta(schema, meta, executor, [1]);
   expect(cached[0]).to.equal(rejected);
+});
+
+it("allocates promises per batch rather than per key and returns cache hits synchronously", async () => {
+  const executor = defineBatchExecutor({
+    name: "promise-allocation",
+    callback: (_options: undefined, keys: readonly number[]) => keys,
+  });
+  function measure(keys: number[]) {
+    const meta = {};
+    let promises = 0;
+    const hook = createHook({
+      init(_id, type) {
+        if (type === "PROMISE") {
+          promises++;
+        }
+      },
+    });
+    hook.enable();
+    let result;
+    try {
+      result = batchInMeta(schema, meta, executor, keys);
+    } finally {
+      hook.disable();
+    }
+    return { result, promises, meta };
+  }
+  const small = measure([1]);
+  const keys = Array.from({ length: 1000 }, (_, i) => i);
+  const large = measure(keys);
+  expect(large.promises).to.equal(small.promises);
+  await small.result;
+  expect(await large.result).to.deep.equal(keys);
+  const cached = batchInMeta(schema, large.meta, executor, keys);
+  expect(Array.isArray(cached)).to.equal(true);
+  expect(cached).to.deep.equal(keys);
+});
+
+it("validates all composite keys before queuing work", async () => {
+  let calls = 0;
+  const executor = defineBatchExecutor({
+    name: "invalid-key",
+    keysetEquality: "tuple",
+    callback: (_options: undefined, keys: readonly unknown[]) => {
+      calls++;
+      return keys;
+    },
+  });
+  const meta = {};
+  expect(() => batchInMeta(schema, meta, executor, [[1], null])).to.throw(
+    "requires array keysets",
+  );
+  await Promise.resolve();
+  expect(calls).to.equal(0);
+  expect(await batchInMeta(schema, meta, executor, [[1]])).to.deep.equal([[1]]);
+  expect(calls).to.equal(1);
+});
+
+it("retries a rejected asynchronous batch and an invalid result count", async () => {
+  let attempts = 0;
+  const executor = defineBatchExecutor({
+    name: "async-retry",
+    callback: async (_options: undefined, keys: readonly number[]) => {
+      attempts++;
+      if (attempts === 1) {
+        throw new Error("fetch failed");
+      } else if (attempts === 2) {
+        return [];
+      } else {
+        return keys;
+      }
+    },
+  });
+  const meta = {};
+  for (let i = 0; i < 2; i++) {
+    const results = await Promise.allSettled([
+      batchInMeta(schema, meta, executor, [1]),
+      batchInMeta(schema, meta, executor, [1, 2]),
+    ]);
+    expect(results.map((result) => result.status)).to.deep.equal([
+      "rejected",
+      "rejected",
+    ]);
+  }
+  expect(await batchInMeta(schema, meta, executor, [2, 1])).to.deep.equal([
+    2, 1,
+  ]);
+  expect(attempts).to.equal(3);
+});
+
+it("observes a failed newer batch while an older batch is still in flight", async () => {
+  let release!: () => void;
+  const error = new Error("newer batch failed");
+  const executor = defineBatchExecutor({
+    name: "overlapping-failure",
+    callback: async (_options: undefined, keys: readonly number[]) => {
+      if (keys[0] === 1) {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        return keys;
+      } else {
+        throw error;
+      }
+    },
+  });
+  const meta = {};
+  const older = batchInMeta(schema, meta, executor, [1]);
+  await Promise.resolve();
+  try {
+    const overlapping = await Promise.allSettled([
+      batchInMeta(schema, meta, executor, [1, 2]),
+    ]);
+    expect(overlapping).to.deep.equal([{ status: "rejected", reason: error }]);
+  } finally {
+    release();
+    await older;
+  }
+  expect(batchInMeta(schema, meta, executor, [1])).to.deep.equal([1]);
 });

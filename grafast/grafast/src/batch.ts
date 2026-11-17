@@ -1,10 +1,11 @@
 import type { GraphQLSchema } from "graphql";
 
-import { isDev } from "./dev.ts";
+import { isDev, noop } from "./dev.ts";
 import type {
   BatchCallback,
   BatchExecutor,
   BatchKeysetEquality,
+  PromiseOrDirect,
 } from "./interfaces.ts";
 import { recordsMatch } from "./utils.ts";
 
@@ -57,18 +58,19 @@ function checkExecutor(
   }
 }
 
-type PendingKey = {
-  keyset: unknown;
-  node: KeyIndex;
-  resolve: (result: CachedResult) => void;
-  reject: (error: unknown) => void;
-};
+interface PendingBatch {
+  deferred: PromiseWithResolvers<ReadonlyArray<any>>;
+  keysets: unknown[];
+  cacheKeys: unknown[];
+}
 
 type BatchFamily = {
   executor: BatchExecutor<any, any, any>;
   options: Record<string, unknown> | undefined;
-  cache: KeyIndex;
-  pending: PendingKey[];
+  cache: Map<unknown, any>;
+  pending: Map<unknown, { batch: PendingBatch; index: number }>;
+  queued?: PendingBatch;
+  keyIndex?: KeyIndex;
 };
 
 type BatchMeta = Record<PropertyKey, unknown> & {
@@ -77,12 +79,32 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 
 const batchesSymbol = Symbol("Grafast batch caches");
 
-type CachedResult = { value: unknown };
+type KeyIndex = { children: Map<unknown, KeyIndex> };
 
-type KeyIndex = {
-  children: Map<unknown, KeyIndex>;
-  value?: Promise<CachedResult>;
-};
+// Composite keys share a cache key when their parts match. Strict keys can use
+// the cache Map directly, as in the original loader implementation.
+function compositeCacheKey(
+  family: BatchFamily,
+  keyset: unknown,
+  mode: BatchKeysetEquality,
+): KeyIndex {
+  let node = (family.keyIndex ??= { children: new Map() });
+  for (const part of keyParts(keyset, mode)) {
+    const key = strictMapKey(part);
+    let child = node.children.get(key);
+    if (child == null) {
+      child = { children: new Map() };
+      node.children.set(key, child);
+    }
+    node = child;
+  }
+  return node;
+}
+
+function strictMapKey(value: unknown): unknown {
+  // Map treats NaN as equal to itself, unlike strict equality.
+  return typeof value === "number" && Number.isNaN(value) ? Symbol() : value;
+}
 
 function keyParts(
   keyset: unknown,
@@ -145,7 +167,7 @@ export function batchInMeta<
   executor: BatchExecutor<TOptions, TKeyset, TResult>,
   keysets: readonly TKeyset[],
   options?: TOptions,
-): Promise<ReadonlyArray<TResult>> {
+): PromiseOrDirect<ReadonlyArray<TResult>> {
   if (isDev && options !== undefined && !isPlainObject(options)) {
     throw new Error(
       "Batch executor options must be a plain object, or omitted.",
@@ -154,7 +176,7 @@ export function batchInMeta<
   checkExecutor(schema, executor);
   const { keysetEquality } = executor;
   if (keysets.length === 0) {
-    return Promise.resolve([]);
+    return [];
   }
 
   const typedMeta = metaByMetaKey as BatchMeta;
@@ -170,70 +192,108 @@ export function batchInMeta<
     family = {
       executor,
       options,
-      cache: { children: new Map() },
-      pending: [],
+      cache: new Map(),
+      pending: new Map(),
     };
     families.push(family);
   }
 
-  // As in loadOne/loadMany, look up cached keys and collect only uncached work.
-  // Cache promises immediately so calls arriving during a fetch share its work.
-  const results: Promise<CachedResult>[] = [];
-  for (const keyset of keysets) {
-    let node = family.cache;
-    for (const part of keyParts(keyset, keysetEquality)) {
-      // Map treats NaN as equal to itself, unlike strict equality.
-      const key =
-        typeof part === "number" && Number.isNaN(part) ? Symbol() : part;
-      let child = node.children.get(key);
-      if (child == null) {
-        child = { children: new Map() };
-        node.children.set(key, child);
+  // Validate composite keys before queuing any work. A malformed later key
+  // must not leave an earlier key's batch running without a caller.
+  const cacheKeys =
+    keysetEquality === "strict"
+      ? keysets
+      : keysets.map((keyset) =>
+          compositeCacheKey(family, keyset, keysetEquality),
+        );
+  const { cache, pending } = family;
+  const batch = new Map<PendingBatch, number[]>();
+  const results: TResult[] = [];
+  for (let i = 0; i < keysets.length; i++) {
+    const spec = strictMapKey(cacheKeys[i]);
+    if (cache.has(spec)) {
+      results.push(cache.get(spec)!);
+    } else {
+      // We'll fill this in in a minute.
+      const targetIndex = results.push(null as any) - 1;
+      let entry = pending.get(spec);
+      if (entry === undefined) {
+        let loadBatch = family.queued;
+        if (loadBatch == null) {
+          const deferred = Promise.withResolvers<ReadonlyArray<any>>();
+          deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
+          loadBatch = { deferred, keysets: [], cacheKeys: [] };
+          family.queued = loadBatch;
+          const currentFamily = family;
+          const currentBatch = loadBatch;
+          queueMicrotask(() => {
+            // Don't allow adding anything else to this batch.
+            currentFamily.queued = undefined;
+            void executeBatch(currentFamily, currentBatch);
+          });
+        }
+        const index = loadBatch.keysets.push(keysets[i]) - 1;
+        loadBatch.cacheKeys.push(spec);
+        entry = { batch: loadBatch, index };
+        pending.set(spec, entry);
       }
-      node = child;
-    }
-    let result = node.value;
-    if (result == null) {
-      const pending = family.pending;
-      result = new Promise((resolve, reject) => {
-        pending.push({ keyset, node, resolve, reject });
-      });
-      node.value = result;
-      if (pending.length === 1) {
-        const currentFamily = family;
-        queueMicrotask(() => {
-          currentFamily.pending = [];
-          void executeFamily(currentFamily, pending);
-        });
+      let indexes = batch.get(entry.batch);
+      if (indexes == null) {
+        indexes = [];
+        batch.set(entry.batch, indexes);
       }
+      // Pairs of source index in the pending batch and target result index.
+      indexes.push(entry.index, targetIndex);
     }
-    results.push(result);
   }
-  return Promise.all(results).then(
-    (entries) => entries.map(({ value }) => value) as TResult[],
-  );
+  if (batch.size > 0) {
+    return (async () => {
+      // Usually there is just one batch. If a call also references older
+      // in-flight batches, observe all failures without waiting on them in turn.
+      const loadBatches = [...batch.keys()];
+      const allLoadResults =
+        loadBatches.length === 1
+          ? [await loadBatches[0].deferred.promise]
+          : await Promise.all(
+              loadBatches.map(({ deferred }) => deferred.promise),
+            );
+      let batchIndex = 0;
+      for (const indexes of batch.values()) {
+        const loadResults = allLoadResults[batchIndex++];
+        for (let i = 0; i < indexes.length; i += 2) {
+          const pendingIndex = indexes[i];
+          const targetIndex = indexes[i + 1];
+          results[targetIndex] = loadResults[pendingIndex];
+        }
+      }
+      return results;
+    })();
+  }
+  return results;
 }
 
-async function executeFamily(
+async function executeBatch(
   family: BatchFamily,
-  pending: PendingKey[],
+  loadBatch: PendingBatch,
 ): Promise<void> {
+  const { deferred, keysets, cacheKeys } = loadBatch;
   try {
-    const keysets = pending.map(({ keyset }) => keyset);
-    const results = await family.executor.callback(family.options, keysets);
-    if (results.length !== keysets.length) {
+    const loadResults = await family.executor.callback(family.options, keysets);
+    if (loadResults.length !== keysets.length) {
       throw new Error(
-        `batch callback returned ${results.length} results for ${keysets.length} keysets`,
+        `batch callback returned ${loadResults.length} results for ${keysets.length} keysets`,
       );
     }
-    for (let i = 0; i < pending.length; i++) {
-      pending[i].resolve({ value: results[i] });
+    for (let pendingIndex = 0; pendingIndex < keysets.length; pendingIndex++) {
+      const spec = cacheKeys[pendingIndex];
+      family.cache.set(spec, loadResults[pendingIndex]);
+      family.pending.delete(spec);
     }
+    deferred.resolve(loadResults);
   } catch (error) {
-    for (const { node, reject } of pending) {
-      // A failed batch must be retryable rather than poisoning this scope.
-      node.value = undefined;
-      reject(error);
+    for (const spec of cacheKeys) {
+      family.pending.delete(spec);
     }
+    deferred.reject(error);
   }
 }

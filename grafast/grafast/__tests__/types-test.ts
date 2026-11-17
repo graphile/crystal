@@ -8,6 +8,7 @@ import type {
   DataFromObjectSteps,
   FieldPlanResolver,
   ListStep,
+  PromiseOrDirect,
   Step,
 } from "../dist/index.js";
 import {
@@ -61,7 +62,7 @@ const _batchTypes = (batch: BatchFunction) => {
     optionsMatch: (left, right) => left.prefix === right.prefix,
   });
   const _result = batch(executor, [1], { prefix: "x" });
-  assert<Equals<typeof _result, Promise<readonly string[]>>>();
+  assert<Equals<typeof _result, PromiseOrDirect<readonly string[]>>>();
   // @ts-expect-error Options are required by this executor.
   batch(executor, [1]);
   // @ts-expect-error Incorrect options type.
