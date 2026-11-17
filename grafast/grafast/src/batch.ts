@@ -66,8 +66,13 @@ type BatchFamily = {
   keyIndex?: KeyIndex;
 };
 
+type BatchOptions = Record<string, unknown> | undefined;
+
 type BatchMeta = Record<PropertyKey, unknown> & {
-  [batchesSymbol]?: BatchFamily[];
+  [batchesSymbol]?: Map<
+    BatchExecutor<any, any, any>,
+    Map<BatchOptions, BatchFamily>
+  >;
 };
 
 const batchesSymbol = Symbol("Grafast batch caches");
@@ -138,15 +143,19 @@ function defaultOptionsMatch(
   );
 }
 
-function familyMatches(
-  family: BatchFamily,
+function findMatchingFamily(
+  families: Map<BatchOptions, BatchFamily>,
   executor: BatchExecutor<any, any, any>,
-  options: Record<string, unknown> | undefined,
-): boolean {
-  return (
-    family.executor === executor &&
-    (executor.optionsMatch ?? defaultOptionsMatch)(family.options, options)
-  );
+  options: BatchOptions,
+): BatchFamily | undefined {
+  const optionsMatch = executor.optionsMatch ?? defaultOptionsMatch;
+  for (const [knownOptions, family] of families) {
+    if (optionsMatch(knownOptions, options)) {
+      // The family already retains the canonical options used by its callback.
+      return family;
+    }
+  }
+  return undefined;
 }
 
 /** @internal Used to implement `ExecutionDetails.batch`. */
@@ -173,22 +182,28 @@ export function batchInMeta<
   }
 
   const typedMeta = metaByMetaKey as BatchMeta;
-  let families = typedMeta[batchesSymbol];
+  let batches = typedMeta[batchesSymbol];
+  if (batches == null) {
+    typedMeta[batchesSymbol] = batches = new Map();
+  }
+  let families = batches.get(executor);
   if (families == null) {
-    typedMeta[batchesSymbol] = families = [];
+    families = new Map();
+    batches.set(executor, families);
   }
 
-  let family = families.find((candidate) =>
-    familyMatches(candidate, executor, options),
-  );
+  let family = families.get(options);
   if (family == null) {
-    family = {
-      executor,
-      options,
-      cache: new Map(),
-      pending: new Map(),
-    };
-    families.push(family);
+    family = findMatchingFamily(families, executor, options);
+    if (family == null) {
+      family = {
+        executor,
+        options,
+        cache: new Map(),
+        pending: new Map(),
+      };
+      families.set(options, family);
+    }
   }
 
   // Validate composite keys before queuing any work. A malformed later key

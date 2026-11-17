@@ -699,3 +699,66 @@ it("defineBatchExecutor returns the supplied executor unchanged", () => {
   };
   expect(defineBatchExecutor(executor)).to.equal(executor);
 });
+
+it("looks up options by identity before comparing and retains canonical options", async () => {
+  let comparisons = 0;
+  const received: Array<{ group: string }> = [];
+  const executor = defineBatchExecutor({
+    name: "indexed-options",
+    keysetEquality: "strict",
+    optionsMatch: (left, right) => {
+      comparisons++;
+      return left.group === right.group;
+    },
+    callback: (options: { group: string }, keys: readonly number[]) => {
+      received.push(options);
+      return keys;
+    },
+  });
+  const meta = {};
+  const first = { group: "first" };
+  const second = { group: "second" };
+  await batchInMeta(schema, meta, executor, [1], first);
+  await batchInMeta(schema, meta, executor, [1], second);
+  comparisons = 0;
+  expect(batchInMeta(schema, meta, executor, [1], second)).to.deep.equal([1]);
+  expect(comparisons).to.equal(0);
+  await batchInMeta(schema, meta, executor, [2], { group: "first" });
+  expect(comparisons).to.equal(1);
+  expect(received).to.have.length(3);
+  expect(received[2]).to.equal(first);
+  // An equivalent options object must not add an alias to the map.
+  comparisons = 0;
+  await batchInMeta(schema, meta, executor, [2], { group: "new" });
+  expect(comparisons).to.equal(2);
+});
+
+it("only compares options within the requested executor", async () => {
+  let comparisons = 0;
+  const unrelated = defineBatchExecutor({
+    name: "unrelated-options",
+    keysetEquality: "strict",
+    callback: (_options: { unrelated: string }, keys: readonly number[]) =>
+      keys,
+    optionsMatch: () => {
+      throw new Error("Must not compare another executor's options");
+    },
+  });
+  const executor = defineBatchExecutor({
+    name: "executor-options-index",
+    keysetEquality: "strict",
+    callback: (_options: { group: string }, keys: readonly number[]) => keys,
+    optionsMatch: (left, right) => {
+      comparisons++;
+      return left.group === right.group;
+    },
+  });
+  const meta = {};
+  await batchInMeta(schema, meta, unrelated, [1], { unrelated: "x" });
+  await batchInMeta(schema, meta, executor, [1], { group: "x" });
+  expect(comparisons).to.equal(0);
+  expect(
+    batchInMeta(schema, meta, executor, [1], { group: "x" }),
+  ).to.deep.equal([1]);
+  expect(comparisons).to.equal(1);
+});
