@@ -105,6 +105,11 @@ into 4 main categories based on the root folders, each of which have a
   verbs.
 - Always use a block body for `if`, `for`, and `while` statements.
 - Do not reassign function parameters; use a local variable instead.
+- When handling all members of a union, include an explicit exhaustiveness check
+  such as `const never: never = value;` in a `switch` default or an unreachable
+  `else`, followed by an appropriate error. Adding a union member must cause a
+  TypeScript error until it is handled; do not rely solely on the branches
+  covering today's union members.
 - This codebase is very performance sensitive. Always perform cheaper
   comparisons before more expensive comparisons unless there is a strong reason
   not to.
