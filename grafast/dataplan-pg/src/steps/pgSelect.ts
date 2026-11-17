@@ -1330,14 +1330,11 @@ export class PgSelectStep<
             : {
                 values: await executionDetails.batch({
                   executor: pgStepBatchExecutor,
-                  unaryDependencies: [
-                    pgStepBatchExecutor.getBatchInfo(
-                      store!,
-                      this.resource.executor,
-                      context,
-                      common,
-                    ),
-                  ],
+                  unaryDependencies: pgStepBatchExecutor.getUnaryDependencies(
+                    this.resource.executor,
+                    context,
+                    common,
+                  ),
                   keysets: specs.map(({ queryValues }) => queryValues),
                 }),
               };

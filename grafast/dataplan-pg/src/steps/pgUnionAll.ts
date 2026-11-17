@@ -1064,14 +1064,11 @@ on (${sql.indent(
       : {
           values: await executionDetails.batch({
             executor: pgStepBatchExecutor,
-            unaryDependencies: [
-              pgStepBatchExecutor.getBatchInfo(
-                store!,
-                this.executor,
-                context,
-                common,
-              ),
-            ],
+            unaryDependencies: pgStepBatchExecutor.getUnaryDependencies(
+              this.executor,
+              context,
+              common,
+            ),
             keysets: specs.map(({ queryValues }) => queryValues),
           }),
         };

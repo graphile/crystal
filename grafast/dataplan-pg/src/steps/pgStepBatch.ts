@@ -7,77 +7,76 @@ import type {
   PgExecutorOptions,
 } from "../executor.ts";
 
-export type PgStepBatchInfo = {
-  executor: PgExecutor;
-  context: PgExecutorContext;
-  options: PgExecutorOptions;
-};
+type PgStepBatchDependencies = readonly [
+  executor: PgExecutor,
+  context: PgExecutorContext,
+  store: PgExecutorOptions["store"],
+  text: PgExecutorOptions["text"],
+  identifierIndex: PgExecutorOptions["identifierIndex"],
+  name: PgExecutorOptions["name"],
+  affinity: PgExecutorOptions["affinity"],
+  eventEmitter: PgExecutorOptions["eventEmitter"],
+  useTransaction: boolean,
+  ...rawSqlValues: PgExecutorOptions["rawSqlValues"],
+];
 
-const batchInfoSymbol = Symbol("PostgreSQL batch info");
-
-type BatchInfoMeta = Record<PropertyKey, any>;
-
-function getPgStepBatchInfo(
-  meta: BatchInfoMeta,
+function getUnaryDependencies(
   executor: PgExecutor,
   context: PgExecutorContext,
   options: PgExecutorOptions,
-): PgStepBatchInfo {
-  const state = (meta[batchInfoSymbol] ??= {
-    infoByExecutor: new WeakMap(),
-    objectIds: new WeakMap(),
-    symbolIds: new Map(),
-    nextId: 0,
-  });
-  function identity(value: object | symbol | undefined): number {
-    if (value === undefined) return 0;
-    const ids = typeof value === "symbol" ? state.symbolIds : state.objectIds;
-    let id = ids.get(value);
-    if (id === undefined) {
-      id = ++state.nextId;
-      ids.set(value, id);
-    }
-    return id;
-  }
-  let byContext = state.infoByExecutor.get(executor);
-  if (byContext == null) {
-    state.infoByExecutor.set(executor, (byContext = new WeakMap()));
-  }
-  let bySignature = byContext.get(context);
-  if (bySignature == null) {
-    byContext.set(context, (bySignature = new Map()));
-  }
-
-  const signature = JSON.stringify([
+): PgStepBatchDependencies {
+  return [
+    executor,
+    context,
+    options.store,
     options.text,
-    options.rawSqlValues,
     options.identifierIndex ?? null,
-    options.name ?? null,
-    identity(options.affinity),
-    identity(options.eventEmitter),
+    options.name,
+    options.affinity,
+    options.eventEmitter,
     options.useTransaction ?? false,
-  ]);
-  let info = bySignature.get(signature);
-  if (info == null) {
-    info = { executor, context, options };
-    bySignature.set(signature, info);
-  }
-  return info;
+    ...options.rawSqlValues,
+  ];
 }
 
 export const pgStepBatchExecutor = Object.freeze({
-  getBatchInfo: getPgStepBatchInfo,
+  getUnaryDependencies,
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
-  callback: async ([{ executor, context, options }], keysets) => {
+  callback: async (
+    [
+      executor,
+      context,
+      store,
+      text,
+      identifierIndex,
+      name,
+      affinity,
+      eventEmitter,
+      useTransaction,
+      ...rawSqlValues
+    ],
+    keysets,
+  ) => {
     const inputs: PgExecutorInput<any>[] = keysets.map((queryValues) => ({
       context,
       queryValues,
     }));
-    return (await executor.executeWithCache(inputs, options)).values;
+    return (
+      await executor.executeWithCache(inputs, {
+        store,
+        text,
+        identifierIndex,
+        name,
+        affinity,
+        eventEmitter,
+        useTransaction,
+        rawSqlValues,
+      })
+    ).values;
   },
 } satisfies BatchExecutor<
-  readonly [PgStepBatchInfo],
+  PgStepBatchDependencies,
   readonly unknown[],
   ReadonlyArray<any>
-> & { getBatchInfo: typeof getPgStepBatchInfo });
+> & { getUnaryDependencies: typeof getUnaryDependencies });
