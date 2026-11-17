@@ -1177,6 +1177,34 @@ function addRelations(
             );
             if (paths.length === 1) {
               const path = paths[0];
+              let numberOfSingleRelations = 0;
+              let recordIdentifier: TE = te`$record`;
+              // Follow unique relations forwards before constructing the
+              // remaining joins backwards. Reciprocal relations can then
+              // reuse a record that is already in the plan.
+              if (!isMutationPayload) {
+                while (
+                  numberOfSingleRelations < path.layers.length - 1 &&
+                  path.layers[numberOfSingleRelations].isUnique
+                ) {
+                  const layer = path.layers[numberOfSingleRelations];
+                  const nextRecordIdentifier = te.identifier(
+                    idents.makeSafeIdentifier(`$${layer.resource.name}`),
+                  );
+                  functionLines.push(
+                    te`  const ${nextRecordIdentifier} = ${recordIdentifier}.singleRelation(${te.lit(layer.relationName)});`,
+                  );
+                  recordIdentifier = nextRecordIdentifier;
+                  numberOfSingleRelations++;
+                }
+              }
+              if (isConnection && numberOfSingleRelations > 0) {
+                // A missing intermediate record must not swallow the row
+                // carrying an aggregate result such as totalCount.
+                functionLines.push(
+                  te`  ${collectionIdentifier}.setInliningStrategy("forbidden");`,
+                );
+              }
               // NOTE: do we ever need to make the above `DISTINCT ON (primary key)`?
               functionLines.push(
                 te`  let previousAlias = ${collectionIdentifier}.alias;`,
@@ -1184,7 +1212,11 @@ function addRelations(
 
               // const finalLayer = path.layers[path.layers.length - 1];
               // Process each layer
-              for (let i = path.layers.length - 1; i >= 1; i--) {
+              for (
+                let i = path.layers.length - 1;
+                i >= numberOfSingleRelations + 1;
+                i--
+              ) {
                 const layer = path.layers[i];
                 const resource = path.layers[i - 1].resource;
                 const { localAttributes, remoteAttributes } = layer;
@@ -1220,7 +1252,7 @@ function addRelations(
               }
               // Now apply `$record`
               {
-                const firstLayer = path.layers[0];
+                const firstLayer = path.layers[numberOfSingleRelations];
                 const { localAttributes, remoteAttributes } = firstLayer;
                 remoteAttributes.forEach((remoteAttrName, i) => {
                   functionLines.push(
@@ -1228,7 +1260,7 @@ function addRelations(
                       ref_sql
                     }.identifier(${te.lit(
                       remoteAttrName,
-                    )})} = \${${collectionIdentifier}.placeholder($record.get(${te.lit(
+                    )})} = \${${collectionIdentifier}.placeholder(${recordIdentifier}.get(${te.lit(
                       localAttributes[i],
                     )}))}\`);`,
                   );
