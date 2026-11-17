@@ -165,7 +165,7 @@ details.batch(executor, keysets, options);
 
 The callback receives the options and the unique keysets, and must
 return one result for each keyset in the same order. It can return an array or a
-promise of an array. `details.batch` returns a promise; if the callback throws
+promise of an array. `details.batch` returns an array or a promise of an array; if the callback throws
 or rejects, each caller in that batch receives the error. An empty keyset list
 returns an empty result without calling the callback.
 
@@ -195,6 +195,7 @@ function fetchUsers(
 
 const usersBatch = defineBatchExecutor({
   name: "myapp/usersById",
+  keysetEquality: "strict",
   callback: fetchUsers,
 });
 
@@ -227,10 +228,10 @@ Conflicting executors still batch separately in production. Each schema has its
 own registry, so rebuilding a schema can introduce new executor definitions.
 Use names that distinguish your executors from those supplied by libraries.
 
-The optional `keysetEquality` in `defineBatchExecutor` controls how keysets are
+The required `keysetEquality` in `defineBatchExecutor` controls how keysets are
 deduplicated:
 
-- `"strict"` (the default) compares each keyset using `===`.
+- `"strict"` compares each keyset using `===`.
 - `"tuple"` compares arrays by length and each element using `===`.
 - `"object"` compares the enumerable string keys of objects, regardless of key
   order, and compares their values using `===`.

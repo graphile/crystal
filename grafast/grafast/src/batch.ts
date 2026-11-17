@@ -2,7 +2,6 @@ import type { GraphQLSchema } from "graphql";
 
 import { isDev, noop } from "./dev.ts";
 import type {
-  BatchCallback,
   BatchExecutor,
   BatchKeysetEquality,
   PromiseOrDirect,
@@ -14,16 +13,10 @@ export function defineBatchExecutor<
   TOptions extends Record<string, unknown> | undefined,
   TKeyset,
   TResult,
->(options: {
-  name: string;
-  callback: BatchCallback<TOptions, TKeyset, TResult>;
-  keysetEquality?: BatchKeysetEquality;
-  optionsMatch?: (left: TOptions, right: TOptions) => boolean;
-}): BatchExecutor<TOptions, TKeyset, TResult> {
-  return Object.freeze({
-    ...options,
-    keysetEquality: options.keysetEquality ?? "strict",
-  });
+>(
+  executor: BatchExecutor<TOptions, TKeyset, TResult>,
+): BatchExecutor<TOptions, TKeyset, TResult> {
+  return executor;
 }
 
 type ExecutorRegistration = {

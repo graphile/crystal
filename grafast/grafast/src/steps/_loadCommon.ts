@@ -159,7 +159,7 @@ function loadOptionsMatch<
 
 // Preserve the generic callbacks: each use specializes this same executor
 // object, without erasing the relationship between its options, keys and data.
-const loadBatchExecutor = Object.freeze({
+const loadBatchExecutor = {
   name: "grafast/load",
   keysetEquality: "strict",
   callback: executeLoadBatch,
@@ -168,7 +168,7 @@ const loadBatchExecutor = Object.freeze({
   LoadBatchOptions<unknown, unknown, unknown, Record<string, unknown>, unknown>,
   unknown,
   unknown
->);
+>;
 
 export function executeLoad<
   TSpec,

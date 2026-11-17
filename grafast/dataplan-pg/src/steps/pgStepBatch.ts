@@ -1,5 +1,5 @@
 import type { BatchExecutor } from "grafast";
-import { arraysMatch, recordsMatch } from "grafast";
+import { arraysMatch, defineBatchExecutor, recordsMatch } from "grafast";
 
 import type {
   PgExecutor,
@@ -29,11 +29,7 @@ export function pgStepBatchOptions(
   };
 }
 
-export const pgStepBatchExecutor: BatchExecutor<
-  PgStepBatchOptions,
-  readonly unknown[],
-  ReadonlyArray<any>
-> = {
+export const pgStepBatchExecutor = defineBatchExecutor({
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
   optionsMatch: (left, right) =>
@@ -52,4 +48,8 @@ export const pgStepBatchExecutor: BatchExecutor<
     }));
     return (await executor.executeWithCache(inputs, options)).values;
   },
-};
+} satisfies BatchExecutor<
+  PgStepBatchOptions,
+  readonly unknown[],
+  ReadonlyArray<any>
+>);

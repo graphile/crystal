@@ -23,13 +23,7 @@ const executors = new Map<
   typeof echoBatch,
   Map<
     string,
-    ReturnType<
-      typeof defineBatchExecutor<
-        Record<string, unknown> | undefined,
-        unknown,
-        unknown
-      >
-    >
+    BatchExecutor<Record<string, unknown> | undefined, unknown, unknown>
   >
 >();
 
@@ -153,8 +147,13 @@ it("matches executors by identity and options shallowly", async () => {
 
 it("accepts a stable executor and isolates registrations by schema", async () => {
   const firstSchema = makeSchema();
-  const first = defineBatchExecutor({ name: "echo", callback: echoBatch });
+  const first = defineBatchExecutor({
+    name: "echo",
+    keysetEquality: "strict",
+    callback: echoBatch,
+  });
   const second = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "echo",
     callback: alternateEchoBatch,
   });
@@ -167,8 +166,13 @@ it("accepts a stable executor and isolates registrations by schema", async () =>
 
 it("detects duplicate names even for empty batches", async () => {
   const schema = makeSchema();
-  const first = defineBatchExecutor({ name: "duplicate", callback: echoBatch });
+  const first = defineBatchExecutor({
+    name: "duplicate",
+    keysetEquality: "strict",
+    callback: echoBatch,
+  });
   const second = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "duplicate",
     callback: echoBatch,
   });
@@ -202,10 +206,12 @@ if (!isDev) {
     const schema = makeSchema();
     const meta = {};
     const first = defineBatchExecutor({
+      keysetEquality: "strict",
       name: "conflict",
       callback: echoBatch,
     });
     const second = defineBatchExecutor({
+      keysetEquality: "strict",
       name: "conflict",
       callback: (
         _options: Record<string, unknown> | undefined,
@@ -232,6 +238,7 @@ it("matches POJO options shallowly and ignores property order", async () => {
   const meta = {};
   const nested = { id: 1 };
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "records",
     callback: (
       _options: { prefix: string; nested: object },
@@ -259,6 +266,7 @@ it("supports omitted options", async () => {
   const schema = makeSchema();
   const meta = {};
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "omitted",
     callback: (
       options: { prefix: string } | undefined,
@@ -288,6 +296,7 @@ it("matches records with null prototypes and undefined properties", async () => 
   const schema = makeSchema();
   const meta = {};
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "null-prototype",
     callback: (_options: Record<string, unknown>, keys: readonly number[]) => {
       calls++;
@@ -309,6 +318,7 @@ it("matches records with null prototypes and undefined properties", async () => 
 if (isDev) {
   it("rejects non-POJO options even with a custom matcher", () => {
     const executor = defineBatchExecutor({
+      keysetEquality: "strict",
       name: "invalid-options",
       callback: echoBatch,
       optionsMatch: () => true,
@@ -333,6 +343,7 @@ it("allows optionsMatch to compare selected fields within POJO options", async (
   const schema = makeSchema();
   const meta = {};
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "custom",
     optionsMatch: (left: { date: Date }, right: { date: Date }) =>
       left.date.getTime() === right.date.getTime(),
@@ -405,6 +416,7 @@ for (const withMetaKeys of [false, true]) {
   it(`batches across steps ${withMetaKeys ? "with different meta keys" : "without meta keys"}`, async () => {
     const calls: (readonly string[])[] = [];
     const executor = defineBatchExecutor({
+      keysetEquality: "strict",
       name: "cross-step",
       callback: ({ prefix }: { prefix: string }, keys: readonly string[]) => {
         calls.push(keys);
@@ -428,6 +440,7 @@ for (const withMetaKeys of [false, true]) {
 it("does not batch across concurrent executions of the same schema without meta keys", async () => {
   const calls: (readonly string[])[] = [];
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "request-isolation",
     callback: ({ prefix }: { prefix: string }, keys: readonly string[]) => {
       calls.push(keys);
@@ -485,6 +498,7 @@ it("shares in-flight keys with calls arriving after dispatch", async () => {
   const calls: number[][] = [];
   const releases: Array<() => void> = [];
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "in-flight",
     callback: async (_options: undefined, keys: readonly number[]) => {
       calls.push([...keys]);
@@ -512,6 +526,7 @@ it("shares in-flight keys with calls arriving after dispatch", async () => {
 it("evicts failed batches so their keys can be retried", async () => {
   let attempts = 0;
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "retry",
     callback: (_options: undefined, keys: readonly number[]) => {
       attempts++;
@@ -541,6 +556,7 @@ it("preserves per-key promises rather than rejecting an entire batch", async () 
   const rejected = Promise.reject(error);
   void rejected.catch(() => {});
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "per-key-promises",
     callback: (_options: undefined, keys: readonly number[]) =>
       keys.map((key) => (key === 1 ? rejected : Promise.resolve(key))),
@@ -555,6 +571,7 @@ it("preserves per-key promises rather than rejecting an entire batch", async () 
 
 it("allocates promises per batch rather than per key and returns cache hits synchronously", async () => {
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "promise-allocation",
     callback: (_options: undefined, keys: readonly number[]) => keys,
   });
@@ -611,6 +628,7 @@ it("validates all composite keys before queuing work", async () => {
 it("retries a rejected asynchronous batch and an invalid result count", async () => {
   let attempts = 0;
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "async-retry",
     callback: async (_options: undefined, keys: readonly number[]) => {
       attempts++;
@@ -644,6 +662,7 @@ it("observes a failed newer batch while an older batch is still in flight", asyn
   let release!: () => void;
   const error = new Error("newer batch failed");
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "overlapping-failure",
     callback: async (_options: undefined, keys: readonly number[]) => {
       if (keys[0] === 1) {
@@ -669,4 +688,14 @@ it("observes a failed newer batch while an older batch is still in flight", asyn
     await older;
   }
   expect(batchInMeta(schema, meta, executor, [1])).to.deep.equal([1]);
+});
+
+it("defineBatchExecutor returns the supplied executor unchanged", () => {
+  const executor = {
+    name: "identity",
+    keysetEquality: "strict" as const,
+    callback: echoBatch,
+    getInfo: () => "info",
+  };
+  expect(defineBatchExecutor(executor)).to.equal(executor);
 });

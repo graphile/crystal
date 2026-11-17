@@ -61,10 +61,15 @@ const _myPlan: FieldPlanResolver = () => {
 // Internal adapter types must preserve the same guarantees as the public loaders.
 const _batchTypes = (batch: BatchFunction) => {
   const executor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "type-test",
     callback: (options: { prefix: string }, keys: readonly number[]) =>
       keys.map((key) => options.prefix + key),
-    optionsMatch: (left, right) => left.prefix === right.prefix,
+    optionsMatch: (left, right) => {
+      assert<Equals<typeof left, { prefix: string }>>();
+      assert<Equals<typeof right, { prefix: string }>>();
+      return left.prefix === right.prefix;
+    },
   });
   const _result = batch(executor, [1], { prefix: "x" });
   assert<Equals<typeof _result, PromiseOrDirect<readonly string[]>>>();
@@ -74,7 +79,13 @@ const _batchTypes = (batch: BatchFunction) => {
   batch(executor, [1], { prefix: 123 });
   // @ts-expect-error Incorrect keyset type.
   batch(executor, ["wrong"], { prefix: "x" });
+  // @ts-expect-error Every executor must explicitly declare keyset equality.
+  defineBatchExecutor({
+    name: "missing-equality",
+    callback: executor.callback,
+  });
   const optionalExecutor = defineBatchExecutor({
+    keysetEquality: "strict",
     name: "optional-type-test",
     callback: (
       options: { prefix: string } | undefined,
@@ -91,6 +102,7 @@ const _batchTypes = (batch: BatchFunction) => {
   // @ts-expect-error Null is not a valid options record.
   batch(optionalExecutor, [1], null);
   defineBatchExecutor({
+    keysetEquality: "strict",
     name: "invalid-tuple-options",
     // @ts-expect-error Executors cannot declare tuple options.
     callback: (_options: readonly [string], keys: readonly number[]) => keys,
