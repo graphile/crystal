@@ -94,16 +94,16 @@ type LoadCallback = (...args: any[]) => any;
 
 type LoadBatchOptions = {
   load: LoadCallback;
-  signature: string;
+  attributes: readonly unknown[];
+  parameterNames: readonly string[];
   shared: unknown;
   params: Record<string, unknown>;
 };
 
 function executeLoadBatch(
-  { load, signature, shared, params }: LoadBatchOptions,
+  { load, attributes, shared, params }: LoadBatchOptions,
   specs: readonly unknown[],
 ): PromiseOrDirect<ReadonlyArray<any>> {
-  const [attributes] = JSON.parse(signature) as [readonly string[]];
   return load(specs, {
     attributes,
     params,
@@ -117,7 +117,8 @@ const loadBatchExecutor = defineBatchExecutor({
   callback: executeLoadBatch,
   optionsMatch: (left, right) =>
     left.load === right.load &&
-    left.signature === right.signature &&
+    arraysMatch(left.attributes, right.attributes) &&
+    arraysMatch(left.parameterNames, right.parameterNames) &&
     left.shared === right.shared &&
     recordsMatch(left.params, right.params),
 });
@@ -177,13 +178,10 @@ export function executeLoad<
   if (pendingCount > 0) {
     const batchSpecs = [...batch.keys()];
     const parameterNames = Object.keys(params).sort();
-    const loadInfoSignature = JSON.stringify([
-      baseLoadInfo.attributes,
-      parameterNames,
-    ]);
     const options = {
       load,
-      signature: loadInfoSignature,
+      attributes: baseLoadInfo.attributes,
+      parameterNames,
       shared,
       params,
     };
