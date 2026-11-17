@@ -1273,6 +1273,7 @@ export class PgSelectStep<
           });
         }
       } else {
+        let hasKeyset = false;
         const queryValuesMatch =
           getSameLengthArraysMatchFunction(queryValuesLength);
         resultIndexes = indexMap<number | null>((i) => {
@@ -1295,7 +1296,7 @@ export class PgSelectStep<
             }
             queryValues.push(result);
           }
-          if (!isMutation && keysets.length > 0) {
+          if (!isMutation && hasKeyset) {
             // Dedupe
             const existingIdx = keysets.findIndex((keyset) =>
               queryValuesMatch(queryValues, keyset),
@@ -1305,6 +1306,7 @@ export class PgSelectStep<
             }
           }
           const keysetIndex = keysets.push(queryValues) - 1;
+          hasKeyset = true;
           return keysetIndex;
         });
       }
