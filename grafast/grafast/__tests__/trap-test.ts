@@ -10,6 +10,7 @@ import {
   assertNotNull,
   constant,
   context,
+  get,
   grafast,
   inhibitIf,
   inhibitOnEmpty,
@@ -86,6 +87,16 @@ const implicitSideEffectErrorPlan = (
   return lambda($a, (a) => a + 3, true);
 };
 
+const EXECUTE_THROW_MESSAGE = "Error from ExecuteThrowStep";
+class ExecuteThrowStep extends Step<never> {
+  execute(): never {
+    throw new Error(EXECUTE_THROW_MESSAGE);
+  }
+}
+function executeThrow() {
+  return new ExecuteThrowStep();
+}
+
 const makeSchema = () => {
   return makeGrafastSchema({
     typeDefs: /* GraphQL */ `
@@ -116,6 +127,7 @@ const makeSchema = () => {
           condition: Boolean!
         ): Int
         implicitSideEffectErrorIsNotTrapped: Int
+        executeThrowTrap: String
       }
       input EmptyableInput {
         a: Int
@@ -300,6 +312,11 @@ const makeSchema = () => {
           },
           implicitSideEffectErrorIsNotTrapped() {
             return implicitSideEffectErrorPlan("inhibit");
+          },
+          executeThrowTrap() {
+            const $throw = executeThrow();
+            const $error = trap($throw, TRAP_ERROR) as Step<Error>;
+            return get($error, "message");
           },
         },
       },
@@ -602,6 +619,17 @@ it("traps errors thrown in side effects in the chain and allows pass-through", a
         errcode: 42,
         detail: "Goodbye, and thanks for all the fish!",
       },
+    },
+  });
+});
+
+it("traps errors thrown at the step-level", async () => {
+  const schema = makeSchema();
+  const source = `{ executeThrowTrap }`;
+  const result = await grafast({ source, schema });
+  expect(result).to.deep.equal({
+    data: {
+      executeThrowTrap: EXECUTE_THROW_MESSAGE,
     },
   });
 });
