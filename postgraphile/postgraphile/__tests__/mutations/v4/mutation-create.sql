@@ -146,25 +146,6 @@ order by __person__."id" asc;
 
 select
   __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."id" desc;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."email" asc;
-
-select
-  __person__."id"::text as "0",
   __person__."person_full_name" as "1",
   __person__."email" as "2"
 from "c"."person" as __person__
@@ -172,15 +153,6 @@ where (
   __person__."id" = $1::"int4"
 )
 order by __person__."email" desc;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."id" asc;
 
 select
   __person__."id"::text as "0",
@@ -199,6 +171,25 @@ select
   ))::text as "0",
   __person__."id"::text as "1"
 from (select ($2::"c"."person").*) as __person__;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" asc;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."id"::text as "0",
@@ -236,25 +227,6 @@ order by __person__."id" asc;
 
 select
   __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."id" desc;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."email" asc;
-
-select
-  __person__."id"::text as "0",
   __person__."person_full_name" as "1",
   __person__."email" as "2"
 from "c"."person" as __person__
@@ -262,15 +234,6 @@ where (
   __person__."id" = $1::"int4"
 )
 order by __person__."email" desc;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."id" asc;
 
 select
   __person__."id"::text as "0",
@@ -289,6 +252,25 @@ select
   ))::text as "0",
   __person__."id"::text as "1"
 from (select ($2::"c"."person").*) as __person__;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" asc;
 
 insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1", "extra") values ($1::"int4", $2::"int4", $3::"bool") returning
   __compound_key__."person_id_1"::text as "0",
@@ -353,25 +335,6 @@ order by __person__."id" asc;
 
 select
   __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."id" desc;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."email" asc;
-
-select
-  __person__."id"::text as "0",
   __person__."person_full_name" as "1",
   __person__."email" as "2"
 from "c"."person" as __person__
@@ -379,15 +342,6 @@ where (
   __person__."id" = $1::"int4"
 )
 order by __person__."email" desc;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-)
-order by __person__."id" asc;
 
 select
   __person__."id"::text as "0",
@@ -406,6 +360,25 @@ select
   ))::text as "0",
   __person__."id"::text as "1"
 from (select ($2::"c"."person").*) as __person__;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" asc;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email") returning
   case when (__person__) is not distinct from null then null::text else json_build_array(
