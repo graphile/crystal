@@ -160,7 +160,7 @@ This can combine work across branches of an operation as well as within a
 single step execution.
 
 ```ts
-details.batch({ callback, unaryDependencies, keysets, keysetEquality });
+details.batch({ executor, unaryDependencies, keysets });
 ```
 
 The callback receives the unary dependencies and the unique keysets, and must
@@ -170,16 +170,16 @@ or rejects, each caller in that batch receives the error. An empty keyset list
 returns an empty result without calling the callback.
 
 To combine calls, set the same [`metaKey`](#metakey) on the steps and use the
-same callback function, equality mode, and unary dependency values. Unary
-dependencies are compared with `===`, so objects must have the same identity.
-Define the callback outside `execute` and pass all values that affect its work
+same executor object and unary dependency values. Unary dependencies are
+compared with `===`, so objects must have the same identity.
+Define the executor outside `execute` and pass all values that affect its work
 through the unary dependencies. Without a shared `metaKey`, calls from separate
 step executions do not share a batch.
 
 For example, given a service whose `getUsers` method returns one result per ID:
 
 ```ts
-import { Step, type ExecutionDetails } from "grafast";
+import { defineBatchExecutor, Step, type ExecutionDetails } from "grafast";
 import { userService } from "./services/users";
 
 const userBatchMetaKey = Symbol("user batches");
@@ -190,6 +190,11 @@ function fetchUsers(
 ) {
   return service.getUsers(ids);
 }
+
+const usersBatch = defineBatchExecutor({
+  name: "myapp/usersById",
+  callback: fetchUsers,
+});
 
 class UserStep extends Step {
   private idDepIndex: number;
@@ -204,7 +209,7 @@ class UserStep extends Step {
     const idEv = details.values[this.idDepIndex];
     const ids = details.indexMap((i) => idEv.at(i) as string);
     return details.batch({
-      callback: fetchUsers,
+      executor: usersBatch,
       unaryDependencies: [userService] as const,
       keysets: ids,
     });
@@ -212,7 +217,15 @@ class UserStep extends Step {
 }
 ```
 
-The optional equality mode controls how keysets are deduplicated:
+Executor names must identify the same executor object within each schema.
+Gra*fast* checks this when `details.batch` is called: conflicting definitions
+throw in development and log a warning once per schema and name in production.
+Conflicting executors still batch separately in production. Each schema has its
+own registry, so rebuilding a schema can introduce new executor definitions.
+Use names that distinguish your executors from those supplied by libraries.
+
+The optional `keysetEquality` in `defineBatchExecutor` controls how keysets are
+deduplicated:
 
 - `"strict"` (the default) compares each keyset using `===`.
 - `"tuple"` compares arrays by length and each element using `===`.

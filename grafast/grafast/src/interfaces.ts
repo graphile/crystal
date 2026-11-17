@@ -735,15 +735,24 @@ export type BatchCallback<
   unaryDependencies: TUnaryDependencies,
   keysets: ReadonlyArray<TKeyset>,
 ) => PromiseOrDirect<ReadonlyArray<TResult>>;
+/** A stable, named batch executor. Define once, outside step execution. */
+export interface BatchExecutor<
+  TUnaryDependencies extends readonly unknown[],
+  TKeyset,
+  TResult,
+> {
+  readonly name: string;
+  readonly callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>;
+  readonly keysetEquality: BatchKeysetEquality;
+}
 export type BatchFunction = <
   TUnaryDependencies extends readonly unknown[],
   TKeyset,
   TResult,
 >(options: {
-  callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>;
+  executor: BatchExecutor<TUnaryDependencies, TKeyset, TResult>;
   unaryDependencies: TUnaryDependencies;
   keysets: ReadonlyArray<TKeyset>;
-  keysetEquality?: BatchKeysetEquality;
 }) => Promise<ReadonlyArray<TResult>>;
 
 export interface ExecutionDetailsStream {
@@ -772,7 +781,7 @@ export interface ExecutionDetails<
 
   /**
    * Batches equivalent keysets submitted during the current runloop tick.
-   * Callbacks must be static functions; pass all varying or captured values in
+   * Define executors outside step execution; pass all varying values in
    * `unaryDependencies`.
    */
   batch: BatchFunction;

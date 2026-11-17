@@ -1,4 +1,4 @@
-import type { BatchCallback } from "grafast";
+import { defineBatchExecutor } from "grafast";
 
 import type {
   PgExecutor,
@@ -65,14 +65,18 @@ export function getPgStepBatchInfo(
   return info;
 }
 
-export const executePgStepBatch: BatchCallback<
+export const pgStepBatchExecutor = defineBatchExecutor<
   readonly [PgStepBatchInfo],
   readonly unknown[],
   ReadonlyArray<any>
-> = async ([{ executor, context, options }], keysets) => {
-  const inputs: PgExecutorInput<any>[] = keysets.map((queryValues) => ({
-    context,
-    queryValues,
-  }));
-  return (await executor.executeWithCache(inputs, options)).values;
-};
+>({
+  name: "@dataplan/pg/step",
+  keysetEquality: "tuple",
+  callback: async ([{ executor, context, options }], keysets) => {
+    const inputs: PgExecutorInput<any>[] = keysets.map((queryValues) => ({
+      context,
+      queryValues,
+    }));
+    return (await executor.executeWithCache(inputs, options)).values;
+  },
+});

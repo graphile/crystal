@@ -55,7 +55,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
-import { executePgStepBatch, getPgStepBatchInfo } from "./pgStepBatch.ts";
+import { getPgStepBatchInfo,pgStepBatchExecutor } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -1063,12 +1063,11 @@ on (${sql.indent(
       ? await this.executor.executeWithoutCache(specs, common)
       : {
           values: await executionDetails.batch({
-            callback: executePgStepBatch,
+            executor: pgStepBatchExecutor,
             unaryDependencies: [
               getPgStepBatchInfo(store!, this.executor, context, common),
             ],
             keysets: specs.map(({ queryValues }) => queryValues),
-            keysetEquality: "tuple",
           }),
         };
     // debugExecute("%s; result: %c", this, executionResult);

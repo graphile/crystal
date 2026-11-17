@@ -84,7 +84,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
-import { executePgStepBatch, getPgStepBatchInfo } from "./pgStepBatch.ts";
+import { getPgStepBatchInfo,pgStepBatchExecutor } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -1329,7 +1329,7 @@ export class PgSelectStep<
             ? await this.resource.executeWithoutCache(specs, common)
             : {
                 values: await executionDetails.batch({
-                  callback: executePgStepBatch,
+                  executor: pgStepBatchExecutor,
                   unaryDependencies: [
                     getPgStepBatchInfo(
                       store!,
@@ -1339,7 +1339,6 @@ export class PgSelectStep<
                     ),
                   ],
                   keysets: specs.map(({ queryValues }) => queryValues),
-                  keysetEquality: "tuple",
                 }),
               };
       // debugExecute("%s; result: %c", this, executionResult);

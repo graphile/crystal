@@ -1,4 +1,59 @@
-import type { BatchCallback, BatchKeysetEquality } from "./interfaces.ts";
+import type { GraphQLSchema } from "graphql";
+
+import { isDev } from "./dev.ts";
+import type {
+  BatchCallback,
+  BatchExecutor,
+  BatchKeysetEquality,
+} from "./interfaces.ts";
+
+/** Define once at module scope, or during schema construction. */
+export function defineBatchExecutor<
+  TUnaryDependencies extends readonly unknown[],
+  TKeyset,
+  TResult,
+>(options: {
+  name: string;
+  callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>;
+  keysetEquality?: BatchKeysetEquality;
+}): BatchExecutor<TUnaryDependencies, TKeyset, TResult> {
+  return Object.freeze({
+    ...options,
+    keysetEquality: options.keysetEquality ?? "strict",
+  });
+}
+
+type ExecutorRegistration = {
+  executor: BatchExecutor<any, any, any>;
+  warned: boolean;
+};
+const executorsBySchema = new WeakMap<
+  GraphQLSchema,
+  Map<string, ExecutorRegistration>
+>();
+
+function checkExecutor(
+  schema: GraphQLSchema,
+  executor: BatchExecutor<any, any, any>,
+): void {
+  let registry = executorsBySchema.get(schema);
+  if (registry == null) {
+    registry = new Map();
+    executorsBySchema.set(schema, registry);
+  }
+  const registration = registry.get(executor.name);
+  if (registration == null) {
+    registry.set(executor.name, { executor, warned: false });
+  } else if (registration.executor !== executor) {
+    const message = `Batch executor '${executor.name}' has multiple definitions in the same schema. Define it once outside step execution and reuse the same executor object.`;
+    if (isDev) {
+      throw new Error(message);
+    } else if (!registration.warned) {
+      registration.warned = true;
+      console.warn(message);
+    }
+  }
+}
 
 type PendingCall = {
   keysets: readonly unknown[];
@@ -7,7 +62,7 @@ type PendingCall = {
 };
 
 type BatchFamily = {
-  callback: BatchCallback<any, any, any>;
+  executor: BatchExecutor<any, any, any>;
   unaryDependencies: readonly unknown[];
   keysetEquality: BatchKeysetEquality;
   calls: PendingCall[];
@@ -44,12 +99,12 @@ function keyParts(
 
 function familyMatches(
   family: BatchFamily,
-  callback: BatchCallback<any, any, any>,
+  executor: BatchExecutor<any, any, any>,
   unaryDependencies: readonly unknown[],
   keysetEquality: BatchKeysetEquality,
 ): boolean {
   return (
-    family.callback === callback &&
+    family.executor === executor &&
     family.keysetEquality === keysetEquality &&
     family.unaryDependencies.length === unaryDependencies.length &&
     family.unaryDependencies.every(
@@ -64,13 +119,17 @@ export function batchInMeta<
   TKeyset,
   TResult,
 >(
+  schema: GraphQLSchema,
   meta: Record<PropertyKey, unknown>,
-  callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>,
+  executor: BatchExecutor<TUnaryDependencies, TKeyset, TResult>,
   unaryDependencies: TUnaryDependencies,
   keysets: readonly TKeyset[],
-  keysetEquality: BatchKeysetEquality = "strict",
 ): Promise<ReadonlyArray<TResult>> {
-  if (keysets.length === 0) return Promise.resolve([]);
+  checkExecutor(schema, executor);
+  const { keysetEquality } = executor;
+  if (keysets.length === 0) {
+    return Promise.resolve([]);
+  }
 
   const typedMeta = meta as BatchMeta;
   let families = typedMeta[batchesSymbol];
@@ -85,13 +144,13 @@ export function batchInMeta<
       reject,
     };
     const family = families.find((candidate) =>
-      familyMatches(candidate, callback, unaryDependencies, keysetEquality),
+      familyMatches(candidate, executor, unaryDependencies, keysetEquality),
     );
     if (family != null) {
       family.calls.push(call);
     } else {
       const newFamily: BatchFamily = {
-        callback,
+        executor,
         unaryDependencies,
         keysetEquality,
         calls: [call],
@@ -135,7 +194,7 @@ async function executeFamily(family: BatchFamily): Promise<void> {
       resultIndexes.push(indexes);
     }
 
-    const results = await family.callback(
+    const results = await family.executor.callback(
       family.unaryDependencies,
       uniqueKeysets,
     );
@@ -150,6 +209,8 @@ async function executeFamily(family: BatchFamily): Promise<void> {
       );
     }
   } catch (error) {
-    for (const call of family.calls) call.reject(error);
+    for (const call of family.calls) {
+      call.reject(error);
+    }
   }
 }

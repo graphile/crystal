@@ -1,3 +1,4 @@
+import { defineBatchExecutor } from "../batch.ts";
 import type {
   ExecutionDetails,
   Maybe,
@@ -111,6 +112,11 @@ function executeLoadBatch(
   });
 }
 
+const loadBatchExecutor = defineBatchExecutor({
+  name: "grafast/load",
+  callback: executeLoadBatch,
+});
+
 export function executeLoad<
   const TLookup extends Multistep,
   TItem,
@@ -177,7 +183,7 @@ export function executeLoad<
       ...parameterNames.map((key) => params[key]),
     ];
     const loadResults = details.batch({
-      callback: executeLoadBatch,
+      executor: loadBatchExecutor,
       unaryDependencies,
       keysets: batchSpecs,
     });
