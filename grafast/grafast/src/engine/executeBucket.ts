@@ -829,7 +829,7 @@ export function executeBucket(
     const executeDetails: ExecutionDetails<readonly any[]> = {
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
-      batch: (executor, keysets, ...[options]) =>
+      batch: (executor, keysets, options?) =>
         batchInMeta(
           step.operationPlan.schema,
           metaByMetaKey,
