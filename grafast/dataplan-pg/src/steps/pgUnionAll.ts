@@ -65,7 +65,9 @@ import type {
 import {
   applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
+  EMPTY_OBJECT,
   getUnary,
+  makeMakeQueryValues,
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.ts";
@@ -86,7 +88,6 @@ const digestSpecificExpressionFromAttributeName = (
   return sql.identifier(name);
 };
 
-const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
   m: Object.create(null),
   hasNextPage: false,
@@ -987,7 +988,7 @@ on (${sql.indent(
       identifierIndex,
       shouldReverseOrder,
       name,
-      queryValues,
+      queryValues: rawQueryValues,
       first,
       last,
       cursorDetails,
@@ -1029,21 +1030,15 @@ on (${sql.indent(
       throw new Error("We have no context dependency?");
     }
 
+    const makeQueryValues = makeMakeQueryValues(rawQueryValues, values);
+
     const specs = indexMap<PgExecutorInput<any>>((i) => {
+      const queryValues =
+        identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i);
       return {
         // The context is how we'd handle different connections with different claims
         context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null
-                  ? null
-                  : alreadyEncoded
-                    ? val
-                    : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
+        queryValues,
       };
     });
     const executeMethod =
@@ -1782,19 +1777,16 @@ ${unionHaving}\
        */
       const text = `\
 with ${identifiersAliasText} as materialized (
-  select ids.ordinality - 1 as idx${
-    queryValues.length > 0
-      ? `, ${queryValues
-          .map(({ codec }, idx) => {
-            return `(ids.value->>${idx})::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(", ")}`
-      : ""
-  } from json_array_elements($${
-    rawSqlValues.length + 1
-  }::json) with ordinality as ids
+  ${
+    queryValues.length === 0
+      ? // We've just been instructed to repeat this N times, so generate_series should suffice
+        `select ids.idx from generate_series(0, json_array_length($${
+          rawSqlValues.length + 1
+        }::json) - 1) as ids(idx)`
+      : `select ids.ordinality - 1 as idx, ${queryValues.map((_, idx) => `ids.id${idx}`).join(", ")} from rows from (json_to_recordset($${rawSqlValues.length + 1}::json) as (${queryValues
+          .map((qv, idx) => `id${idx} ${sql.compile(qv.codec.sqlType).text}`)
+          .join(", ")})) with ordinality as ids`
+  }
 )
 select ${wrapperAliasText}.*
 from ${identifiersAliasText},

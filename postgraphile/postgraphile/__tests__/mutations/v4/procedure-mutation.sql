@@ -322,7 +322,7 @@ from "a"."post_many"($1::"a"."post"[]) as __post_many__;
 commit; /*fake*/
 
 with __frmcdc_comptype_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."comptype"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "a"."comptype"[])) with ordinality as ids
 )
 select __frmcdc_comptype_result__.*
 from __frmcdc_comptype_identifiers__,
