@@ -128,6 +128,7 @@ const makeSchema = () => {
         ): Int
         implicitSideEffectErrorIsNotTrapped: Int
         executeThrowTrap: String
+        sideEffectExecuteThrowTrap: String
       }
       input EmptyableInput {
         a: Int
@@ -315,6 +316,12 @@ const makeSchema = () => {
           },
           executeThrowTrap() {
             const $throw = executeThrow();
+            const $error = trap($throw, TRAP_ERROR) as Step<Error>;
+            return get($error, "message");
+          },
+          sideEffectExecuteThrowTrap() {
+            const $throw = executeThrow();
+            $throw.hasSideEffects = true;
             const $error = trap($throw, TRAP_ERROR) as Step<Error>;
             return get($error, "message");
           },
@@ -630,6 +637,16 @@ it("traps errors thrown at the step-level", async () => {
   expect(result).to.deep.equal({
     data: {
       executeThrowTrap: EXECUTE_THROW_MESSAGE,
+    },
+  });
+});
+it("traps errors thrown at the step-level (with side effects)", async () => {
+  const schema = makeSchema();
+  const source = `{ sideEffectExecuteThrowTrap }`;
+  const result = await grafast({ source, schema });
+  expect(result).to.deep.equal({
+    data: {
+      sideEffectExecuteThrowTrap: EXECUTE_THROW_MESSAGE,
     },
   });
 });
