@@ -46,6 +46,7 @@ export class __InputObjectStep<
       const defaultValue =
         inputFieldDefinition.defaultValue !== undefined
           ? defaultValueToValueNode(
+              this.operationPlan.schema,
               inputFieldType,
               inputFieldDefinition.defaultValue,
             )

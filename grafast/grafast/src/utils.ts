@@ -261,11 +261,17 @@ function rawValueToValueNode(
   throw new Error(`Encountered unexpected type when processing defaultValue`);
 }
 
+const DEFAULT_VALUE_VALUE_NODE_CACHE = new WeakMap<
+  GraphQLSchema,
+  Map<GraphQLInputType, Map<unknown, ConstValueNode | undefined>>
+>();
+
 /**
- * Specifically allows for the `defaultValue` to be undefined, but otherwise
- * defers to {@link rawValueToValueNode}
+ * Specifically allows for the `defaultValue` to be undefined, implements a
+ * cache, but otherwise defers to {@link rawValueToValueNode}
  */
 export function defaultValueToValueNode(
+  schema: GraphQLSchema,
   type: GraphQLInputType,
   defaultValue: unknown,
 ): ConstValueNode | undefined {
@@ -275,7 +281,26 @@ export function defaultValueToValueNode(
   if (defaultValue === undefined) {
     return undefined;
   }
-  return rawValueToValueNode(type, defaultValue);
+
+  let cacheBySchema = DEFAULT_VALUE_VALUE_NODE_CACHE.get(schema);
+  if (!cacheBySchema) {
+    cacheBySchema = new Map();
+    DEFAULT_VALUE_VALUE_NODE_CACHE.set(schema, cacheBySchema);
+  }
+
+  let cacheByType = cacheBySchema.get(type);
+  if (!cacheByType) {
+    cacheByType = new Map();
+    cacheBySchema.set(type, cacheByType);
+  }
+
+  if (cacheByType.has(defaultValue)) {
+    return cacheByType.get(defaultValue);
+  }
+
+  const node = rawValueToValueNode(type, defaultValue);
+  cacheByType.set(defaultValue, node);
+  return node;
 }
 
 export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {

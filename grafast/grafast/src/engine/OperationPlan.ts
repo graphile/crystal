@@ -1,6 +1,5 @@
 import LRU from "@graphile/lru";
 import type {
-  ConstValueNode,
   FieldNode,
   FragmentDefinitionNode,
   GraphQLArgument,
@@ -3185,33 +3184,6 @@ export class OperationPlan {
   }
 
   /**
-   * One default value node per argument, so that `inputStep`'s cache (keyed
-   * by value node) returns the same step each time the argument is planned.
-   */
-  private defaultValueNodeByArgument = new Map<
-    GraphQLArgument,
-    ConstValueNode | undefined
-  >();
-
-  private defaultValueNode(
-    argumentDefinition: GraphQLArgument,
-  ): ConstValueNode | undefined {
-    if (!argumentDefinition.defaultValue) {
-      return undefined;
-    }
-    if (!this.defaultValueNodeByArgument.has(argumentDefinition)) {
-      this.defaultValueNodeByArgument.set(
-        argumentDefinition,
-        defaultValueToValueNode(
-          argumentDefinition.type,
-          argumentDefinition.defaultValue,
-        ),
-      );
-    }
-    return this.defaultValueNodeByArgument.get(argumentDefinition);
-  }
-
-  /**
    * A replacement for GraphQL's
    * `CoerceArgumentValues` that factors in tracked variables.
    *
@@ -3232,7 +3204,11 @@ export class OperationPlan {
         );
       }
       const argumentType = argumentDefinition.type;
-      const defaultValue = this.defaultValueNode(argumentDefinition);
+      const defaultValue = defaultValueToValueNode(
+        this.schema,
+        argumentType,
+        argumentDefinition.defaultValue,
+      );
       const argumentValue = argumentValues?.find(
         (v) => v.name.value === argumentName,
       );
