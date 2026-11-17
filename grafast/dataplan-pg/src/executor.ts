@@ -312,7 +312,8 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
   public getBatchCacheToken(context: PgExecutorContext): object {
     let token = this.batchCacheTokens.get(context);
     if (token == null) {
-      token = {};
+      /* Empty identity token; only reference equality matters. */
+      token = Object.create(null);
       this.batchCacheTokens.set(context, token);
     }
     return token;
