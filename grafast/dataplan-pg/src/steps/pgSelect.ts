@@ -84,6 +84,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { executePgStepBatch, getPgStepBatchInfo } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -1311,21 +1312,35 @@ export class PgSelectStep<
           return specIdx;
         });
       }
-      const executeMethod = isMutation
-        ? "executeWithoutCache"
-        : "executeWithCache";
+      const common = {
+        store,
+        text,
+        rawSqlValues,
+        identifierIndex,
+        name,
+        affinity: this.executionAffinity,
+        eventEmitter,
+        useTransaction: isMutation,
+      };
       const executionResult =
         specs.length > 0
-          ? await this.resource[executeMethod](specs, {
-              store,
-              text,
-              rawSqlValues,
-              identifierIndex,
-              name,
-              affinity: this.executionAffinity,
-              eventEmitter,
-              useTransaction: isMutation,
-            })
+          ? isMutation
+            ? await this.resource.executeWithoutCache(specs, common)
+            : {
+                values: await executionDetails.batch(
+                  executePgStepBatch,
+                  [
+                    getPgStepBatchInfo(
+                      store!,
+                      this.resource.executor,
+                      context,
+                      common,
+                    ),
+                  ],
+                  specs.map(({ queryValues }) => queryValues),
+                  "tuple",
+                ),
+              }
           : null;
       // debugExecute("%s; result: %c", this, executionResult);
 

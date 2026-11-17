@@ -55,6 +55,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { executePgStepBatch, getPgStepBatchInfo } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -1048,10 +1049,7 @@ on (${sql.indent(
             : EMPTY_ARRAY,
       };
     });
-    const executeMethod = this.hasSideEffects
-      ? "executeWithoutCache"
-      : "executeWithCache";
-    const executionResult = await this.executor[executeMethod](specs, {
+    const common = {
       store,
       text,
       rawSqlValues,
@@ -1060,7 +1058,17 @@ on (${sql.indent(
       affinity: this.executionAffinity,
       eventEmitter,
       useTransaction: this.hasSideEffects,
-    });
+    };
+    const executionResult = this.hasSideEffects
+      ? await this.executor.executeWithoutCache(specs, common)
+      : {
+          values: await executionDetails.batch(
+            executePgStepBatch,
+            [getPgStepBatchInfo(store!, this.executor, context, common)],
+            specs.map(({ queryValues }) => queryValues),
+            "tuple",
+          ),
+        };
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
