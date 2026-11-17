@@ -713,6 +713,7 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
+    this.metaKey = "PgSelect";
     if (!options.resource) {
       throw new Error(
         `Resource passed to \`pgSelect(...)\` was ${inspect(options.resource)} - perhaps you used the wrong resource name when looking it up in the registry?`,

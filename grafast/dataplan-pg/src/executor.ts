@@ -29,6 +29,10 @@ const LOOK_UP = "👆".repeat(30);
 
 const $$FINISHED: unique symbol = Symbol("finished");
 
+type TextAndValues = string & { brand?: "TextAndValues" };
+type IdentifiersJSON = string & { brand?: "IdentifiersJSON" };
+type CacheForQuery = Map<IdentifiersJSON, PromiseWithResolvers<any[]>>;
+
 class Wrapped<T extends Error | typeof $$FINISHED = Error | typeof $$FINISHED> {
   public originalValue: T;
 
@@ -302,6 +306,10 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
   private maxClientQueues: number;
   private $$cache: symbol;
+  private _cache: WeakMap<
+    object,
+    WeakMap<object, LRU<TextAndValues, CacheForQuery>>
+  >;
   private queryQueues: WeakMap<PgExecutorContext, QueryQueueState>;
 
   constructor(options: {
@@ -318,6 +326,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     this.contextCallback = context;
     this.maxClientQueues = maxClientQueues;
     this.$$cache = Symbol(this.name + "_cache");
+    this._cache = new WeakMap();
     this.queryQueues = new WeakMap();
   }
 
@@ -737,21 +746,12 @@ ${duration}
 
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
-    type TextAndValues = string & { brand?: "TextAndValues" };
-    type IdentifiersJSON = string & { brand?: "IdentifiersJSON" };
-    type CacheForQuery = Map<IdentifiersJSON, PromiseWithResolvers<any[]>>;
     for (const [batchContext, batch] of batches) {
       const context = batchContext as typeof batchContext &
         Record<symbol, LRU<TextAndValues, CacheForQuery> | undefined>;
       promises.push(
         (async () => {
-          const cacheForContext = cacheFor(
-            this.$$cache,
-            useCache,
-            store,
-            context,
-          );
-
+          const cacheForContext = this.cacheFor(useCache, store, context);
           const textAndValues = `${common.text}\n${JSON.stringify(rawSqlValues)}`;
           let cacheForQuery = cacheForContext.get(textAndValues);
           if (!cacheForQuery) {
@@ -1274,40 +1274,42 @@ ${duration}
 
     return result;
   }
+
+  cacheFor(
+    useCache: boolean,
+    store: object | undefined,
+    context: {
+      [key in symbol]?: LRU<TextAndValues, CacheForQuery> | undefined;
+    },
+  ) {
+    if (!useCache) {
+      return newCache();
+    } else if (store != null) {
+      let cacheForStore = this._cache.get(store);
+      if (!cacheForStore) {
+        cacheForStore = new WeakMap();
+        this._cache.set(store, cacheForStore);
+      }
+      let cacheForContext = cacheForStore.get(context);
+      if (!cacheForContext) {
+        cacheForContext = newCache();
+        cacheForStore.set(context, cacheForContext);
+      }
+      return cacheForContext;
+    } else {
+      let cacheForContext = context[this.$$cache];
+      if (cacheForContext === undefined) {
+        cacheForContext = newCache();
+        context[this.$$cache] = cacheForContext;
+      }
+      return cacheForContext;
+    }
+  }
 }
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");
 
 function newCache() {
-  return new LRU({ maxLength: 500 /* SQL queries */ });
-}
-
-const CACHE = new WeakMap<object, WeakMap<object, LRU>>();
-function cacheFor(
-  $$cache: symbol,
-  useCache: boolean,
-  store: object | undefined,
-  context: { [$$cache]?: LRU },
-) {
-  if (!useCache) {
-    return newCache();
-  } else if (store != null) {
-    let cacheForStore = CACHE.get(store);
-    if (!cacheForStore) {
-      cacheForStore = new WeakMap();
-      CACHE.set(store, cacheForStore);
-    }
-    let cacheForContext = cacheForStore.get(context);
-    if (!cacheForContext) {
-      cacheForContext = newCache();
-      cacheForStore.set(context, cacheForContext);
-    }
-    return cacheForContext;
-  } else {
-    let cacheForContext = context[$$cache];
-    if (cacheForContext === undefined) {
-      cacheForContext = newCache();
-      context[$$cache] = cacheForContext;
-    }
-    return cacheForContext;
-  }
+  return new LRU<TextAndValues, CacheForQuery>({
+    maxLength: 500 /* SQL queries */,
+  });
 }

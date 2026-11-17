@@ -580,6 +580,7 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
+    this.metaKey = "PgUnionAll";
     {
       this.mode = spec.mode ?? "normal";
 
