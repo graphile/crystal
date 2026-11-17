@@ -977,7 +977,7 @@ on (${sql.indent(
     const {
       indexMap,
       values,
-      extra: { eventEmitter },
+      extra: { eventEmitter, meta: store },
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {
@@ -1050,6 +1050,7 @@ on (${sql.indent(
       ? "executeWithoutCache"
       : "executeWithCache";
     const executionResult = await this.executor[executeMethod](specs, {
+      store,
       text,
       rawSqlValues,
       identifierIndex,

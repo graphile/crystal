@@ -164,6 +164,7 @@ export type PgExecutorInput<TInput> = {
 };
 
 export type PgExecutorOptions = {
+  store?: object;
   text: string;
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
@@ -681,7 +682,7 @@ ${duration}
   ): Promise<{
     values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
-    const { rawSqlValues, identifierIndex, eventEmitter } = common;
+    const { rawSqlValues, identifierIndex, eventEmitter, store } = common;
 
     const publishExecute: PublishFunction | undefined = eventEmitter
       ? (text, name, explain) => {
@@ -744,13 +745,12 @@ ${duration}
         Record<symbol, LRU<TextAndValues, CacheForQuery> | undefined>;
       promises.push(
         (async () => {
-          let cacheForContext = useCache ? context[this.$$cache] : undefined;
-          if (cacheForContext === undefined) {
-            cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
-            if (useCache) {
-              context[this.$$cache] = cacheForContext;
-            }
-          }
+          const cacheForContext = cacheFor(
+            this.$$cache,
+            useCache,
+            store,
+            context,
+          );
 
           const textAndValues = `${common.text}\n${JSON.stringify(rawSqlValues)}`;
           let cacheForQuery = cacheForContext.get(textAndValues);
@@ -1276,3 +1276,38 @@ ${duration}
   }
 }
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");
+
+function newCache() {
+  return new LRU({ maxLength: 500 /* SQL queries */ });
+}
+
+const CACHE = new WeakMap<object, WeakMap<object, LRU>>();
+function cacheFor(
+  $$cache: symbol,
+  useCache: boolean,
+  store: object | undefined,
+  context: { [$$cache]?: LRU },
+) {
+  if (!useCache) {
+    return newCache();
+  } else if (store != null) {
+    let cacheForStore = CACHE.get(store);
+    if (!cacheForStore) {
+      cacheForStore = new WeakMap();
+      CACHE.set(store, cacheForStore);
+    }
+    let cacheForContext = cacheForStore.get(context);
+    if (!cacheForContext) {
+      cacheForContext = newCache();
+      cacheForStore.set(context, cacheForContext);
+    }
+    return cacheForContext;
+  } else {
+    let cacheForContext = context[$$cache];
+    if (cacheForContext === undefined) {
+      cacheForContext = newCache();
+      context[$$cache] = cacheForContext;
+    }
+    return cacheForContext;
+  }
+}

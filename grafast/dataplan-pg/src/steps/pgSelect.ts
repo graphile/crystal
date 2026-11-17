@@ -1189,7 +1189,7 @@ export class PgSelectStep<
       indexMap,
       count,
       values,
-      extra: { eventEmitter },
+      extra: { eventEmitter, meta: store },
     } = executionDetails;
     const {
       meta,
@@ -1315,6 +1315,7 @@ export class PgSelectStep<
       const executionResult =
         specs.length > 0
           ? await this.resource[executeMethod](specs, {
+              store,
               text,
               rawSqlValues,
               identifierIndex,
@@ -1374,6 +1375,7 @@ export class PgSelectStep<
       const initialFetchResult = specs
         ? (
             await this.resource.executeWithoutCache(specs, {
+              store,
               text,
               rawSqlValues,
               identifierIndex,
