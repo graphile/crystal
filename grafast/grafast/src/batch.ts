@@ -1,11 +1,7 @@
 import type { GraphQLSchema } from "graphql";
 
 import { isDev, noop } from "./dev.ts";
-import type {
-  BatchExecutor,
-  BatchKeysetEquality,
-  PromiseOrDirect,
-} from "./interfaces.ts";
+import type { BatchExecutor, PromiseOrDirect } from "./interfaces.ts";
 import { recordsMatch } from "./utils.ts";
 
 /** Define once at module scope, or during schema construction. */
@@ -71,7 +67,8 @@ type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
     }
   >;
   queued?: PendingBatch<TKeyset, TResult>;
-  keyIndex?: KeysetTrieNode<TKeyset>;
+  tupleKeyIndex?: KeysetTrieNode<TKeyset>;
+  objectKeyIndexes?: Map<string, KeysetTrieNode<TKeyset>>;
 };
 
 type BatchMeta = Record<PropertyKey, unknown> & {
@@ -89,48 +86,49 @@ type KeysetTrieNode<TKeyset> = {
   keyset: TKeyset | undefined;
 };
 
-// Composite keys share the first keyset whose parts match. Strict keys can use
-// the cache Map directly, as in the original loader implementation.
-function canonicalizeKeyset<TOptions extends BatchOptions, TKeyset, TResult>(
-  family: BatchFamily<TOptions, TKeyset, TResult>,
+function canonicalizeTuple<TKeyset>(
+  node: KeysetTrieNode<TKeyset>,
   keyset: TKeyset,
-  mode: BatchKeysetEquality,
 ): TKeyset {
-  let node: KeysetTrieNode<TKeyset> = (family.keyIndex ??= {
-    children: new Map(),
-    keyset: undefined,
-  });
-  for (const part of keyParts(keyset, mode)) {
-    let child = node.children.get(part);
+  if (!Array.isArray(keyset)) {
+    throw new Error("batch(..., 'tuple') requires array keysets");
+  }
+  for (const value of keyset) {
+    let child = node.children.get(value);
     if (child == null) {
       child = { children: new Map(), keyset: undefined };
-      node.children.set(part, child);
+      node.children.set(value, child);
     }
     node = child;
   }
-  // Composite keysets are arrays or objects, so undefined means unset.
   return (node.keyset ??= keyset);
 }
 
-function keyParts(
-  keyset: unknown,
-  mode: BatchKeysetEquality,
-): readonly unknown[] {
-  if (mode === "strict") {
-    return [keyset];
-  }
-  if (mode === "tuple") {
-    if (!Array.isArray(keyset)) {
-      throw new Error("batch(..., 'tuple') requires array keysets");
-    }
-    return keyset;
-  }
+function canonicalizeObject<TKeyset>(
+  indexes: Map<string, KeysetTrieNode<TKeyset>>,
+  keyset: TKeyset,
+): TKeyset {
   if (typeof keyset !== "object" || keyset === null || Array.isArray(keyset)) {
     throw new Error("batch(..., 'object') requires object keysets");
   }
-  return Object.keys(keyset)
-    .sort()
-    .flatMap((key) => [key, (keyset as Record<string, unknown>)[key]]);
+  const record = keyset as Record<string, unknown>;
+  const keys = Object.keys(record).sort();
+  const shape = JSON.stringify(keys);
+  let node = indexes.get(shape);
+  if (node == null) {
+    node = { children: new Map(), keyset: undefined };
+    indexes.set(shape, node);
+  }
+  for (const key of keys) {
+    const value = record[key];
+    let child: KeysetTrieNode<TKeyset> | undefined = node.children.get(value);
+    if (child == null) {
+      child = { children: new Map(), keyset: undefined };
+      node.children.set(value, child);
+    }
+    node = child;
+  }
+  return (node.keyset ??= keyset);
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -222,12 +220,21 @@ export function batchInMeta<
 
   // Validate composite keys before queuing any work. A malformed later key
   // must not leave an earlier key's batch running without a caller.
-  const canonicalKeysets: readonly TKeyset[] =
-    keysetEquality === "strict"
-      ? keysets
-      : keysets.map((keyset) =>
-          canonicalizeKeyset(family, keyset, keysetEquality),
-        );
+  let canonicalKeysets = keysets;
+  if (keysetEquality === "tuple") {
+    const index = (family.tupleKeyIndex ??= {
+      children: new Map(),
+      keyset: undefined,
+    });
+    canonicalKeysets = keysets.map((keyset) =>
+      canonicalizeTuple(index, keyset),
+    );
+  } else if (keysetEquality === "object") {
+    const indexes = (family.objectKeyIndexes ??= new Map());
+    canonicalKeysets = keysets.map((keyset) =>
+      canonicalizeObject(indexes, keyset),
+    );
+  }
   const { cache, pending } = family;
   const batch = new Map<PendingBatch<TKeyset, TResult>, number[]>();
   const results: TResult[] = [];

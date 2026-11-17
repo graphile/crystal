@@ -807,3 +807,47 @@ for (const mode of ["tuple", "object"] as const) {
     expect(attempts).to.equal(2);
   });
 }
+
+it("keeps record shapes separate even when their value paths match", async () => {
+  const received: Array<readonly Record<string, unknown>[]> = [];
+  const executor = defineBatchExecutor({
+    name: "record-shapes",
+    keysetEquality: "object",
+    callback: (
+      _options: undefined,
+      keys: readonly Record<string, unknown>[],
+    ) => {
+      received.push(keys);
+      return keys;
+    },
+  });
+  const meta = {};
+  const first = { a: 1, b: 2 };
+  const reordered = { b: 2, a: 1 };
+  const otherNames = { c: 1, d: 2 };
+  const specialName = { 'a","b': 1 };
+  const empty = {};
+  const undefinedValue = { a: undefined };
+  const originals = [first, otherNames, specialName, empty, undefinedValue];
+  const results = await batchInMeta(schema, meta, executor, [
+    first,
+    reordered,
+    otherNames,
+    specialName,
+    empty,
+    undefinedValue,
+  ]);
+  expect(received).to.deep.equal([originals]);
+  expect(results[0]).to.equal(first);
+  expect(results[1]).to.equal(first);
+  const cached = batchInMeta(schema, meta, executor, [
+    reordered,
+    { c: 1, d: 2 },
+    { 'a","b': 1 },
+    {},
+    { a: undefined },
+  ]);
+  expect(Array.isArray(cached)).to.equal(true);
+  expect(cached).to.deep.equal(originals);
+  expect(received).to.have.length(1);
+});
