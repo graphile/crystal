@@ -160,7 +160,7 @@ This can combine work across branches of an operation as well as within a
 single step execution.
 
 ```ts
-details.batch(callback, unaryDependencies, keysets, keysetEquality?)
+details.batch({ callback, unaryDependencies, keysets, keysetEquality });
 ```
 
 The callback receives the unary dependencies and the unique keysets, and must
@@ -203,7 +203,11 @@ class UserStep extends Step {
   execute(details: ExecutionDetails) {
     const idEv = details.values[this.idDepIndex];
     const ids = details.indexMap((i) => idEv.at(i) as string);
-    return details.batch(fetchUsers, [userService] as const, ids);
+    return details.batch({
+      callback: fetchUsers,
+      unaryDependencies: [userService] as const,
+      keysets: ids,
+    });
   }
 }
 ```

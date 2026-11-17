@@ -739,12 +739,12 @@ export type BatchFunction = <
   TUnaryDependencies extends readonly unknown[],
   TKeyset,
   TResult,
->(
-  callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>,
-  unaryDependencies: TUnaryDependencies,
-  keysets: ReadonlyArray<TKeyset>,
-  keysetEquality?: BatchKeysetEquality,
-) => Promise<ReadonlyArray<TResult>>;
+>(options: {
+  callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>;
+  unaryDependencies: TUnaryDependencies;
+  keysets: ReadonlyArray<TKeyset>;
+  keysetEquality?: BatchKeysetEquality;
+}) => Promise<ReadonlyArray<TResult>>;
 
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;

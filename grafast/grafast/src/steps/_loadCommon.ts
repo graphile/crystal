@@ -176,11 +176,11 @@ export function executeLoad<
       shared,
       ...parameterNames.map((key) => params[key]),
     ];
-    const loadResults = details.batch(
-      executeLoadBatch,
+    const loadResults = details.batch({
+      callback: executeLoadBatch,
       unaryDependencies,
-      batchSpecs,
-    );
+      keysets: batchSpecs,
+    });
     return (async () => {
       const loaded = await loadResults;
       for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {

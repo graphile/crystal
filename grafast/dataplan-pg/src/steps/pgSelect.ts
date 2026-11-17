@@ -1328,9 +1328,9 @@ export class PgSelectStep<
           : isMutation
             ? await this.resource.executeWithoutCache(specs, common)
             : {
-                values: await executionDetails.batch(
-                  executePgStepBatch,
-                  [
+                values: await executionDetails.batch({
+                  callback: executePgStepBatch,
+                  unaryDependencies: [
                     getPgStepBatchInfo(
                       store!,
                       this.resource.executor,
@@ -1338,9 +1338,9 @@ export class PgSelectStep<
                       common,
                     ),
                   ],
-                  specs.map(({ queryValues }) => queryValues),
-                  "tuple",
-                ),
+                  keysets: specs.map(({ queryValues }) => queryValues),
+                  keysetEquality: "tuple",
+                }),
               };
       // debugExecute("%s; result: %c", this, executionResult);
 
