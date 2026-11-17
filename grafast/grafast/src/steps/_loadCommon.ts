@@ -109,9 +109,9 @@ const loadBatchExecutor = defineBatchExecutor({
   callback: executeLoadBatch,
   optionsMatch: (left, right) =>
     left.load === right.load &&
+    left.shared === right.shared &&
     arraysMatch(left.attributes, right.attributes) &&
     arraysMatch(left.parameterNames, right.parameterNames) &&
-    left.shared === right.shared &&
     recordsMatch(left.params, right.params),
 });
 

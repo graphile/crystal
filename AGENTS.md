@@ -105,6 +105,9 @@ into 4 main categories based on the root folders, each of which have a
   verbs.
 - Always use a block body for `if`, `for`, and `while` statements.
 - Do not reassign function parameters; use a local variable instead.
+- This codebase is very performance sensitive. Always perform cheaper
+  comparisons before more expensive comparisons unless there is a strong reason
+  not to.
 - Prefer explicit checks over implicit boolean coercion: use `foo.length > 0`
   rather than `foo.length`, and use `foo == null` to check for non-existence
   rather than `!foo`.
