@@ -1189,7 +1189,9 @@ function addRelations(
                 const resource = path.layers[i - 1].resource;
                 const { localAttributes, remoteAttributes } = layer;
                 const ref_resource = te.ref(resource, resource.name);
-                const layerAlias = te.identifier(resource.name + "Alias");
+                const layerAlias = te.identifier(
+                  idents.makeSafeIdentifier(resource.name + "Alias"),
+                );
                 functionLines.push(
                   te`  const ${layerAlias} = ${ref_sql}.identifier(Symbol(${te.lit(
                     resource.name,
