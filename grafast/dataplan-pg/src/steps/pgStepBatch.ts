@@ -7,7 +7,7 @@ import type {
   PgExecutorOptions,
 } from "../executor.ts";
 
-type PgStepBatchDependencies = readonly [
+type PgStepBatchOptions = readonly [
   executor: PgExecutor,
   context: PgExecutorContext,
   store: PgExecutorOptions["store"],
@@ -20,11 +20,11 @@ type PgStepBatchDependencies = readonly [
   ...rawSqlValues: PgExecutorOptions["rawSqlValues"],
 ];
 
-function getUnaryDependencies(
+function getOptions(
   executor: PgExecutor,
   context: PgExecutorContext,
   options: PgExecutorOptions,
-): PgStepBatchDependencies {
+): PgStepBatchOptions {
   return [
     executor,
     context,
@@ -40,7 +40,7 @@ function getUnaryDependencies(
 }
 
 export const pgStepBatchExecutor = Object.freeze({
-  getUnaryDependencies,
+  getOptions,
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
   callback: async (
@@ -76,7 +76,7 @@ export const pgStepBatchExecutor = Object.freeze({
     ).values;
   },
 } satisfies BatchExecutor<
-  PgStepBatchDependencies,
+  PgStepBatchOptions,
   readonly unknown[],
   ReadonlyArray<any>
-> & { getUnaryDependencies: typeof getUnaryDependencies });
+> & { getOptions: typeof getOptions });

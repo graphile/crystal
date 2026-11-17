@@ -1328,15 +1328,15 @@ export class PgSelectStep<
           : isMutation
             ? await this.resource.executeWithoutCache(specs, common)
             : {
-                values: await executionDetails.batch({
-                  executor: pgStepBatchExecutor,
-                  unaryDependencies: pgStepBatchExecutor.getUnaryDependencies(
+                values: await executionDetails.batch(
+                  pgStepBatchExecutor,
+                  specs.map(({ queryValues }) => queryValues),
+                  pgStepBatchExecutor.getOptions(
                     this.resource.executor,
                     context,
                     common,
                   ),
-                  keysets: specs.map(({ queryValues }) => queryValues),
-                }),
+                ),
               };
       // debugExecute("%s; result: %c", this, executionResult);
 

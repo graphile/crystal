@@ -1062,15 +1062,11 @@ on (${sql.indent(
     const executionResult = this.hasSideEffects
       ? await this.executor.executeWithoutCache(specs, common)
       : {
-          values: await executionDetails.batch({
-            executor: pgStepBatchExecutor,
-            unaryDependencies: pgStepBatchExecutor.getUnaryDependencies(
-              this.executor,
-              context,
-              common,
-            ),
-            keysets: specs.map(({ queryValues }) => queryValues),
-          }),
+          values: await executionDetails.batch(
+            pgStepBatchExecutor,
+            specs.map(({ queryValues }) => queryValues),
+            pgStepBatchExecutor.getOptions(this.executor, context, common),
+          ),
         };
     // debugExecute("%s; result: %c", this, executionResult);
 

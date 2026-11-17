@@ -6,17 +6,15 @@ import type {
   BatchExecutor,
   BatchKeysetEquality,
 } from "./interfaces.ts";
+import { arraysMatch, recordsMatch } from "./utils.ts";
 
 /** Define once at module scope, or during schema construction. */
-export function defineBatchExecutor<
-  TUnaryDependencies extends readonly unknown[],
-  TKeyset,
-  TResult,
->(options: {
+export function defineBatchExecutor<TOptions, TKeyset, TResult>(options: {
   name: string;
-  callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>;
+  callback: BatchCallback<TOptions, TKeyset, TResult>;
   keysetEquality?: BatchKeysetEquality;
-}): BatchExecutor<TUnaryDependencies, TKeyset, TResult> {
+  optionsMatch?: (left: TOptions, right: TOptions) => boolean;
+}): BatchExecutor<TOptions, TKeyset, TResult> {
   return Object.freeze({
     ...options,
     keysetEquality: options.keysetEquality ?? "strict",
@@ -63,7 +61,7 @@ type PendingCall = {
 
 type BatchFamily = {
   executor: BatchExecutor<any, any, any>;
-  unaryDependencies: readonly unknown[];
+  options: unknown;
   keysetEquality: BatchKeysetEquality;
   calls: PendingCall[];
 };
@@ -97,33 +95,44 @@ function keyParts(
     .flatMap((key) => [key, (keyset as Record<string, unknown>)[key]]);
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function defaultOptionsMatch(left: unknown, right: unknown): boolean {
+  if (left === right) {
+    return true;
+  } else if (Array.isArray(left) && Array.isArray(right)) {
+    return arraysMatch(left, right);
+  } else if (isPlainObject(left) && isPlainObject(right)) {
+    return recordsMatch(left, right);
+  } else {
+    return false;
+  }
+}
+
 function familyMatches(
   family: BatchFamily,
   executor: BatchExecutor<any, any, any>,
-  unaryDependencies: readonly unknown[],
-  keysetEquality: BatchKeysetEquality,
+  options: unknown,
 ): boolean {
   return (
     family.executor === executor &&
-    family.keysetEquality === keysetEquality &&
-    family.unaryDependencies.length === unaryDependencies.length &&
-    family.unaryDependencies.every(
-      (dependency, index) => dependency === unaryDependencies[index],
-    )
+    (executor.optionsMatch ?? defaultOptionsMatch)(family.options, options)
   );
 }
 
 /** @internal Used to implement `ExecutionDetails.batch`. */
-export function batchInMeta<
-  TUnaryDependencies extends readonly unknown[],
-  TKeyset,
-  TResult,
->(
+export function batchInMeta<TOptions, TKeyset, TResult>(
   schema: GraphQLSchema,
   meta: Record<PropertyKey, unknown>,
-  executor: BatchExecutor<TUnaryDependencies, TKeyset, TResult>,
-  unaryDependencies: TUnaryDependencies,
+  executor: BatchExecutor<TOptions, TKeyset, TResult>,
   keysets: readonly TKeyset[],
+  options?: TOptions,
 ): Promise<ReadonlyArray<TResult>> {
   checkExecutor(schema, executor);
   const { keysetEquality } = executor;
@@ -144,14 +153,14 @@ export function batchInMeta<
       reject,
     };
     const family = families.find((candidate) =>
-      familyMatches(candidate, executor, unaryDependencies, keysetEquality),
+      familyMatches(candidate, executor, options),
     );
     if (family != null) {
       family.calls.push(call);
     } else {
       const newFamily: BatchFamily = {
         executor,
-        unaryDependencies,
+        options,
         keysetEquality,
         calls: [call],
       };
@@ -195,7 +204,7 @@ async function executeFamily(family: BatchFamily): Promise<void> {
     }
 
     const results = await family.executor.callback(
-      family.unaryDependencies,
+      family.options,
       uniqueKeysets,
     );
     if (results.length !== uniqueKeysets.length) {

@@ -17,7 +17,10 @@ function makeSchema() {
 const schema = makeSchema();
 const executors = new Map<
   typeof echoBatch,
-  Map<string, ReturnType<typeof defineBatchExecutor>>
+  Map<
+    string,
+    ReturnType<typeof defineBatchExecutor<readonly unknown[], unknown, unknown>>
+  >
 >();
 
 // Retain the existing test matrix with stable executors for each equality mode.
@@ -42,7 +45,7 @@ function batch(
     });
     byMode.set(keysetEquality, executor);
   }
-  return batchInMeta(schema, meta, executor, unaryDependencies, keysets);
+  return batchInMeta(schema, meta, executor, keysets, unaryDependencies);
 }
 
 let callbackCount = 0;
@@ -115,7 +118,7 @@ it("compares object keysets without depending on key order", async () => {
   expect(second).to.deep.equal([{ organizationId: null, personId: 1 }]);
 });
 
-it("matches callback and unary dependencies by identity", async () => {
+it("matches executors by identity and array options shallowly", async () => {
   callbackCount = 0;
   const meta = {};
   const firstKeyset = { id: 1 };
@@ -145,9 +148,9 @@ it("accepts a stable executor and isolates registrations by schema", async () =>
     name: "echo",
     callback: alternateEchoBatch,
   });
-  expect(await batchInMeta(firstSchema, {}, first, [], [1])).to.deep.equal([1]);
-  expect(await batchInMeta(firstSchema, {}, first, [], [2])).to.deep.equal([2]);
-  expect(await batchInMeta(makeSchema(), {}, second, [], [3])).to.deep.equal([
+  expect(await batchInMeta(firstSchema, {}, first, [1], [])).to.deep.equal([1]);
+  expect(await batchInMeta(firstSchema, {}, first, [2], [])).to.deep.equal([2]);
+  expect(await batchInMeta(makeSchema(), {}, second, [3], [])).to.deep.equal([
     3,
   ]);
 });
@@ -201,8 +204,8 @@ if (!isDev) {
     console.warn = () => {};
     try {
       const results = await Promise.all([
-        batchInMeta(schema, meta, first, [], [1]),
-        batchInMeta(schema, meta, second, [], [1]),
+        batchInMeta(schema, meta, first, [1], []),
+        batchInMeta(schema, meta, second, [1], []),
       ]);
       expect(results).to.deep.equal([[1], ["other"]]);
     } finally {
@@ -210,3 +213,103 @@ if (!isDev) {
     }
   });
 }
+
+it("matches POJO options shallowly and ignores property order", async () => {
+  let calls = 0;
+  const schema = makeSchema();
+  const meta = {};
+  const nested = { id: 1 };
+  const executor = defineBatchExecutor({
+    name: "records",
+    callback: (
+      _options: { prefix: string; nested: object },
+      keys: readonly number[],
+    ) => {
+      calls++;
+      return keys;
+    },
+  });
+  const results = await Promise.all([
+    batchInMeta(schema, meta, executor, [1], { prefix: "x", nested }),
+    batchInMeta(schema, meta, executor, [2], { nested, prefix: "x" }),
+    batchInMeta(schema, meta, executor, [3], {
+      prefix: "x",
+      nested: { id: 1 },
+    }),
+    batchInMeta(schema, meta, executor, [4], { prefix: "y", nested }),
+  ]);
+  expect(calls).to.equal(3);
+  expect(results).to.deep.equal([[1], [2], [3], [4]]);
+});
+
+it("supports omitted, primitive and null options", async () => {
+  let calls = 0;
+  const schema = makeSchema();
+  const meta = {};
+  const executor = defineBatchExecutor({
+    name: "primitives",
+    callback: (options: string | null | undefined, keys: readonly number[]) => {
+      calls++;
+      return keys.map((key) => `${options}:${key}`);
+    },
+  });
+  const results = await Promise.all([
+    batchInMeta(schema, meta, executor, [1]),
+    batchInMeta(schema, meta, executor, [2], undefined),
+    batchInMeta(schema, meta, executor, [3], null),
+    batchInMeta(schema, meta, executor, [4], "x"),
+    batchInMeta(schema, meta, executor, [5], "x"),
+  ]);
+  expect(calls).to.equal(3);
+  expect(results).to.deep.equal([
+    ["undefined:1"],
+    ["undefined:2"],
+    ["null:3"],
+    ["x:4"],
+    ["x:5"],
+  ]);
+});
+
+it("does not shallowly equate class instances or different option shapes", async () => {
+  let calls = 0;
+  const schema = makeSchema();
+  const meta = {};
+  const executor = defineBatchExecutor({
+    name: "instances",
+    callback: (_options: unknown, keys: readonly number[]) => {
+      calls++;
+      return keys;
+    },
+  });
+  const date = new Date(0);
+  await Promise.all([
+    batchInMeta(schema, meta, executor, [1], date),
+    batchInMeta(schema, meta, executor, [2], date),
+    batchInMeta(schema, meta, executor, [3], new Date(0)),
+    batchInMeta(schema, meta, executor, [4], []),
+    batchInMeta(schema, meta, executor, [5], {}),
+  ]);
+  expect(calls).to.equal(4);
+});
+
+it("allows optionsMatch to override identity for arbitrary options", async () => {
+  let calls = 0;
+  const schema = makeSchema();
+  const meta = {};
+  const executor = defineBatchExecutor({
+    name: "custom",
+    optionsMatch: (left: Date, right: Date) =>
+      left.getTime() === right.getTime(),
+    callback: (options: Date, keys: readonly number[]) => {
+      calls++;
+      return keys.map((key) => options.getTime() + key);
+    },
+  });
+  const results = await Promise.all([
+    batchInMeta(schema, meta, executor, [1], new Date(100)),
+    batchInMeta(schema, meta, executor, [2], new Date(100)),
+    batchInMeta(schema, meta, executor, [3], new Date(200)),
+  ]);
+  expect(calls).to.equal(2);
+  expect(results).to.deep.equal([[101], [102], [203]]);
+});

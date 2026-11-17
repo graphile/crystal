@@ -93,10 +93,10 @@ interface LoadMeta {
 type LoadCallback = (...args: any[]) => any;
 
 function executeLoadBatch(
-  unaryDependencies: readonly unknown[],
+  options: readonly unknown[],
   specs: readonly unknown[],
 ): PromiseOrDirect<ReadonlyArray<any>> {
-  const [load, signature, shared, ...parameterValues] = unaryDependencies;
+  const [load, signature, shared, ...parameterValues] = options;
   const [attributes, parameterNames] = JSON.parse(signature as string) as [
     readonly string[],
     readonly string[],
@@ -176,17 +176,13 @@ export function executeLoad<
       baseLoadInfo.attributes,
       parameterNames,
     ]);
-    const unaryDependencies = [
+    const options = [
       load,
       loadInfoSignature,
       shared,
       ...parameterNames.map((key) => params[key]),
     ];
-    const loadResults = details.batch({
-      executor: loadBatchExecutor,
-      unaryDependencies,
-      keysets: batchSpecs,
-    });
+    const loadResults = details.batch(loadBatchExecutor, batchSpecs, options);
     return (async () => {
       const loaded = await loadResults;
       for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {

@@ -160,20 +160,23 @@ This can combine work across branches of an operation as well as within a
 single step execution.
 
 ```ts
-details.batch({ executor, unaryDependencies, keysets });
+details.batch(executor, keysets, options);
 ```
 
-The callback receives the unary dependencies and the unique keysets, and must
+The callback receives the options and the unique keysets, and must
 return one result for each keyset in the same order. It can return an array or a
 promise of an array. `details.batch` returns a promise; if the callback throws
 or rejects, each caller in that batch receives the error. An empty keyset list
 returns an empty result without calling the callback.
 
 To combine calls, set the same [`metaKey`](#metakey) on the steps and use the
-same executor object and unary dependency values. Unary dependencies are
-compared with `===`, so objects must have the same identity.
+same executor object and matching options. By default, arrays are compared
+shallowly with `arraysMatch` and plain objects with `recordsMatch`. Nested values
+are compared with `===`; other option values are compared with `===` directly.
+`recordsMatch` compares enumerable string keys and treats missing properties
+and properties set to `undefined` as equivalent.
 Define the executor outside `execute` and pass all values that affect its work
-through the unary dependencies. Without a shared `metaKey`, calls from separate
+through the options. Without a shared `metaKey`, calls from separate
 step executions do not share a batch.
 
 For example, given a service whose `getUsers` method returns one result per ID:
@@ -185,7 +188,7 @@ import { userService } from "./services/users";
 const userBatchMetaKey = Symbol("user batches");
 
 function fetchUsers(
-  [service]: readonly [typeof userService],
+  { service }: { service: typeof userService },
   ids: readonly string[],
 ) {
   return service.getUsers(ids);
@@ -208,14 +211,16 @@ class UserStep extends Step {
   execute(details: ExecutionDetails) {
     const idEv = details.values[this.idDepIndex];
     const ids = details.indexMap((i) => idEv.at(i) as string);
-    return details.batch({
-      executor: usersBatch,
-      unaryDependencies: [userService] as const,
-      keysets: ids,
-    });
+    return details.batch(usersBatch, ids, { service: userService });
   }
 }
 ```
+
+Options can be any value. Supply an `optionsMatch(left, right)` callback to
+`defineBatchExecutor` to override the default comparison, for example to compare
+class instances or selected option fields. It must only match options for which
+the callback produces equivalent results. A combined batch uses the first
+caller's options. Omit the third argument when the executor accepts `undefined`.
 
 Executor names must identify the same executor object within each schema.
 Gra*fast* checks this when `details.batch` is called: conflicting definitions

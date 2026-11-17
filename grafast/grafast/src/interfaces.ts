@@ -727,33 +727,25 @@ export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
 
 export type BatchKeysetEquality = "strict" | "tuple" | "object";
-export type BatchCallback<
-  TUnaryDependencies extends readonly unknown[],
-  TKeyset,
-  TResult,
-> = (
-  unaryDependencies: TUnaryDependencies,
+export type BatchCallback<TOptions, TKeyset, TResult> = (
+  options: TOptions,
   keysets: ReadonlyArray<TKeyset>,
 ) => PromiseOrDirect<ReadonlyArray<TResult>>;
 /** A stable, named batch executor. Define once, outside step execution. */
-export interface BatchExecutor<
-  TUnaryDependencies extends readonly unknown[],
-  TKeyset,
-  TResult,
-> {
+export interface BatchExecutor<TOptions, TKeyset, TResult> {
   readonly name: string;
-  readonly callback: BatchCallback<TUnaryDependencies, TKeyset, TResult>;
+  readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
   readonly keysetEquality: BatchKeysetEquality;
+  /** Overrides the default shallow comparison of batch options. */
+  readonly optionsMatch?: (left: TOptions, right: TOptions) => boolean;
 }
-export type BatchFunction = <
-  TUnaryDependencies extends readonly unknown[],
-  TKeyset,
-  TResult,
->(options: {
-  executor: BatchExecutor<TUnaryDependencies, TKeyset, TResult>;
-  unaryDependencies: TUnaryDependencies;
-  keysets: ReadonlyArray<TKeyset>;
-}) => Promise<ReadonlyArray<TResult>>;
+export type BatchFunction = <TOptions, TKeyset, TResult>(
+  executor: BatchExecutor<TOptions, TKeyset, TResult>,
+  keysets: ReadonlyArray<TKeyset>,
+  ...options: undefined extends TOptions
+    ? [options?: NoInfer<TOptions>]
+    : [options: NoInfer<TOptions>]
+) => Promise<ReadonlyArray<TResult>>;
 
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;
@@ -782,7 +774,7 @@ export interface ExecutionDetails<
   /**
    * Batches equivalent keysets submitted during the current runloop tick.
    * Define executors outside step execution; pass all varying values in
-   * `unaryDependencies`.
+   * `options`.
    */
   batch: BatchFunction;
 

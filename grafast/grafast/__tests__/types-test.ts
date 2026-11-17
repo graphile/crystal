@@ -3,13 +3,20 @@ import { assert } from "tsafe";
 
 import type {
   __ValueStep,
+  BatchFunction,
   ConstantStep,
   DataFromObjectSteps,
   FieldPlanResolver,
   ListStep,
   Step,
 } from "../dist/index.js";
-import { access, constant, get, loadOne } from "../dist/index.js";
+import {
+  access,
+  constant,
+  defineBatchExecutor,
+  get,
+  loadOne,
+} from "../dist/index.js";
 
 type Expected = {
   test: number[];
@@ -44,4 +51,29 @@ const _myPlan: FieldPlanResolver = () => {
   const _$nullableA3 = access($nullableRecord, "a");
   assert<Equals<StepValue<typeof _$nullableA3>, number | undefined>>();
   return constant(null);
+};
+
+const _batchTypes = (batch: BatchFunction) => {
+  const executor = defineBatchExecutor({
+    name: "type-test",
+    callback: (options: { prefix: string }, keys: readonly number[]) =>
+      keys.map((key) => options.prefix + key),
+    optionsMatch: (left, right) => left.prefix === right.prefix,
+  });
+  const _result = batch(executor, [1], { prefix: "x" });
+  assert<Equals<typeof _result, Promise<readonly string[]>>>();
+  // @ts-expect-error Options are required by this executor.
+  batch(executor, [1]);
+  // @ts-expect-error Incorrect options type.
+  batch(executor, [1], { prefix: 123 });
+  // @ts-expect-error Incorrect keyset type.
+  batch(executor, ["wrong"], { prefix: "x" });
+  const optionalExecutor = defineBatchExecutor({
+    name: "optional-type-test",
+    callback: (options: string | undefined, keys: readonly number[]) =>
+      keys.map((key) => `${options}:${key}`),
+  });
+  batch(optionalExecutor, [1]);
+  batch(optionalExecutor, [1], "x");
+  batch(optionalExecutor, [1], undefined);
 };
