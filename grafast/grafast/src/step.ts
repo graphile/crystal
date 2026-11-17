@@ -281,7 +281,7 @@ export /* abstract */ class Step<TData = any> {
   public peerKey: string | null = null;
 
   /** Backing field for `hasSideEffects`. */
-  private _hasSideEffects;
+  private _hasSideEffects: boolean;
 
   /**
    * Set this to `true` if this step might return an iterable or async iterable
