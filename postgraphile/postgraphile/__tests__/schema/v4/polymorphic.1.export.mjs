@@ -17582,45 +17582,25 @@ export const objects = {
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
         let previousAlias = $people.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $people.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("person_id")} = ${i_relational_itemsAlias}.${sql.identifier("author_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $people.where(sql`${previousAlias}.${sql.identifier("id")} = ${$people.placeholder($record.get("checklist_item_id"))}`);
+        $people.where(sql`${previousAlias}.${sql.identifier("person_id")} = ${$people.placeholder(i_$relational_items.get("author_id"))}`);
         return $people.single();
       },
       relationalItemByParentId($record) {
         const $relational_items = otherSource_relational_itemsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
         let previousAlias = $relational_items.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_items.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${i_relational_itemsAlias}.${sql.identifier("parent_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("checklist_item_id"))}`);
+        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder(i_$relational_items.get("parent_id"))}`);
         return $relational_items.single();
       },
       relationalItemRelationCompositePksByChildId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("checklist_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -17636,16 +17616,10 @@ export const objects = {
       relationalItemRelationCompositePksByParentId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("checklist_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -17661,16 +17635,10 @@ export const objects = {
       relationalItemRelationsByChildId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("checklist_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -17686,16 +17654,10 @@ export const objects = {
       relationalItemRelationsByParentId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("checklist_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -17711,16 +17673,10 @@ export const objects = {
       relationalItemsByParentId: {
         plan($record) {
           const $relational_items = otherSource_relational_itemsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
+          $relational_items.setInliningStrategy("forbidden");
           let previousAlias = $relational_items.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_items.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("checklist_item_id"))}`);
+          $relational_items.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_items.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_items);
         },
         args: {
@@ -17735,16 +17691,9 @@ export const objects = {
       },
       relationalTopicByRootTopicId($record) {
         const $relational_topics = spec_resource_relational_topicsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemId");
         let previousAlias = $relational_topics.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_topics.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${i_relational_itemsAlias}.${sql.identifier("root_topic_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("checklist_item_id"))}`);
+        $relational_topics.where(sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${$relational_topics.placeholder(i_$relational_items.get("root_topic_id"))}`);
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
@@ -17772,45 +17721,25 @@ export const objects = {
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
         let previousAlias = $people.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $people.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("person_id")} = ${i_relational_itemsAlias}.${sql.identifier("author_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $people.where(sql`${previousAlias}.${sql.identifier("id")} = ${$people.placeholder($record.get("checklist_item_item_id"))}`);
+        $people.where(sql`${previousAlias}.${sql.identifier("person_id")} = ${$people.placeholder(i_$relational_items.get("author_id"))}`);
         return $people.single();
       },
       relationalItemByParentId($record) {
         const $relational_items = otherSource_relational_itemsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
         let previousAlias = $relational_items.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_items.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${i_relational_itemsAlias}.${sql.identifier("parent_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("checklist_item_item_id"))}`);
+        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder(i_$relational_items.get("parent_id"))}`);
         return $relational_items.single();
       },
       relationalItemRelationCompositePksByChildId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("checklist_item_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -17826,16 +17755,10 @@ export const objects = {
       relationalItemRelationCompositePksByParentId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("checklist_item_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -17851,16 +17774,10 @@ export const objects = {
       relationalItemRelationsByChildId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("checklist_item_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -17876,16 +17793,10 @@ export const objects = {
       relationalItemRelationsByParentId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("checklist_item_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -17901,16 +17812,10 @@ export const objects = {
       relationalItemsByParentId: {
         plan($record) {
           const $relational_items = otherSource_relational_itemsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
+          $relational_items.setInliningStrategy("forbidden");
           let previousAlias = $relational_items.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_items.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("checklist_item_item_id"))}`);
+          $relational_items.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_items.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_items);
         },
         args: {
@@ -17925,16 +17830,9 @@ export const objects = {
       },
       relationalTopicByRootTopicId($record) {
         const $relational_topics = spec_resource_relational_topicsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyChecklistItemItemId");
         let previousAlias = $relational_topics.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_topics.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${i_relational_itemsAlias}.${sql.identifier("root_topic_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("checklist_item_item_id"))}`);
+        $relational_topics.where(sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${$relational_topics.placeholder(i_$relational_items.get("root_topic_id"))}`);
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
@@ -17974,45 +17872,25 @@ export const objects = {
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
         let previousAlias = $people.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $people.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("person_id")} = ${i_relational_itemsAlias}.${sql.identifier("author_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $people.where(sql`${previousAlias}.${sql.identifier("id")} = ${$people.placeholder($record.get("divider_item_id"))}`);
+        $people.where(sql`${previousAlias}.${sql.identifier("person_id")} = ${$people.placeholder(i_$relational_items.get("author_id"))}`);
         return $people.single();
       },
       relationalItemByParentId($record) {
         const $relational_items = otherSource_relational_itemsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
         let previousAlias = $relational_items.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_items.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${i_relational_itemsAlias}.${sql.identifier("parent_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("divider_item_id"))}`);
+        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder(i_$relational_items.get("parent_id"))}`);
         return $relational_items.single();
       },
       relationalItemRelationCompositePksByChildId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("divider_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -18028,16 +17906,10 @@ export const objects = {
       relationalItemRelationCompositePksByParentId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("divider_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -18053,16 +17925,10 @@ export const objects = {
       relationalItemRelationsByChildId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("divider_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -18078,16 +17944,10 @@ export const objects = {
       relationalItemRelationsByParentId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("divider_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -18103,16 +17963,10 @@ export const objects = {
       relationalItemsByParentId: {
         plan($record) {
           const $relational_items = otherSource_relational_itemsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
+          $relational_items.setInliningStrategy("forbidden");
           let previousAlias = $relational_items.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_items.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("divider_item_id"))}`);
+          $relational_items.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_items.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_items);
         },
         args: {
@@ -18127,16 +17981,9 @@ export const objects = {
       },
       relationalTopicByRootTopicId($record) {
         const $relational_topics = spec_resource_relational_topicsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyDividerItemId");
         let previousAlias = $relational_topics.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_topics.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${i_relational_itemsAlias}.${sql.identifier("root_topic_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("divider_item_id"))}`);
+        $relational_topics.where(sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${$relational_topics.placeholder(i_$relational_items.get("root_topic_id"))}`);
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
@@ -18228,45 +18075,25 @@ export const objects = {
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
         let previousAlias = $people.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $people.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("person_id")} = ${i_relational_itemsAlias}.${sql.identifier("author_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $people.where(sql`${previousAlias}.${sql.identifier("id")} = ${$people.placeholder($record.get("post_item_id"))}`);
+        $people.where(sql`${previousAlias}.${sql.identifier("person_id")} = ${$people.placeholder(i_$relational_items.get("author_id"))}`);
         return $people.single();
       },
       relationalItemByParentId($record) {
         const $relational_items = otherSource_relational_itemsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
         let previousAlias = $relational_items.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_items.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${i_relational_itemsAlias}.${sql.identifier("parent_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("post_item_id"))}`);
+        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder(i_$relational_items.get("parent_id"))}`);
         return $relational_items.single();
       },
       relationalItemRelationCompositePksByChildId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("post_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -18282,16 +18109,10 @@ export const objects = {
       relationalItemRelationCompositePksByParentId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("post_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -18307,16 +18128,10 @@ export const objects = {
       relationalItemRelationsByChildId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("post_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -18332,16 +18147,10 @@ export const objects = {
       relationalItemRelationsByParentId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("post_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -18357,16 +18166,10 @@ export const objects = {
       relationalItemsByParentId: {
         plan($record) {
           const $relational_items = otherSource_relational_itemsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
+          $relational_items.setInliningStrategy("forbidden");
           let previousAlias = $relational_items.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_items.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("post_item_id"))}`);
+          $relational_items.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_items.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_items);
         },
         args: {
@@ -18381,16 +18184,9 @@ export const objects = {
       },
       relationalTopicByRootTopicId($record) {
         const $relational_topics = spec_resource_relational_topicsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyPostItemId");
         let previousAlias = $relational_topics.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_topics.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${i_relational_itemsAlias}.${sql.identifier("root_topic_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("post_item_id"))}`);
+        $relational_topics.where(sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${$relational_topics.placeholder(i_$relational_items.get("root_topic_id"))}`);
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
@@ -18428,45 +18224,25 @@ export const objects = {
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
         let previousAlias = $people.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $people.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("person_id")} = ${i_relational_itemsAlias}.${sql.identifier("author_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $people.where(sql`${previousAlias}.${sql.identifier("id")} = ${$people.placeholder($record.get("topic_item_id"))}`);
+        $people.where(sql`${previousAlias}.${sql.identifier("person_id")} = ${$people.placeholder(i_$relational_items.get("author_id"))}`);
         return $people.single();
       },
       relationalItemByParentId($record) {
         const $relational_items = otherSource_relational_itemsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
         let previousAlias = $relational_items.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_items.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${i_relational_itemsAlias}.${sql.identifier("parent_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("topic_item_id"))}`);
+        $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder(i_$relational_items.get("parent_id"))}`);
         return $relational_items.single();
       },
       relationalItemRelationCompositePksByChildId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("topic_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -18482,16 +18258,10 @@ export const objects = {
       relationalItemRelationCompositePksByParentId: {
         plan($record) {
           const $relational_item_relation_composite_pks = spec_resource_relational_item_relation_composite_pksPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
+          $relational_item_relation_composite_pks.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relation_composite_pks.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relation_composite_pks.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relation_composite_pks.placeholder($record.get("topic_item_id"))}`);
+          $relational_item_relation_composite_pks.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relation_composite_pks.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relation_composite_pks);
         },
         args: {
@@ -18507,16 +18277,10 @@ export const objects = {
       relationalItemRelationsByChildId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("child_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("topic_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("child_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -18532,16 +18296,10 @@ export const objects = {
       relationalItemRelationsByParentId: {
         plan($record) {
           const $relational_item_relations = spec_resource_relational_item_relationsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
+          $relational_item_relations.setInliningStrategy("forbidden");
           let previousAlias = $relational_item_relations.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_item_relations.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_item_relations.placeholder($record.get("topic_item_id"))}`);
+          $relational_item_relations.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_item_relations.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_item_relations);
         },
         args: {
@@ -18557,16 +18315,10 @@ export const objects = {
       relationalItemsByParentId: {
         plan($record) {
           const $relational_items = otherSource_relational_itemsPgResource.find();
+          const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
+          $relational_items.setInliningStrategy("forbidden");
           let previousAlias = $relational_items.alias;
-          const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-          $relational_items.join({
-            type: "inner",
-            from: otherSource_relational_itemsPgResource.from,
-            alias: i_relational_itemsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("parent_id")} = ${i_relational_itemsAlias}.${sql.identifier("id")}`]
-          });
-          previousAlias = i_relational_itemsAlias;
-          $relational_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_items.placeholder($record.get("topic_item_id"))}`);
+          $relational_items.where(sql`${previousAlias}.${sql.identifier("parent_id")} = ${$relational_items.placeholder(i_$relational_items.get("id"))}`);
           return connection($relational_items);
         },
         args: {
@@ -18598,16 +18350,9 @@ export const objects = {
       },
       relationalTopicByRootTopicId($record) {
         const $relational_topics = spec_resource_relational_topicsPgResource.find();
+        const i_$relational_items = $record.singleRelation("relationalItemsByMyTopicItemId");
         let previousAlias = $relational_topics.alias;
-        const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $relational_topics.join({
-          type: "inner",
-          from: otherSource_relational_itemsPgResource.from,
-          alias: i_relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${i_relational_itemsAlias}.${sql.identifier("root_topic_id")}`]
-        });
-        previousAlias = i_relational_itemsAlias;
-        $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("topic_item_id"))}`);
+        $relational_topics.where(sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${$relational_topics.placeholder(i_$relational_items.get("root_topic_id"))}`);
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
