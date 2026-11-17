@@ -196,10 +196,13 @@ export function batchInMeta<
     batches.set(executor, families);
   }
 
+  // Get identical family
   let family = families.get(batchOptions);
   if (family === undefined) {
+    // Identical family not found, get equivalent family
     family = findMatchingFamily(families, executor, batchOptions);
     if (family === undefined) {
+      // Create my own family
       family = {
         executor,
         options: batchOptions,
