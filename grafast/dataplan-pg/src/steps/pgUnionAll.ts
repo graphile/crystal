@@ -1032,7 +1032,7 @@ on (${sql.indent(
     }
 
     const keysets = indexMap((i) =>
-      identifierIndex != null
+      identifierIndex !== null
         ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
             const val = values[dependencyIndex].at(i);
             return val == null ? null : alreadyEncoded ? val : codec.toPg(val);

@@ -338,7 +338,7 @@ export class LoadManyStep<
     const lookup = this.getDep(0) as TLookup;
     const { load, ioEquivalence } = this;
     const shared =
-      this.sharedDepId != null
+      this.sharedDepId !== null
         ? (this.getDep(this.sharedDepId) as TShared)
         : (null as any as TShared);
     const $clone = new LoadManyStep(lookup, {

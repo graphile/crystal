@@ -1248,7 +1248,7 @@ export class PgSelectStep<
     if (streamInitialCount == null) {
       const keysets: (readonly unknown[])[] = [];
       let resultIndexes: ReadonlyArray<number | null>;
-      if (identifierIndex == null) {
+      if (identifierIndex === null) {
         if (isMutation) {
           // Run them all
           resultIndexes = indexMap((_i) => keysets.push(EMPTY_ARRAY) - 1);

@@ -36,12 +36,12 @@ function batch(
   keysetEquality: "strict" | "tuple" | "object" = "strict",
 ) {
   let byMode = executors.get(callback);
-  if (byMode == null) {
+  if (byMode === undefined) {
     byMode = new Map();
     executors.set(callback, byMode);
   }
   let executor = byMode.get(keysetEquality);
-  if (executor == null) {
+  if (executor === undefined) {
     executor = defineBatchExecutor({
       name: `${callback.name}/${keysetEquality}`,
       callback,

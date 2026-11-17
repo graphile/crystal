@@ -211,7 +211,7 @@ export function executeLoad<
   const { indexMap, values } = details;
   const values0 = values[0];
   const shared = (
-    sharedDepId != null ? values[sharedDepId].unaryValue() : undefined
+    sharedDepId !== null ? values[sharedDepId].unaryValue() : undefined
   ) as TShared;
   const params = Object.fromEntries(
     Object.entries(paramDepIdByKey).map(([key, depId]) => [

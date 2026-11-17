@@ -311,7 +311,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
   /** Identifies the current read cache generation for cross-step batching. */
   public getBatchCacheToken(context: PgExecutorContext): object {
     let token = this.batchCacheTokens.get(context);
-    if (token == null) {
+    if (token === undefined) {
       /* Empty identity token; only reference equality matters. */
       token = Object.create(null) as object;
       this.batchCacheTokens.set(context, token);
