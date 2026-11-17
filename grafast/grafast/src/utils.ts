@@ -1625,3 +1625,11 @@ export function consume(value: unknown): void {
     void value.then(undefined, noop);
   }
 }
+
+/** Is obj a Plain Old JavaScript Object? */
+export function isPojo(obj: any): obj is object {
+  if (obj == null) return false;
+  if (typeof obj !== "object") return false;
+  const proto = Object.getPrototypeOf(obj);
+  return proto === null || proto === Object.prototype;
+}

@@ -2,7 +2,7 @@ import type { GraphQLSchema } from "graphql";
 
 import { isDev, noop } from "./dev.ts";
 import type { BatchExecutor, PromiseOrDirect } from "./interfaces.ts";
-import { recordsMatch } from "./utils.ts";
+import { isPojo, recordsMatch } from "./utils.ts";
 
 /** Define once at module scope, or during schema construction. */
 export function defineBatchExecutor<
@@ -108,7 +108,7 @@ function canonicalizeObject<TKeyset>(
   indexes: Map<string, KeysetTrieNode<TKeyset>>,
   keyset: TKeyset,
 ): TKeyset {
-  if (typeof keyset !== "object" || keyset === null || Array.isArray(keyset)) {
+  if (!isPojo(keyset)) {
     throw new Error("batch(..., 'object') requires object keysets");
   }
   const record = keyset as Record<string, unknown>;
