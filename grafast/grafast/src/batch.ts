@@ -131,14 +131,6 @@ function canonicalizeObject<TKeyset>(
   return (node.keyset ??= keyset);
 }
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-  const prototype = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
-}
-
 function defaultOptionsMatch(
   left: Record<string, unknown> | undefined,
   right: Record<string, unknown> | undefined,
@@ -176,7 +168,7 @@ export function batchInMeta<
   keysets: readonly TKeyset[],
   options?: TOptions,
 ): PromiseOrDirect<ReadonlyArray<TResult>> {
-  if (isDev && options !== undefined && !isPlainObject(options)) {
+  if (isDev && options !== undefined && !isPojo(options)) {
     throw new Error(
       "Batch executor options must be a plain object, or omitted.",
     );
