@@ -1006,14 +1006,14 @@ const relational_items_relational_itemsPgResource = registry.pgResources["relati
 function RelationalTopic_buildingByConstructorPlan($record) {
   const $buildings = building_buildingPgResource.find();
   let previousAlias = $buildings.alias;
-  const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
+  const i_relational_itemsAlias = sql.identifier(Symbol("relational_items"));
   $buildings.join({
     type: "inner",
     from: relational_items_relational_itemsPgResource.from,
-    alias: relational_itemsAlias,
-    conditions: [sql`${previousAlias}.${sql.identifier("constructor")} = ${relational_itemsAlias}.${sql.identifier("constructor")}`]
+    alias: i_relational_itemsAlias,
+    conditions: [sql`${previousAlias}.${sql.identifier("constructor")} = ${i_relational_itemsAlias}.${sql.identifier("constructor")}`]
   });
-  previousAlias = relational_itemsAlias;
+  previousAlias = i_relational_itemsAlias;
   $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
   return $buildings.single();
 }

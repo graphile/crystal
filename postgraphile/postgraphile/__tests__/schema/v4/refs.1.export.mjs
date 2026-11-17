@@ -1855,14 +1855,14 @@ export const objects = {
         plan($record) {
           const $people = resource_peoplePgResource.find();
           let previousAlias = $people.alias;
-          const book_editorsAlias = sql.identifier(Symbol("book_editors"));
+          const i_book_editorsAlias = sql.identifier(Symbol("book_editors"));
           $people.join({
             type: "inner",
             from: resource_book_editorsPgResource.from,
-            alias: book_editorsAlias,
-            conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${book_editorsAlias}.${sql.identifier("person_id")}`]
+            alias: i_book_editorsAlias,
+            conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${i_book_editorsAlias}.${sql.identifier("person_id")}`]
           });
-          previousAlias = book_editorsAlias;
+          previousAlias = i_book_editorsAlias;
           $people.where(sql`${previousAlias}.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
           return connection($people);
         },
