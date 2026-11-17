@@ -1791,7 +1791,7 @@ export class OperationPlan {
       >();
       const partitionedFieldEntriesByStep = new Map<
         Step,
-        Array<PlanFieldReturnTypeDetails>
+        Array<QueueTuple<PlanFieldReturnTypeDetails>>
       >();
       for (const entry of batch) {
         const [method, rawArgs] = entry;
@@ -1844,11 +1844,13 @@ export class OperationPlan {
             !isEnumType(nullableType)
           ) {
             const step = args.parentStep;
+            const tuple =
+              entry as unknown as QueueTuple<PlanFieldReturnTypeDetails>;
             const list = partitionedFieldEntriesByStep.get(step);
             if (list) {
-              list.push(args);
+              list.push(tuple);
             } else {
-              partitionedFieldEntriesByStep.set(step, [args]);
+              partitionedFieldEntriesByStep.set(step, [tuple]);
             }
           }
         }
@@ -1861,9 +1863,9 @@ export class OperationPlan {
       // items and nested polymorphism are not repeated per partition. A step
       // shared deeper (beneath a field each type plans to its own step) is
       // not combined here.
-      for (const entries of partitionedFieldEntriesByStep.values()) {
+      for (const tuples of partitionedFieldEntriesByStep.values()) {
         const layerPlans = new Set<LayerPlan>();
-        for (const entry of entries) {
+        for (const [, entry] of tuples) {
           layerPlans.add(entry.layerPlan);
         }
         if (layerPlans.size < 2) {
@@ -1873,8 +1875,38 @@ export class OperationPlan {
         // the step remains available in the combined layer plan.
         const combinedLayerPlan =
           this.getCombinedLayerPlanForLayerPlans(layerPlans);
-        for (const entry of entries) {
+        for (const [, entry] of tuples) {
           entry.layerPlan = combinedLayerPlan;
+        }
+        // Entries that would plan exactly the same thing (the same selections
+        // beneath the same field) are planned once, by the first of them, for
+        // all of their polymorphic paths; the others receive its output plan.
+        // An entry whose selections differ (e.g. a fragment on one type adds a
+        // field beneath it) is planned on its own.
+        const primaries: Array<QueueTuple<PlanFieldReturnTypeDetails>> = [];
+        for (const tuple of tuples) {
+          const entry = tuple[1];
+          const primary = primaries.find(([, p]) =>
+            planFieldReturnTypeIsShareable(p, entry),
+          );
+          if (primary === undefined) {
+            primaries.push(tuple);
+            continue;
+          }
+          const primaryEntry = primary[1];
+          if (primaryEntry.polymorphicPaths !== null) {
+            primaryEntry.polymorphicPaths = new Set([
+              ...primaryEntry.polymorphicPaths,
+              ...entry.polymorphicPaths!,
+            ]);
+          }
+          primaryEntry.outputPlan.mirrorChild(
+            primaryEntry.responseKey!,
+            entry.outputPlan,
+            entry.parentObjectType,
+            entry.locationDetails,
+          );
+          tuple[0] = this.planFieldReturnTypeElsewhere;
         }
       }
 
@@ -2254,6 +2286,14 @@ export class OperationPlan {
   private planFieldReturnType(details: PlanFieldReturnTypeDetails): void {
     return this.planIntoOutputPlan({ ...details, listDepth: 0 });
   }
+
+  /**
+   * Stands in for `planFieldReturnType` on an entry whose output plan is
+   * planned by an equivalent entry and mirrored into it (see `mutateTodos`).
+   */
+  private planFieldReturnTypeElsewhere(
+    _details: PlanFieldReturnTypeDetails,
+  ): void {}
 
   private planIntoOutputPlan(details: PlanIntoOutputPlanDetails): void {
     const {
@@ -5856,6 +5896,31 @@ function isPeerLayerPlan(
     return true;
   }
   return false;
+}
+
+/**
+ * True if planning `b` would plan exactly what planning `a` plans (beyond
+ * their polymorphic paths and the object output plan they write to), so `a`
+ * can be planned for both.
+ */
+function planFieldReturnTypeIsShareable(
+  a: PlanFieldReturnTypeDetails,
+  b: PlanFieldReturnTypeDetails,
+): boolean {
+  return (
+    a.parentStep === b.parentStep &&
+    a.layerPlan === b.layerPlan &&
+    a.positionType === b.positionType &&
+    a.responseKey === b.responseKey &&
+    a.resolverEmulation === b.resolverEmulation &&
+    a.streamDetails == null &&
+    b.streamDetails == null &&
+    a.outputPlan.type.mode === "object" &&
+    b.outputPlan.type.mode === "object" &&
+    a.selections !== undefined &&
+    b.selections !== undefined &&
+    arraysMatch(a.selections, b.selections)
+  );
 }
 
 type StepCache = Record<string, Map<any, any> | undefined>;

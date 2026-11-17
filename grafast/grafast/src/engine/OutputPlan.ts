@@ -229,6 +229,19 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   public layerPlan: LayerPlan;
   public readonly type: TType;
 
+  /**
+   * For root/object output plans, other object output plans that receive the
+   * same child as this one for a key (see `mirrorChild`).
+   */
+  private mirrorsByKey: Map<
+    string,
+    Array<{
+      outputPlan: OutputPlan;
+      type: GraphQLObjectType;
+      locationDetails: LocationDetails;
+    }>
+  > | null = null;
+
   constructor(
     layerPlan: LayerPlan,
     /**
@@ -329,11 +342,51 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     }
   }
 
+  /**
+   * Whatever child is later added to this object output plan for `key` is
+   * also added to `outputPlan` (as the child of `type`, with its own location
+   * details): used when a field is planned once on behalf of several output
+   * plans.
+   */
+  mirrorChild(
+    key: string,
+    outputPlan: OutputPlan,
+    type: GraphQLObjectType,
+    locationDetails: LocationDetails,
+  ): void {
+    if (isDev) {
+      assert.ok(
+        this.type.mode === "object" && outputPlan.type.mode === "object",
+        "GrafastInternalError<0c3b2a51-7f1e-4f53-9c41-4b8f8d4f3e6a>: only object output plans can mirror a child",
+      );
+      assert.ok(
+        this.keys[key] === undefined,
+        "GrafastInternalError<6a2f6d52-1b7e-4a0d-8b0e-6f1f1b9b6c1d>: cannot mirror a child that is already set",
+      );
+    }
+    this.mirrorsByKey ??= new Map();
+    let mirrors = this.mirrorsByKey.get(key);
+    if (mirrors === undefined) {
+      mirrors = [];
+      this.mirrorsByKey.set(key, mirrors);
+    }
+    mirrors.push({ outputPlan, type, locationDetails });
+  }
+
   addChild(
     type: GraphQLObjectType | null,
     key: string | null,
     child: OutputPlanKeyValue,
   ): void {
+    const mirrors = key !== null ? this.mirrorsByKey?.get(key) : undefined;
+    if (mirrors !== undefined) {
+      for (const mirror of mirrors) {
+        mirror.outputPlan.addChild(mirror.type, key, {
+          ...child,
+          locationDetails: mirror.locationDetails,
+        });
+      }
+    }
     if (this.type.mode === "root" || this.type.mode === "object") {
       if (isDev) {
         if (typeof key !== "string") {
