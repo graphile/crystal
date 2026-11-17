@@ -43,14 +43,11 @@ export class __InputObjectStep<
     for (const inputFieldName in inputFieldDefinitions) {
       const inputFieldDefinition = inputFieldDefinitions[inputFieldName];
       const inputFieldType = inputFieldDefinition.type;
-      const defaultValue =
-        inputFieldDefinition.defaultValue !== undefined
-          ? defaultValueToValueNode(
-              this.operationPlan.schema,
-              inputFieldType,
-              inputFieldDefinition.defaultValue,
-            )
-          : undefined;
+      const defaultValue = defaultValueToValueNode(
+        this.operationPlan.schema,
+        inputFieldType,
+        inputFieldDefinition.defaultValue,
+      );
       const inputFieldValue = inputFields?.find(
         (val) => val.name.value === inputFieldName,
       );
