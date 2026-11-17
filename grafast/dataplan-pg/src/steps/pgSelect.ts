@@ -5,6 +5,7 @@ import type {
   ConnectionHandlingStep,
   ExecutionDetails,
   ExecutionDetailsStream,
+  ExecutionResultValue,
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
@@ -4377,7 +4378,7 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
 }
 
 function createSelectResult(
-  allVals: null | readonly any[],
+  allVals: ExecutionResultValue<null | readonly any[]>,
   {
     first,
     last,
@@ -4398,7 +4399,7 @@ function createSelectResult(
     groupDetails: PgGroupDetails | undefined;
   },
 ) {
-  if (allVals == null) {
+  if (allVals == null || !Array.isArray(allVals)) {
     return allVals as never;
   }
   const limit = first ?? last;

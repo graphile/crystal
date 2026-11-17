@@ -757,7 +757,7 @@ export type BatchFunction = <
   ...options: undefined extends TOptions
     ? [options?: NoInfer<TOptions>]
     : [options: NoInfer<TOptions>]
-) => PromiseOrDirect<ReadonlyArray<TResult>>;
+) => PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>>;
 
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;

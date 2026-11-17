@@ -1,8 +1,14 @@
 import type { GraphQLSchema } from "graphql";
 
 import { isDev, noop } from "./dev.ts";
-import type { BatchExecutor, PromiseOrDirect } from "./interfaces.ts";
+import type {
+  BatchExecutor,
+  ExecutionResultValue,
+  GrafastResultsList,
+  PromiseOrDirect,
+} from "./interfaces.ts";
 import { isPojo, recordsMatch } from "./utils.ts";
+import { flagError } from "./error.ts";
 
 /** Define once at module scope, or during schema construction. */
 export function defineBatchExecutor<
@@ -167,7 +173,7 @@ export function batchInMeta<
   executor: BatchExecutor<TOptions, TKeyset, TResult>,
   keysets: readonly TKeyset[],
   options?: TOptions,
-): PromiseOrDirect<ReadonlyArray<TResult>> {
+): PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>> {
   if (isDev && options !== undefined && !isPojo(options)) {
     throw new Error(
       "Batch executor options must be a plain object, or omitted.",
@@ -244,15 +250,16 @@ export function batchInMeta<
     }
   }
   const { cache, pending } = family;
-  const batch = new Map<PendingBatch<TKeyset, TResult>, number[]>();
-  const results: TResult[] = [];
+  const batch = new Map<Promise<ReadonlyArray<TResult>>, number[]>();
+  const results: ExecutionResultValue<TResult>[] = [];
   for (let i = 0; i < keysets.length; i++) {
     const spec = canonicalKeysets[i];
     if (cache.has(spec)) {
       results.push(cache.get(spec)!);
     } else {
-      // We'll fill this in in a minute.
+      // Placeholder
       const targetIndex = results.push(null as TResult) - 1;
+
       let entry = pending.get(spec);
       if (entry === undefined) {
         let loadBatch = family.queued;
@@ -261,6 +268,8 @@ export function batchInMeta<
           deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
           loadBatch = { deferred, keysets: [] };
           family.queued = loadBatch;
+
+          // Kick off the batch
           const currentFamily = family;
           const currentBatch = loadBatch;
           queueMicrotask(() => {
@@ -273,39 +282,42 @@ export function batchInMeta<
         entry = { batch: loadBatch, index };
         pending.set(spec, entry);
       }
-      let indexes = batch.get(entry.batch);
+      let indexes = batch.get(entry.batch.deferred.promise);
       if (indexes === undefined) {
         indexes = [];
-        batch.set(entry.batch, indexes);
+        batch.set(entry.batch.deferred.promise, indexes);
       }
       // Pairs of source index in the pending batch and target result index.
       indexes.push(entry.index, targetIndex);
     }
   }
-  if (batch.size > 0) {
+  if (batch.size === 0) {
+    return results;
+  } else {
     return (async () => {
-      // Usually there is just one batch. If a call also references older
-      // in-flight batches, observe all failures without waiting on them in turn.
-      const loadBatches = [...batch.keys()];
-      const allLoadResults =
-        loadBatches.length === 1
-          ? [await loadBatches[0].deferred.promise]
-          : await Promise.all(
-              loadBatches.map(({ deferred }) => deferred.promise),
-            );
-      let batchIndex = 0;
-      for (const indexes of batch.values()) {
-        const loadResults = allLoadResults[batchIndex++];
-        for (let i = 0; i < indexes.length; i += 2) {
-          const pendingIndex = indexes[i];
-          const targetIndex = indexes[i + 1];
-          results[targetIndex] = loadResults[pendingIndex];
+      for (const [promise, indexes] of batch.entries()) {
+        try {
+          // Usually there is just one batch (one promise). I suspect it's
+          // unlikely that there will often be sufficiently many that switching
+          // to `Promise.allSettled` would be worthwhile.
+          const loadResults = await promise;
+          for (let i = 0; i < indexes.length; i += 2) {
+            const pendingIndex = indexes[i];
+            const targetIndex = indexes[i + 1];
+            results[targetIndex] = loadResults[pendingIndex];
+          }
+        } catch (e) {
+          const err = flagError(e);
+          for (let i = 0; i < indexes.length; i += 2) {
+            // const pendingIndex = indexes[i];
+            const targetIndex = indexes[i + 1];
+            results[targetIndex] = err;
+          }
         }
       }
       return results;
     })();
   }
-  return results;
 }
 
 async function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(

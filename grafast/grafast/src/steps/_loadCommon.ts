@@ -2,6 +2,7 @@ import type {
   BatchExecutor,
   BatchKeysetEquality,
   ExecutionDetails,
+  ExecutionResultValue,
   PromiseOrDirect,
 } from "../interfaces.ts";
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
@@ -207,7 +208,9 @@ export function executeLoad<
   },
   load: LoadCallback<TSpec, TItem, TData, TParams, TShared>,
   keysetEquality: BatchKeysetEquality,
-): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>> {
+): PromiseOrDirect<
+  ReadonlyArray<PromiseOrDirect<ExecutionResultValue<TData>>>
+> {
   const { indexMap, values } = details;
   const values0 = values[0];
   const shared = (

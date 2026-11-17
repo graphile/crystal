@@ -1064,11 +1064,11 @@ on (${sql.indent(
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
-      if (isPromiseLike(allVals)) {
+      if (allVals == null) {
+        return NO_ROWS;
+      } else if (!Array.isArray(allVals)) {
         // Must be an error!
         return allVals;
-      } else if (allVals == null) {
-        return NO_ROWS;
       }
       const limit = first ?? last;
       const firstAndLast = first != null && last != null && last < first;
