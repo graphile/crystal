@@ -1002,19 +1002,11 @@ const nodeIdCodecs = {
   }
 };
 const building_buildingPgResource = registry.pgResources["building"];
-const relational_items_relational_itemsPgResource = registry.pgResources["relational_items"];
 function RelationalTopic_buildingByConstructorPlan($record) {
   const $buildings = building_buildingPgResource.find();
+  const i_$relational_items = $record.singleRelation("relationalItemsByMyId");
   let previousAlias = $buildings.alias;
-  const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-  $buildings.join({
-    type: "inner",
-    from: relational_items_relational_itemsPgResource.from,
-    alias: relational_itemsAlias,
-    conditions: [sql`${previousAlias}.${sql.identifier("constructor")} = ${relational_itemsAlias}.${sql.identifier("constructor")}`]
-  });
-  previousAlias = relational_itemsAlias;
-  $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
+  $buildings.where(sql`${previousAlias}.${sql.identifier("constructor")} = ${$buildings.placeholder(i_$relational_items.get("constructor"))}`);
   return $buildings.single();
 }
 const EMPTY_OBJECT = Object.freeze({});
@@ -1151,6 +1143,7 @@ function findTypeNameMatch(specifier) {
   return null;
 }
 const relational_items_pkColumnsByRelatedCodecName = Object.fromEntries([["relationalTopics", pkCols], ["relationalStatus", relational_statusUniques[0].attributes]]);
+const resource_relational_itemsPgResource = registry.pgResources["relational_items"];
 const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   function typeNameFromType(typeVal) {
     if (typeof typeVal !== "string") return null;
@@ -6326,7 +6319,7 @@ export const objects = {
       },
       allRelationalItems: {
         plan() {
-          return connection(relational_items_relational_itemsPgResource.find());
+          return connection(resource_relational_itemsPgResource.find());
         },
         args: {
           first: applyFirstArg,
@@ -6340,7 +6333,7 @@ export const objects = {
       },
       allRelationalItemsList: {
         plan() {
-          return relational_items_relational_itemsPgResource.find();
+          return resource_relational_itemsPgResource.find();
         },
         args: {
           first: applyFirstArg,
@@ -7762,7 +7755,7 @@ export const objects = {
       },
       relationalItemsByConstructor: {
         plan($record) {
-          return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
+          return connection(resource_relational_itemsPgResource.find(specFromRecord2($record)));
         },
         args: {
           first: applyFirstArg,
@@ -7776,7 +7769,7 @@ export const objects = {
       },
       relationalItemsByConstructorList: {
         plan($record) {
-          return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
+          return resource_relational_itemsPgResource.find(specFromRecord2($record));
         },
         args: {
           first: applyFirstArg,
@@ -8384,11 +8377,11 @@ export const interfaces = {
       if (step instanceof PgSelectSingleStep &&
       // NOTE: don't compare `resource` directly since it
       // could be a function.
-      step.resource.codec !== relational_items_relational_itemsPgResource.codec) {
+      step.resource.codec !== resource_relational_itemsPgResource.codec) {
         // Assume it's a child; return description of base
         const pkColumns = relational_items_pkColumnsByRelatedCodecName[step.resource.codec.name];
         if (!pkColumns) {
-          throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but '${step.resource.codec.name}' does not seem to be related!`);
+          throw new Error(`Expected a relational record for ${resource_relational_itemsPgResource.name}, but '${step.resource.codec.name}' does not seem to be related!`);
         }
         return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, pkColumns[idx])])));
       } else {
@@ -8403,7 +8396,7 @@ export const interfaces = {
       // A PgSelectSingleStep representing the base relational table
       const $base = (() => {
         if ($inStep instanceof PgSelectSingleStep) {
-          if ($inStep.resource.codec === relational_items_relational_itemsPgResource.codec) {
+          if ($inStep.resource.codec === resource_relational_itemsPgResource.codec) {
             // It's the core table; that's what we want!
             return $inStep;
           } else {
@@ -8413,16 +8406,16 @@ export const interfaces = {
             // shorter and also cacheable.
             const stepPk = $inStep.resource.uniques.find(u => u.isPrimary)?.attributes;
             if (!stepPk) {
-              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
+              throw new Error(`Expected a relational record for ${resource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
             }
             if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
-              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
+              throw new Error(`Expected a relational record for ${resource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
             }
-            return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
+            return resource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
           }
         } else {
           // Assume it's an object representing the base table
-          return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+          return resource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
         }
       })();
       const $typeVal = get2($base, "type");
