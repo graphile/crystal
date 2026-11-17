@@ -1,4 +1,4 @@
-import { defineBatchExecutor } from "grafast";
+import type { BatchExecutor } from "grafast";
 
 import type {
   PgExecutor,
@@ -17,7 +17,7 @@ const batchInfoSymbol = Symbol("PostgreSQL batch info");
 
 type BatchInfoMeta = Record<PropertyKey, any>;
 
-export function getPgStepBatchInfo(
+function getPgStepBatchInfo(
   meta: BatchInfoMeta,
   executor: PgExecutor,
   context: PgExecutorContext,
@@ -65,11 +65,8 @@ export function getPgStepBatchInfo(
   return info;
 }
 
-export const pgStepBatchExecutor = defineBatchExecutor<
-  readonly [PgStepBatchInfo],
-  readonly unknown[],
-  ReadonlyArray<any>
->({
+export const pgStepBatchExecutor = Object.freeze({
+  getBatchInfo: getPgStepBatchInfo,
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
   callback: async ([{ executor, context, options }], keysets) => {
@@ -79,4 +76,8 @@ export const pgStepBatchExecutor = defineBatchExecutor<
     }));
     return (await executor.executeWithCache(inputs, options)).values;
   },
-});
+} satisfies BatchExecutor<
+  readonly [PgStepBatchInfo],
+  readonly unknown[],
+  ReadonlyArray<any>
+> & { getBatchInfo: typeof getPgStepBatchInfo });
