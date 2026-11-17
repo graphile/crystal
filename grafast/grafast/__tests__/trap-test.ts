@@ -93,8 +93,17 @@ class ExecuteThrowStep extends Step<never> {
     throw new Error(EXECUTE_THROW_MESSAGE);
   }
 }
-function executeThrow() {
-  return new ExecuteThrowStep();
+class AsyncExecuteThrowStep extends Step<never> {
+  async execute(): Promise<never> {
+    throw new Error(EXECUTE_THROW_MESSAGE);
+  }
+}
+function executeThrow(async = false) {
+  if (async) {
+    return new AsyncExecuteThrowStep();
+  } else {
+    return new ExecuteThrowStep();
+  }
 }
 
 const makeSchema = () => {
@@ -129,6 +138,8 @@ const makeSchema = () => {
         implicitSideEffectErrorIsNotTrapped: Int
         executeThrowTrap: String
         sideEffectExecuteThrowTrap: String
+        executeThrowTrapAsync: String
+        sideEffectExecuteThrowTrapAsync: String
       }
       input EmptyableInput {
         a: Int
@@ -321,6 +332,17 @@ const makeSchema = () => {
           },
           sideEffectExecuteThrowTrap() {
             const $throw = executeThrow();
+            $throw.hasSideEffects = true;
+            const $error = trap($throw, TRAP_ERROR) as Step<Error>;
+            return get($error, "message");
+          },
+          executeThrowTrapAsync() {
+            const $throw = executeThrow(true);
+            const $error = trap($throw, TRAP_ERROR) as Step<Error>;
+            return get($error, "message");
+          },
+          sideEffectExecuteThrowTrapAsync() {
+            const $throw = executeThrow(true);
             $throw.hasSideEffects = true;
             const $error = trap($throw, TRAP_ERROR) as Step<Error>;
             return get($error, "message");
@@ -632,21 +654,41 @@ it("traps errors thrown in side effects in the chain and allows pass-through", a
 
 it("traps errors thrown at the step-level", async () => {
   const schema = makeSchema();
-  const source = `{ executeThrowTrap }`;
+  const source = `{ res: executeThrowTrap }`;
   const result = await grafast({ source, schema });
   expect(result).to.deep.equal({
     data: {
-      executeThrowTrap: EXECUTE_THROW_MESSAGE,
+      res: EXECUTE_THROW_MESSAGE,
     },
   });
 });
 it("traps errors thrown at the step-level (with side effects)", async () => {
   const schema = makeSchema();
-  const source = `{ sideEffectExecuteThrowTrap }`;
+  const source = `{ res: sideEffectExecuteThrowTrap }`;
   const result = await grafast({ source, schema });
   expect(result).to.deep.equal({
     data: {
-      sideEffectExecuteThrowTrap: EXECUTE_THROW_MESSAGE,
+      res: EXECUTE_THROW_MESSAGE,
+    },
+  });
+});
+it("traps errors thrown at the step-level (async)", async () => {
+  const schema = makeSchema();
+  const source = `{ res: executeThrowTrapAsync }`;
+  const result = await grafast({ source, schema });
+  expect(result).to.deep.equal({
+    data: {
+      res: EXECUTE_THROW_MESSAGE,
+    },
+  });
+});
+it("traps errors thrown at the step-level (async, with side effects)", async () => {
+  const schema = makeSchema();
+  const source = `{ res: sideEffectExecuteThrowTrapAsync }`;
+  const result = await grafast({ source, schema });
+  expect(result).to.deep.equal({
+    data: {
+      res: EXECUTE_THROW_MESSAGE,
     },
   });
 });
