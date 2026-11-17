@@ -762,3 +762,48 @@ it("only compares options within the requested executor", async () => {
   ).to.deep.equal([1]);
   expect(comparisons).to.equal(1);
 });
+
+for (const mode of ["tuple", "object"] as const) {
+  it(`retains canonical ${mode} specifiers at empty and prefix trie paths`, async () => {
+    const makeKeys = () =>
+      mode === "tuple"
+        ? [[], [1], [1, 2], [1, 2, 3]]
+        : [{}, { a: 1 }, { a: 1, b: 2 }, { a: 1, b: 2, c: 3 }];
+    type Keyset = ReturnType<typeof makeKeys>[number];
+    const received: Array<readonly Keyset[]> = [];
+    let attempts = 0;
+    const executor = defineBatchExecutor({
+      name: `canonical-keysets/${mode}`,
+      keysetEquality: mode,
+      callback: (_options: undefined, keys: readonly Keyset[]) => {
+        received.push(keys);
+        attempts++;
+        if (attempts === 1) {
+          throw new Error("retry with equivalent keys");
+        }
+        return keys;
+      },
+    });
+    const meta = {};
+    const original = makeKeys();
+    const failed = await Promise.allSettled([
+      batchInMeta(schema, meta, executor, original),
+    ]);
+    expect(failed[0].status).to.equal("rejected");
+    const equivalent = makeKeys();
+    const results = await batchInMeta(schema, meta, executor, [
+      ...equivalent,
+      ...equivalent,
+    ]);
+    expect(received[1]).to.have.length(original.length);
+    for (let i = 0; i < original.length; i++) {
+      expect(received[1][i]).to.equal(original[i]);
+      expect(results[i]).to.equal(original[i]);
+      expect(results[i + original.length]).to.equal(original[i]);
+    }
+    const cached = batchInMeta(schema, meta, executor, makeKeys());
+    expect(Array.isArray(cached)).to.equal(true);
+    expect(cached).to.deep.equal(original);
+    expect(attempts).to.equal(2);
+  });
+}

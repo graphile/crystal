@@ -53,31 +53,25 @@ function checkExecutor(
 
 type BatchOptions = Record<string, unknown> | undefined;
 
-// Strict keys retain the original value.
-// Tuple/object keys use the terminal node of their canonical trie path.
-type BatchCacheKey<TKeyset> = TKeyset | KeysetTrieNode;
-
 interface PendingBatch<TKeyset, TResult> {
   deferred: PromiseWithResolvers<ReadonlyArray<TResult>>;
-  /** Deduplicated original specifiers, passed to the callback. */
+  /** Deduplicated canonical specifiers, used by the callback and cache maps. */
   keysets: TKeyset[];
-  /** Corresponding canonical identities, used by the cache and pending maps. */
-  cacheKeys: BatchCacheKey<TKeyset>[];
 }
 
 type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
   executor: BatchExecutor<TOptions, TKeyset, TResult>;
   options: TOptions;
-  cache: Map<BatchCacheKey<TKeyset>, TResult>;
+  cache: Map<TKeyset, TResult>;
   pending: Map<
-    BatchCacheKey<TKeyset>,
+    TKeyset,
     {
       batch: PendingBatch<TKeyset, TResult>;
       index: number;
     }
   >;
   queued?: PendingBatch<TKeyset, TResult>;
-  keyIndex?: KeysetTrieNode;
+  keyIndex?: KeysetTrieNode<TKeyset>;
 };
 
 type BatchMeta = Record<PropertyKey, unknown> & {
@@ -89,16 +83,22 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 
 const batchesSymbol = Symbol("Grafast batch caches");
 
-type KeysetTrieNode = { children: Map<unknown, KeysetTrieNode> };
+type KeysetTrieNode<TKeyset> = {
+  children: Map<unknown, KeysetTrieNode<TKeyset>>;
+  /** First keyset at this terminal node; subsequent lookups reuse its identity. */
+  keyset?: TKeyset;
+};
 
-// Composite keys share a cache key when their parts match. Strict keys can use
+// Composite keys share the first keyset whose parts match. Strict keys can use
 // the cache Map directly, as in the original loader implementation.
-function compositeCacheKey<TOptions extends BatchOptions, TKeyset, TResult>(
+function canonicalizeKeyset<TOptions extends BatchOptions, TKeyset, TResult>(
   family: BatchFamily<TOptions, TKeyset, TResult>,
   keyset: TKeyset,
   mode: BatchKeysetEquality,
-): KeysetTrieNode {
-  let node = (family.keyIndex ??= { children: new Map() });
+): TKeyset {
+  let node: KeysetTrieNode<TKeyset> = (family.keyIndex ??= {
+    children: new Map(),
+  });
   for (const part of keyParts(keyset, mode)) {
     let child = node.children.get(part);
     if (child == null) {
@@ -107,7 +107,8 @@ function compositeCacheKey<TOptions extends BatchOptions, TKeyset, TResult>(
     }
     node = child;
   }
-  return node;
+  // Composite keysets are arrays or objects, so undefined means unset.
+  return (node.keyset ??= keyset);
 }
 
 function keyParts(
@@ -220,17 +221,17 @@ export function batchInMeta<
 
   // Validate composite keys before queuing any work. A malformed later key
   // must not leave an earlier key's batch running without a caller.
-  const cacheKeys: readonly BatchCacheKey<TKeyset>[] =
+  const canonicalKeysets: readonly TKeyset[] =
     keysetEquality === "strict"
       ? keysets
       : keysets.map((keyset) =>
-          compositeCacheKey(family, keyset, keysetEquality),
+          canonicalizeKeyset(family, keyset, keysetEquality),
         );
   const { cache, pending } = family;
   const batch = new Map<PendingBatch<TKeyset, TResult>, number[]>();
   const results: TResult[] = [];
   for (let i = 0; i < keysets.length; i++) {
-    const spec = cacheKeys[i];
+    const spec = canonicalKeysets[i];
     if (cache.has(spec)) {
       results.push(cache.get(spec)!);
     } else {
@@ -242,7 +243,7 @@ export function batchInMeta<
         if (loadBatch == null) {
           const deferred = Promise.withResolvers<ReadonlyArray<TResult>>();
           deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
-          loadBatch = { deferred, keysets: [], cacheKeys: [] };
+          loadBatch = { deferred, keysets: [] };
           family.queued = loadBatch;
           const currentFamily = family;
           const currentBatch = loadBatch;
@@ -252,8 +253,7 @@ export function batchInMeta<
             void executeBatch(currentFamily, currentBatch);
           });
         }
-        const index = loadBatch.keysets.push(keysets[i]) - 1;
-        loadBatch.cacheKeys.push(spec);
+        const index = loadBatch.keysets.push(spec) - 1;
         entry = { batch: loadBatch, index };
         pending.set(spec, entry);
       }
@@ -296,7 +296,7 @@ async function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
   family: BatchFamily<TOptions, TKeyset, TResult>,
   loadBatch: PendingBatch<TKeyset, TResult>,
 ): Promise<void> {
-  const { deferred, keysets, cacheKeys } = loadBatch;
+  const { deferred, keysets } = loadBatch;
   try {
     const loadResults = await family.executor.callback(family.options, keysets);
     if (loadResults.length !== keysets.length) {
@@ -305,13 +305,13 @@ async function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
       );
     }
     for (let pendingIndex = 0; pendingIndex < keysets.length; pendingIndex++) {
-      const spec = cacheKeys[pendingIndex];
+      const spec = keysets[pendingIndex];
       family.cache.set(spec, loadResults[pendingIndex]);
       family.pending.delete(spec);
     }
     deferred.resolve(loadResults);
   } catch (error) {
-    for (const spec of cacheKeys) {
+    for (const spec of keysets) {
       family.pending.delete(spec);
     }
     deferred.reject(error);
