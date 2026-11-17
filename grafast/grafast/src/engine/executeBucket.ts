@@ -9,7 +9,6 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   FLAG_POLY_SKIPPED,
-  FLAG_STOPPED,
   NO_FLAGS,
 } from "../constants.ts";
 import { isDev } from "../dev.ts";
@@ -1192,7 +1191,7 @@ export function executeBucket(
           // ExecutionValue is created:
           //   bucket.hasNonZeroStatus = true;
           return {
-            flags: arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
+            flags: arrayOfLength(size, FLAG_ERROR),
             results: arrayOfLength(size, error),
           };
         });
@@ -1204,7 +1203,7 @@ export function executeBucket(
       // ExecutionValue is created:
       //   bucket.hasNonZeroStatus = true;
       return {
-        flags: arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
+        flags: arrayOfLength(size, FLAG_ERROR),
         results: arrayOfLength(size, error),
       };
     }
