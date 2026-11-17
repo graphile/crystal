@@ -86,7 +86,7 @@ const batchesSymbol = Symbol("Grafast batch caches");
 type KeysetTrieNode<TKeyset> = {
   children: Map<unknown, KeysetTrieNode<TKeyset>>;
   /** First keyset at this terminal node; subsequent lookups reuse its identity. */
-  keyset?: TKeyset;
+  keyset: TKeyset | undefined;
 };
 
 // Composite keys share the first keyset whose parts match. Strict keys can use
@@ -98,11 +98,12 @@ function canonicalizeKeyset<TOptions extends BatchOptions, TKeyset, TResult>(
 ): TKeyset {
   let node: KeysetTrieNode<TKeyset> = (family.keyIndex ??= {
     children: new Map(),
+    keyset: undefined,
   });
   for (const part of keyParts(keyset, mode)) {
     let child = node.children.get(part);
     if (child == null) {
-      child = { children: new Map() };
+      child = { children: new Map(), keyset: undefined };
       node.children.set(part, child);
     }
     node = child;
