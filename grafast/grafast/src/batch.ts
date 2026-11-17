@@ -215,20 +215,33 @@ export function batchInMeta<
 
   // Validate composite keys before queuing any work. A malformed later key
   // must not leave an earlier key's batch running without a caller.
-  let canonicalKeysets = keysets;
-  if (keysetEquality === "tuple") {
-    const index = (family.tupleKeyIndex ??= {
-      children: new Map(),
-      keyset: undefined,
-    });
-    canonicalKeysets = keysets.map((keyset) =>
-      canonicalizeTuple(index, keyset),
-    );
-  } else if (keysetEquality === "object") {
-    const indexes = (family.objectKeyIndexes ??= new Map());
-    canonicalKeysets = keysets.map((keyset) =>
-      canonicalizeObject(indexes, keyset),
-    );
+  let canonicalKeysets: readonly TKeyset[];
+  switch (keysetEquality) {
+    case "strict": {
+      canonicalKeysets = keysets;
+      break;
+    }
+    case "tuple": {
+      const index = (family.tupleKeyIndex ??= {
+        children: new Map(),
+        keyset: undefined,
+      });
+      canonicalKeysets = keysets.map((keyset) =>
+        canonicalizeTuple(index, keyset),
+      );
+      break;
+    }
+    case "object": {
+      const indexes = (family.objectKeyIndexes ??= new Map());
+      canonicalKeysets = keysets.map((keyset) =>
+        canonicalizeObject(indexes, keyset),
+      );
+      break;
+    }
+    default: {
+      const never: never = keysetEquality;
+      throw new Error(`Unknown keysetEquality: '${never}'`);
+    }
   }
   const { cache, pending } = family;
   const batch = new Map<PendingBatch<TKeyset, TResult>, number[]>();
