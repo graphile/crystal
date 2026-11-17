@@ -1192,6 +1192,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
     }
 
+    if (metaByMetaKey === null) {
+      throw new Error(
+        "GrafastInternalError<3d6bd21c-bfc3-450e-bf17-bef636085f1f>: metaByMetaKey should have been set",
+      );
+    }
+
     if (totalSize === 0) return null;
 
     for (const stepId of batchStepIdsToCopy) {
@@ -1291,11 +1297,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
         offset += parentBucket.size;
       }
-    }
-    if (metaByMetaKey === null) {
-      throw new Error(
-        "GrafastInternalError<3d6bd21c-bfc3-450e-bf17-bef636085f1f>: metaByMetaKey should have been set",
-      );
     }
 
     //
