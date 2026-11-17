@@ -28,7 +28,6 @@ import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.ts";
 import { TYPES } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
-import type { PgExecutorInput } from "../executor.ts";
 import { PgExecutor } from "../executor.ts";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.ts";
 import type {
@@ -1032,23 +1031,14 @@ on (${sql.indent(
       throw new Error("We have no context dependency?");
     }
 
-    const specs = indexMap<PgExecutorInput<any>>((i) => {
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null
-                  ? null
-                  : alreadyEncoded
-                    ? val
-                    : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
+    const keysets = indexMap((i) =>
+      identifierIndex != null
+        ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
+            const val = values[dependencyIndex].at(i);
+            return val == null ? null : alreadyEncoded ? val : codec.toPg(val);
+          })
+        : EMPTY_ARRAY,
+    );
     const common = {
       store,
       text,
@@ -1060,11 +1050,14 @@ on (${sql.indent(
       useTransaction: this.hasSideEffects,
     };
     const executionResult = this.hasSideEffects
-      ? await this.executor.executeWithoutCache(specs, common)
+      ? await this.executor.executeWithoutCache(
+          keysets.map((queryValues) => ({ context, queryValues })),
+          common,
+        )
       : {
           values: await executionDetails.batch(
             pgStepBatchExecutor,
-            specs.map(({ queryValues }) => queryValues),
+            keysets,
             pgStepBatchExecutor.getOptions(this.executor, context, common),
           ),
         };

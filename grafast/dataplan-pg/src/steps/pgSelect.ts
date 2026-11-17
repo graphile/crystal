@@ -1246,17 +1246,15 @@ export class PgSelectStep<
     const isSkippable = this.mode === "normal" && !this.hasSideEffects;
 
     if (streamInitialCount == null) {
-      const specs: PgExecutorInput<any>[] = [];
+      const keysets: (readonly unknown[])[] = [];
       let resultIndexes: ReadonlyArray<number | null>;
       if (identifierIndex == null) {
         if (isMutation) {
           // Run them all
-          resultIndexes = indexMap(
-            (_i) => specs.push({ context, queryValues: EMPTY_ARRAY }) - 1,
-          );
+          resultIndexes = indexMap((_i) => keysets.push(EMPTY_ARRAY) - 1);
         } else {
-          // We'll add at most one spec
-          let specIdx: null | number = null;
+          // We'll add at most one keyset
+          let keysetIndex: null | number = null;
           resultIndexes = indexMap((i) => {
             if (
               isSkippable &&
@@ -1267,15 +1265,14 @@ export class PgSelectStep<
               // Skip!
               return null;
             } else {
-              if (specIdx === null) {
-                specIdx = specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
+              if (keysetIndex === null) {
+                keysetIndex = keysets.push(EMPTY_ARRAY) - 1;
               }
-              return specIdx;
+              return keysetIndex;
             }
           });
         }
       } else {
-        let hasSpec = false;
         const queryValuesMatch =
           getSameLengthArraysMatchFunction(queryValuesLength);
         resultIndexes = indexMap<number | null>((i) => {
@@ -1298,18 +1295,17 @@ export class PgSelectStep<
             }
             queryValues.push(result);
           }
-          if (!isMutation && hasSpec) {
+          if (!isMutation && keysets.length > 0) {
             // Dedupe
-            const existingIdx = specs.findIndex((s) =>
-              queryValuesMatch(queryValues, s.queryValues),
+            const existingIdx = keysets.findIndex((keyset) =>
+              queryValuesMatch(queryValues, keyset),
             );
             if (existingIdx !== -1) {
               return existingIdx;
             }
           }
-          const specIdx = specs.push({ context, queryValues }) - 1;
-          hasSpec = true;
-          return specIdx;
+          const keysetIndex = keysets.push(queryValues) - 1;
+          return keysetIndex;
         });
       }
       const common = {
@@ -1323,14 +1319,17 @@ export class PgSelectStep<
         useTransaction: isMutation,
       };
       const executionResult =
-        specs.length === 0
+        keysets.length === 0
           ? null
           : isMutation
-            ? await this.resource.executeWithoutCache(specs, common)
+            ? await this.resource.executeWithoutCache(
+                keysets.map((queryValues) => ({ context, queryValues })),
+                common,
+              )
             : {
                 values: await executionDetails.batch(
                   pgStepBatchExecutor,
-                  specs.map(({ queryValues }) => queryValues),
+                  keysets,
                   pgStepBatchExecutor.getOptions(
                     this.resource.executor,
                     context,
