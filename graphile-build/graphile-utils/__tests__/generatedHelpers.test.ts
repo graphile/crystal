@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PgCodec, PgRegistry, PgResource } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import { GraphQLInt } from "grafast/graphql";
@@ -6,7 +7,7 @@ import {
   addPgTableCondition,
   orderByAscDesc,
   processSchema,
-} from "../src/index.ts";
+} from "../dist/index.js";
 
 type UserCodec = PgCodec<
   "users",
