@@ -3204,9 +3204,11 @@ export class OperationPlan {
         );
       }
       const argumentType = argumentDefinition.type;
-      const defaultValue = argumentDefinition.defaultValue
-        ? defaultValueToValueNode(argumentType, argumentDefinition.defaultValue)
-        : undefined;
+      const defaultValue = defaultValueToValueNode(
+        this.schema,
+        argumentType,
+        argumentDefinition.defaultValue,
+      );
       const argumentValue = argumentValues?.find(
         (v) => v.name.value === argumentName,
       );
