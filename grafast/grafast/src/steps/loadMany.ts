@@ -5,6 +5,7 @@ import type {
 } from "../index.ts";
 import { currentFieldStreamDetails } from "../index.ts";
 import type {
+  BatchKeysetEquality,
   ExecutionDetailsStream,
   GrafastResultsList,
   Maybe,
@@ -17,6 +18,7 @@ import { Step } from "../step.ts";
 import { recordsMatch } from "../utils.ts";
 import {
   executeLoad,
+  getLoadKeysetEquality,
   type IOEquivalence,
   ioEquivalenceMatches,
   makeAccessMap,
@@ -141,6 +143,7 @@ export class LoadManyStep<
   >;
   paginationSupport?: PaginationFeatures;
   private name: Maybe<string>;
+  private keysetEquality: BatchKeysetEquality;
 
   /** Direct field stream */
   private _fieldMightStream: boolean;
@@ -170,8 +173,9 @@ export class LoadManyStep<
       );
     }
     this.ioEquivalence = ioEquivalence ?? null;
+    this.keysetEquality = getLoadKeysetEquality(lookup);
 
-    const $lookup = multistep(lookup, "load");
+    const $lookup = multistep(lookup);
     this.addDependency($lookup);
 
     if (shared != null) {
@@ -251,6 +255,7 @@ export class LoadManyStep<
     return peers.filter(
       (p) =>
         p.load === this.load &&
+        p.keysetEquality === this.keysetEquality &&
         ioEquivalenceMatches(p.ioEquivalence, this.ioEquivalence) &&
         recordsMatch(p.paramDepIdByKey, this.paramDepIdByKey),
     );
@@ -318,6 +323,7 @@ export class LoadManyStep<
       this.paramDepIdByKey,
       this.loadInfo!,
       this.load,
+      this.keysetEquality,
     );
   }
 
@@ -340,6 +346,8 @@ export class LoadManyStep<
       shared,
       ioEquivalence,
     });
+
+    $clone.keysetEquality = this.keysetEquality;
 
     // Copy attributes?
     for (const attr of this.attributes) {

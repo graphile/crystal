@@ -1,11 +1,11 @@
 import type {
   BatchExecutor,
+  BatchKeysetEquality,
   ExecutionDetails,
   PromiseOrDirect,
 } from "../interfaces.ts";
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
-import type { Step } from "../step.ts";
-import { isListLikeStep, isObjectLikeStep } from "../step.ts";
+import { isListLikeStep, isObjectLikeStep, Step } from "../step.ts";
 import {
   arraysMatch,
   isTuple,
@@ -170,6 +170,28 @@ const loadBatchExecutor = {
   unknown
 >;
 
+const loadBatchExecutors = {
+  strict: loadBatchExecutor,
+  tuple: {
+    ...loadBatchExecutor,
+    name: "grafast/load/tuple",
+    keysetEquality: "tuple" as const,
+  },
+  object: {
+    ...loadBatchExecutor,
+    name: "grafast/load/object",
+    keysetEquality: "object" as const,
+  },
+};
+
+export function getLoadKeysetEquality(lookup: Multistep): BatchKeysetEquality {
+  return lookup == null || lookup instanceof Step
+    ? "strict"
+    : isTuple(lookup)
+      ? "tuple"
+      : "object";
+}
+
 export function executeLoad<
   TSpec,
   TItem,
@@ -184,6 +206,7 @@ export function executeLoad<
     attributes: readonly (keyof TItem)[];
   },
   load: LoadCallback<TSpec, TItem, TData, TParams, TShared>,
+  keysetEquality: BatchKeysetEquality,
 ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>> {
   const { indexMap, values } = details;
   const values0 = values[0];
@@ -202,7 +225,7 @@ export function executeLoad<
     TSpec,
     PromiseOrDirect<TData>
   >(
-    loadBatchExecutor,
+    loadBatchExecutors[keysetEquality],
     indexMap((i) => values0.at(i)),
     {
       load,

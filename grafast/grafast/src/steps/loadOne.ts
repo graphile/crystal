@@ -1,5 +1,6 @@
 import type { ExecutionDetails } from "../index.ts";
 import type {
+  BatchKeysetEquality,
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
@@ -12,6 +13,7 @@ import { recordsMatch } from "../utils.ts";
 import type { IOEquivalence } from "./_loadCommon.ts";
 import {
   executeLoad,
+  getLoadKeysetEquality,
   ioEquivalenceMatches,
   makeAccessMap,
   paramSig,
@@ -116,6 +118,7 @@ export class LoadOneStep<
     UnwrapMultistep<TShared>
   >;
   private name: Maybe<string>;
+  private readonly keysetEquality: BatchKeysetEquality;
   constructor(
     lookup: TLookup,
     loader: LoadOneLoader<
@@ -137,8 +140,9 @@ export class LoadOneStep<
       );
     }
     this.ioEquivalence = ioEquivalence ?? null;
+    this.keysetEquality = getLoadKeysetEquality(lookup);
 
-    const $spec = multistep(lookup, "load");
+    const $spec = multistep(lookup);
     this.addDependency($spec);
 
     if (shared != null) {
@@ -184,6 +188,7 @@ export class LoadOneStep<
     return peers.filter(
       (p) =>
         p.load === this.load &&
+        p.keysetEquality === this.keysetEquality &&
         ioEquivalenceMatches(p.ioEquivalence, this.ioEquivalence) &&
         recordsMatch(p.paramDepIdByKey, this.paramDepIdByKey),
     );
@@ -242,6 +247,7 @@ export class LoadOneStep<
       this.paramDepIdByKey,
       this.loadInfo!,
       this.load,
+      this.keysetEquality,
     );
   }
 

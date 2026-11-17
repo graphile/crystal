@@ -137,6 +137,7 @@ const _executeLoadTypes = (
     { limit: 2 },
     { attributes: ["id"] },
     one,
+    "strict",
   );
   assert<
     Equals<
@@ -150,20 +151,36 @@ const _executeLoadTypes = (
     { limit: 2 },
     { attributes: ["id"] },
     one,
+    "strict",
   );
   assert<Equals<typeof _inferred, typeof _result>>();
-  // @ts-expect-error The lookup dependency must yield the callback's key type.
-  executeOne(wrongDetails, 1, { limit: 2 }, { attributes: ["id"] }, one);
-  // @ts-expect-error Attributes must belong to the loaded item type.
-  executeOne(details, 1, { limit: 2 }, { attributes: ["missing"] }, one);
+  executeOne(
+    // @ts-expect-error The lookup dependency must yield the callback's key type.
+    wrongDetails,
+    1,
+    { limit: 2 },
+    { attributes: ["id"] },
+    one,
+    "strict",
+  );
+  executeOne(
+    details,
+    1,
+    { limit: 2 },
+    // @ts-expect-error Attributes must belong to the loaded item type.
+    { attributes: ["missing"] },
+    one,
+    "strict",
+  );
   // @ts-expect-error A loadMany callback cannot yield a loadOne result.
-  executeOne(details, 1, { limit: 2 }, { attributes: ["id"] }, many);
+  executeOne(details, 1, { limit: 2 }, { attributes: ["id"] }, many, "strict");
   const _results = executeLoad<number, Item, readonly Item[], Params, Shared>(
     details,
     1,
     { limit: 2 },
     { attributes: ["id"] },
     many,
+    "strict",
   );
   assert<
     Equals<

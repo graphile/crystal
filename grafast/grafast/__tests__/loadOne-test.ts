@@ -12,7 +12,9 @@ import type {
 import {
   constant,
   context,
+  each,
   grafast,
+  lambda,
   loadMany,
   loadOne,
   loadOneCallback,
@@ -656,3 +658,78 @@ for (const many of [false, true]) {
     expect(calls).to.deep.equal([[1], [1]]);
   });
 }
+
+for (const many of [false, true]) {
+  for (const objectLookup of [false, true]) {
+    it(`${many ? "loadMany connection clone" : "loadOne"} caches ${objectLookup ? "object" : "tuple"} lookups beyond the interning cache size`, async () => {
+      type Spec = { id: number } | readonly [number];
+      const calls: number[][] = [];
+      const callback = (keys: readonly Spec[]) => {
+        const ids = keys.map((key) => ("id" in key ? key.id : key[0]));
+        calls.push(ids);
+        return ids.map((id) => ({ id }));
+      };
+      const manyCallback = (keys: readonly Spec[]) =>
+        callback(keys).map((item) => [item]);
+      const load = ($id: Step<number>) => {
+        const lookup = objectLookup ? { id: $id } : ([$id] as const);
+        if (many) {
+          const $loaded = loadMany(lookup, manyCallback);
+          return $loaded.connectionClone();
+        } else {
+          return loadOne(lookup, callback);
+        }
+      };
+      const ids = Array.from({ length: 150 }, (_, i) => i);
+      const inputs = [...ids, ...ids];
+      const itemType = many ? "[Item]" : "Item";
+      const schema = makeGrafastSchema({
+        typeDefs: `type Query { items: [${itemType}] } type Item { id: Int, next: ${itemType} }`,
+        objects: {
+          Query: { plans: { items: () => each(constant(inputs), load) } },
+          Item: { plans: { next: ($item) => load($item.get("id")) } },
+        },
+      });
+      const result = await grafast({
+        schema,
+        source: "{ items { id next { id } } }",
+      });
+      expect(result).to.deep.equal({
+        data: {
+          items: inputs.map((id) => {
+            const item = { id, next: many ? [{ id }] : { id } };
+            return many ? [item] : item;
+          }),
+        },
+      });
+      // Deduplicate uncached keys, then reuse all 150 across later steps.
+      expect(calls).to.deep.equal([ids]);
+    });
+  }
+}
+
+it("preserves identity equality for an existing step yielding objects", async () => {
+  const calls: number[][] = [];
+  const callback = (keys: readonly { id: number }[]) => {
+    calls.push(keys.map(({ id }) => id));
+    return keys;
+  };
+  const schema = makeGrafastSchema({
+    typeDefs: "type Query { items: [Item] } type Item { id: Int }",
+    objects: {
+      Query: {
+        plans: {
+          items: () =>
+            each(constant([1, 1]), ($id) => {
+              const $lookup = lambda($id, (id) => ({ id }));
+              return loadOne($lookup, callback);
+            }),
+        },
+      },
+    },
+  });
+  expect(await grafast({ schema, source: "{ items { id } }" })).to.deep.equal({
+    data: { items: [{ id: 1 }, { id: 1 }] },
+  });
+  expect(calls).to.deep.equal([[1, 1]]);
+});
