@@ -70,10 +70,23 @@ const _batchTypes = (batch: BatchFunction) => {
   batch(executor, ["wrong"], { prefix: "x" });
   const optionalExecutor = defineBatchExecutor({
     name: "optional-type-test",
-    callback: (options: string | undefined, keys: readonly number[]) =>
-      keys.map((key) => `${options}:${key}`),
+    callback: (
+      options: { prefix: string } | undefined,
+      keys: readonly number[],
+    ) => keys.map((key) => `${options?.prefix}:${key}`),
   });
   batch(optionalExecutor, [1]);
-  batch(optionalExecutor, [1], "x");
+  batch(optionalExecutor, [1], { prefix: "x" });
   batch(optionalExecutor, [1], undefined);
+  // @ts-expect-error Options must be a record, not an array.
+  batch(optionalExecutor, [1], []);
+  // @ts-expect-error Options must be a record, not a primitive.
+  batch(optionalExecutor, [1], "x");
+  // @ts-expect-error Null is not a valid options record.
+  batch(optionalExecutor, [1], null);
+  defineBatchExecutor({
+    name: "invalid-tuple-options",
+    // @ts-expect-error Executors cannot declare tuple options.
+    callback: (_options: readonly [string], keys: readonly number[]) => keys,
+  });
 };

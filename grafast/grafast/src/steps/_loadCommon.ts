@@ -92,19 +92,19 @@ interface LoadMeta {
 
 type LoadCallback = (...args: any[]) => any;
 
+type LoadBatchOptions = {
+  load: LoadCallback;
+  signature: string;
+  shared: unknown;
+  params: Record<string, unknown>;
+};
+
 function executeLoadBatch(
-  options: readonly unknown[],
+  { load, signature, shared, params }: LoadBatchOptions,
   specs: readonly unknown[],
 ): PromiseOrDirect<ReadonlyArray<any>> {
-  const [load, signature, shared, ...parameterValues] = options;
-  const [attributes, parameterNames] = JSON.parse(signature as string) as [
-    readonly string[],
-    readonly string[],
-  ];
-  const params = Object.fromEntries(
-    parameterNames.map((name, index) => [name, parameterValues[index]]),
-  );
-  return (load as LoadCallback)(specs, {
+  const [attributes] = JSON.parse(signature) as [readonly string[]];
+  return load(specs, {
     attributes,
     params,
     shared,
@@ -115,6 +115,11 @@ function executeLoadBatch(
 const loadBatchExecutor = defineBatchExecutor({
   name: "grafast/load",
   callback: executeLoadBatch,
+  optionsMatch: (left, right) =>
+    left.load === right.load &&
+    left.signature === right.signature &&
+    left.shared === right.shared &&
+    recordsMatch(left.params, right.params),
 });
 
 export function executeLoad<
@@ -176,12 +181,12 @@ export function executeLoad<
       baseLoadInfo.attributes,
       parameterNames,
     ]);
-    const options = [
+    const options = {
       load,
-      loadInfoSignature,
+      signature: loadInfoSignature,
       shared,
-      ...parameterNames.map((key) => params[key]),
-    ];
+      params,
+    };
     const loadResults = details.batch(loadBatchExecutor, batchSpecs, options);
     return (async () => {
       const loaded = await loadResults;

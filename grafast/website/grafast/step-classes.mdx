@@ -170,9 +170,9 @@ or rejects, each caller in that batch receives the error. An empty keyset list
 returns an empty result without calling the callback.
 
 To combine calls, set the same [`metaKey`](#metakey) on the steps and use the
-same executor object and matching options. By default, arrays are compared
-shallowly with `arraysMatch` and plain objects with `recordsMatch`. Nested values
-are compared with `===`; other option values are compared with `===` directly.
+same executor object and matching options. Options must be plain objects
+(`Record<string, unknown>`) and are compared shallowly with `recordsMatch` by
+default. Nested values are compared with `===`.
 `recordsMatch` compares enumerable string keys and treats missing properties
 and properties set to `undefined` as equivalent.
 Define the executor outside `execute` and pass all values that affect its work
@@ -216,9 +216,9 @@ class UserStep extends Step {
 }
 ```
 
-Options can be any value. Supply an `optionsMatch(left, right)` callback to
-`defineBatchExecutor` to override the default comparison, for example to compare
-class instances or selected option fields. It must only match options for which
+Supply an `optionsMatch(left, right)` callback to `defineBatchExecutor` to
+override the default comparison, for example to compare array-valued fields
+shallowly or compare selected option fields. It must only match options for which
 the callback produces equivalent results. A combined batch uses the first
 caller's options. Omit the third argument when the executor accepts `undefined`.
 

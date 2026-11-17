@@ -6,10 +6,14 @@ import type {
   BatchExecutor,
   BatchKeysetEquality,
 } from "./interfaces.ts";
-import { arraysMatch, recordsMatch } from "./utils.ts";
+import { recordsMatch } from "./utils.ts";
 
 /** Define once at module scope, or during schema construction. */
-export function defineBatchExecutor<TOptions, TKeyset, TResult>(options: {
+export function defineBatchExecutor<
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+>(options: {
   name: string;
   callback: BatchCallback<TOptions, TKeyset, TResult>;
   keysetEquality?: BatchKeysetEquality;
@@ -61,7 +65,7 @@ type PendingCall = {
 
 type BatchFamily = {
   executor: BatchExecutor<any, any, any>;
-  options: unknown;
+  options: Record<string, unknown> | undefined;
   keysetEquality: BatchKeysetEquality;
   calls: PendingCall[];
 };
@@ -103,22 +107,20 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
-function defaultOptionsMatch(left: unknown, right: unknown): boolean {
-  if (left === right) {
-    return true;
-  } else if (Array.isArray(left) && Array.isArray(right)) {
-    return arraysMatch(left, right);
-  } else if (isPlainObject(left) && isPlainObject(right)) {
-    return recordsMatch(left, right);
-  } else {
-    return false;
-  }
+function defaultOptionsMatch(
+  left: Record<string, unknown> | undefined,
+  right: Record<string, unknown> | undefined,
+): boolean {
+  return (
+    left === right ||
+    (left !== undefined && right !== undefined && recordsMatch(left, right))
+  );
 }
 
 function familyMatches(
   family: BatchFamily,
   executor: BatchExecutor<any, any, any>,
-  options: unknown,
+  options: Record<string, unknown> | undefined,
 ): boolean {
   return (
     family.executor === executor &&
@@ -127,13 +129,22 @@ function familyMatches(
 }
 
 /** @internal Used to implement `ExecutionDetails.batch`. */
-export function batchInMeta<TOptions, TKeyset, TResult>(
+export function batchInMeta<
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+>(
   schema: GraphQLSchema,
   meta: Record<PropertyKey, unknown>,
   executor: BatchExecutor<TOptions, TKeyset, TResult>,
   keysets: readonly TKeyset[],
   options?: TOptions,
 ): Promise<ReadonlyArray<TResult>> {
+  if (isDev && options !== undefined && !isPlainObject(options)) {
+    throw new Error(
+      "Batch executor options must be a plain object, or omitted.",
+    );
+  }
   checkExecutor(schema, executor);
   const { keysetEquality } = executor;
   if (keysets.length === 0) {

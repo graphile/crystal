@@ -1,4 +1,5 @@
 import type { BatchExecutor } from "grafast";
+import { arraysMatch, recordsMatch } from "grafast";
 
 import type {
   PgExecutor,
@@ -7,73 +8,41 @@ import type {
   PgExecutorOptions,
 } from "../executor.ts";
 
-type PgStepBatchOptions = readonly [
-  executor: PgExecutor,
-  context: PgExecutorContext,
-  store: PgExecutorOptions["store"],
-  text: PgExecutorOptions["text"],
-  identifierIndex: PgExecutorOptions["identifierIndex"],
-  name: PgExecutorOptions["name"],
-  affinity: PgExecutorOptions["affinity"],
-  eventEmitter: PgExecutorOptions["eventEmitter"],
-  useTransaction: boolean,
-  ...rawSqlValues: PgExecutorOptions["rawSqlValues"],
-];
+type PgStepBatchOptions = PgExecutorOptions & {
+  executor: PgExecutor;
+  context: PgExecutorContext;
+};
 
 function getOptions(
   executor: PgExecutor,
   context: PgExecutorContext,
   options: PgExecutorOptions,
 ): PgStepBatchOptions {
-  return [
+  return {
+    ...options,
     executor,
     context,
-    options.store,
-    options.text,
-    options.identifierIndex ?? null,
-    options.name,
-    options.affinity,
-    options.eventEmitter,
-    options.useTransaction ?? false,
-    ...options.rawSqlValues,
-  ];
+    identifierIndex: options.identifierIndex ?? null,
+    useTransaction: options.useTransaction ?? false,
+  };
 }
 
 export const pgStepBatchExecutor = Object.freeze({
   getOptions,
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
-  callback: async (
-    [
-      executor,
-      context,
-      store,
-      text,
-      identifierIndex,
-      name,
-      affinity,
-      eventEmitter,
-      useTransaction,
-      ...rawSqlValues
-    ],
-    keysets,
-  ) => {
+  optionsMatch: (left, right) =>
+    recordsMatch(left, right, (key, a, b) =>
+      key === "rawSqlValues"
+        ? arraysMatch(left.rawSqlValues, right.rawSqlValues)
+        : a === b,
+    ),
+  callback: async ({ executor, context, ...options }, keysets) => {
     const inputs: PgExecutorInput<any>[] = keysets.map((queryValues) => ({
       context,
       queryValues,
     }));
-    return (
-      await executor.executeWithCache(inputs, {
-        store,
-        text,
-        identifierIndex,
-        name,
-        affinity,
-        eventEmitter,
-        useTransaction,
-        rawSqlValues,
-      })
-    ).values;
+    return (await executor.executeWithCache(inputs, options)).values;
   },
 } satisfies BatchExecutor<
   PgStepBatchOptions,

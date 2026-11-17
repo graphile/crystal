@@ -727,19 +727,31 @@ export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
 
 export type BatchKeysetEquality = "strict" | "tuple" | "object";
-export type BatchCallback<TOptions, TKeyset, TResult> = (
+export type BatchCallback<
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+> = (
   options: TOptions,
   keysets: ReadonlyArray<TKeyset>,
 ) => PromiseOrDirect<ReadonlyArray<TResult>>;
 /** A stable, named batch executor. Define once, outside step execution. */
-export interface BatchExecutor<TOptions, TKeyset, TResult> {
+export interface BatchExecutor<
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+> {
   readonly name: string;
   readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
   readonly keysetEquality: BatchKeysetEquality;
   /** Overrides the default shallow comparison of batch options. */
   readonly optionsMatch?: (left: TOptions, right: TOptions) => boolean;
 }
-export type BatchFunction = <TOptions, TKeyset, TResult>(
+export type BatchFunction = <
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+>(
   executor: BatchExecutor<TOptions, TKeyset, TResult>,
   keysets: ReadonlyArray<TKeyset>,
   ...options: undefined extends TOptions
