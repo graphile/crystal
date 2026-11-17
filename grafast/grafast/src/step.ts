@@ -281,7 +281,7 @@ export /* abstract */ class Step<TData = any> {
   public peerKey: string | null = null;
 
   /** Backing field for `hasSideEffects`. */
-  #hasSideEffects = false;
+  private _hasSideEffects;
 
   /**
    * Set this to `true` if this step might return an iterable or async iterable
@@ -337,6 +337,7 @@ export /* abstract */ class Step<TData = any> {
     this._isSelectiveStep = false;
 
     this.implicitSideEffectStep = layerPlan.latestSideEffectStep;
+    this._hasSideEffects = false;
     this.cloneStreams = false;
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
@@ -358,11 +359,11 @@ export /* abstract */ class Step<TData = any> {
    * from being tree-shaken.
    */
   get hasSideEffects(): boolean {
-    return this.#hasSideEffects;
+    return this._hasSideEffects;
   }
 
   set hasSideEffects(value: boolean) {
-    if (value === this.#hasSideEffects) {
+    if (value === this._hasSideEffects) {
       // No change necessary
       return;
     }
@@ -394,10 +395,10 @@ export /* abstract */ class Step<TData = any> {
     }
     if (nonDependentSteps === null) {
       if (value) {
-        this.#hasSideEffects = true;
+        this._hasSideEffects = true;
         this.layerPlan.latestSideEffectStep = this;
         this.operationPlan.resetCache();
-      } else if (this.#hasSideEffects === true) {
+      } else if (this._hasSideEffects === true) {
         throw new Error(
           `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
         );
