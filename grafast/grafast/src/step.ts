@@ -393,10 +393,14 @@ export /* abstract */ class Step<TData = any> {
       }
     }
     if (nonDependentSteps === null) {
-      this.#hasSideEffects = value;
-      if (value === true) {
+      if (value) {
+        this.#hasSideEffects = true;
         this.layerPlan.latestSideEffectStep = this;
         this.operationPlan.resetCache();
+      } else if (this.#hasSideEffects === true) {
+        throw new Error(
+          `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
+        );
       }
     } else if (value) {
       throw new Error(
