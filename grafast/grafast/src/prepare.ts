@@ -978,7 +978,8 @@ function processSingleDeferred(
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
   // const childBucketIndex = 0;
-  const rootBucket = newBucket(null, {
+  // Deferred payloads continue the originating execution and share its caches.
+  const rootBucket = newBucket(firstBucket, {
     layerPlan: outputPlan.layerPlan,
     size,
     store,
