@@ -29,12 +29,12 @@ function checkExecutor(
   executor: BatchExecutor<any, any, any>,
 ): void {
   let registry = executorsBySchema.get(schema);
-  if (registry == null) {
+  if (registry === undefined) {
     registry = new Map();
     executorsBySchema.set(schema, registry);
   }
   const registration = registry.get(executor.name);
-  if (registration == null) {
+  if (registration === undefined) {
     registry.set(executor.name, { executor, warned: false });
   } else if (registration.executor !== executor) {
     const message = `Batch executor '${executor.name}' has multiple definitions in the same schema. Define it once outside step execution and reuse the same executor object.`;
@@ -95,7 +95,7 @@ function canonicalizeTuple<TKeyset>(
   }
   for (const value of keyset) {
     let child = node.children.get(value);
-    if (child == null) {
+    if (child === undefined) {
       child = { children: new Map(), keyset: undefined };
       node.children.set(value, child);
     }
@@ -115,14 +115,14 @@ function canonicalizeObject<TKeyset>(
   const keys = Object.keys(record).sort();
   const shape = JSON.stringify(keys);
   let node = indexes.get(shape);
-  if (node == null) {
+  if (node === undefined) {
     node = { children: new Map(), keyset: undefined };
     indexes.set(shape, node);
   }
   for (const key of keys) {
     const value = record[key];
     let child: KeysetTrieNode<TKeyset> | undefined = node.children.get(value);
-    if (child == null) {
+    if (child === undefined) {
       child = { children: new Map(), keyset: undefined };
       node.children.set(value, child);
     }
@@ -181,7 +181,7 @@ export function batchInMeta<
 
   const typedMeta = metaByMetaKey as BatchMeta;
   let batches = typedMeta[batchesSymbol];
-  if (batches == null) {
+  if (batches === undefined) {
     typedMeta[batchesSymbol] = batches = new Map();
   }
   // Executor identity determines the options, keyset and result types of all
@@ -191,15 +191,15 @@ export function batchInMeta<
     | undefined;
   // ExecutionDetails.batch requires options unless TOptions includes undefined.
   const batchOptions = options as TOptions;
-  if (families == null) {
+  if (families === undefined) {
     families = new Map();
     batches.set(executor, families);
   }
 
   let family = families.get(batchOptions);
-  if (family == null) {
+  if (family === undefined) {
     family = findMatchingFamily(families, executor, batchOptions);
-    if (family == null) {
+    if (family === undefined) {
       family = {
         executor,
         options: batchOptions,
@@ -240,7 +240,7 @@ export function batchInMeta<
       let entry = pending.get(spec);
       if (entry === undefined) {
         let loadBatch = family.queued;
-        if (loadBatch == null) {
+        if (loadBatch === undefined) {
           const deferred = Promise.withResolvers<ReadonlyArray<TResult>>();
           deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
           loadBatch = { deferred, keysets: [] };
@@ -258,7 +258,7 @@ export function batchInMeta<
         pending.set(spec, entry);
       }
       let indexes = batch.get(entry.batch);
-      if (indexes == null) {
+      if (indexes === undefined) {
         indexes = [];
         batch.set(entry.batch, indexes);
       }
