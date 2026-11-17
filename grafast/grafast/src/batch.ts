@@ -1,14 +1,13 @@
 import type { GraphQLSchema } from "graphql";
 
 import { isDev, noop } from "./dev.ts";
+import { flagError } from "./error.ts";
 import type {
   BatchExecutor,
   ExecutionResultValue,
-  GrafastResultsList,
   PromiseOrDirect,
 } from "./interfaces.ts";
 import { isPojo, recordsMatch } from "./utils.ts";
-import { flagError } from "./error.ts";
 
 /** Define once at module scope, or during schema construction. */
 export function defineBatchExecutor<

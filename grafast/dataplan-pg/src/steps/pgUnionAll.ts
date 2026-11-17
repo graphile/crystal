@@ -16,7 +16,6 @@ import {
   exportAs,
   first,
   isDev,
-  isPromiseLike,
   lambda,
   reverseArray,
   SafeError,

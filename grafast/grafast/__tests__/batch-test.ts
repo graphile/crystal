@@ -7,7 +7,7 @@ import { it } from "mocha";
 import { batchInMeta, defineBatchExecutor } from "../dist/batch.js";
 import { isDev } from "../dist/dev.js";
 import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
-import { grafast, makeGrafastSchema, Step } from "../dist/index.js";
+import { flagError, grafast, makeGrafastSchema, Step } from "../dist/index.js";
 
 function makeSchema() {
   return new GraphQLSchema({
@@ -537,14 +537,12 @@ it("evicts failed batches so their keys can be retried", async () => {
     },
   });
   const meta = {};
-  const failed = await Promise.allSettled([
+  const failed = await Promise.all([
     batchInMeta(schema, meta, executor, [1]),
     batchInMeta(schema, meta, executor, [1, 2]),
   ]);
-  expect(failed.map((result) => result.status)).to.deep.equal([
-    "rejected",
-    "rejected",
-  ]);
+  const error = flagError(new Error("fetch failed"));
+  expect(failed).to.deep.equal([[error], [error, error]]);
   expect(await batchInMeta(schema, meta, executor, [2, 1])).to.deep.equal([
     2, 1,
   ]);
@@ -643,14 +641,16 @@ it("retries a rejected asynchronous batch and an invalid result count", async ()
   });
   const meta = {};
   for (let i = 0; i < 2; i++) {
-    const results = await Promise.allSettled([
+    const results = await Promise.all([
       batchInMeta(schema, meta, executor, [1]),
       batchInMeta(schema, meta, executor, [1, 2]),
     ]);
-    expect(results.map((result) => result.status)).to.deep.equal([
-      "rejected",
-      "rejected",
-    ]);
+    const message =
+      i === 0
+        ? "fetch failed"
+        : "batch callback returned 0 results for 2 keysets";
+    const error = flagError(new Error(message));
+    expect(results).to.deep.equal([[error], [error, error]]);
   }
   expect(await batchInMeta(schema, meta, executor, [2, 1])).to.deep.equal([
     2, 1,
@@ -658,7 +658,7 @@ it("retries a rejected asynchronous batch and an invalid result count", async ()
   expect(attempts).to.equal(3);
 });
 
-it("observes a failed newer batch while an older batch is still in flight", async () => {
+it("preserves successful entries when an overlapping batch fails", async () => {
   let release!: () => void;
   const error = new Error("newer batch failed");
   const executor = defineBatchExecutor({
@@ -678,15 +678,11 @@ it("observes a failed newer batch while an older batch is still in flight", asyn
   const meta = {};
   const older = batchInMeta(schema, meta, executor, [1]);
   await Promise.resolve();
-  try {
-    const overlapping = await Promise.allSettled([
-      batchInMeta(schema, meta, executor, [1, 2]),
-    ]);
-    expect(overlapping).to.deep.equal([{ status: "rejected", reason: error }]);
-  } finally {
-    release();
-    await older;
-  }
+  const overlapping = batchInMeta(schema, meta, executor, [1, 2]);
+  await Promise.resolve();
+  release();
+  expect(await overlapping).to.deep.equal([1, flagError(error)]);
+  expect(await older).to.deep.equal([1]);
   expect(batchInMeta(schema, meta, executor, [1])).to.deep.equal([1]);
 });
 
@@ -786,10 +782,9 @@ for (const mode of ["tuple", "object"] as const) {
     });
     const meta = {};
     const original = makeKeys();
-    const failed = await Promise.allSettled([
-      batchInMeta(schema, meta, executor, original),
-    ]);
-    expect(failed[0].status).to.equal("rejected");
+    const failed = await batchInMeta(schema, meta, executor, original);
+    const error = flagError(new Error("retry with equivalent keys"));
+    expect(failed).to.deep.equal(original.map(() => error));
     const equivalent = makeKeys();
     const results = await batchInMeta(schema, meta, executor, [
       ...equivalent,

@@ -7,6 +7,7 @@ import type {
   ConstantStep,
   DataFromObjectSteps,
   ExecutionDetails,
+  ExecutionResultValue,
   FieldPlanResolver,
   ListStep,
   LoadManyCallback,
@@ -72,7 +73,12 @@ const _batchTypes = (batch: BatchFunction) => {
     },
   });
   const _result = batch(executor, [1], { prefix: "x" });
-  assert<Equals<typeof _result, PromiseOrDirect<readonly string[]>>>();
+  assert<
+    Equals<
+      typeof _result,
+      PromiseOrDirect<ReadonlyArray<ExecutionResultValue<string>>>
+    >
+  >();
   // @ts-expect-error Options are required by this executor.
   batch(executor, [1]);
   // @ts-expect-error Incorrect options type.
@@ -142,7 +148,9 @@ const _executeLoadTypes = (
   assert<
     Equals<
       typeof _result,
-      PromiseOrDirect<ReadonlyArray<PromiseOrDirect<Item | null>>>
+      PromiseOrDirect<
+        ReadonlyArray<PromiseOrDirect<ExecutionResultValue<Item | null>>>
+      >
     >
   >();
   const _inferred = executeLoad(
@@ -185,7 +193,9 @@ const _executeLoadTypes = (
   assert<
     Equals<
       typeof _results,
-      PromiseOrDirect<ReadonlyArray<PromiseOrDirect<readonly Item[]>>>
+      PromiseOrDirect<
+        ReadonlyArray<PromiseOrDirect<ExecutionResultValue<readonly Item[]>>>
+      >
     >
   >();
 };
