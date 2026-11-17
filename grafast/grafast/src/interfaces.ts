@@ -784,7 +784,9 @@ export interface ExecutionDetails<
   indexForEach: IndexForEach;
 
   /**
-   * Batches equivalent keysets submitted during the current runloop tick.
+   * Batches equivalent keysets across steps in the same execution scope during
+   * the current runloop tick. Mutation fields and subscription events each
+   * have separate scopes.
    * Define executors outside step execution; pass all varying values in
    * `options`.
    */

@@ -135,7 +135,7 @@ export function batchInMeta<
   TResult,
 >(
   schema: GraphQLSchema,
-  meta: Record<PropertyKey, unknown>,
+  metaByMetaKey: Record<PropertyKey, unknown>,
   executor: BatchExecutor<TOptions, TKeyset, TResult>,
   keysets: readonly TKeyset[],
   options?: TOptions,
@@ -151,7 +151,7 @@ export function batchInMeta<
     return Promise.resolve([]);
   }
 
-  const typedMeta = meta as BatchMeta;
+  const typedMeta = metaByMetaKey as BatchMeta;
   let families = typedMeta[batchesSymbol];
   if (families == null) {
     typedMeta[batchesSymbol] = families = [];

@@ -169,23 +169,22 @@ promise of an array. `details.batch` returns a promise; if the callback throws
 or rejects, each caller in that batch receives the error. An empty keyset list
 returns an empty result without calling the callback.
 
-To combine calls, set the same [`metaKey`](#metakey) on the steps and use the
-same executor object and matching options. Options must be plain objects
+To combine calls, use the same executor object and matching options. Calls
+share batch state across steps within the same execution scope, regardless of
+their `metaKey`. Each root execution, mutation field, and subscription event
+starts a fresh scope. Options must be plain objects
 (`Record<string, unknown>`) and are compared shallowly with `recordsMatch` by
 default. Nested values are compared with `===`.
 `recordsMatch` compares enumerable string keys and treats missing properties
 and properties set to `undefined` as equivalent.
 Define the executor outside `execute` and pass all values that affect its work
-through the options. Without a shared `metaKey`, calls from separate
-step executions do not share a batch.
+through the options.
 
 For example, given a service whose `getUsers` method returns one result per ID:
 
 ```ts
 import { defineBatchExecutor, Step, type ExecutionDetails } from "grafast";
 import { userService } from "./services/users";
-
-const userBatchMetaKey = Symbol("user batches");
 
 function fetchUsers(
   { service }: { service: typeof userService },
@@ -204,7 +203,6 @@ class UserStep extends Step {
 
   constructor($id: Step<string>) {
     super();
-    this.metaKey = userBatchMetaKey;
     this.idDepIndex = this.addDependency($id);
   }
 

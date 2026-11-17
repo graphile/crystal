@@ -832,7 +832,7 @@ export function executeBucket(
       batch: (executor, keysets, ...[options]) =>
         batchInMeta(
           step.operationPlan.schema,
-          (extra.meta ??= {}),
+          metaByMetaKey,
           executor,
           keysets,
           options,

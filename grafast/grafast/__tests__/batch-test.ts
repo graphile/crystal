@@ -4,6 +4,8 @@ import { it } from "mocha";
 
 import { batchInMeta, defineBatchExecutor } from "../dist/batch.js";
 import { isDev } from "../dist/dev.js";
+import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
+import { grafast, makeGrafastSchema, Step } from "../dist/index.js";
 
 function makeSchema() {
   return new GraphQLSchema({
@@ -344,4 +346,105 @@ it("allows optionsMatch to compare selected fields within POJO options", async (
   ]);
   expect(calls).to.equal(2);
   expect(results).to.deep.equal([[101], [102], [203]]);
+});
+
+class BatchScopeStep extends Step<string> {
+  isSyncAndSafe = false;
+
+  private executor: BatchExecutor<{ prefix: string }, string, string>;
+  private key: string;
+
+  constructor(
+    executor: BatchExecutor<{ prefix: string }, string, string>,
+    key: string,
+    metaKey?: symbol,
+  ) {
+    super();
+    this.executor = executor;
+    this.key = key;
+    this.metaKey = metaKey;
+  }
+
+  deduplicate() {
+    return [];
+  }
+
+  execute(details: ExecutionDetails) {
+    const originalMeta = details.extra.meta;
+    const result = details.batch(
+      this.executor,
+      details.indexMap(() => this.key),
+      { prefix: "value:" },
+    );
+    // Using batch must not create or replace a step's metadata.
+    expect(details.extra.meta).to.equal(originalMeta);
+    return result;
+  }
+}
+
+function makeBatchScopeSchema(
+  executor: BatchExecutor<{ prefix: string }, string, string>,
+  metaKeys: readonly (symbol | undefined)[],
+) {
+  return makeGrafastSchema({
+    typeDefs: `type Query { first: String, second: String }`,
+    objects: {
+      Query: {
+        plans: {
+          first: () => new BatchScopeStep(executor, "first", metaKeys[0]),
+          second: () => new BatchScopeStep(executor, "second", metaKeys[1]),
+        },
+      },
+    },
+  });
+}
+
+for (const withMetaKeys of [false, true]) {
+  it(`batches across steps ${withMetaKeys ? "with different meta keys" : "without meta keys"}`, async () => {
+    const calls: (readonly string[])[] = [];
+    const executor = defineBatchExecutor({
+      name: "cross-step",
+      callback: ({ prefix }: { prefix: string }, keys: readonly string[]) => {
+        calls.push(keys);
+        return keys.map((key) => prefix + key);
+      },
+    });
+    const schema = makeBatchScopeSchema(
+      executor,
+      withMetaKeys ? [Symbol(), Symbol()] : [],
+    );
+    const result = await grafast({ schema, source: "{ first second }" });
+    expect(result).not.to.have.property("errors");
+    expect(result)
+      .to.have.property("data")
+      .that.deep.equals({ first: "value:first", second: "value:second" });
+    expect(calls).to.have.length(1);
+    expect(calls[0]).to.have.members(["first", "second"]);
+  });
+}
+
+it("does not batch across concurrent executions of the same schema without meta keys", async () => {
+  const calls: (readonly string[])[] = [];
+  const executor = defineBatchExecutor({
+    name: "request-isolation",
+    callback: ({ prefix }: { prefix: string }, keys: readonly string[]) => {
+      calls.push(keys);
+      return keys.map((key) => prefix + key);
+    },
+  });
+  const schema = makeBatchScopeSchema(executor, []);
+  const results = await Promise.all([
+    grafast({ schema, source: "{ first second }" }),
+    grafast({ schema, source: "{ first second }" }),
+  ]);
+  for (const result of results) {
+    expect(result).not.to.have.property("errors");
+    expect(result)
+      .to.have.property("data")
+      .that.deep.equals({ first: "value:first", second: "value:second" });
+  }
+  expect(calls).to.have.length(2);
+  for (const call of calls) {
+    expect(call).to.have.members(["first", "second"]);
+  }
 });
