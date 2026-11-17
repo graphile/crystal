@@ -14,7 +14,7 @@ import type {
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
 import { multistep } from "../multistep.ts";
 import { Step } from "../step.ts";
-import { canonicalJSONStringify, recordsMatch } from "../utils.ts";
+import { recordsMatch } from "../utils.ts";
 import {
   executeLoad,
   type IOEquivalence,
@@ -92,9 +92,6 @@ export function loadManyLoader<
   return load;
 }
 
-const idByLoad = new WeakMap<LoadManyCallback<any, any, any, any>, string>();
-let loadCounter = 0;
-
 interface LoadManyBaseParams {
   [key: string]: Maybe<any>;
   reverse?: Maybe<boolean>;
@@ -128,7 +125,6 @@ export class LoadManyStep<
     LoadManyInfo<TItem, TParams, UnwrapMultistep<TShared>>,
     "shared" | "unary" | "params"
   > | null = null;
-  loadInfoKey = "";
 
   attributes = new Set<keyof TItem>();
   paramDepIdByKey: {
@@ -304,14 +300,6 @@ export class LoadManyStep<
     const attributes = [...this.attributes].sort();
     this.loadInfo = { attributes };
 
-    // If the canonicalJSONStringify is the same, then we deem that the options are the same
-    this.loadInfoKey = canonicalJSONStringify(this.loadInfo);
-    let loadId = idByLoad.get(this.load);
-    if (!loadId) {
-      loadId = String(++loadCounter);
-      idByLoad.set(this.load, loadId);
-    }
-    this.metaKey = `LoadManyStep|${loadId}|${this.loadInfoKey}`;
     super.finalize();
   }
 

@@ -448,3 +448,105 @@ it("does not batch across concurrent executions of the same schema without meta 
     expect(call).to.have.members(["first", "second"]);
   }
 });
+
+for (const mode of ["strict", "tuple", "object"] as const) {
+  it(`caches ${mode} keys across calls and isolates options and scopes`, async () => {
+    const calls: unknown[][] = [];
+    const executor = defineBatchExecutor({
+      name: `cache/${mode}`,
+      keysetEquality: mode,
+      callback: (_options: { prefix: string }, keys: readonly unknown[]) => {
+        calls.push([...keys]);
+        return keys.map(() => undefined);
+      },
+    });
+    const key = (n: number) =>
+      mode === "strict" ? n : mode === "tuple" ? [n] : { n };
+    const meta = {};
+    const options = { prefix: "a" };
+    expect(
+      await batchInMeta(schema, meta, executor, [key(1), key(1)], options),
+    ).to.deep.equal([undefined, undefined]);
+    expect(
+      await batchInMeta(schema, meta, executor, [key(1), key(2), key(2)], {
+        ...options,
+      }),
+    ).to.deep.equal([undefined, undefined, undefined]);
+    expect(calls.map((keys) => keys.length)).to.deep.equal([1, 1]);
+    await batchInMeta(schema, meta, executor, [key(1)], { prefix: "b" });
+    await batchInMeta(schema, {}, executor, [key(1)], options);
+    expect(calls.map((keys) => keys.length)).to.deep.equal([1, 1, 1, 1]);
+  });
+}
+
+it("shares in-flight keys with calls arriving after dispatch", async () => {
+  const calls: number[][] = [];
+  const releases: Array<() => void> = [];
+  const executor = defineBatchExecutor({
+    name: "in-flight",
+    callback: async (_options: undefined, keys: readonly number[]) => {
+      calls.push([...keys]);
+      await new Promise<void>((resolve) => releases.push(resolve));
+      return keys.map((key) => key * 10);
+    },
+  });
+  const meta = {};
+  const first = batchInMeta(schema, meta, executor, [1, 1]);
+  await Promise.resolve();
+  const second = batchInMeta(schema, meta, executor, [1, 2, 2]);
+  await Promise.resolve();
+  expect(calls).to.deep.equal([[1], [2]]);
+  for (const release of releases) {
+    release();
+  }
+  expect(await first).to.deep.equal([10, 10]);
+  expect(await second).to.deep.equal([10, 20, 20]);
+  expect(await batchInMeta(schema, meta, executor, [2, 1])).to.deep.equal([
+    20, 10,
+  ]);
+  expect(calls).to.have.length(2);
+});
+
+it("evicts failed batches so their keys can be retried", async () => {
+  let attempts = 0;
+  const executor = defineBatchExecutor({
+    name: "retry",
+    callback: (_options: undefined, keys: readonly number[]) => {
+      attempts++;
+      if (attempts === 1) {
+        throw new Error("fetch failed");
+      }
+      return keys;
+    },
+  });
+  const meta = {};
+  const failed = await Promise.allSettled([
+    batchInMeta(schema, meta, executor, [1]),
+    batchInMeta(schema, meta, executor, [1, 2]),
+  ]);
+  expect(failed.map((result) => result.status)).to.deep.equal([
+    "rejected",
+    "rejected",
+  ]);
+  expect(await batchInMeta(schema, meta, executor, [2, 1])).to.deep.equal([
+    2, 1,
+  ]);
+  expect(attempts).to.equal(2);
+});
+
+it("preserves per-key promises rather than rejecting an entire batch", async () => {
+  const error = new Error("one key failed");
+  const rejected = Promise.reject(error);
+  void rejected.catch(() => {});
+  const executor = defineBatchExecutor({
+    name: "per-key-promises",
+    callback: (_options: undefined, keys: readonly number[]) =>
+      keys.map((key) => (key === 1 ? rejected : Promise.resolve(key))),
+  });
+  const meta = {};
+  const results = await batchInMeta(schema, meta, executor, [1, 2]);
+  expect(results[0]).to.equal(rejected);
+  expect(await results[1]).to.equal(2);
+  const cached = await batchInMeta(schema, meta, executor, [1]);
+  expect(cached[0]).to.equal(rejected);
+});

@@ -10,8 +10,10 @@ import type {
   Step,
 } from "../dist/index.js";
 import {
+  constant,
   context,
   grafast,
+  loadMany,
   loadOne,
   loadOneCallback,
   loadOneLoader,
@@ -613,3 +615,44 @@ it("uses stable identifiers to avoid the need for double-fetches (obj)", async (
   expect(CALLS).to.have.length(1);
   expect(CALLS[0].attributes).to.deep.equal(["id", "name", "orgId"]);
 });
+
+for (const many of [false, true]) {
+  it(`${many ? "loadMany" : "loadOne"} shares cached keys across successive steps within each execution`, async () => {
+    const calls: number[][] = [];
+    const callback = (keys: readonly number[]) => {
+      calls.push([...keys]);
+      return keys.map((id) => ({ id }));
+    };
+    const manyCallback = (keys: readonly number[]) =>
+      callback(keys).map((item) => [item, item]);
+    const load = ($key: Step<number>) =>
+      many ? loadMany($key, manyCallback) : loadOne($key, callback);
+    const type = many ? "[Item]" : "Item";
+    const schema = makeGrafastSchema({
+      typeDefs: `type Query { item: ${type} } type Item { id: Int, next: ${type} }`,
+      objects: {
+        Query: {
+          plans: { item: () => load(constant(1)) },
+        },
+        Item: {
+          plans: {
+            next: ($item) => load($item.get("id")),
+          },
+        },
+      },
+    });
+    const item = { id: 1, next: many ? [{ id: 1 }, { id: 1 }] : { id: 1 } };
+    const expected = { data: { item: many ? [item, item] : item } };
+    const contextValue = {};
+    for (let i = 0; i < 2; i++) {
+      expect(
+        await grafast({
+          schema,
+          source: "{ item { id next { id } } }",
+          contextValue,
+        }),
+      ).to.deep.equal(expected);
+    }
+    expect(calls).to.deep.equal([[1], [1]]);
+  });
+}

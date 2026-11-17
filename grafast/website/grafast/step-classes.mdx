@@ -237,8 +237,11 @@ deduplicated:
 
 These comparisons are shallow: nested objects and arrays are compared by
 identity. Select a mode that matches the inputs your callback treats as
-equivalent. Batching is limited to compatible calls ready in the same tick; it
-is not a cache of results for later calls.
+equivalent. Compatible calls share cached results and in-flight work throughout
+an execution scope, including across steps and later batch calls. Only uncached
+keysets are passed to the callback. The cache belongs to `metaByMetaKey` and ends
+with that scope; root executions, mutation fields and subscription events have
+separate scopes. Failed batch calls are evicted so later calls can retry.
 
 #### details.values
 

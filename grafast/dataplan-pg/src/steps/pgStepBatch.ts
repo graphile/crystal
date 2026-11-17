@@ -11,6 +11,7 @@ import type {
 type PgStepBatchOptions = PgExecutorOptions & {
   executor: PgExecutor;
   context: PgExecutorContext;
+  cacheToken: object;
 };
 
 function getOptions(
@@ -22,6 +23,7 @@ function getOptions(
     ...options,
     executor,
     context,
+    cacheToken: executor.getBatchCacheToken(context),
     identifierIndex: options.identifierIndex ?? null,
     useTransaction: options.useTransaction ?? false,
   };
@@ -37,7 +39,10 @@ export const pgStepBatchExecutor = Object.freeze({
         ? arraysMatch(left.rawSqlValues, right.rawSqlValues)
         : a === b,
     ),
-  callback: async ({ executor, context, ...options }, keysets) => {
+  callback: async (
+    { executor, context, cacheToken: _cacheToken, ...options },
+    keysets,
+  ) => {
     const inputs: PgExecutorInput<any>[] = keysets.map((queryValues) => ({
       context,
       queryValues,

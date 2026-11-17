@@ -1,9 +1,5 @@
 import { defineBatchExecutor } from "../batch.ts";
-import type {
-  ExecutionDetails,
-  Maybe,
-  PromiseOrDirect,
-} from "../interfaces.ts";
+import type { ExecutionDetails, PromiseOrDirect } from "../interfaces.ts";
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
 import type { Step } from "../step.ts";
 import { isListLikeStep, isObjectLikeStep } from "../step.ts";
@@ -86,10 +82,6 @@ export function paramSig(
   );
 }
 
-interface LoadMeta {
-  cache?: Map<any, any>;
-}
-
 type LoadCallback = (...args: any[]) => any;
 
 type LoadBatchOptions = {
@@ -123,13 +115,7 @@ const loadBatchExecutor = defineBatchExecutor({
     recordsMatch(left.params, right.params),
 });
 
-export function executeLoad<
-  const TLookup extends Multistep,
-  TItem,
-  TData extends Maybe<TItem> | Maybe<ReadonlyArray<Maybe<TItem>>>,
-  TParams extends Record<string, any>,
-  const TLoadContext extends Multistep = never,
->(
+export function executeLoad(
   details: ExecutionDetails,
   sharedDepId: number | null,
   paramDepIdByKey: Record<string, number>,
@@ -138,67 +124,26 @@ export function executeLoad<
   },
   load: LoadCallback,
 ) {
-  const { count, extra, values } = details;
-  const values0 = values[0] as UnwrapMultistep<TLookup>;
+  const { indexMap, values } = details;
+  const values0 = values[0];
   const shared =
-    sharedDepId != null
-      ? (values[sharedDepId].unaryValue() as UnwrapMultistep<TLoadContext>)
-      : (undefined as never);
-  const meta = extra.meta as LoadMeta;
-  let cache = meta.cache;
-  if (!cache) {
-    cache = new Map();
-    meta.cache = cache;
-  }
-  const batch = new Map<UnwrapMultistep<TLookup>, number[]>();
+    sharedDepId != null ? values[sharedDepId].unaryValue() : undefined;
   const params = Object.fromEntries(
     Object.entries(paramDepIdByKey).map(([key, depId]) => [
       key,
       values[depId].unaryValue(),
     ]),
-  ) as Partial<TParams>;
+  );
 
-  const results: Array<PromiseOrDirect<TData>> = [];
-  for (let i = 0; i < count; i++) {
-    const spec = values0.at(i);
-    if (cache.has(spec)) {
-      results.push(cache.get(spec)!);
-    } else {
-      // We'll fill this in in a minute
-      const index = results.push(null as any) - 1;
-      const existingIdx = batch.get(spec);
-      if (existingIdx !== undefined) {
-        existingIdx.push(index);
-      } else {
-        batch.set(spec, [index]);
-      }
-    }
-  }
-  const pendingCount = batch.size;
-  if (pendingCount > 0) {
-    const batchSpecs = [...batch.keys()];
-    const parameterNames = Object.keys(params).sort();
-    const options = {
+  return details.batch(
+    loadBatchExecutor,
+    indexMap((i) => values0.at(i)),
+    {
       load,
       attributes: baseLoadInfo.attributes,
-      parameterNames,
+      parameterNames: Object.keys(params).sort(),
       shared,
       params,
-    };
-    const loadResults = details.batch(loadBatchExecutor, batchSpecs, options);
-    return (async () => {
-      const loaded = await loadResults;
-      for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {
-        const spec = batchSpecs[pendingIndex];
-        const targetIndexes = batch.get(spec)!;
-        const loadResult = loaded[pendingIndex];
-        cache.set(spec, loadResult);
-        for (const targetIndex of targetIndexes) {
-          results[targetIndex] = loadResult;
-        }
-      }
-      return results;
-    })();
-  }
-  return results;
+    },
+  );
 }
