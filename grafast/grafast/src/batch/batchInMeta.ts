@@ -23,6 +23,11 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 
 const $$batches = Symbol("Grafast batch caches");
 
+/** Replace this scope's cache generation; already dispatched work can finish. */
+export function invalidateBatchCache(scope: object): void {
+  delete (scope as BatchMeta)[$$batches];
+}
+
 /** @internal Used to implement `ExecutionDetails.batch`. */
 export function batchInMeta<
   TOptions extends Record<string, unknown> | undefined,

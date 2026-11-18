@@ -15,6 +15,7 @@ import {
   each,
   flagError,
   grafast,
+  invalidateBatchCache,
   lambda,
   makeGrafastSchema,
   Step,
@@ -1160,4 +1161,34 @@ it("keeps record shapes separate even when their value paths match", async () =>
   expect(Array.isArray(cached)).to.equal(true);
   expect(cached).to.deep.equal(originals);
   expect(received).to.have.length(1);
+});
+
+it("invalidates a scope without letting old in-flight results populate its new cache", async () => {
+  let release!: () => void;
+  let version = 1;
+  const executor = defineBatchExecutor({
+    name: "generation-invalidation",
+    keysetEquality: "strict",
+    callback: async (_options: undefined, keys: readonly number[]) => {
+      const value = version;
+      if (value === 1) {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+      }
+      return keys.map(() => value);
+    },
+  });
+  const scope = {};
+  const old = batchInMeta(schema, scope, executor, [1]);
+  await Promise.resolve();
+  invalidateBatchCache(scope);
+  version = 2;
+  try {
+    expect(await batchInMeta(schema, scope, executor, [1])).to.deep.equal([2]);
+  } finally {
+    release();
+  }
+  expect(await old).to.deep.equal([1]);
+  expect(batchInMeta(schema, scope, executor, [1])).to.deep.equal([2]);
 });

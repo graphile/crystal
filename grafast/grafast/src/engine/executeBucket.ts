@@ -841,6 +841,7 @@ export function executeBucket(
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
       batch,
+      batchScope: metaByMetaKey,
       stream: evaluateStream(bucket, step, distributorOptions),
       extra,
     };

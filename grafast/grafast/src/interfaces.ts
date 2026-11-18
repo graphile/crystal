@@ -815,6 +815,9 @@ export interface ExecutionDetails<
    */
   batch: BatchFunction;
 
+  /** Opaque cache scope; pass to invalidateBatchCache after a successful mutation. */
+  batchScope: object;
+
   /**
    * If this step is expected to return a stream (e.g. because it's a
    * `subscription`, or because of the `@stream` incremental delivery
