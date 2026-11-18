@@ -3,12 +3,16 @@ import type { CompositeEntry, KeysetTrieNode } from "./batchInterfaces.ts";
 import type { BatchTupleIndex } from "./batchTupleIndex.ts";
 import { internBatchTupleEntry } from "./batchTupleIndex.ts";
 
-function createEntry<K, R>(keyset: K): CompositeEntry<K, R> {
+function createEntry<TKeyset, TResult>(
+  keyset: TKeyset,
+): CompositeEntry<TKeyset, TResult> {
   return { keyset, batch: undefined, index: -1, result: undefined };
 }
 
-function getTupleKeyset<K, R>(entry: CompositeEntry<K, R>) {
-  return entry.keyset as K & readonly unknown[];
+function getTupleKeyset<TKeyset, TResult>(
+  entry: CompositeEntry<TKeyset, TResult>,
+) {
+  return entry.keyset as TKeyset & readonly unknown[];
 }
 
 export function canonicalizeTuple<TKeyset, TResult>(

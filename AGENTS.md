@@ -118,6 +118,13 @@ into 4 main categories based on the root folders, each of which have a
   type. Use the same order at every construction site. List properties
   explicitly when spreading an object would make their order depend on the
   caller.
+- Use descriptive names for variables and generic type parameters. Reserve
+  single-letter names for: simple loop indices/lengths (`i`, `j`, `l`), `e` for
+  errors, `a` and `z` for sort callback parameters (so that sort is intuitively
+  `a-z` or `z-a`), `T` where there's only one generic type parameter and it has
+  no constraints, `U` where there's only one inferred type, and `K` where
+  there's only one inferred key type. Variables in tests may use single letter
+  names.
 - Do not reassign function parameters; use a local variable instead.
 - When handling all members of a union, include an explicit exhaustiveness check
   such as `const never: never = value;` in a `switch` default or an unreachable

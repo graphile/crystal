@@ -21,13 +21,13 @@ export interface PendingItem<TKeyset, TResult> {
 }
 
 /** The canonical keyset and its pending or cached result for a tuple or object. */
-export interface CompositeEntry<K, R> {
-  keyset: K;
+export interface CompositeEntry<TKeyset, TResult> {
+  keyset: TKeyset;
   /** Undefined before queuing or after failure, null once the result is cached. */
-  batch: PendingBatch<K, R> | null | undefined;
+  batch: PendingBatch<TKeyset, TResult> | null | undefined;
   /** Position in `batch.keysets`. A value of `-1` means no batch is pending. */
   index: number;
-  result: R | undefined;
+  result: TResult | undefined;
 }
 
 export type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
