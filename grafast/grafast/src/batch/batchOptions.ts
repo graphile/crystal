@@ -8,7 +8,15 @@ interface KeyOrder {
 
 interface OptionsMatcher {
   matches(left: unknown, right: unknown): boolean;
-  /** Matching options must append the same keys under Map equality. */
+  /**
+   * Appends this value's components to the flat key used to find candidate
+   * batches. Nested matchers append to the same array. The index shares
+   * `order` across lookups so symbol keys sort consistently.
+   *
+   * Values that match must produce the same components under Map equality.
+   * Several distinct values can share an index key. `matches` checks the
+   * candidates before reusing a batch.
+   */
   appendKeys(value: unknown, keys: unknown[], order: KeyOrder): void;
 }
 
@@ -24,13 +32,10 @@ const $$scalar = Symbol("non-structural batch option");
 const tupleMatcher: OptionsMatcher = {
   matches: (left, right) =>
     left === right ||
-    (Array.isArray(left) &&
-      Array.isArray(right) &&
-      Object.getPrototypeOf(left) === Object.getPrototypeOf(right) &&
-      arraysMatch(left, right)),
+    (Array.isArray(left) && Array.isArray(right) && arraysMatch(left, right)),
   appendKeys(value, keys) {
     if (Array.isArray(value)) {
-      keys.push(Object.getPrototypeOf(value), value.length);
+      keys.push(value.length);
       for (let i = 0; i < value.length; i++) {
         keys.push(value[i]);
       }

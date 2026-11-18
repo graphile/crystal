@@ -229,9 +229,9 @@ const optionsMatch = {
 ```
 
 `"strict"` uses `===`. `"record"` compares an object by prototype, own keys,
-and their values. `"tuple"` compares an array by prototype, length, and its
-elements in order. A nested descriptor applies the same own-property rules to
-that object. Gra*fast* uses these rules to narrow the search for equivalent
+and their values. `"tuple"` compares an array by length and its elements in
+order. A nested descriptor applies the same own-property rules to that object.
+Gra*fast* uses these rules to narrow the search for equivalent
 options, then checks the remaining candidates against the descriptor. The index
 uses explicit rules in declaration order, followed by the other own keys in a
 canonical order. Put distinctive values early to reduce index branching. Only
@@ -1012,7 +1012,7 @@ directly on any step:
 ```ts
 const $step = doSomething();
 
-const $log = lambda(null, () => console.log("hello world"))
+const $log = lambda(null, () => console.log("hello world"));
 // Ensure $log will run and not be tree shaken away
 $log.hasSideEffects = true;
 
