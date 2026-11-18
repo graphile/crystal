@@ -89,7 +89,8 @@ export function batchInMeta<
     }
   }
   const { cache, pending } = family;
-  const batch = new Map<Promise<ReadonlyArray<TResult>>, number[]>();
+  let pendingIndexes: Map<Promise<ReadonlyArray<TResult>>, number[]> | null =
+    null;
   const results: ExecutionResultValue<TResult>[] = [];
   for (let i = 0; i < keysets.length; i++) {
     const composite = entries?.[i];
@@ -133,20 +134,22 @@ export function batchInMeta<
           (loadBatch.entries ??= []).push(composite);
         }
       }
-      let indexes = batch.get(batchForKey.deferred.promise);
+      const indexesByPromise = (pendingIndexes ??= new Map());
+      const promise = batchForKey.deferred.promise;
+      let indexes = indexesByPromise.get(promise);
       if (indexes === undefined) {
         indexes = [];
-        batch.set(batchForKey.deferred.promise, indexes);
+        indexesByPromise.set(promise, indexes);
       }
       // Pairs of source index in the pending batch and target result index.
       indexes.push(sourceIndex!, targetIndex);
     }
   }
-  if (batch.size === 0) {
+  if (pendingIndexes === null) {
     return results;
   } else {
-    const promises: Promise<any>[] = [];
-    for (const [promise, indexes] of batch.entries()) {
+    const promises: Promise<void>[] = [];
+    for (const [promise, indexes] of pendingIndexes) {
       promises.push(
         promise.then(
           (loadResults) => {
@@ -159,7 +162,6 @@ export function batchInMeta<
           (e) => {
             const err = flagError(e);
             for (let i = 0; i < indexes.length; i += 2) {
-              // const pendingIndex = indexes[i];
               const targetIndex = indexes[i + 1];
               results[targetIndex] = err;
             }

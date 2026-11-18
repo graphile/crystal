@@ -17,6 +17,7 @@ import { flagError, isFlaggedValue, SafeError } from "../error.ts";
 import { inspect } from "../inspect.ts";
 import type {
   BatchExecutionValue,
+  BatchFunction,
   ExecuteStepEvent,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -134,9 +135,17 @@ export function executeBucket(
     metaByMetaKey,
     size,
     store,
-    layerPlan: { phases },
+    layerPlan: { phases, operationPlan },
   } = bucket;
 
+  const batch: BatchFunction = (executor, keysets, options?) =>
+    batchInMeta(
+      operationPlan.schema,
+      metaByMetaKey,
+      executor,
+      keysets,
+      options,
+    );
   const phaseCount = phases.length;
 
   // Like a `for(i = 0; i < phaseCount; i++)` loop with some `await`s in it, except it does promise
@@ -831,14 +840,7 @@ export function executeBucket(
       values,
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
-      batch: (executor, keysets, options?) =>
-        batchInMeta(
-          step.operationPlan.schema,
-          metaByMetaKey,
-          executor,
-          keysets,
-          options,
-        ),
+      batch,
       stream: evaluateStream(bucket, step, distributorOptions),
       extra,
     };

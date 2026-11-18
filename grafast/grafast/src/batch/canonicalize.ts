@@ -7,6 +7,10 @@ function createEntry<K, R>(keyset: K): CompositeEntry<K, R> {
   return { keyset, batch: undefined, index: -1, result: undefined };
 }
 
+function getTupleKeyset<K, R>(entry: CompositeEntry<K, R>) {
+  return entry.keyset as K & readonly unknown[];
+}
+
 export function canonicalizeTuple<TKeyset, TResult>(
   index: BatchTupleIndex<CompositeEntry<TKeyset, TResult>>,
   keyset: TKeyset,
@@ -17,7 +21,7 @@ export function canonicalizeTuple<TKeyset, TResult>(
   return internBatchTupleEntry(
     index,
     keyset,
-    (entry) => entry.keyset as TKeyset & readonly unknown[],
+    getTupleKeyset<TKeyset, TResult>,
     createEntry<TKeyset, TResult>,
   );
 }
