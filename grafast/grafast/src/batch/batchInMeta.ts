@@ -8,8 +8,8 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.ts";
 import { isPojo } from "../utils.ts";
-import type { BatchFamily, CompositeEntry } from "./batchInterfaces.ts";
-import { BatchOptionsIndex, getOptionsMatcher } from "./batchOptions.ts";
+import type { CompositeEntry } from "./batchInterfaces.ts";
+import { BatchOptionsIndex } from "./batchOptions.ts";
 import { canonicalizeObject, canonicalizeTuple } from "./canonicalize.ts";
 import { checkExecutor } from "./checkExecutor.ts";
 import { executeBatch } from "./executeBatch.ts";
@@ -17,7 +17,7 @@ import { executeBatch } from "./executeBatch.ts";
 type BatchMeta = Record<PropertyKey, unknown> & {
   [$$batches]?: Map<
     BatchExecutor<any, any, any>,
-    BatchOptionsIndex<any, BatchFamily<any, any, any>>
+    BatchOptionsIndex<any, any, any>
   >;
 };
 
@@ -51,21 +51,10 @@ export function batchInMeta<
     metaByMetaKey[$$batches] = batches = new Map();
   }
   let families = batches.get(executor) as
-    | BatchOptionsIndex<TOptions, BatchFamily<TOptions, TKeyset, TResult>>
+    | BatchOptionsIndex<TOptions, TKeyset, TResult>
     | undefined;
   if (families === undefined) {
-    families = new BatchOptionsIndex(
-      getOptionsMatcher(executor.optionsMatch),
-      (options: TOptions) => ({
-        executor,
-        options,
-        cache: new Map(),
-        pending: new Map(),
-        queued: null,
-        tupleKeyIndex: null,
-        objectKeyIndexes: null,
-      }),
-    );
+    families = new BatchOptionsIndex(executor);
     batches.set(executor, families);
   }
   // ExecutionDetails.batch requires options unless TOptions includes undefined.

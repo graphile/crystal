@@ -1,4 +1,6 @@
+import type { BatchExecutor } from "../interfaces.ts";
 import { arraysMatch, isPojo } from "../utils.ts";
+import type { BatchFamily, BatchOptions } from "./batchInterfaces.ts";
 import type { BatchTupleIndex } from "./batchTupleIndex.ts";
 import { internBatchTuple } from "./batchTupleIndex.ts";
 
@@ -181,21 +183,42 @@ interface OptionsIndex<TOptions, TEntry> extends KeyOrder {
 }
 
 /** The index only narrows the search: the matcher decides whether to merge. */
-export class BatchOptionsIndex<TOptions, TEntry extends { options: TOptions }> {
-  private first: TEntry | null = null;
-  private index: OptionsIndex<TOptions, TEntry> | null = null;
+export class BatchOptionsIndex<
+  TOptions extends BatchOptions,
+  TKeyset,
+  TResult,
+> {
+  private first: BatchFamily<TOptions, TKeyset, TResult> | null = null;
+  private index: OptionsIndex<
+    TOptions,
+    BatchFamily<TOptions, TKeyset, TResult>
+  > | null = null;
+  private readonly executor: BatchExecutor<TOptions, TKeyset, TResult>;
   private readonly matcher: OptionsMatcher;
-  private readonly create: (options: TOptions) => TEntry;
 
-  constructor(matcher: OptionsMatcher, create: (options: TOptions) => TEntry) {
-    this.matcher = matcher;
-    this.create = create;
+  constructor(executor: BatchExecutor<TOptions, TKeyset, TResult>) {
+    this.executor = executor;
+    this.matcher = getOptionsMatcher(executor.optionsMatch);
   }
 
-  getOrCreate(options: TOptions): TEntry {
+  private createFamily(
+    options: TOptions,
+  ): BatchFamily<TOptions, TKeyset, TResult> {
+    return {
+      executor: this.executor,
+      options,
+      cache: new Map(),
+      pending: new Map(),
+      queued: null,
+      tupleKeyIndex: null,
+      objectKeyIndexes: null,
+    };
+  }
+
+  getOrCreate(options: TOptions): BatchFamily<TOptions, TKeyset, TResult> {
     const first = this.first;
     if (first === null) {
-      return (this.first = this.create(options));
+      return (this.first = this.createFamily(options));
     }
 
     let index = this.index;
@@ -234,7 +257,7 @@ export class BatchOptionsIndex<TOptions, TEntry extends { options: TOptions }> {
     ) {
       return bucket;
     }
-    const entry = this.create(options);
+    const entry = this.createFamily(options);
     index.byIdentity.set(options, entry);
     if (Array.isArray(bucket)) {
       bucket.push(entry);
@@ -244,7 +267,10 @@ export class BatchOptionsIndex<TOptions, TEntry extends { options: TOptions }> {
     return entry;
   }
 
-  private getKey(index: OptionsIndex<TOptions, TEntry>, options: TOptions) {
+  private getKey(
+    index: OptionsIndex<TOptions, BatchFamily<TOptions, TKeyset, TResult>>,
+    options: TOptions,
+  ) {
     const keys: unknown[] = [];
     this.matcher.appendKeys(options, keys, index);
     return internBatchTuple(index.keys, keys);
