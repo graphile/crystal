@@ -109,6 +109,14 @@ into 4 main categories based on the root folders, each of which have a
 - Use a block body for any `switch` clause that declares or assigns a variable,
   or contains more than four statements. If one clause uses a block body, use
   block bodies for all clauses in that `switch`.
+- Keep internal object shapes stable for V8. Initialize fields at construction
+  time. When a field is populated lazily, declare it as required (no `?`) and
+  extend the type with `| null` or `| undefined`. Explicitly initialize it (to
+  `null` or `undefined`) when constructing the object..
+- Add object properties in the order declared by their TypeScript interface or
+  type. Use the same order at every construction site. List properties
+  explicitly when spreading an object would make their order depend on the
+  caller.
 - Do not reassign function parameters; use a local variable instead.
 - When handling all members of a union, include an explicit exhaustiveness check
   such as `const never: never = value;` in a `switch` default or an unreachable
