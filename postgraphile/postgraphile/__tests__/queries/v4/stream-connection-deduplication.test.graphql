@@ -1,0 +1,21 @@
+## expect(errors).toBeFalsy();
+## expect((await result1).extensions.explain.operations.find((op) => op.type === "plan").plan.buckets.flatMap((bucket) => bucket.steps).filter((step) => step.stepClass === "ConnectionStep")).toHaveLength(1);
+## expect(queries.some(({ text }) => /^declare /im.test(text))).toBe(false);
+## expect(payloads[0].data.sharedPeople).toEqual({ streamed: [{ id: 1 }], plain: { pageInfo: { hasNextPage: true } } });
+## expect(payloads.filter(({ path }) => path?.slice(0, 2).join(".") === "sharedPeople.streamed").map(({ data }) => data.id)).toEqual([2, 3]);
+#> extends: ["./StreamConnectionDeduplication.ts:preset"]
+#> schema: ["a", "b", "c"]
+{
+  sharedPeople {
+    streamed @stream(initialCount: 1) {
+      id
+    }
+    # Request page info without calling nodes or edges, so this connection
+    # requires arrays without already disabling streaming on the shared select.
+    plain {
+      pageInfo {
+        hasNextPage
+      }
+    }
+  }
+}
