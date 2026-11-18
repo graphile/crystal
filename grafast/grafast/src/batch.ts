@@ -7,7 +7,7 @@ import type {
   ExecutionResultValue,
   PromiseOrDirect,
 } from "./interfaces.ts";
-import { isPojo, recordsMatch } from "./utils.ts";
+import { isPojo, isPromiseLike, recordsMatch } from "./utils.ts";
 
 /** Define once at module scope, or during schema construction. */
 export function defineBatchExecutor<
@@ -333,8 +333,13 @@ async function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
     }
     for (let pendingIndex = 0; pendingIndex < keysets.length; pendingIndex++) {
       const spec = keysets[pendingIndex];
-      family.cache.set(spec, loadResults[pendingIndex]);
+      const result = loadResults[pendingIndex];
+      family.cache.set(spec, result);
       family.pending.delete(spec);
+      if (isPromiseLike(result)) {
+        // Prevent promise rejections causing unhandledRejection
+        result.then(null, noop);
+      }
     }
     deferred.resolve(loadResults);
   } catch (error) {
