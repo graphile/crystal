@@ -89,6 +89,11 @@ export function batchInMeta<
     }
   }
   const { cache, pending } = family;
+  /**
+   * Map from the fetch promise to a list where the even (0-indexed) entries
+   * are the index in the batch request, and the odd entries are the target index to
+   * write to in the result.
+   */
   let pendingIndexes: Map<Promise<ReadonlyArray<TResult>>, number[]> | null =
     null;
   const results: ExecutionResultValue<TResult>[] = [];
@@ -109,6 +114,7 @@ export function batchInMeta<
       // Placeholder; we'll overwrite this once fetched
       const targetIndex = results.push(null as TResult) - 1;
 
+      /** strict mode: PendingItem?; otherwise `batch` is nullable and `index` might be -1 */
       const request = entryI === undefined ? pending.get(keyset) : entryI;
       let batchForKey: PendingBatch<TKeyset, TResult>;
       let sourceIndex: number;
@@ -133,8 +139,10 @@ export function batchInMeta<
         batchForKey = loadBatch;
         sourceIndex = index;
         if (entryI === undefined) {
+          // strict mode
           pending.set(keyset, { batch: loadBatch, index });
         } else {
+          // tuple/object mode
           entryI.batch = loadBatch;
           entryI.index = index;
           (loadBatch.entries ??= []).push(entryI);
