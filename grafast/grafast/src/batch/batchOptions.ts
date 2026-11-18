@@ -207,9 +207,10 @@ export class BatchOptionsIndex<
     return {
       executor: this.executor,
       options,
+      queued: null,
+
       cache: new Map(),
       pending: new Map(),
-      queued: null,
       tupleKeyIndex: null,
       objectKeyIndexes: null,
     };

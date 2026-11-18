@@ -33,12 +33,13 @@ export interface CompositeEntry<TKeyset, TResult> {
 export type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
   executor: BatchExecutor<TOptions, TKeyset, TResult>;
   options: TOptions;
+  /** The batch currently collecting keys, scheduled to start in a microtask. */
+  queued: PendingBatch<TKeyset, TResult> | null;
+
   /** In `strict` mode, cached results by keyset. */
   cache: Map<TKeyset, TResult>;
   /** In `strict` mode, the pending batch and position for each in-flight keyset. */
   pending: Map<TKeyset, PendingItem<TKeyset, TResult>>;
-  /** The batch currently collecting keys, scheduled to start in a microtask. */
-  queued: PendingBatch<TKeyset, TResult> | null;
   /**
    * In `tuple` mode, a trie keyed by tuple elements. Each entry holds the
    * canonical keyset and its pending batch or cached result.
