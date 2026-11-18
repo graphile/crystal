@@ -8,6 +8,7 @@ interface KeyOrder {
   symbolOrder: Map<symbol, number> | null;
 }
 
+/** @internal */
 interface OptionsMatcher {
   matches(left: unknown, right: unknown): boolean;
   /**
@@ -162,6 +163,7 @@ function compileOptionsMatch(descriptor: object): OptionsMatcher {
 
 const compiled = new WeakMap<object, OptionsMatcher>();
 
+/** @internal */
 export function getOptionsMatcher(
   descriptor: object | undefined,
 ): OptionsMatcher {
@@ -182,7 +184,11 @@ interface OptionsIndex<TOptions, TEntry> extends KeyOrder {
   byKeys: Map<readonly unknown[], TEntry | TEntry[]>;
 }
 
-/** The index only narrows the search: the matcher decides whether to merge. */
+/**
+ * The index only narrows the search: the matcher decides whether to merge.
+ *
+ * @internal
+ */
 export class BatchOptionsIndex<
   TOptions extends BatchOptions,
   TKeyset,
