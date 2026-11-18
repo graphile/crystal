@@ -30,7 +30,7 @@ export function batchInMeta<
   TResult,
 >(
   schema: GraphQLSchema,
-  metaByMetaKey: Record<PropertyKey, unknown>,
+  metaByMetaKey: BatchMeta,
   executor: BatchExecutor<TOptions, TKeyset, TResult>,
   keysets: readonly TKeyset[],
   options?: TOptions,
@@ -46,13 +46,10 @@ export function batchInMeta<
     return [];
   }
 
-  const typedMeta = metaByMetaKey as BatchMeta;
-  let batches = typedMeta[$$batches];
+  let batches = metaByMetaKey[$$batches];
   if (batches === undefined) {
-    typedMeta[$$batches] = batches = new Map();
+    metaByMetaKey[$$batches] = batches = new Map();
   }
-  // Executor identity determines the options, keyset and result types of all
-  // families stored under it; only the heterogeneous registry erases them.
   let families = batches.get(executor) as
     | BatchOptionsIndex<TOptions, BatchFamily<TOptions, TKeyset, TResult>>
     | undefined;
