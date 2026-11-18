@@ -3,7 +3,6 @@ import { assert } from "tsafe";
 
 import type {
   __ValueStep,
-  BatchFunction,
   ConstantStep,
   DataFromObjectSteps,
   ExecutionDetails,
@@ -60,7 +59,7 @@ const _myPlan: FieldPlanResolver = () => {
 };
 
 // Internal adapter types must preserve the same guarantees as the public loaders.
-const _batchTypes = (batch: BatchFunction) => {
+const _batchTypes = (batch: ExecutionDetails["batch"]) => {
   const executor = defineBatchExecutor({
     name: "type-test",
     keysetEquality: "strict",

@@ -7,11 +7,11 @@ import { it } from "mocha";
 
 import { batchInMeta } from "../dist/batch/batchInMeta.js";
 import { getOptionsMatcher } from "../dist/batch/batchOptions.js";
-import { defineBatchExecutor } from "../dist/batch/defineBatchExecutor.js";
 import { isDev } from "../dist/dev.js";
 import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
 import {
   constant,
+  defineBatchExecutor,
   each,
   flagError,
   grafast,
