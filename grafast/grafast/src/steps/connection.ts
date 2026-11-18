@@ -821,7 +821,7 @@ export class ConnectionStep<
     );
   }
 
-  deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any>) {
+  deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any, any>) {
     if (this.neededCollection) {
       replacement.neededCollection = true;
     }
@@ -830,6 +830,11 @@ export class ConnectionStep<
     }
     if (this.needsHasMore) {
       replacement.needsHasMore = true;
+    }
+    // Consumers may already rely on either connection yielding an array.
+    if (replacement.mightStream() && !this.mightStream()) {
+      replacement._mightStream = false;
+      replacement.getHandler(false).addStreamDetails?.(null);
     }
   }
 
