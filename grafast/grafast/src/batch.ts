@@ -293,43 +293,57 @@ export function batchInMeta<
   if (batch.size === 0) {
     return results;
   } else {
-    return (async () => {
-      for (const [promise, indexes] of batch.entries()) {
-        try {
-          // Usually there is just one batch (one promise). I suspect it's
-          // unlikely that there will often be sufficiently many that switching
-          // to `Promise.allSettled` would be worthwhile.
-          const loadResults = await promise;
-          for (let i = 0; i < indexes.length; i += 2) {
-            const pendingIndex = indexes[i];
-            const targetIndex = indexes[i + 1];
-            results[targetIndex] = loadResults[pendingIndex];
-          }
-        } catch (e) {
-          const err = flagError(e);
-          for (let i = 0; i < indexes.length; i += 2) {
-            // const pendingIndex = indexes[i];
-            const targetIndex = indexes[i + 1];
-            results[targetIndex] = err;
-          }
-        }
-      }
-      return results;
-    })();
+    const promises: Promise<any>[] = [];
+    for (const [promise, indexes] of batch.entries()) {
+      promises.push(
+        promise.then(
+          (loadResults) => {
+            for (let i = 0; i < indexes.length; i += 2) {
+              const pendingIndex = indexes[i];
+              const targetIndex = indexes[i + 1];
+              results[targetIndex] = loadResults[pendingIndex];
+            }
+          },
+          (e) => {
+            const err = flagError(e);
+            for (let i = 0; i < indexes.length; i += 2) {
+              // const pendingIndex = indexes[i];
+              const targetIndex = indexes[i + 1];
+              results[targetIndex] = err;
+            }
+          },
+        ),
+      );
+    }
+    if (promises.length === 1) {
+      return promises[0].then(() => results);
+    } else {
+      return Promise.all(promises).then(() => results);
+    }
   }
 }
 
-async function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
+function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
   family: BatchFamily<TOptions, TKeyset, TResult>,
   loadBatch: PendingBatch<TKeyset, TResult>,
-): Promise<void> {
+): PromiseOrDirect<void> {
   const { deferred, keysets } = loadBatch;
   try {
-    const loadResults = await family.executor.callback(family.options, keysets);
+    const promiseOrValue = family.executor.callback(family.options, keysets);
+    if (isPromiseLike(promiseOrValue)) {
+      return promiseOrValue.then(processResults).then(null, handleError);
+    } else {
+      return processResults(promiseOrValue);
+    }
+  } catch (e) {
+    handleError(e);
+  }
+
+  function processResults(loadResults: readonly TResult[]) {
     if (loadResults.length !== keysets.length) {
       // This path shouldn't happen, so expensively handle the case that
       // loadResults may include promises
-      await Promise.allSettled(loadResults);
+      void Promise.all(loadResults).catch(noop);
       throw new Error(
         `batch callback returned ${loadResults.length} results for ${keysets.length} keysets`,
       );
@@ -350,9 +364,10 @@ async function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
     }
     deferred.resolve(loadResults);
     if (promises !== null) {
-      Promise.allSettled(promises);
+      Promise.all(promises).catch(noop);
     }
-  } catch (error) {
+  }
+  function handleError(error: unknown) {
     for (const spec of keysets) {
       family.pending.delete(spec);
     }
