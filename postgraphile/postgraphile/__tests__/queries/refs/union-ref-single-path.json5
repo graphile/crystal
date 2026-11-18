@@ -1,0 +1,24 @@
+{
+  allNotes: {
+    nodes: [
+      {
+        body: "first note",
+        owner: {
+          __typename: "Person",
+          username: "alice",
+        },
+      },
+      {
+        body: "second note",
+        owner: {
+          __typename: "Person",
+          username: "bob",
+        },
+      },
+      {
+        body: "note without a person",
+        owner: null,
+      },
+    ],
+  },
+}
