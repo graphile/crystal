@@ -37,22 +37,19 @@ export function canonicalizeObject<TKeyset, TResult>(
   if (!isPojo(keyset)) {
     throw new Error("batch(..., 'object') requires object keysets");
   }
-  const record = keyset as Record<string, unknown>;
-  const keys = Object.keys(record).sort();
+  const keys = Object.keys(keyset).sort();
   const shape = JSON.stringify(keys);
-  let node = indexes.get(shape);
-  if (node === undefined) {
-    node = { children: null, entry: null };
-    indexes.set(shape, node);
+  let startNode = indexes.get(shape);
+  if (startNode === undefined) {
+    startNode = { children: null, entry: null };
+    indexes.set(shape, startNode);
   }
+  let node = startNode;
   for (const key of keys) {
-    const value = record[key];
-    const children: Map<
-      unknown,
-      KeysetTrieNode<TKeyset, TResult>
-    > = (node.children ??= new Map());
-    let child: KeysetTrieNode<TKeyset, TResult> | undefined =
-      children.get(value);
+    const value = keyset[key];
+    node.children ??= new Map();
+    const children = node.children;
+    let child = children.get(value);
     if (child === undefined) {
       child = { children: null, entry: null };
       children.set(value, child);
