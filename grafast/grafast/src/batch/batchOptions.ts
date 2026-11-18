@@ -142,10 +142,21 @@ function makeObjectMatcher(
 
 const recordMatcher = makeObjectMatcher();
 
-function compileOptionsMatch(descriptor: object): OptionsMatcher {
+interface OptionsMatchDescriptor {
+  readonly [key: PropertyKey]:
+    | "strict"
+    | "tuple"
+    | "record"
+    | OptionsMatchDescriptor
+    | undefined;
+}
+
+function compileOptionsMatch(
+  descriptor: OptionsMatchDescriptor,
+): OptionsMatcher {
   const rules = new Map<PropertyKey, OptionsMatcher>();
   for (const key of Reflect.ownKeys(descriptor)) {
-    const rule = (descriptor as Record<PropertyKey, unknown>)[key];
+    const rule = descriptor[key];
     if (rule === "tuple") {
       rules.set(key, tupleMatcher);
     } else if (rule === "record") {
@@ -161,11 +172,11 @@ function compileOptionsMatch(descriptor: object): OptionsMatcher {
   return rules.size === 0 ? recordMatcher : makeObjectMatcher(rules);
 }
 
-const compiled = new WeakMap<object, OptionsMatcher>();
+const compiled = new WeakMap<OptionsMatchDescriptor, OptionsMatcher>();
 
 /** @internal */
 export function getOptionsMatcher(
-  descriptor: object | undefined,
+  descriptor: OptionsMatchDescriptor | undefined,
 ): OptionsMatcher {
   if (descriptor === undefined) {
     return recordMatcher;
