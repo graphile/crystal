@@ -1,4 +1,5 @@
 import { createHook } from "node:async_hooks";
+import { setImmediate } from "node:timers/promises";
 
 import { expect } from "chai";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
@@ -7,7 +8,15 @@ import { it } from "mocha";
 import { batchInMeta, defineBatchExecutor } from "../dist/batch.js";
 import { isDev } from "../dist/dev.js";
 import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
-import { flagError, grafast, makeGrafastSchema, Step } from "../dist/index.js";
+import {
+  constant,
+  each,
+  flagError,
+  grafast,
+  lambda,
+  makeGrafastSchema,
+  Step,
+} from "../dist/index.js";
 
 function makeSchema() {
   return new GraphQLSchema({
@@ -684,6 +693,105 @@ it("preserves successful entries when an overlapping batch fails", async () => {
   expect(await overlapping).to.deep.equal([1, flagError(error)]);
   expect(await older).to.deep.equal([1]);
   expect(batchInMeta(schema, meta, executor, [1])).to.deep.equal([1]);
+});
+
+it("handles a per-key rejection while waiting for an older overlapping batch", async () => {
+  const olderStarted = Promise.withResolvers<void>();
+  const newerStarted = Promise.withResolvers<void>();
+  const olderResult = Promise.withResolvers<readonly number[]>();
+  const failedKey = Promise.withResolvers<number>();
+  const error = new Error("key in the newer batch failed");
+  const calls: (readonly number[])[] = [];
+  const executor = defineBatchExecutor<
+    undefined,
+    number,
+    number | Promise<number>
+  >({
+    keysetEquality: "strict",
+    name: "overlapping-per-key-rejection",
+    callback: (_options: undefined, keys: readonly number[]) => {
+      calls.push(keys);
+      if (keys[0] === 1) {
+        olderStarted.resolve();
+        return olderResult.promise;
+      } else {
+        newerStarted.resolve();
+        failedKey.reject(error);
+        return [failedKey.promise];
+      }
+    },
+  });
+  class OverlappingBatchStep extends Step<number> {
+    isSyncAndSafe = false;
+
+    constructor($key: Step<number>) {
+      super();
+      this.addDependency($key);
+    }
+
+    execute({ values: [key], batch }: ExecutionDetails<readonly [number]>) {
+      const values = key.isBatch ? key.entries : [key.value];
+      return batch(executor, values);
+    }
+  }
+  const schema = makeGrafastSchema({
+    typeDefs: `type Query { older: [Int], overlapping: [Int] }`,
+    objects: {
+      Query: {
+        plans: {
+          older: () =>
+            each(constant([1]), ($key) => new OverlappingBatchStep($key)),
+          overlapping: () =>
+            each(constant([1, 2]), ($key) => {
+              const $delayedKey = lambda($key, async (key) => {
+                await olderStarted.promise;
+                return key;
+              });
+              return new OverlappingBatchStep($delayedKey);
+            }),
+        },
+      },
+    },
+  });
+  let unhandled = false;
+  const onUnhandledRejection = (
+    _reason: unknown,
+    promise: Promise<unknown>,
+  ) => {
+    if (promise === failedKey.promise) {
+      unhandled = true;
+    } else {
+      throw new Error("Unexpected unhandled promise!");
+    }
+  };
+  process.once("unhandledRejection", onUnhandledRejection);
+  try {
+    const [result] = await Promise.all([
+      grafast({ schema, source: "{ older overlapping }" }),
+      (async () => {
+        await newerStarted.promise;
+        // Give Node a turn to report the rejection before the older batch finishes.
+        await setImmediate();
+        olderResult.resolve([1]);
+      })(),
+    ]);
+    expect(calls).to.deep.equal([[1], [2]]);
+    expect(result)
+      .to.have.property("data")
+      .that.deep.equals({
+        older: [1],
+        overlapping: [1, null],
+      });
+    expect(result).to.have.property("errors").with.lengthOf(1);
+    expect(result)
+      .to.have.nested.property("errors[0].path")
+      .that.deep.equals(["overlapping", 1]);
+    expect(unhandled, "the newer key's rejection was unhandled").to.equal(
+      false,
+    );
+  } finally {
+    process.off("unhandledRejection", onUnhandledRejection);
+  }
 });
 
 it("defineBatchExecutor returns the supplied executor unchanged", () => {
