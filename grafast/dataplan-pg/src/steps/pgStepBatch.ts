@@ -8,10 +8,9 @@ import type {
   PgExecutorOptions,
 } from "../executor.ts";
 
-type PgStepBatchOptions = PgExecutorOptions & {
+type PgStepBatchOptions = Omit<PgExecutorOptions, "store"> & {
   executor: PgExecutor;
   context: PgExecutorContext;
-  cacheToken: object;
 };
 
 export function pgStepBatchOptions(
@@ -20,7 +19,6 @@ export function pgStepBatchOptions(
   options: PgExecutorOptions,
 ): PgStepBatchOptions {
   return {
-    store: options.store,
     text: options.text,
     rawSqlValues: options.rawSqlValues,
     identifierIndex: options.identifierIndex ?? null,
@@ -30,24 +28,22 @@ export function pgStepBatchOptions(
     useTransaction: options.useTransaction ?? false,
     executor,
     context,
-    cacheToken: executor.getBatchCacheToken(context),
   };
 }
 
 export const pgStepBatchExecutor = defineBatchExecutor({
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
-  callback: async (
-    { executor, context, cacheToken: _cacheToken, ...options },
-    keysets,
-  ) => {
+  callback: async ({ executor, context, ...options }, keysets) => {
     const inputs: PgExecutorInput<any>[] = keysets.map((queryValues) => ({
       context,
       queryValues,
     }));
-    return (await executor.executeWithCache(inputs, options)).values;
+    return (
+      await executor.executeWithoutCache(inputs, { ...options, queue: true })
+    ).values;
   },
-  optionsMatch: { text: "strict", rawSqlValues: "tuple" },
+  optionsMatch: { text: "strict", rawSqlValues: "deepTuple" },
 } satisfies BatchExecutor<
   PgStepBatchOptions,
   readonly unknown[],

@@ -27,7 +27,7 @@ import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.ts";
 import { TYPES } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
-import { PgExecutor } from "../executor.ts";
+import type { PgExecutor } from "../executor.ts";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.ts";
 import type {
   PgCodec,
@@ -580,7 +580,6 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
-    this.metaKey = PgExecutor.metaKey;
     {
       this.mode = spec.mode ?? "normal";
 
@@ -978,7 +977,8 @@ on (${sql.indent(
     const {
       indexMap,
       values,
-      extra: { eventEmitter, meta: store },
+      batchScope: store,
+      extra: { eventEmitter },
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {

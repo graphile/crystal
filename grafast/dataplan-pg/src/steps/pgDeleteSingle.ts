@@ -20,7 +20,6 @@ import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.ts";
-import { PgExecutor } from "../executor.ts";
 import type {
   PgCodecWithAttributes,
   PgResource,
@@ -144,7 +143,6 @@ export class PgDeleteSingleStep<
     >,
   ) {
     super();
-    this.metaKey = PgExecutor.metaKey;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);
@@ -379,7 +377,7 @@ export class PgDeleteSingleStep<
   async execute({
     indexMap,
     values,
-    extra: { meta: store },
+    batchScope: store,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { alias, contextId, finalizeResults } = this;
     if (!finalizeResults) {

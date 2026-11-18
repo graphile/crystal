@@ -26,3 +26,7 @@ subscription events each have their own scope.
 
 (We also added the `defineBatchExecutor` TypeScript Identity Function to help
 you define batch executors with strong types in your own code.)
+
+Move PostgreSQL read caching into the shared batching scope. Successful
+mutations invalidate that scope. `PgExecutor.executeWithCache` now forwards to
+`executeWithoutCache` and logs a deprecation warning once.

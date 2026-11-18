@@ -24,7 +24,6 @@ import type { PgCodecAttribute } from "../codecs.ts";
 import { sqlValueWithCodec } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
 import type { PgClientResult } from "../executor.ts";
-import { PgExecutor } from "../executor.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -153,7 +152,6 @@ export class PgUpdateSingleStep<
     },
   ) {
     super();
-    this.metaKey = PgExecutor.metaKey;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);
@@ -423,7 +421,7 @@ export class PgUpdateSingleStep<
   async execute({
     indexMap,
     values,
-    extra: { meta: store },
+    batchScope: store,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { alias, contextId, finalizeResults, resource } = this;
     if (!finalizeResults) {

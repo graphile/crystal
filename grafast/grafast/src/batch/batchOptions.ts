@@ -48,6 +48,36 @@ const tupleMatcher: OptionsMatcher = {
   },
 };
 
+const deepTupleMatcher: OptionsMatcher = {
+  matches(left, right) {
+    if (left === right) {
+      return true;
+    } else if (
+      !Array.isArray(left) ||
+      !Array.isArray(right) ||
+      left.length !== right.length
+    ) {
+      return false;
+    }
+    for (let i = 0; i < left.length; i++) {
+      if (!deepTupleMatcher.matches(left[i], right[i])) {
+        return false;
+      }
+    }
+    return true;
+  },
+  appendKeys(value, keys, order) {
+    if (Array.isArray(value)) {
+      keys.push(value.length);
+      for (let i = 0; i < value.length; i++) {
+        deepTupleMatcher.appendKeys(value[i], keys, order);
+      }
+    } else {
+      keys.push($$scalar, value);
+    }
+  },
+};
+
 function symbolRank(order: Map<symbol, number>, key: symbol): number {
   let rank = order.get(key);
   if (rank === undefined) {
@@ -146,6 +176,7 @@ interface OptionsMatchDescriptor {
   readonly [key: PropertyKey]:
     | "strict"
     | "tuple"
+    | "deepTuple"
     | "record"
     | OptionsMatchDescriptor
     | undefined;
@@ -159,6 +190,8 @@ function compileOptionsMatch(
     const rule = descriptor[key];
     if (rule === "tuple") {
       rules.set(key, tupleMatcher);
+    } else if (rule === "deepTuple") {
+      rules.set(key, deepTupleMatcher);
     } else if (rule === "record") {
       rules.set(key, recordMatcher);
     } else if (rule === "strict") {

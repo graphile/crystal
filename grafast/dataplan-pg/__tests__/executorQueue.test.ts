@@ -40,12 +40,10 @@ function run(
   text: string,
   value: string,
   executionAffinity?: symbol,
-  cached = true,
-  store?: object,
+  queued = true,
 ) {
-  const method = cached ? "executeWithCache" : "executeWithoutCache";
-  return executor[method]([{ context, queryValues: [] }], {
-    store,
+  return executor.executeWithoutCache([{ context, queryValues: [] }], {
+    queue: queued,
     text,
     rawSqlValues: [value],
     name: text,
@@ -319,111 +317,193 @@ test("rejects pending work if the last queue cannot acquire a client", async () 
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
 
-test("read caches are isolated by event, executor, and context", async () => {
+test("executeWithCache forwards uncached calls and warns only once", async () => {
   const executor = makeExecutor();
   let version = 1;
   const { context, seen } = makeContext(async () => ({
     rows: [[version]],
     rowCount: 1,
   }));
-  const firstEvent = {};
-  const read = (
-    target: PgExecutor,
-    scope: object | undefined,
-    ctx: ReturnType<typeof makeContext>["context"],
-  ) => run(target, ctx, "select value", "x", undefined, true, scope);
-
-  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
-  // Change what the (uncached) result will be
-  version = 2;
-  // This read is satisfied by cache, change is not reflected
-  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
-  expect(seen).toHaveLength(1);
-
-  // A new store means a fresh cache, change is reflected
-  expect((await read(executor, {}, context)).values).toEqual([[[2]]]);
-  // New PgExecutor, new cache
-  version = 3;
-  expect((await read(makeExecutor(), firstEvent, context)).values).toEqual([
-    [[3]],
-  ]);
-  // New context, new cache
-  version = 4;
-  expect((await read(executor, firstEvent, { ...context })).values).toEqual([
-    [[4]],
-  ]);
-  // Original values, use old cache, old result again
-  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
+  const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+  const read = () =>
+    executor.executeWithCache([{ context, queryValues: [] }], {
+      text: "select value",
+      rawSqlValues: [],
+      eventEmitter: undefined,
+    });
+  try {
+    expect((await read()).values).toEqual([[[1]]]);
+    version = 2;
+    expect((await read()).values).toEqual([[[2]]]);
+    expect(seen).toHaveLength(2);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("deprecated");
+  } finally {
+    warn.mockRestore();
+  }
 });
 
-test.each([false, true])(
-  "mutations invalidate read caches (store: %s)",
-  async (scoped) => {
-    const executor = makeExecutor();
-    let version = 1;
-    const { context } = makeContext(async () => ({
-      rows: [[version]],
-      rowCount: 1,
-    }));
-    const store = scoped ? {} : undefined;
-    const read = () =>
-      run(executor, context, "select value", "x", undefined, true, store);
-
-    expect((await read()).values).toEqual([[[1]]]);
-    await executor.executeMutation({ store, context }, async () => {
-      version = 2;
-    });
-    expect((await read()).values).toEqual([[[2]]]);
-  },
-);
-
-test.each([false, true])(
-  "cross-step batch caches respect mutation invalidation (store: %s)",
-  async (scoped) => {
-    const executor = makeExecutor();
-    let version = 1;
-    const { context, seen } = makeContext(async () => ({
-      rows: [[version]],
-      rowCount: 1,
-    }));
-    const store = scoped ? {} : undefined;
-    // This test step deliberately closes over mutable test state.
-    // eslint-disable-next-line graphile-export/export-subclasses
-    class ReadAroundMutationStep extends Step<string> {
-      async execute(details: ExecutionDetails) {
-        const read = () =>
-          details.batch(
-            pgStepBatchExecutor,
-            [[], []],
-            pgStepBatchOptions(executor, context, {
-              store,
-              text: "select value",
-              rawSqlValues: [],
-              eventEmitter: undefined,
-            }),
-          );
-        const first = await read();
-        const cached = await read();
-        expect(cached[0]).toBe(first[0]);
-        expect(seen).toHaveLength(1);
-        await executor.executeMutation({ store, context }, async () => {
-          version = 2;
-        });
-        const updated = await read();
-        expect(updated).toEqual([[[2]], [[2]]]);
-        expect(seen).toHaveLength(2);
-        return ["ok"];
-      }
+test("cross-step batch caches respect scope mutation invalidation", async () => {
+  const executor = makeExecutor();
+  let version = 1;
+  const { context, seen } = makeContext(async () => ({
+    rows: [[version]],
+    rowCount: 1,
+  }));
+  // This test step deliberately closes over mutable test state.
+  // eslint-disable-next-line graphile-export/export-subclasses
+  class ReadAroundMutationStep extends Step<string> {
+    async execute(details: ExecutionDetails) {
+      const store = details.batchScope;
+      const read = () =>
+        details.batch(
+          pgStepBatchExecutor,
+          [[], []],
+          pgStepBatchOptions(executor, context, {
+            store,
+            text: "select value",
+            rawSqlValues: [],
+            eventEmitter: undefined,
+          }),
+        );
+      const first = await read();
+      expect((await read())[0]).toBe(first[0]);
+      expect(seen).toHaveLength(1);
+      await expect(
+        executor.executeMutation({ context, store }, async () => {
+          throw new Error("rolled back");
+        }),
+      ).rejects.toThrow("rolled back");
+      expect((await read())[0]).toBe(first[0]);
+      expect(seen).toHaveLength(1);
+      await executor.executeMutation({ context, store }, async () => {
+        version = 2;
+      });
+      expect(await read()).toEqual([[[2]], [[2]]]);
+      expect(seen).toHaveLength(2);
+      return ["ok"];
     }
-    const schema = makeGrafastSchema({
-      typeDefs: "type Query { value: String }",
-      objects: {
-        // eslint-disable-next-line graphile-export/export-plans
-        Query: { plans: { value: () => new ReadAroundMutationStep() } },
+  }
+  const schema = makeGrafastSchema({
+    typeDefs: "type Query { value: String }",
+    objects: {
+      // eslint-disable-next-line graphile-export/export-plans
+      Query: { plans: { value: () => new ReadAroundMutationStep() } },
+    },
+  });
+  expect(await grafast({ schema, source: "{ value }" })).toEqual({
+    data: { value: "ok" },
+  });
+});
+
+test("side effects execute separately for identical inputs", async () => {
+  const executor = makeExecutor();
+  let version = 0;
+  const { context, seen } = makeContext(async () => ({
+    rows: [[++version]],
+    rowCount: 1,
+  }));
+  const result = await executor.executeWithoutCache(
+    [
+      { context, queryValues: [] },
+      { context, queryValues: [] },
+    ],
+    {
+      text: "select side_effect()",
+      rawSqlValues: [],
+      useTransaction: true,
+      eventEmitter: undefined,
+    },
+  );
+  expect(result.values).toEqual([[[1]], [[2]]]);
+  expect(seen).toHaveLength(2);
+});
+
+test("compiled SQL with equivalent nested parameter arrays shares batch work", async () => {
+  const executor = makeExecutor();
+  const { context, seen } = makeContext(async (opts) => ({
+    rows: [[JSON.stringify(opts.values[0])]],
+    rowCount: 1,
+  }));
+  // This test step deliberately closes over the test executor and context.
+  // eslint-disable-next-line graphile-export/export-subclasses
+  class ReadStep extends Step<string> {
+    private readonly parameter: number;
+
+    constructor(parameter: number) {
+      super();
+      this.parameter = parameter;
+    }
+
+    deduplicate() {
+      return [];
+    }
+    async execute(details: ExecutionDetails) {
+      const results = await details.batch(
+        pgStepBatchExecutor,
+        [[]],
+        pgStepBatchOptions(executor, context, {
+          text: "select $1",
+          rawSqlValues: [[this.parameter, 2]],
+          eventEmitter: undefined,
+        }),
+      );
+      return results.map((rows) => (Array.isArray(rows) ? rows[0][0] : rows));
+    }
+  }
+  const schema = makeGrafastSchema({
+    typeDefs: "type Query { first: String, second: String, third: String }",
+    objects: {
+      Query: {
+        plans: {
+          // eslint-disable-next-line graphile-export/export-plans
+          first: () => new ReadStep(1),
+          // eslint-disable-next-line graphile-export/export-plans
+          second: () => new ReadStep(3),
+          // eslint-disable-next-line graphile-export/export-plans
+          third: () => new ReadStep(1),
+        },
       },
-    });
-    expect(await grafast({ schema, source: "{ value }" })).toEqual({
-      data: { value: "ok" },
-    });
-  },
-);
+    },
+  });
+  expect(await grafast({ schema, source: "{ first second third }" })).toEqual({
+    data: { first: "[1,2]", second: "[3,2]", third: "[1,2]" },
+  });
+  expect(seen).toHaveLength(2);
+});
+
+test("maps compiled identifier rows back to input order, including empty groups", async () => {
+  const executor = makeExecutor();
+  const { context } = makeContext(async (opts) => {
+    expect(opts.values).toEqual(["fixed", '[["x"],["missing"],["x"]]']);
+    return {
+      rows: [
+        ["last-a", 2],
+        ["first", 0],
+        ["last-b", 2],
+      ],
+      rowCount: 3,
+    };
+  });
+  const result = await executor.executeWithoutCache(
+    [
+      { context, queryValues: ["x"] },
+      { context, queryValues: ["missing"] },
+      { context, queryValues: ["x"] },
+    ],
+    {
+      text: "select grouped_values",
+      rawSqlValues: ["fixed"],
+      identifierIndex: 1,
+      eventEmitter: undefined,
+    },
+  );
+  expect(result.values).toEqual([
+    [["first", 0]],
+    [],
+    [
+      ["last-a", 2],
+      ["last-b", 2],
+    ],
+  ]);
+});

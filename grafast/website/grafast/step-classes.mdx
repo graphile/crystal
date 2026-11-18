@@ -234,6 +234,8 @@ const optionsMatch = {
 own keys, and their values. A nested descriptor applies the same own-property
 rules. For other values, `"record"` and nested descriptors use `===`.
 `"tuple"` compares arrays by length and their elements in order.
+`"deepTuple"` applies the same comparison recursively to nested arrays.
+Use it for acyclic arrays.
 Gra*fast* uses these rules to narrow the search for equivalent
 options, then checks the remaining candidates against the descriptor. The index
 uses explicit rules in declaration order, followed by the other own keys in a
