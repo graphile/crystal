@@ -18,6 +18,7 @@ import { Step, UnbatchedStep } from "../step.ts";
 import {
   asyncIteratorWithCleanup,
   maybeArraysMatch,
+  recordsMatch,
   terminateIterable,
 } from "../utils.ts";
 import { __FlagStep } from "./__flag.ts";
@@ -1301,12 +1302,7 @@ function paginationFeaturesMatch(
   } else if (a === null || b === null) {
     return false;
   } else {
-    return (
-      !a.reverse === !b.reverse &&
-      !a.cursor === !b.cursor &&
-      !a.offset === !b.offset &&
-      !a.full === !b.full
-    );
+    return recordsMatch(a, b);
   }
 }
 
