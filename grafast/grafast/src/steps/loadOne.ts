@@ -99,16 +99,16 @@ export class LoadOneStep<
 
   public isSyncAndSafe = false;
 
-  loadInfo: Omit<
+  private loadInfo: Omit<
     LoadOneInfo<TItem, TParams, UnwrapMultistep<TShared>>,
     "shared" | "unary" | "params"
   > | null = null;
 
-  attributes = new Set<keyof TItem>();
-  paramDepIdByKey: {
+  private attributes = new Set<keyof TItem>();
+  private paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
-  sharedDepId: number | null = null;
+  private sharedDepId: number | null = null;
   private ioEquivalence: IOEquivalence<UnwrapMultistep<TLookup>> | null;
   private load: LoadOneCallback<
     UnwrapMultistep<TLookup>,
@@ -245,7 +245,7 @@ export class LoadOneStep<
       details,
       this.sharedDepId,
       this.paramDepIdByKey,
-      this.loadInfo!,
+      this.loadInfo!.attributes,
       this.load,
       this.keysetEquality,
     );

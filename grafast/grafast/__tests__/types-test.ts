@@ -140,14 +140,7 @@ const _executeLoadTypes = (
   type Params = { limit: number };
   type Shared = { tenant: string };
   const executeOne = executeLoad<number, Item, Item | null, Params, Shared>;
-  const _result = executeOne(
-    details,
-    1,
-    { limit: 2 },
-    { attributes: ["id"] },
-    one,
-    "strict",
-  );
+  const _result = executeOne(details, 1, { limit: 2 }, ["id"], one, "strict");
   assert<
     Equals<
       typeof _result,
@@ -160,7 +153,7 @@ const _executeLoadTypes = (
     details,
     1,
     { limit: 2 },
-    { attributes: ["id"] },
+    ["id"],
     one,
     "strict",
   );
@@ -170,7 +163,7 @@ const _executeLoadTypes = (
     wrongDetails,
     1,
     { limit: 2 },
-    { attributes: ["id"] },
+    ["id"],
     one,
     "strict",
   );
@@ -179,17 +172,17 @@ const _executeLoadTypes = (
     1,
     { limit: 2 },
     // @ts-expect-error Attributes must belong to the loaded item type.
-    { attributes: ["missing"] },
+    ["missing"],
     one,
     "strict",
   );
   // @ts-expect-error A loadMany callback cannot yield a loadOne result.
-  executeOne(details, 1, { limit: 2 }, { attributes: ["id"] }, many, "strict");
+  executeOne(details, 1, { limit: 2 }, ["id"], many, "strict");
   const _results = executeLoad<number, Item, readonly Item[], Params, Shared>(
     details,
     1,
     { limit: 2 },
-    { attributes: ["id"] },
+    ["id"],
     many,
     "strict",
   );

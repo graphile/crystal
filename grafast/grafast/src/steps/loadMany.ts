@@ -123,16 +123,16 @@ export class LoadManyStep<
 
   public isSyncAndSafe = false;
 
-  loadInfo: Omit<
+  private loadInfo: Omit<
     LoadManyInfo<TItem, TParams, UnwrapMultistep<TShared>>,
     "shared" | "unary" | "params"
   > | null = null;
 
-  attributes = new Set<keyof TItem>();
-  paramDepIdByKey: {
+  private attributes = new Set<keyof TItem>();
+  private paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
-  sharedDepId: number | null = null;
+  private sharedDepId: number | null = null;
   private ioEquivalence: IOEquivalence<UnwrapMultistep<TLookup>> | null;
   private load: LoadManyCallback<
     UnwrapMultistep<TLookup>,
@@ -141,7 +141,7 @@ export class LoadManyStep<
     TParams,
     UnwrapMultistep<TShared>
   >;
-  paginationSupport?: PaginationFeatures;
+  public paginationSupport?: PaginationFeatures;
   private name: Maybe<string>;
   private keysetEquality: BatchKeysetEquality;
 
@@ -321,7 +321,7 @@ export class LoadManyStep<
       details,
       this.sharedDepId,
       this.paramDepIdByKey,
-      this.loadInfo!,
+      this.loadInfo!.attributes,
       this.load,
       this.keysetEquality,
     );

@@ -8,6 +8,7 @@ import type {
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
 import { isListLikeStep, isObjectLikeStep, Step } from "../step.ts";
 import {
+  arrayOfLength,
   arraysMatch,
   isTuple,
   recordsMatch,
@@ -184,15 +185,13 @@ export function executeLoad<
   details: ExecutionDetails<readonly [TSpec, ...any[]]>,
   sharedDepId: number | null,
   paramDepIdByKey: Record<string, number>,
-  baseLoadInfo: {
-    attributes: readonly (keyof TItem)[];
-  },
+  attributes: readonly (keyof TItem)[],
   load: LoadCallback<TSpec, TItem, TData, TParams, TShared>,
   keysetEquality: BatchKeysetEquality,
 ): PromiseOrDirect<
   ReadonlyArray<PromiseOrDirect<ExecutionResultValue<TData>>>
 > {
-  const { indexMap, values } = details;
+  const { count, values } = details;
   const values0 = values[0];
   const shared = (
     sharedDepId !== null ? values[sharedDepId].unaryValue() : undefined
@@ -210,12 +209,7 @@ export function executeLoad<
     PromiseOrDirect<TData>
   >(
     loadBatchExecutors[keysetEquality],
-    indexMap((i) => values0.at(i)),
-    {
-      load,
-      attributes: baseLoadInfo.attributes,
-      shared,
-      params,
-    },
+    values0.isBatch ? values0.entries : arrayOfLength(count, values0.value),
+    { load, attributes, shared, params },
   );
 }
