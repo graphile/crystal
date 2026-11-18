@@ -1,5 +1,15 @@
 # graphile-export
 
+## 1.0.3
+
+### Patch Changes
+
+- [#3210](https://github.com/graphile/crystal/pull/3210)
+  [`9b54140`](https://github.com/graphile/crystal/commit/9b54140403b04717989e688125268848bc757a2f)
+  Thanks [@dilame](https://github.com/dilame)! - Export an interface's
+  `interfaces` as a thunk to avoid
+  `Cannot access '<Interface>' before initialization`.
+
 ## 1.0.2
 
 ### Patch Changes
