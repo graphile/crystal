@@ -59,7 +59,7 @@ type BatchOptions = Record<string, unknown> | undefined;
 
 interface PendingBatch<TKeyset, TResult> {
   deferred: PromiseWithResolvers<ReadonlyArray<TResult>>;
-  entries?: CompositeEntry<TKeyset, TResult>[];
+  entries: CompositeEntry<TKeyset, TResult>[] | null;
   /** Deduplicated canonical specifiers, used by the callback and cache maps. */
   keysets: TKeyset[];
 }
@@ -87,9 +87,9 @@ type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
       index: number;
     }
   >;
-  queued?: PendingBatch<TKeyset, TResult>;
-  tupleKeyIndex?: BatchTupleIndex<CompositeEntry<TKeyset, TResult>>;
-  objectKeyIndexes?: Map<string, KeysetTrieNode<TKeyset, TResult>>;
+  queued: PendingBatch<TKeyset, TResult> | null;
+  tupleKeyIndex: BatchTupleIndex<CompositeEntry<TKeyset, TResult>> | null;
+  objectKeyIndexes: Map<string, KeysetTrieNode<TKeyset, TResult>> | null;
 };
 
 type BatchMeta = Record<PropertyKey, unknown> & {
@@ -102,9 +102,9 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 const batchesSymbol = Symbol("Grafast batch caches");
 
 type KeysetTrieNode<TKeyset, TResult> = {
-  children?: Map<unknown, KeysetTrieNode<TKeyset, TResult>>;
+  children: Map<unknown, KeysetTrieNode<TKeyset, TResult>> | null;
   /** First keyset at this terminal node; subsequent lookups reuse its identity. */
-  entry?: CompositeEntry<TKeyset, TResult>;
+  entry: CompositeEntry<TKeyset, TResult> | null;
 };
 
 function canonicalizeTuple<TKeyset, TResult>(
@@ -134,7 +134,7 @@ function canonicalizeObject<TKeyset, TResult>(
   const shape = JSON.stringify(keys);
   let node = indexes.get(shape);
   if (node === undefined) {
-    node = {};
+    node = { children: null, entry: null };
     indexes.set(shape, node);
   }
   for (const key of keys) {
@@ -146,7 +146,7 @@ function canonicalizeObject<TKeyset, TResult>(
     let child: KeysetTrieNode<TKeyset, TResult> | undefined =
       children.get(value);
     if (child === undefined) {
-      child = {};
+      child = { children: null, entry: null };
       children.set(value, child);
     }
     node = child;
@@ -195,6 +195,9 @@ export function batchInMeta<
         options,
         cache: new Map(),
         pending: new Map(),
+        queued: null,
+        tupleKeyIndex: null,
+        objectKeyIndexes: null,
       }),
     );
     batches.set(executor, families);
@@ -249,10 +252,10 @@ export function batchInMeta<
       let sourceIndex = existing?.index;
       if (batchForKey == null) {
         let loadBatch = family.queued;
-        if (loadBatch === undefined) {
+        if (loadBatch === null) {
           const deferred = Promise.withResolvers<ReadonlyArray<TResult>>();
           deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
-          loadBatch = { deferred, keysets: [] };
+          loadBatch = { deferred, entries: null, keysets: [] };
           family.queued = loadBatch;
 
           // Kick off the batch
@@ -260,7 +263,7 @@ export function batchInMeta<
           const currentBatch = loadBatch;
           queueMicrotask(() => {
             // Don't allow adding anything else to this batch.
-            currentFamily.queued = undefined;
+            currentFamily.queued = null;
             void executeBatch(currentFamily, currentBatch);
           });
         }
@@ -360,7 +363,7 @@ function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
     deferred.resolve(loadResults);
   }
   function handleError(error: unknown) {
-    if (loadBatch.entries !== undefined) {
+    if (loadBatch.entries !== null) {
       for (const entry of loadBatch.entries) {
         entry.batch = undefined;
         entry.result = undefined;
