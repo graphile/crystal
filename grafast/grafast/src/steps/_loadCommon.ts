@@ -14,6 +14,7 @@ import {
   stableStringSortFirstTupleEntry,
 } from "../utils.ts";
 import { access } from "./access.ts";
+import type { LoadOneInfo } from "./loadOne.ts";
 
 export type IOEquivalence<TSpec> =
   | null
@@ -85,22 +86,6 @@ export function paramSig(
     ),
   );
 }
-
-type LoadCallback<
-  TSpec,
-  TItem,
-  TData,
-  TParams extends Record<string, any>,
-  TShared,
-> = (
-  specs: readonly TSpec[],
-  info: {
-    shared: TShared;
-    attributes: readonly (keyof TItem)[];
-    params: Partial<TParams>;
-    unary: TShared;
-  },
-) => PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
 
 type LoadBatchOptions<
   TSpec,
@@ -177,6 +162,17 @@ export function getLoadKeysetEquality(lookup: Multistep): BatchKeysetEquality {
       ? "tuple"
       : "object";
 }
+
+type LoadCallback<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+> = (
+  specs: readonly TSpec[],
+  info: LoadOneInfo<TItem, TParams, TShared>,
+) => PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
 
 export function executeLoad<
   TSpec,
