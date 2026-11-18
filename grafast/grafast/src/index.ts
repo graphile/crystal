@@ -11,7 +11,7 @@ import type {
 } from "graphql";
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
-import { defineBatchExecutor } from "./batch.ts";
+import { defineBatchExecutor } from "./batch/defineBatchExecutor.ts";
 import { promiseWithResolve } from "./promiseWithResolve.ts";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.ts";
 import type { DataFromObjectSteps } from "./steps/object.ts";

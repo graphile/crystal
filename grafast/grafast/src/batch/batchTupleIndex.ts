@@ -1,4 +1,4 @@
-import { arraysMatch } from "./utils.ts";
+import { arraysMatch } from "../utils.ts";
 
 /** A branch stores the original tuple directly until it needs to split. */
 export type BatchTupleIndex<T> = Map<unknown, T | BatchTupleIndex<T>>;

@@ -1,6 +1,6 @@
 import type { BatchTupleIndex } from "./batchTupleIndex.ts";
 import { internBatchTuple } from "./batchTupleIndex.ts";
-import { arraysMatch, isPojo } from "./utils.ts";
+import { arraysMatch, isPojo } from "../utils.ts";
 
 interface KeyOrder {
   symbolOrder: Map<symbol, number> | null;

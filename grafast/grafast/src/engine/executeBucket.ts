@@ -1,7 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
-import { batchInMeta } from "../batch.ts";
+import { batchInMeta } from "../batch/batchInMeta.ts";
 import type { Bucket, RequestTools, SharedBucketState } from "../bucket.ts";
 import {
   $$streamMore,

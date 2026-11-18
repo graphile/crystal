@@ -5,8 +5,9 @@ import { expect } from "chai";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { it } from "mocha";
 
-import { batchInMeta, defineBatchExecutor } from "../dist/batch.js";
-import { getOptionsMatcher } from "../dist/batchOptions.js";
+import { batchInMeta } from "../dist/batch/batchInMeta.js";
+import { getOptionsMatcher } from "../dist/batch/batchOptions.js";
+import { defineBatchExecutor } from "../dist/batch/defineBatchExecutor.js";
 import { isDev } from "../dist/dev.js";
 import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
 import {
