@@ -1,5 +1,5 @@
 import type { BatchExecutor } from "grafast";
-import { arraysMatch, defineBatchExecutor, recordsMatch } from "grafast";
+import { defineBatchExecutor } from "grafast";
 
 import type {
   PgExecutor,
@@ -32,12 +32,7 @@ export function pgStepBatchOptions(
 export const pgStepBatchExecutor = defineBatchExecutor({
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
-  optionsMatch: (left, right) =>
-    recordsMatch(left, right, (key, a, b) =>
-      key === "rawSqlValues"
-        ? arraysMatch(left.rawSqlValues, right.rawSqlValues)
-        : a === b,
-    ),
+  optionsMatch: { rawSqlValues: "tuple" },
   callback: async (
     { executor, context, cacheToken: _cacheToken, ...options },
     keysets,

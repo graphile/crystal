@@ -1,0 +1,226 @@
+import type { BatchTupleIndex } from "./batchTupleIndex.ts";
+import { internBatchTuple } from "./batchTupleIndex.ts";
+import { arraysMatch, isPojo } from "./utils.ts";
+
+interface KeyOrder {
+  symbolOrder?: Map<symbol, number>;
+}
+
+interface OptionsMatcher {
+  matches(left: unknown, right: unknown): boolean;
+  /** Matching options must append the same keys under Map equality. */
+  appendKeys(value: unknown, keys: unknown[], order: KeyOrder): void;
+}
+
+const strictMatcher: OptionsMatcher = {
+  matches: (left, right) => left === right,
+  appendKeys(value, keys) {
+    keys.push(value);
+  },
+};
+
+const $$scalar = Symbol("non-structural batch option");
+
+const tupleMatcher: OptionsMatcher = {
+  matches: (left, right) =>
+    left === right ||
+    (Array.isArray(left) &&
+      Array.isArray(right) &&
+      Object.getPrototypeOf(left) === Object.getPrototypeOf(right) &&
+      arraysMatch(left, right)),
+  appendKeys(value, keys) {
+    if (Array.isArray(value)) {
+      keys.push(Object.getPrototypeOf(value), value.length);
+      for (let i = 0; i < value.length; i++) {
+        keys.push(value[i]);
+      }
+    } else {
+      keys.push($$scalar, value);
+    }
+  },
+};
+
+function isOptionsObject(
+  value: unknown,
+): value is Record<PropertyKey, unknown> {
+  return value !== null && typeof value === "object";
+}
+
+function symbolRank(order: Map<symbol, number>, key: symbol): number {
+  let rank = order.get(key);
+  if (rank === undefined) {
+    rank = order.size;
+    order.set(key, rank);
+  }
+  return rank;
+}
+
+function compareOptionKeys(
+  a: string | symbol,
+  b: string | symbol,
+  order: KeyOrder,
+): number {
+  if (typeof a === "string") {
+    return typeof b === "string" ? (a < b ? -1 : a === b ? 0 : 1) : -1;
+  } else if (typeof b === "string") {
+    return 1;
+  } else {
+    const ranks = (order.symbolOrder ??= new Map());
+    return symbolRank(ranks, a) - symbolRank(ranks, b);
+  }
+}
+
+function makeObjectMatcher(
+  rules?: Map<PropertyKey, OptionsMatcher>,
+): OptionsMatcher {
+  return {
+    matches(left, right) {
+      if (left === right) {
+        return true;
+      } else if (
+        !isOptionsObject(left) ||
+        !isOptionsObject(right) ||
+        Object.getPrototypeOf(left) !== Object.getPrototypeOf(right)
+      ) {
+        return false;
+      }
+      const keys = Reflect.ownKeys(left);
+      if (keys.length !== Reflect.ownKeys(right).length) {
+        return false;
+      }
+      for (const key of keys) {
+        if (!Object.hasOwn(right, key)) {
+          return false;
+        }
+        const rule = rules?.get(key) ?? strictMatcher;
+        if (!rule.matches(left[key], right[key])) {
+          return false;
+        }
+      }
+      return true;
+    },
+    appendKeys(value, keys, order) {
+      if (!isOptionsObject(value)) {
+        keys.push($$scalar, value);
+        return;
+      }
+      const ownKeys = Reflect.ownKeys(value);
+      if (ownKeys.length > 1) {
+        ownKeys.sort((a, b) => compareOptionKeys(a, b, order));
+      }
+      keys.push(Object.getPrototypeOf(value), ownKeys.length);
+      for (const key of ownKeys) {
+        keys.push(key);
+        const rule = rules?.get(key) ?? strictMatcher;
+        rule.appendKeys(value[key], keys, order);
+      }
+    },
+  };
+}
+
+const recordMatcher = makeObjectMatcher();
+
+function compileOptionsMatch(descriptor: object): OptionsMatcher {
+  const rules = new Map<PropertyKey, OptionsMatcher>();
+  for (const key of Reflect.ownKeys(descriptor)) {
+    const rule = (descriptor as Record<PropertyKey, unknown>)[key];
+    if (rule === "tuple") {
+      rules.set(key, tupleMatcher);
+    } else if (rule === "record") {
+      rules.set(key, recordMatcher);
+    } else if (isPojo(rule)) {
+      rules.set(key, compileOptionsMatch(rule));
+    } else if (rule !== "strict" && rule !== undefined) {
+      throw new Error(`Invalid batch optionsMatch rule for '${String(key)}'`);
+    }
+  }
+  return rules.size === 0 ? recordMatcher : makeObjectMatcher(rules);
+}
+
+const compiled = new WeakMap<object, OptionsMatcher>();
+
+export function getOptionsMatcher(
+  descriptor: object | undefined,
+): OptionsMatcher {
+  if (descriptor === undefined) {
+    return recordMatcher;
+  }
+  let matcher = compiled.get(descriptor);
+  if (matcher === undefined) {
+    matcher = compileOptionsMatch(descriptor);
+    compiled.set(descriptor, matcher);
+  }
+  return matcher;
+}
+
+interface OptionsIndex<TOptions, TEntry> extends KeyOrder {
+  byIdentity: Map<TOptions, TEntry>;
+  keys: BatchTupleIndex<readonly unknown[]>;
+  byKeys: Map<readonly unknown[], TEntry | TEntry[]>;
+}
+
+/** The index only narrows the search: the matcher decides whether to merge. */
+export class BatchOptionsIndex<TOptions, TEntry extends { options: TOptions }> {
+  private first?: TEntry;
+  private index?: OptionsIndex<TOptions, TEntry>;
+  private readonly matcher: OptionsMatcher;
+  private readonly create: (options: TOptions) => TEntry;
+
+  constructor(matcher: OptionsMatcher, create: (options: TOptions) => TEntry) {
+    this.matcher = matcher;
+    this.create = create;
+  }
+
+  getOrCreate(options: TOptions): TEntry {
+    const first = this.first;
+    if (first === undefined) {
+      return (this.first = this.create(options));
+    }
+
+    let index = this.index;
+    if (index === undefined) {
+      if (this.matcher.matches(first.options, options)) {
+        return first;
+      }
+      // Most executors have just one family. Build the index on the first miss.
+      index = { byIdentity: new Map(), keys: new Map(), byKeys: new Map() };
+      const firstKey = this.getKey(index, first.options);
+      index.byIdentity.set(first.options, first);
+      index.byKeys.set(firstKey, first);
+      this.index = index;
+    }
+
+    const identical = index.byIdentity.get(options);
+    if (identical !== undefined) {
+      return identical;
+    }
+    const key = this.getKey(index, options);
+    const bucket = index.byKeys.get(key);
+    if (Array.isArray(bucket)) {
+      for (const entry of bucket) {
+        if (this.matcher.matches(entry.options, options)) {
+          return entry;
+        }
+      }
+    } else if (
+      bucket !== undefined &&
+      this.matcher.matches(bucket.options, options)
+    ) {
+      return bucket;
+    }
+    const entry = this.create(options);
+    index.byIdentity.set(options, entry);
+    if (Array.isArray(bucket)) {
+      bucket.push(entry);
+    } else {
+      index.byKeys.set(key, bucket === undefined ? entry : [bucket, entry]);
+    }
+    return entry;
+  }
+
+  private getKey(index: OptionsIndex<TOptions, TEntry>, options: TOptions) {
+    const keys: unknown[] = [];
+    this.matcher.appendKeys(options, keys, index);
+    return internBatchTuple(index.keys, keys);
+  }
+}

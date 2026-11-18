@@ -66,11 +66,7 @@ const _batchTypes = (batch: BatchFunction) => {
     name: "type-test",
     callback: (options: { prefix: string }, keys: readonly number[]) =>
       keys.map((key) => options.prefix + key),
-    optionsMatch: (left, right) => {
-      assert<Equals<typeof left, { prefix: string }>>();
-      assert<Equals<typeof right, { prefix: string }>>();
-      return left.prefix === right.prefix;
-    },
+    optionsMatch: { prefix: "strict" },
   });
   const _result = batch(executor, [1], { prefix: "x" });
   assert<
@@ -112,6 +108,13 @@ const _batchTypes = (batch: BatchFunction) => {
     name: "invalid-tuple-options",
     // @ts-expect-error Executors cannot declare tuple options.
     callback: (_options: readonly [string], keys: readonly number[]) => keys,
+  });
+  defineBatchExecutor({
+    keysetEquality: "strict",
+    name: "invalid-options-match",
+    callback: executor.callback,
+    // @ts-expect-error A string option cannot use tuple matching.
+    optionsMatch: { prefix: "tuple" },
   });
 };
 

@@ -736,6 +736,23 @@ export type BatchCallback<
   options: TOptions,
   keysets: ReadonlyArray<TKeyset>,
 ) => PromiseOrDirect<ReadonlyArray<TResult>>;
+
+type BatchOptionComparison<T> =
+  | "strict"
+  | "record"
+  | (unknown extends T
+      ? "tuple" | BatchOptionsMatch<Record<PropertyKey, unknown>>
+      : T extends readonly unknown[]
+        ? "tuple" | BatchOptionsMatch<T>
+        : T extends object
+          ? BatchOptionsMatch<T>
+          : never);
+
+/** How to compare the own properties of an options object. */
+export type BatchOptionsMatch<T extends object> = {
+  readonly [K in keyof T as K]?: BatchOptionComparison<T[K]>;
+};
+
 /** A stable, named batch executor. Define once, outside step execution. */
 export interface BatchExecutor<
   TOptions extends Record<string, unknown> | undefined,
@@ -745,8 +762,8 @@ export interface BatchExecutor<
   readonly name: string;
   readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
   readonly keysetEquality: BatchKeysetEquality;
-  /** Overrides the default shallow comparison of batch options. */
-  readonly optionsMatch?: (left: TOptions, right: TOptions) => boolean;
+  /** Unspecified own properties are compared using strict equality. */
+  readonly optionsMatch?: BatchOptionsMatch<NonNullable<TOptions>>;
 }
 export type BatchFunction = <
   TOptions extends Record<string, unknown> | undefined,

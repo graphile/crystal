@@ -111,7 +111,6 @@ type LoadBatchOptions<
 > = {
   load: LoadCallback<TSpec, TItem, TData, TParams, TShared>;
   attributes: readonly (keyof TItem)[];
-  parameterNames: readonly string[];
   shared: TShared;
   params: Partial<TParams>;
 };
@@ -139,32 +138,18 @@ function executeLoadBatch<
   });
 }
 
-function loadOptionsMatch<
-  TSpec,
-  TItem,
-  TData,
-  TParams extends Record<string, any>,
-  TShared,
->(
-  left: LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
-  right: LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
-): boolean {
-  return (
-    left.load === right.load &&
-    left.shared === right.shared &&
-    arraysMatch(left.attributes, right.attributes) &&
-    arraysMatch(left.parameterNames, right.parameterNames) &&
-    recordsMatch(left.params, right.params)
-  );
-}
-
 // Preserve the generic callbacks: each use specializes this same executor
 // object, without erasing the relationship between its options, keys and data.
 const loadBatchExecutor = {
   name: "grafast/load",
   keysetEquality: "strict",
   callback: executeLoadBatch,
-  optionsMatch: loadOptionsMatch,
+  optionsMatch: {
+    load: "strict",
+    shared: "strict",
+    attributes: "tuple",
+    params: "record",
+  },
 } satisfies BatchExecutor<
   LoadBatchOptions<unknown, unknown, unknown, Record<string, unknown>, unknown>,
   unknown,
@@ -233,7 +218,6 @@ export function executeLoad<
     {
       load,
       attributes: baseLoadInfo.attributes,
-      parameterNames: Object.keys(params).sort(),
       shared,
       params,
     },

@@ -300,7 +300,7 @@ it("supports omitted options", async () => {
   ]);
 });
 
-it("matches records with null prototypes and undefined properties", async () => {
+it("distinguishes different prototypes and missing own options", async () => {
   let calls = 0;
   const schema = makeSchema();
   const meta = {};
@@ -316,21 +316,29 @@ it("matches records with null prototypes and undefined properties", async () => 
   options.prefix = "x";
   await Promise.all([
     batchInMeta(schema, meta, executor, [1], options),
-    batchInMeta(schema, meta, executor, [2], {
+    batchInMeta(
+      schema,
+      meta,
+      executor,
+      [2],
+      Object.assign(Object.create(null), options),
+    ),
+    batchInMeta(schema, meta, executor, [3], { prefix: "x" }),
+    batchInMeta(schema, meta, executor, [4], {
       prefix: "x",
       missing: undefined,
     }),
   ]);
-  expect(calls).to.equal(1);
+  expect(calls).to.equal(3);
 });
 
 if (isDev) {
-  it("rejects non-POJO options even with a custom matcher", () => {
+  it("rejects non-POJO options even with a descriptor", () => {
     const executor = defineBatchExecutor({
       keysetEquality: "strict",
       name: "invalid-options",
       callback: echoBatch,
-      optionsMatch: () => true,
+      optionsMatch: {},
     });
     const schema = makeSchema();
     for (const invalid of [[], null, "x", 1, new Date()]) {
@@ -347,27 +355,105 @@ if (isDev) {
   });
 }
 
-it("allows optionsMatch to compare selected fields within POJO options", async () => {
-  let calls = 0;
+it("matches nested option rules and compares unspecified properties strictly", async () => {
+  const calls: Array<readonly number[]> = [];
   const schema = makeSchema();
   const meta = {};
+  const withClient = () => {};
+  const makeOptions = (limit: number, params: number[], tag = "same") => ({
+    context: { settings: { limit }, withClient },
+    params,
+    values: [1, 2],
+    tag,
+  });
   const executor = defineBatchExecutor({
     keysetEquality: "strict",
-    name: "custom",
-    optionsMatch: (left: { date: Date }, right: { date: Date }) =>
-      left.date.getTime() === right.date.getTime(),
-    callback: (options: { date: Date }, keys: readonly number[]) => {
-      calls++;
-      return keys.map((key) => options.date.getTime() + key);
+    name: "nested-rules",
+    optionsMatch: {
+      context: { settings: "record", withClient: "strict" },
+      params: "tuple",
+      values: { length: "strict" },
+    },
+    callback: (
+      _options: ReturnType<typeof makeOptions>,
+      keys: readonly number[],
+    ) => {
+      calls.push(keys);
+      return keys;
     },
   });
-  const results = await Promise.all([
-    batchInMeta(schema, meta, executor, [1], { date: new Date(100) }),
-    batchInMeta(schema, meta, executor, [2], { date: new Date(100) }),
-    batchInMeta(schema, meta, executor, [3], { date: new Date(200) }),
+  await Promise.all([
+    batchInMeta(schema, meta, executor, [1], makeOptions(10, [1])),
+    batchInMeta(schema, meta, executor, [2], makeOptions(20, [1])),
+    batchInMeta(schema, meta, executor, [3], makeOptions(10, [1])),
+    batchInMeta(schema, meta, executor, [4], makeOptions(10, [2])),
+    batchInMeta(schema, meta, executor, [5], makeOptions(10, [1], "different")),
+    batchInMeta(schema, meta, executor, [6], {
+      ...makeOptions(10, [1]),
+      values: [2, 1],
+    }),
   ]);
-  expect(calls).to.equal(2);
-  expect(results).to.deep.equal([[101], [102], [203]]);
+  expect(calls).to.deep.equal([[1, 3], [2], [4], [5], [6]]);
+});
+
+it("indexes option symbols irrespective of order and checks non-enumerable values", async () => {
+  const a = Symbol("option");
+  const b = Symbol("option");
+  const calls: Array<readonly number[]> = [];
+  const executor = defineBatchExecutor({
+    name: "own-options",
+    keysetEquality: "strict",
+    callback: (
+      _options: Record<PropertyKey, unknown>,
+      keys: readonly number[],
+    ) => {
+      calls.push(keys);
+      return keys;
+    },
+  });
+  const meta = {};
+  const first = Object.defineProperty({ [a]: 1, [b]: 2 }, "hidden", {
+    value: 1,
+  });
+  const other = Object.defineProperty({ [a]: 1, [b]: 2 }, "hidden", {
+    value: 2,
+  });
+  const reordered = Object.defineProperty({ [b]: 2, [a]: 1 }, "hidden", {
+    value: 1,
+  });
+  const differentSymbol = Object.defineProperty(
+    { [a]: 1, [Symbol("option")]: 2 },
+    "hidden",
+    { value: 1 },
+  );
+  await Promise.all([
+    batchInMeta(schema, meta, executor, [1], first),
+    batchInMeta(schema, meta, executor, [2], other),
+    batchInMeta(schema, meta, executor, [3], reordered),
+    batchInMeta(schema, meta, executor, [4], differentSymbol),
+  ]);
+  expect(calls).to.deep.equal([[1, 3], [2], [4]]);
+});
+
+it("checks matching rules after finding an options index bucket", async () => {
+  const calls: Array<readonly number[]> = [];
+  const executor = defineBatchExecutor({
+    name: "options-key-collision",
+    keysetEquality: "strict",
+    callback: (_options: { value: number }, keys: readonly number[]) => {
+      calls.push(keys);
+      return keys;
+    },
+  });
+  const meta = {};
+  const first = { value: NaN };
+  const second = { value: NaN };
+  await Promise.all([
+    batchInMeta(schema, meta, executor, [1], first),
+    batchInMeta(schema, meta, executor, [2], second),
+    batchInMeta(schema, meta, executor, [3], first),
+  ]);
+  expect(calls).to.deep.equal([[1, 3], [2]]);
 });
 
 class BatchScopeStep extends Step<string> {
@@ -805,66 +891,67 @@ it("defineBatchExecutor returns the supplied executor unchanged", () => {
 });
 
 it("looks up options by identity before comparing and retains canonical options", async () => {
-  let comparisons = 0;
+  let reads = 0;
   const received: Array<{ group: string }> = [];
   const executor = defineBatchExecutor({
     name: "indexed-options",
     keysetEquality: "strict",
-    optionsMatch: (left, right) => {
-      comparisons++;
-      return left.group === right.group;
-    },
     callback: (options: { group: string }, keys: readonly number[]) => {
       received.push(options);
       return keys;
     },
   });
   const meta = {};
-  const first = { group: "first" };
-  const second = { group: "second" };
+  const first = {
+    get group() {
+      reads++;
+      return "first";
+    },
+  };
+  const second = {
+    get group() {
+      reads++;
+      return "second";
+    },
+  };
   await batchInMeta(schema, meta, executor, [1], first);
   await batchInMeta(schema, meta, executor, [1], second);
-  comparisons = 0;
+  reads = 0;
   expect(batchInMeta(schema, meta, executor, [1], second)).to.deep.equal([1]);
-  expect(comparisons).to.equal(0);
+  expect(reads).to.equal(0);
   await batchInMeta(schema, meta, executor, [2], { group: "first" });
-  expect(comparisons).to.equal(1);
+  expect(reads).to.equal(1);
   expect(received).to.have.length(3);
   expect(received[2]).to.equal(first);
-  // An equivalent options object must not add an alias to the map.
-  comparisons = 0;
-  await batchInMeta(schema, meta, executor, [2], { group: "new" });
-  expect(comparisons).to.equal(2);
+  reads = 0;
+  for (let i = 0; i < 100; i++) {
+    await batchInMeta(schema, meta, executor, [2], { group: String(i) });
+  }
+  expect(reads).to.equal(0);
 });
 
 it("only compares options within the requested executor", async () => {
-  let comparisons = 0;
   const unrelated = defineBatchExecutor({
     name: "unrelated-options",
     keysetEquality: "strict",
     callback: (_options: { unrelated: string }, keys: readonly number[]) =>
       keys,
-    optionsMatch: () => {
-      throw new Error("Must not compare another executor's options");
-    },
   });
   const executor = defineBatchExecutor({
     name: "executor-options-index",
     keysetEquality: "strict",
     callback: (_options: { group: string }, keys: readonly number[]) => keys,
-    optionsMatch: (left, right) => {
-      comparisons++;
-      return left.group === right.group;
-    },
   });
   const meta = {};
-  await batchInMeta(schema, meta, unrelated, [1], { unrelated: "x" });
+  await batchInMeta(schema, meta, unrelated, [1], {
+    get unrelated(): string {
+      throw new Error("Must not compare another executor's options");
+    },
+  });
   await batchInMeta(schema, meta, executor, [1], { group: "x" });
-  expect(comparisons).to.equal(0);
   expect(
     batchInMeta(schema, meta, executor, [1], { group: "x" }),
   ).to.deep.equal([1]);
-  expect(comparisons).to.equal(1);
 });
 
 for (const mode of ["tuple", "object"] as const) {
@@ -910,6 +997,30 @@ for (const mode of ["tuple", "object"] as const) {
     expect(attempts).to.equal(2);
   });
 }
+
+it("splits tuple prefixes without conflating undefined or losing NaN keys", async () => {
+  const calls: Array<readonly (readonly unknown[])[]> = [];
+  const executor = defineBatchExecutor({
+    name: "tuple-split",
+    keysetEquality: "tuple",
+    callback: (_options: undefined, keys: readonly (readonly unknown[])[]) => {
+      calls.push(keys);
+      return keys;
+    },
+  });
+  const meta = {};
+  const longer = [NaN, undefined];
+  const shorter = [NaN];
+  const results = await batchInMeta(schema, meta, executor, [
+    longer,
+    shorter,
+    [...longer],
+    [...shorter],
+  ]);
+  expect(calls).to.deep.equal([[longer, shorter]]);
+  expect(results[2]).to.equal(longer);
+  expect(results[3]).to.equal(shorter);
+});
 
 it("keeps record shapes separate even when their value paths match", async () => {
   const received: Array<readonly Record<string, unknown>[]> = [];

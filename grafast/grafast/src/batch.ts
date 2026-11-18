@@ -1,5 +1,8 @@
 import type { GraphQLSchema } from "graphql";
 
+import { BatchOptionsIndex, getOptionsMatcher } from "./batchOptions.ts";
+import type { BatchTupleIndex } from "./batchTupleIndex.ts";
+import { internBatchTuple } from "./batchTupleIndex.ts";
 import { isDev, noop } from "./dev.ts";
 import { flagError } from "./error.ts";
 import type {
@@ -7,7 +10,7 @@ import type {
   ExecutionResultValue,
   PromiseOrDirect,
 } from "./interfaces.ts";
-import { isPojo, isPromiseLike, recordsMatch } from "./utils.ts";
+import { isPojo, isPromiseLike } from "./utils.ts";
 
 /** Define once at module scope, or during schema construction. */
 export function defineBatchExecutor<
@@ -72,14 +75,14 @@ type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
     }
   >;
   queued?: PendingBatch<TKeyset, TResult>;
-  tupleKeyIndex?: KeysetTrieNode<TKeyset>;
+  tupleKeyIndex?: BatchTupleIndex<TKeyset & readonly unknown[]>;
   objectKeyIndexes?: Map<string, KeysetTrieNode<TKeyset>>;
 };
 
 type BatchMeta = Record<PropertyKey, unknown> & {
   [batchesSymbol]?: Map<
     BatchExecutor<any, any, any>,
-    Map<BatchOptions, BatchFamily<any, any, any>>
+    BatchOptionsIndex<any, BatchFamily<any, any, any>>
   >;
 };
 
@@ -92,21 +95,13 @@ type KeysetTrieNode<TKeyset> = {
 };
 
 function canonicalizeTuple<TKeyset>(
-  node: KeysetTrieNode<TKeyset>,
+  index: BatchTupleIndex<TKeyset & readonly unknown[]>,
   keyset: TKeyset,
 ): TKeyset {
   if (!Array.isArray(keyset)) {
     throw new Error("batch(..., 'tuple') requires array keysets");
   }
-  for (const value of keyset) {
-    let child = node.children.get(value);
-    if (child === undefined) {
-      child = { children: new Map(), keyset: undefined };
-      node.children.set(value, child);
-    }
-    node = child;
-  }
-  return (node.keyset ??= keyset);
+  return internBatchTuple(index, keyset);
 }
 
 function canonicalizeObject<TKeyset>(
@@ -134,31 +129,6 @@ function canonicalizeObject<TKeyset>(
     node = child;
   }
   return (node.keyset ??= keyset);
-}
-
-function defaultOptionsMatch(
-  left: Record<string, unknown> | undefined,
-  right: Record<string, unknown> | undefined,
-): boolean {
-  return (
-    left === right ||
-    (left !== undefined && right !== undefined && recordsMatch(left, right))
-  );
-}
-
-function findMatchingFamily<TOptions extends BatchOptions, TKeyset, TResult>(
-  families: Map<TOptions, BatchFamily<TOptions, TKeyset, TResult>>,
-  executor: BatchExecutor<TOptions, TKeyset, TResult>,
-  options: TOptions,
-): BatchFamily<TOptions, TKeyset, TResult> | undefined {
-  const optionsMatch = executor.optionsMatch ?? defaultOptionsMatch;
-  for (const [knownOptions, family] of families) {
-    if (optionsMatch(knownOptions, options)) {
-      // The family already retains the canonical options used by its callback.
-      return family;
-    }
-  }
-  return undefined;
 }
 
 /** @internal Used to implement `ExecutionDetails.batch`. */
@@ -192,31 +162,22 @@ export function batchInMeta<
   // Executor identity determines the options, keyset and result types of all
   // families stored under it; only the heterogeneous registry erases them.
   let families = batches.get(executor) as
-    | Map<TOptions, BatchFamily<TOptions, TKeyset, TResult>>
+    | BatchOptionsIndex<TOptions, BatchFamily<TOptions, TKeyset, TResult>>
     | undefined;
-  // ExecutionDetails.batch requires options unless TOptions includes undefined.
-  const batchOptions = options as TOptions;
   if (families === undefined) {
-    families = new Map();
-    batches.set(executor, families);
-  }
-
-  // Get identical family
-  let family = families.get(batchOptions);
-  if (family === undefined) {
-    // Identical family not found, get equivalent family
-    family = findMatchingFamily(families, executor, batchOptions);
-    if (family === undefined) {
-      // Create my own family
-      family = {
+    families = new BatchOptionsIndex(
+      getOptionsMatcher(executor.optionsMatch),
+      (options: TOptions) => ({
         executor,
-        options: batchOptions,
+        options,
         cache: new Map(),
         pending: new Map(),
-      };
-      families.set(batchOptions, family);
-    }
+      }),
+    );
+    batches.set(executor, families);
   }
+  // ExecutionDetails.batch requires options unless TOptions includes undefined.
+  const family = families.getOrCreate(options as TOptions);
 
   // Validate composite keys before queuing any work. A malformed later key
   // must not leave an earlier key's batch running without a caller.
@@ -227,10 +188,7 @@ export function batchInMeta<
       break;
     }
     case "tuple": {
-      const index = (family.tupleKeyIndex ??= {
-        children: new Map(),
-        keyset: undefined,
-      });
+      const index = (family.tupleKeyIndex ??= new Map());
       canonicalKeysets = keysets.map((keyset) =>
         canonicalizeTuple(index, keyset),
       );
