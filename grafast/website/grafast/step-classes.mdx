@@ -218,12 +218,13 @@ Supply an `optionsMatch` descriptor to `defineBatchExecutor` to choose how
 each property is compared. Properties you leave unspecified still use `===`.
 
 ```ts
+// For a user lookup that also accepts filters and a list of fields:
 const optionsMatch = {
-  context: {
-    withPgClient: "strict",
-    pgSettings: "record",
+  lookup: {
+    service: "strict",
+    filters: "record",
   },
-  params: "tuple",
+  fields: "tuple",
 } as const;
 ```
 
