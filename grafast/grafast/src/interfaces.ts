@@ -726,6 +726,7 @@ export interface UnaryExecutionValue<TData = any>
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
 
+/** Keyset comparisons use Map equality (`===` with `NaN` equal to itself). */
 export type BatchKeysetEquality = "strict" | "tuple" | "object";
 export type BatchCallback<
   TOptions extends Record<string, unknown> | undefined,

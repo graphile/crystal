@@ -221,9 +221,9 @@ parameters so it shouldn't be needed.
 Rather than calling `loadOne(list([$a, $b]), loader)`, it's better to remove
 the `list()` wrapper and pass the [multistep](./multistep.md) tuple directly:
 `loadOne([$a, $b], loader)`. This multistep form is more ergonomic and concise,
-but more importantly this form compares tuple elements using `===` when
-batching and caching lookups. Passing an existing step uses reference equality
-for its whole value instead. The same goes for objects: prefer
+and it compares tuple elements as `Map` keys would when batching and caching
+lookups. Passing an existing step compares its whole value as a single `Map`
+key. The same goes for objects: prefer
 `{ a: $a, b: $b }` over `object({ a: $a, b: $b })`: object shorthand compares
 property names and their values shallowly.
 

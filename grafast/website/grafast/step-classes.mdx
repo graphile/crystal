@@ -231,11 +231,12 @@ Use names that distinguish your executors from those supplied by libraries.
 The required `keysetEquality` in `defineBatchExecutor` controls how keysets are
 deduplicated:
 
-- `"strict"` compares each keyset using `===`.
-- `"tuple"` compares arrays by length and each element using `===`.
+- `"strict"` uses direct equality.
+- `"tuple"` compares arrays by length and each element in order.
 - `"object"` compares the enumerable string keys of objects, regardless of key
-  order, and compares their values using `===`.
+  order, and compares their values.
 
+Values use the same equality as `Map` keys (`===` with `NaN` equal to itself).
 These comparisons are shallow: nested objects and arrays are compared by
 identity. Select a mode that matches the inputs your callback treats as
 equivalent. Compatible calls share cached results and in-flight work throughout
