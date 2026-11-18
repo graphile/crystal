@@ -1,0 +1,127 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        username: "Alice",
+        applications: {
+          nodes: [
+            {
+              __typename: "AwsApplication",
+              name: "AWS App 4",
+              ordered: {
+                nodes: [
+                  {
+                    __typename: "FirstPartyVulnerability",
+                    name: "Exponential backtracking",
+                    cvssScore: 7.7,
+                  },
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "CSRF",
+                    cvssScore: 7.5,
+                  },
+                  {
+                    __typename: "FirstPartyVulnerability",
+                    name: "Information disclosure",
+                    cvssScore: 7.2,
+                  },
+                ],
+              },
+              filtered: {
+                nodes: [],
+              },
+            },
+            {
+              __typename: "AwsApplication",
+              name: "AWS App 5",
+              ordered: {
+                nodes: [
+                  {
+                    __typename: "FirstPartyVulnerability",
+                    name: "Exponential backtracking",
+                    cvssScore: 7.7,
+                  },
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "Malware",
+                    cvssScore: 7.2,
+                  },
+                  {
+                    __typename: "FirstPartyVulnerability",
+                    name: "Timing attack",
+                    cvssScore: 7.2,
+                  },
+                ],
+              },
+              filtered: {
+                nodes: [],
+              },
+            },
+            {
+              __typename: "AwsApplication",
+              name: "AWS App 6",
+              ordered: {
+                nodes: [
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "XSS",
+                    cvssScore: 9.1,
+                  },
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "License",
+                    cvssScore: 7.2,
+                  },
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "Malware",
+                    cvssScore: 7.2,
+                  },
+                  {
+                    __typename: "FirstPartyVulnerability",
+                    name: "Off-by-one",
+                    cvssScore: 3,
+                  },
+                ],
+              },
+              filtered: {
+                nodes: [
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "XSS",
+                  },
+                ],
+              },
+            },
+            {
+              __typename: "GcpApplication",
+              name: "Gigacellerator Pro",
+              ordered: {
+                nodes: [
+                  {
+                    __typename: "FirstPartyVulnerability",
+                    name: "Exponential backtracking",
+                    cvssScore: 7.7,
+                  },
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "License",
+                    cvssScore: 7.2,
+                  },
+                  {
+                    __typename: "ThirdPartyVulnerability",
+                    name: "Malware",
+                    cvssScore: 7.2,
+                  },
+                ],
+              },
+              filtered: {
+                nodes: [],
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
