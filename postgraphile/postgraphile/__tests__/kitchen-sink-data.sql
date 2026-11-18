@@ -72,6 +72,10 @@ delete from js_reserved.yield cascade;
 delete from js_reserved.__proto__ cascade;
 delete from js_reserved.null cascade;
 delete from js_reserved.reserved cascade;
+delete from relational_root_refs.reviews cascade;
+delete from relational_root_refs.books cascade;
+delete from relational_root_refs.films cascade;
+delete from relational_root_refs.items cascade;
 
 delete from partitions.measurements cascade;
 delete from partitions.users cascade;
@@ -500,6 +504,20 @@ insert into enum_tables.referencing_table(enum_1, enum_2, enum_3, simple_enum) v
   (null, null, 'c3', 'Qux');
 
 --------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+
+alter sequence relational_root_refs.items_id_seq restart with 1;
+alter sequence relational_root_refs.reviews_id_seq restart with 1;
+insert into relational_root_refs.items (type, name) values
+  ('BOOK', 'A book'),
+  ('FILM', 'A film');
+insert into relational_root_refs.books (id, pages) values (1, 100);
+insert into relational_root_refs.films (id, minutes) values (2, 90);
+insert into relational_root_refs.reviews (item_id, body) values
+  (1, 'A good book'),
+  (1, 'An ok book'),
+  (2, 'A nice film');
 
 alter sequence geometry.geom_id_seq restart with 101;
 insert into geometry.geom(

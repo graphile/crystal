@@ -1,0 +1,40 @@
+## expect(errors).toBeFalsy()
+#> schema: ["relational_root_refs"]
+## expect(data.allItems.nodes.length).toEqual(2)
+## expect(data.allItems.nodes[0].__typename).toEqual("Book")
+## expect(data.allItems.nodes[0].reviewList.nodes.map((r) => r.body)).toEqual(["A good book", "An ok book"])
+## expect(data.allItems.nodes[1].__typename).toEqual("Film")
+## expect(data.allItems.nodes[1].reviewList.nodes.map((r) => r.body)).toEqual(["A nice film"])
+## expect(data.allBooks.nodes[0].reviewList.totalCount).toEqual(2)
+## expect(data.allFilms.nodes[0].reviewList.nodes.map((r) => r.body)).toEqual(["A nice film"])
+
+{
+  allItems(orderBy: PRIMARY_KEY_ASC) {
+    nodes {
+      __typename
+      name
+      reviewList {
+        nodes {
+          body
+        }
+      }
+    }
+  }
+  allBooks {
+    nodes {
+      name
+      reviewList {
+        totalCount
+      }
+    }
+  }
+  allFilms {
+    nodes {
+      reviewList {
+        nodes {
+          body
+        }
+      }
+    }
+  }
+}
