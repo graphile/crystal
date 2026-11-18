@@ -153,6 +153,8 @@ of the execute method.
 
 #### details.batch
 
+(Experimental)
+
 `details.batch` combines compatible work submitted by step executions that are
 ready in the same tick. It deduplicates keysets before calling your batch
 function, then returns results in the original order, including duplicates.
