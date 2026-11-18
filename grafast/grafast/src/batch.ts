@@ -321,6 +321,7 @@ function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
   }
   function handleError(error: unknown) {
     for (const spec of keysets) {
+      family.cache.delete(spec);
       family.pending.delete(spec);
     }
     deferred.reject(error);
