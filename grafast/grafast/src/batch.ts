@@ -89,7 +89,7 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 const batchesSymbol = Symbol("Grafast batch caches");
 
 type KeysetTrieNode<TKeyset> = {
-  children: Map<unknown, KeysetTrieNode<TKeyset>>;
+  children?: Map<unknown, KeysetTrieNode<TKeyset>>;
   /** First keyset at this terminal node; subsequent lookups reuse its identity. */
   keyset: TKeyset | undefined;
 };
@@ -116,15 +116,17 @@ function canonicalizeObject<TKeyset>(
   const shape = JSON.stringify(keys);
   let node = indexes.get(shape);
   if (node === undefined) {
-    node = { children: new Map(), keyset: undefined };
+    node = { keyset: undefined };
     indexes.set(shape, node);
   }
   for (const key of keys) {
     const value = record[key];
-    let child: KeysetTrieNode<TKeyset> | undefined = node.children.get(value);
+    const children: Map<unknown, KeysetTrieNode<TKeyset>> =
+      (node.children ??= new Map());
+    let child: KeysetTrieNode<TKeyset> | undefined = children.get(value);
     if (child === undefined) {
-      child = { children: new Map(), keyset: undefined };
-      node.children.set(value, child);
+      child = { keyset: undefined };
+      children.set(value, child);
     }
     node = child;
   }
