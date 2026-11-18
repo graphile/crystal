@@ -4004,8 +4004,8 @@ function applyConditionFromCursor<
     // Nullable, so now handle if one is null but the other isn't
     if (nullable) {
       const useAIsNullAndBIsNotNull =
-        (nullsFirst && beforeOrAfter === "after") ||
-        (!nullsFirst && beforeOrAfter === "before");
+        (!nullsFirst && beforeOrAfter === "after") ||
+        (nullsFirst && beforeOrAfter === "before");
       const oneIsNull = useAIsNullAndBIsNotNull
         ? sql`${orderFragment} is null and ${sqlValue} is not null`
         : sql`${orderFragment} is not null and ${sqlValue} is null`;

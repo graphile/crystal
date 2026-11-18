@@ -1,0 +1,102 @@
+{
+  ascFirst: {
+    edges: [
+      {
+        cursor: "WyJmZmExM2NhNjljIiwiSnVzdCBhIGZyaWVuZGx5IGh1bWFuIiwzXQ==",
+        node: {
+          id: 3,
+          about: "Just a friendly human",
+        },
+      },
+    ],
+  },
+  ascAfter: {
+    edges: [
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDFd",
+        node: {
+          id: 1,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDJd",
+        node: {
+          id: 2,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDRd",
+        node: {
+          id: 4,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDVd",
+        node: {
+          id: 5,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDZd",
+        node: {
+          id: 6,
+          about: null,
+        },
+      },
+    ],
+  },
+  descFirst: {
+    edges: [
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDZd",
+        node: {
+          id: 6,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDVd",
+        node: {
+          id: 5,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDRd",
+        node: {
+          id: 4,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDJd",
+        node: {
+          id: 2,
+          about: null,
+        },
+      },
+      {
+        cursor: "WyJmZmExM2NhNjljIixudWxsLDFd",
+        node: {
+          id: 1,
+          about: null,
+        },
+      },
+    ],
+  },
+  descAfter: {
+    edges: [
+      {
+        cursor: "WyJmZmExM2NhNjljIiwiSnVzdCBhIGZyaWVuZGx5IGh1bWFuIiwzXQ==",
+        node: {
+          id: 3,
+          about: "Just a friendly human",
+        },
+      },
+    ],
+  },
+}
