@@ -123,7 +123,11 @@ export function batchInMeta<
         if (loadBatch === null) {
           const deferred = Promise.withResolvers<ReadonlyArray<TResult>>();
           deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
-          loadBatch = { deferred, entries: null, keysets: [] };
+          loadBatch = {
+            deferred,
+            entries: entryI === undefined ? null : [],
+            keysets: [],
+          };
           family.queued = loadBatch;
 
           // Kick off the batch
@@ -145,7 +149,7 @@ export function batchInMeta<
           // tuple/object mode
           entryI.batch = loadBatch;
           entryI.index = index;
-          (loadBatch.entries ??= []).push(entryI);
+          loadBatch.entries!.push(entryI);
         }
       } else {
         batchForKey = request.batch;
