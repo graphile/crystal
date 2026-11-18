@@ -1627,7 +1627,7 @@ export function consume(value: unknown): void {
 }
 
 /** Is obj a Plain Old JavaScript Object? */
-export function isPojo(obj: any): obj is object {
+export function isPojo(obj: any): obj is Record<PropertyKey, unknown> {
   if (obj == null) return false;
   if (typeof obj !== "object") return false;
   const proto = Object.getPrototypeOf(obj);
