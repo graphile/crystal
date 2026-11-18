@@ -3,7 +3,7 @@ import { internBatchTuple } from "./batchTupleIndex.ts";
 import { arraysMatch, isPojo } from "./utils.ts";
 
 interface KeyOrder {
-  symbolOrder?: Map<symbol, number>;
+  symbolOrder: Map<symbol, number> | null;
 }
 
 interface OptionsMatcher {
@@ -177,8 +177,8 @@ interface OptionsIndex<TOptions, TEntry> extends KeyOrder {
 
 /** The index only narrows the search: the matcher decides whether to merge. */
 export class BatchOptionsIndex<TOptions, TEntry extends { options: TOptions }> {
-  private first?: TEntry;
-  private index?: OptionsIndex<TOptions, TEntry>;
+  private first: TEntry | null = null;
+  private index: OptionsIndex<TOptions, TEntry> | null = null;
   private readonly matcher: OptionsMatcher;
   private readonly create: (options: TOptions) => TEntry;
 
@@ -189,17 +189,22 @@ export class BatchOptionsIndex<TOptions, TEntry extends { options: TOptions }> {
 
   getOrCreate(options: TOptions): TEntry {
     const first = this.first;
-    if (first === undefined) {
+    if (first === null) {
       return (this.first = this.create(options));
     }
 
     let index = this.index;
-    if (index === undefined) {
+    if (index === null) {
       if (this.matcher.matches(first.options, options)) {
         return first;
       }
       // Most executors have just one family. Build the index on the first miss.
-      index = { byIdentity: new Map(), keys: new Map(), byKeys: new Map() };
+      index = {
+        byIdentity: new Map(),
+        keys: new Map(),
+        byKeys: new Map(),
+        symbolOrder: null,
+      };
       const firstKey = this.getKey(index, first.options);
       index.byIdentity.set(first.options, first);
       index.byKeys.set(firstKey, first);

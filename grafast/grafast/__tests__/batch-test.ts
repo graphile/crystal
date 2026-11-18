@@ -423,8 +423,8 @@ it("indexes explicit option rules in declaration order before unspecified keys",
   };
   const firstKeys: unknown[] = [];
   const secondKeys: unknown[] = [];
-  matcher.appendKeys(first, firstKeys, {});
-  matcher.appendKeys(second, secondKeys, {});
+  matcher.appendKeys(first, firstKeys, { symbolOrder: null });
+  matcher.appendKeys(second, secondKeys, { symbolOrder: null });
   expect(firstKeys.filter((value) => typeof value === "symbol")).to.deep.equal([
     priority,
     later,
