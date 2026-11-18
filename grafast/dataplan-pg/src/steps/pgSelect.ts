@@ -5,6 +5,7 @@ import type {
   ConnectionHandlingStep,
   ExecutionDetails,
   ExecutionDetailsStream,
+  ExecutionResultValue,
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
@@ -84,6 +85,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { pgStepBatchExecutor, pgStepBatchOptions } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -1245,17 +1247,15 @@ export class PgSelectStep<
     const isSkippable = this.mode === "normal" && !this.hasSideEffects;
 
     if (streamInitialCount == null) {
-      const specs: PgExecutorInput<any>[] = [];
+      const keysets: (readonly unknown[])[] = [];
       let resultIndexes: ReadonlyArray<number | null>;
-      if (identifierIndex == null) {
+      if (identifierIndex === null) {
         if (isMutation) {
           // Run them all
-          resultIndexes = indexMap(
-            (_i) => specs.push({ context, queryValues: EMPTY_ARRAY }) - 1,
-          );
+          resultIndexes = indexMap((_i) => keysets.push(EMPTY_ARRAY) - 1);
         } else {
-          // We'll add at most one spec
-          let specIdx: null | number = null;
+          // We'll add at most one keyset
+          let keysetIndex: null | number = null;
           resultIndexes = indexMap((i) => {
             if (
               isSkippable &&
@@ -1266,15 +1266,15 @@ export class PgSelectStep<
               // Skip!
               return null;
             } else {
-              if (specIdx === null) {
-                specIdx = specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
+              if (keysetIndex === null) {
+                keysetIndex = keysets.push(EMPTY_ARRAY) - 1;
               }
-              return specIdx;
+              return keysetIndex;
             }
           });
         }
       } else {
-        let hasSpec = false;
+        let hasKeyset = false;
         const queryValuesMatch =
           getSameLengthArraysMatchFunction(queryValuesLength);
         resultIndexes = indexMap<number | null>((i) => {
@@ -1297,36 +1297,45 @@ export class PgSelectStep<
             }
             queryValues.push(result);
           }
-          if (!isMutation && hasSpec) {
+          if (!isMutation && hasKeyset) {
             // Dedupe
-            const existingIdx = specs.findIndex((s) =>
-              queryValuesMatch(queryValues, s.queryValues),
+            const existingIdx = keysets.findIndex((keyset) =>
+              queryValuesMatch(queryValues, keyset),
             );
             if (existingIdx !== -1) {
               return existingIdx;
             }
           }
-          const specIdx = specs.push({ context, queryValues }) - 1;
-          hasSpec = true;
-          return specIdx;
+          const keysetIndex = keysets.push(queryValues) - 1;
+          hasKeyset = true;
+          return keysetIndex;
         });
       }
-      const executeMethod = isMutation
-        ? "executeWithoutCache"
-        : "executeWithCache";
+      const common = {
+        store,
+        text,
+        rawSqlValues,
+        identifierIndex,
+        name,
+        affinity: this.executionAffinity,
+        eventEmitter,
+        useTransaction: isMutation,
+      };
       const executionResult =
-        specs.length > 0
-          ? await this.resource[executeMethod](specs, {
-              store,
-              text,
-              rawSqlValues,
-              identifierIndex,
-              name,
-              affinity: this.executionAffinity,
-              eventEmitter,
-              useTransaction: isMutation,
-            })
-          : null;
+        keysets.length === 0
+          ? null
+          : isMutation
+            ? await this.resource.executeWithoutCache(
+                keysets.map((queryValues) => ({ context, queryValues })),
+                common,
+              )
+            : {
+                values: await executionDetails.batch(
+                  pgStepBatchExecutor,
+                  keysets,
+                  pgStepBatchOptions(this.resource.executor, context, common),
+                ),
+              };
       // debugExecute("%s; result: %c", this, executionResult);
 
       return indexMap((i) => {
@@ -4369,7 +4378,7 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
 }
 
 function createSelectResult(
-  allVals: null | readonly any[],
+  allVals: ExecutionResultValue<null | readonly any[]>,
   {
     first,
     last,
@@ -4390,7 +4399,7 @@ function createSelectResult(
     groupDetails: PgGroupDetails | undefined;
   },
 ) {
-  if (allVals == null) {
+  if (allVals == null || !Array.isArray(allVals)) {
     return allVals as never;
   }
   const limit = first ?? last;

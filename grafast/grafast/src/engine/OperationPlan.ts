@@ -5607,9 +5607,9 @@ function makeMetaByMetaKeysFactory(
   };
 }
 
-const EMPTY_OBJECT = Object.freeze(Object.create(null));
 function makeMetaByMetaKeys0() {
-  return EMPTY_OBJECT;
+  // This scope also owns batch state, even when no step declares a metaKey.
+  return Object.create(null);
 }
 function makeMetaByMetaKeys1Factory(key1: string | number | symbol) {
   return function makeMetaByMetaKeys1() {

@@ -306,6 +306,19 @@ export type PgExecutorSubscribeOptions = {
  * caching.
  */
 export class PgExecutor<const TName extends string = string, TSettings = any> {
+  private readonly batchCacheTokens = new WeakMap<PgExecutorContext, object>();
+
+  /** Identifies the current read cache generation for cross-step batching. */
+  public getBatchCacheToken(context: PgExecutorContext): object {
+    let token = this.batchCacheTokens.get(context);
+    if (token === undefined) {
+      /* Empty identity token; only reference equality matters. */
+      token = Object.create(null) as object;
+      this.batchCacheTokens.set(context, token);
+    }
+    return token;
+  }
+
   /** Shared execution metadata for PostgreSQL read caches. */
   public static readonly metaKey = Symbol("PgExecutor cache");
   public name: TName;
@@ -1276,6 +1289,7 @@ ${duration}
     );
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
+    this.batchCacheTokens.delete(context);
     (context as any)[this.$$cache]?.reset();
     if (store != null) {
       this._cache.get(store)?.get(context)?.reset();
