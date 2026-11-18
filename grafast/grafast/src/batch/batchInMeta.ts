@@ -93,17 +93,23 @@ export function batchInMeta<
     null;
   const results: ExecutionResultValue<TResult>[] = [];
   for (let i = 0; i < keysets.length; i++) {
-    const composite = entries?.[i];
-    const spec = composite === undefined ? keysets[i] : composite.keyset;
-    if (composite === undefined ? cache.has(spec) : composite.batch === null) {
-      results.push(
-        composite === undefined ? cache.get(spec)! : composite.result!,
-      );
+    /**
+     * The deduplicated composite tuple/object's entry when in `tuple`/`object`
+     * mode. In `strict` mode, `entries` is not set since we don't need a trie
+     * and can just use a Map.
+     */
+    const entryI = entries?.[i];
+    const keyset = entryI === undefined ? keysets[i] : entryI.keyset;
+    if (entryI === undefined ? cache.has(keyset) : entryI.batch === null) {
+      const existingResult = (
+        entryI === undefined ? cache.get(keyset) : entryI.result
+      ) as TResult;
+      results.push(existingResult);
     } else {
-      // Placeholder
+      // Placeholder; we'll overwrite this once fetched
       const targetIndex = results.push(null as TResult) - 1;
 
-      const existing = composite === undefined ? pending.get(spec) : composite;
+      const existing = entryI === undefined ? pending.get(keyset) : entryI;
       let batchForKey = existing?.batch;
       let sourceIndex = existing?.index;
       if (batchForKey == null) {
@@ -123,15 +129,15 @@ export function batchInMeta<
             void executeBatch(currentFamily, currentBatch);
           });
         }
-        const index = loadBatch.keysets.push(spec) - 1;
+        const index = loadBatch.keysets.push(keyset) - 1;
         batchForKey = loadBatch;
         sourceIndex = index;
-        if (composite === undefined) {
-          pending.set(spec, { batch: loadBatch, index });
+        if (entryI === undefined) {
+          pending.set(keyset, { batch: loadBatch, index });
         } else {
-          composite.batch = loadBatch;
-          composite.index = index;
-          (loadBatch.entries ??= []).push(composite);
+          entryI.batch = loadBatch;
+          entryI.index = index;
+          (loadBatch.entries ??= []).push(entryI);
         }
       }
       const indexesByPromise = (pendingIndexes ??= new Map());
