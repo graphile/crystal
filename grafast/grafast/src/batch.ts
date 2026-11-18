@@ -327,21 +327,31 @@ async function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
   try {
     const loadResults = await family.executor.callback(family.options, keysets);
     if (loadResults.length !== keysets.length) {
+      // This path shouldn't happen, so expensively handle the case that
+      // loadResults may include promises
+      await Promise.allSettled(loadResults);
       throw new Error(
         `batch callback returned ${loadResults.length} results for ${keysets.length} keysets`,
       );
     }
+    let promises: PromiseLike<any>[] | null = null;
     for (let pendingIndex = 0; pendingIndex < keysets.length; pendingIndex++) {
       const spec = keysets[pendingIndex];
       const result = loadResults[pendingIndex];
       family.cache.set(spec, result);
       family.pending.delete(spec);
       if (isPromiseLike(result)) {
-        // Prevent promise rejections causing unhandledRejection
-        result.then(null, noop);
+        if (promises === null) {
+          promises = [result];
+        } else {
+          promises.push(result);
+        }
       }
     }
     deferred.resolve(loadResults);
+    if (promises !== null) {
+      Promise.allSettled(promises);
+    }
   } catch (error) {
     for (const spec of keysets) {
       family.pending.delete(spec);
