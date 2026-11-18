@@ -26,7 +26,9 @@ export interface CompositeEntry<K, R> {
 export type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
   executor: BatchExecutor<TOptions, TKeyset, TResult>;
   options: TOptions;
+  /** In `strict` mode, cached results by keyset. */
   cache: Map<TKeyset, TResult>;
+  /** In `strict` mode, the pending batch and position for each in-flight keyset. */
   pending: Map<
     TKeyset,
     {
@@ -36,9 +38,16 @@ export type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
   >;
   /** The batch currently collecting keys, scheduled to start in a microtask. */
   queued: PendingBatch<TKeyset, TResult> | null;
-  /** Trie that deduplicates tuple keys by their elements. */
+  /**
+   * In `tuple` mode, a trie keyed by tuple elements. Each entry holds the
+   * canonical keyset and its pending batch or cached result.
+   */
   tupleKeyIndex: BatchTupleIndex<CompositeEntry<TKeyset, TResult>> | null;
-  /** Tries that deduplicate object keys by property names and values. */
+  /**
+   * In `object` mode, one trie per set of property names, keyed by property
+   * values. Each entry holds the canonical keyset and its pending batch or
+   * cached result.
+   */
   objectKeyIndexes: Map<string, KeysetTrieNode<TKeyset, TResult>> | null;
 };
 
