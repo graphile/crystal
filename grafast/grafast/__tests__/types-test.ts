@@ -62,8 +62,8 @@ const _myPlan: FieldPlanResolver = () => {
 // Internal adapter types must preserve the same guarantees as the public loaders.
 const _batchTypes = (batch: BatchFunction) => {
   const executor = defineBatchExecutor({
-    keysetEquality: "strict",
     name: "type-test",
+    keysetEquality: "strict",
     callback: (options: { prefix: string }, keys: readonly number[]) =>
       keys.map((key) => options.prefix + key),
     optionsMatch: { prefix: "strict" },
@@ -87,8 +87,8 @@ const _batchTypes = (batch: BatchFunction) => {
     callback: executor.callback,
   });
   const optionalExecutor = defineBatchExecutor({
-    keysetEquality: "strict",
     name: "optional-type-test",
+    keysetEquality: "strict",
     callback: (
       options: { prefix: string } | undefined,
       keys: readonly number[],
@@ -104,14 +104,14 @@ const _batchTypes = (batch: BatchFunction) => {
   // @ts-expect-error Null is not a valid options record.
   batch(optionalExecutor, [1], null);
   defineBatchExecutor({
-    keysetEquality: "strict",
     name: "invalid-tuple-options",
+    keysetEquality: "strict",
     // @ts-expect-error Executors cannot declare tuple options.
     callback: (_options: readonly [string], keys: readonly number[]) => keys,
   });
   defineBatchExecutor({
-    keysetEquality: "strict",
     name: "invalid-options-match",
+    keysetEquality: "strict",
     callback: executor.callback,
     // @ts-expect-error A string option cannot use tuple matching.
     optionsMatch: { prefix: "tuple" },

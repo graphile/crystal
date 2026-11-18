@@ -370,7 +370,7 @@ test.each([false, true])(
       run(executor, context, "select value", "x", undefined, true, store);
 
     expect((await read()).values).toEqual([[[1]]]);
-    await executor.executeMutation({ context, store }, async () => {
+    await executor.executeMutation({ store, context }, async () => {
       version = 2;
     });
     expect((await read()).values).toEqual([[[2]]]);
@@ -406,7 +406,7 @@ test.each([false, true])(
         const cached = await read();
         expect(cached[0]).toBe(first[0]);
         expect(seen).toHaveLength(1);
-        await executor.executeMutation({ context, store }, async () => {
+        await executor.executeMutation({ store, context }, async () => {
           version = 2;
         });
         const updated = await read();

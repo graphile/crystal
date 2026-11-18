@@ -200,10 +200,10 @@ export class BatchOptionsIndex<TOptions, TEntry extends { options: TOptions }> {
       }
       // Most executors have just one family. Build the index on the first miss.
       index = {
+        symbolOrder: null,
         byIdentity: new Map(),
         keys: new Map(),
         byKeys: new Map(),
-        symbolOrder: null,
       };
       const firstKey = this.getKey(index, first.options);
       index.byIdentity.set(first.options, first);

@@ -760,8 +760,8 @@ export interface BatchExecutor<
   TResult,
 > {
   readonly name: string;
-  readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
   readonly keysetEquality: BatchKeysetEquality;
+  readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
   /** Unspecified own properties are compared using strict equality. */
   readonly optionsMatch?: BatchOptionsMatch<NonNullable<TOptions>>;
 }

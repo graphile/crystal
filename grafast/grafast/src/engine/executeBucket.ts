@@ -827,6 +827,8 @@ export function executeBucket(
       }
     }
     const executeDetails: ExecutionDetails<readonly any[]> = {
+      count,
+      values,
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
       batch: (executor, keysets, options?) =>
@@ -837,10 +839,8 @@ export function executeBucket(
           keysets,
           options,
         ),
-      count,
-      values,
-      extra,
       stream: evaluateStream(bucket, step, distributorOptions),
+      extra,
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(

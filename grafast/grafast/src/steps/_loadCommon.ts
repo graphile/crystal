@@ -95,9 +95,9 @@ type LoadCallback<
 > = (
   specs: readonly TSpec[],
   info: {
+    shared: TShared;
     attributes: readonly (keyof TItem)[];
     params: Partial<TParams>;
-    shared: TShared;
     unary: TShared;
   },
 ) => PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
@@ -131,9 +131,9 @@ function executeLoadBatch<
   specs: readonly TSpec[],
 ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>> {
   return load(specs, {
+    shared,
     attributes,
     params,
-    shared,
     unary: shared,
   });
 }
