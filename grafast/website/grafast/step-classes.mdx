@@ -228,9 +228,10 @@ const optionsMatch = {
 } as const;
 ```
 
-`"strict"` uses `===`. `"record"` compares an object by prototype, own keys,
-and their values. `"tuple"` compares an array by length and its elements in
-order. A nested descriptor applies the same own-property rules to that object.
+`"strict"` uses `===`. `"record"` compares plain objects and arrays by prototype,
+own keys, and their values. A nested descriptor applies the same own-property
+rules. For other values, `"record"` and nested descriptors use `===`.
+`"tuple"` compares arrays by length and their elements in order.
 Gra*fast* uses these rules to narrow the search for equivalent
 options, then checks the remaining candidates against the descriptor. The index
 uses explicit rules in declaration order, followed by the other own keys in a

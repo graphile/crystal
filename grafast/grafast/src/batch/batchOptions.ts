@@ -48,12 +48,6 @@ const tupleMatcher: OptionsMatcher = {
   },
 };
 
-function isOptionsObject(
-  value: unknown,
-): value is Record<PropertyKey, unknown> {
-  return value !== null && typeof value === "object";
-}
-
 function symbolRank(order: Map<symbol, number>, key: symbol): number {
   let rank = order.get(key);
   if (rank === undefined) {
@@ -76,6 +70,12 @@ function compareOptionKeys(
     const ranks = (order.symbolOrder ??= new Map());
     return symbolRank(ranks, a) - symbolRank(ranks, z);
   }
+}
+
+function isOptionsObject(
+  value: unknown,
+): value is Record<PropertyKey, unknown> {
+  return Array.isArray(value) || isPojo(value);
 }
 
 function makeObjectMatcher(

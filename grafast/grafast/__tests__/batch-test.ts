@@ -398,6 +398,30 @@ it("matches nested option rules and compares unspecified properties strictly", a
   expect(calls).to.deep.equal([[1, 3], [2], [4], [5], [6]]);
 });
 
+it("matches arrays structurally and class instances by identity", () => {
+  const matcher = getOptionsMatcher({
+    record: "record",
+    nested: { length: "strict" },
+  });
+  const date = new Date(0);
+  const array = [1, 2];
+  const options = { record: date, nested: array };
+  expect(matcher.matches(options, { record: date, nested: array })).to.equal(
+    true,
+  );
+  expect(
+    matcher.matches(options, { record: new Date(1), nested: array }),
+  ).to.equal(false);
+  expect(matcher.matches(options, { record: date, nested: [1, 2] })).to.equal(
+    true,
+  );
+
+  const keys: unknown[] = [];
+  matcher.appendKeys(options, keys, { symbolOrder: null });
+  expect(keys).to.include(date);
+  expect(keys).to.include(Array.prototype);
+});
+
 it("indexes explicit option rules in declaration order before unspecified keys", () => {
   const matcher = getOptionsMatcher({
     priority: "strict",
