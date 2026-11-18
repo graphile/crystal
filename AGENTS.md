@@ -202,6 +202,10 @@ the query shape.
 - If the package lacks a lifecycle helper, add a local wrapper around
   `@localrepo/test-helpers`. Follow the relevant runner's lifecycle hooks
   (`before`/`after` for `node:test`, `beforeAll`/`afterAll` for Jest).
+- Use node builtins where possible; we're phasing out usage of `jest`, `mocha`,
+  etc.
+- Do not have tests write files (except snapshots); there should be no need to
+  create temporary directories.
 
 Note: many of the integration tests work by writing `*.test.graphql` files,
 which the system will run and capture snapshots of data, plans, errors and
