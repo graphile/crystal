@@ -103,7 +103,12 @@ into 4 main categories based on the root folders, each of which have a
 - Modal verbs: avoid unnecessary language which suggests some is tentative or
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
   verbs.
-- Always use a block body for `if`, `for`, and `while` statements.
+- Use block bodies for `if`, `else`, `for`, and `while`. In a short function, a
+  standalone `if` can omit braces when its condition is a single comparison and
+  the entire statement fits comfortably on one line.
+- Use a block body for any `switch` clause that declares or assigns a variable,
+  or contains more than four statements. If one clause uses a block body, use
+  block bodies for all clauses in that `switch`.
 - Do not reassign function parameters; use a local variable instead.
 - When handling all members of a union, include an explicit exhaustiveness check
   such as `const never: never = value;` in a `switch` default or an unreachable
