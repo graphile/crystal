@@ -810,6 +810,8 @@ export interface ExecutionDetails<
    * have separate scopes.
    * Define executors outside step execution; pass all varying values in
    * `options`.
+   *
+   * @experimental
    */
   batch: BatchFunction;
 
