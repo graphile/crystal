@@ -404,42 +404,43 @@ it("indexes explicit option rules in declaration order before unspecified keys",
     group: { later: "strict", early: "strict" },
     absent: "strict",
   });
-  const priority = Symbol();
-  const later = Symbol();
-  const early = Symbol();
-  const other = Symbol();
-  const alpha = Symbol();
-  const zeta = Symbol();
+  const $$priority = Symbol();
+  const $$later = Symbol();
+  const $$early = Symbol();
+  const $$other = Symbol();
+  const $$alpha = Symbol();
+  const $$zeta = Symbol();
   const first = {
-    zeta,
-    group: { early, other, later },
-    priority,
-    alpha,
+    zeta: $$zeta,
+    group: { early: $$early, other: $$other, later: $$later },
+    priority: $$priority,
+    alpha: $$alpha,
   };
   const second = {
-    alpha,
-    priority,
-    group: { later, early, other },
-    zeta,
+    alpha: $$alpha,
+    priority: $$priority,
+    group: { later: $$later, early: $$early, other: $$other },
+    zeta: $$zeta,
   };
   const firstKeys: unknown[] = [];
   const secondKeys: unknown[] = [];
   matcher.appendKeys(first, firstKeys, { symbolOrder: null });
   matcher.appendKeys(second, secondKeys, { symbolOrder: null });
   expect(firstKeys.filter((value) => typeof value === "symbol")).to.deep.equal([
-    priority,
-    later,
-    early,
-    other,
-    alpha,
-    zeta,
+    $$priority,
+    $$later,
+    $$early,
+    $$other,
+    $$alpha,
+    $$zeta,
   ]);
   expect(secondKeys).to.deep.equal(firstKeys);
 });
 
 it("indexes option symbols irrespective of order and checks non-enumerable values", async () => {
-  const a = Symbol("option");
-  const b = Symbol("option");
+  const $$a = Symbol("option");
+  const $$b = Symbol("option");
+  const $$different = Symbol("option");
   const calls: Array<readonly number[]> = [];
   const executor = defineBatchExecutor({
     name: "own-options",
@@ -453,17 +454,17 @@ it("indexes option symbols irrespective of order and checks non-enumerable value
     },
   });
   const meta = {};
-  const first = Object.defineProperty({ [a]: 1, [b]: 2 }, "hidden", {
+  const first = Object.defineProperty({ [$$a]: 1, [$$b]: 2 }, "hidden", {
     value: 1,
   });
-  const other = Object.defineProperty({ [a]: 1, [b]: 2 }, "hidden", {
+  const other = Object.defineProperty({ [$$a]: 1, [$$b]: 2 }, "hidden", {
     value: 2,
   });
-  const reordered = Object.defineProperty({ [b]: 2, [a]: 1 }, "hidden", {
+  const reordered = Object.defineProperty({ [$$b]: 2, [$$a]: 1 }, "hidden", {
     value: 1,
   });
   const differentSymbol = Object.defineProperty(
-    { [a]: 1, [Symbol("option")]: 2 },
+    { [$$a]: 1, [$$different]: 2 },
     "hidden",
     { value: 1 },
   );

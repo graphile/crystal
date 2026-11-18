@@ -109,6 +109,7 @@ into 4 main categories based on the root folders, each of which have a
 - Use a block body for any `switch` clause that declares or assigns a variable,
   or contains more than four statements. If one clause uses a block body, use
   block bodies for all clauses in that `switch`.
+- Prefix named symbol constants with `$$`.
 - Keep internal object shapes stable for V8. Initialize fields at construction
   time. When a field is populated lazily, declare it as required (no `?`) and
   extend the type with `| null` or `| undefined`. Explicitly initialize it (to

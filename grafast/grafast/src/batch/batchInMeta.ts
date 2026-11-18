@@ -15,13 +15,13 @@ import { checkExecutor } from "./checkExecutor.ts";
 import { executeBatch } from "./executeBatch.ts";
 
 type BatchMeta = Record<PropertyKey, unknown> & {
-  [batchesSymbol]?: Map<
+  [$$batches]?: Map<
     BatchExecutor<any, any, any>,
     BatchOptionsIndex<any, BatchFamily<any, any, any>>
   >;
 };
 
-const batchesSymbol = Symbol("Grafast batch caches");
+const $$batches = Symbol("Grafast batch caches");
 
 /** @internal Used to implement `ExecutionDetails.batch`. */
 export function batchInMeta<
@@ -47,9 +47,9 @@ export function batchInMeta<
   }
 
   const typedMeta = metaByMetaKey as BatchMeta;
-  let batches = typedMeta[batchesSymbol];
+  let batches = typedMeta[$$batches];
   if (batches === undefined) {
-    typedMeta[batchesSymbol] = batches = new Map();
+    typedMeta[$$batches] = batches = new Map();
   }
   // Executor identity determines the options, keyset and result types of all
   // families stored under it; only the heterogeneous registry erases them.
