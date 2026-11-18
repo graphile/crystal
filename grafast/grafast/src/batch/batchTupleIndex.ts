@@ -26,6 +26,11 @@ export function internBatchTupleEntry<
   create: (tuple: TTuple) => TEntry,
 ): TEntry {
   let index = root;
+  /**
+   * The last stored tuple that failed comparison during this lookup. Skip
+   * redundant calls to `arraysMatch` when splitting a shared prefix encounters
+   * the same tuple again.
+   */
   let mismatching: TTuple | undefined;
   for (let depth = 0; ; depth++) {
     const key = depth === tuple.length ? $$terminal : tuple[depth];
@@ -53,7 +58,6 @@ export function internBatchTupleEntry<
       children.set(previousKey, existing);
       index.set(key, children);
       index = children;
-      // A long shared prefix can require several splits with the same leaf.
       mismatching = previous;
     }
   }
