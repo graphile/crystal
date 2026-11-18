@@ -211,12 +211,18 @@ export function batchInMeta<
     }
     case "tuple": {
       const index = (family.tupleKeyIndex ??= new Map());
-      entries = keysets.map((keyset) => canonicalizeTuple(index, keyset));
+      entries = [];
+      for (let i = 0; i < keysets.length; i++) {
+        entries.push(canonicalizeTuple(index, keysets[i]));
+      }
       break;
     }
     case "object": {
       const indexes = (family.objectKeyIndexes ??= new Map());
-      entries = keysets.map((keyset) => canonicalizeObject(indexes, keyset));
+      entries = [];
+      for (let i = 0; i < keysets.length; i++) {
+        entries.push(canonicalizeObject(indexes, keysets[i]));
+      }
       break;
     }
     default: {

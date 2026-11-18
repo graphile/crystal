@@ -758,6 +758,34 @@ it("validates all composite keys before queuing work", async () => {
   expect(calls).to.equal(1);
 });
 
+for (const mode of ["tuple", "object"] as const) {
+  it(`rejects sparse ${mode} key batches before queuing work`, async () => {
+    let calls = 0;
+    const executor = defineBatchExecutor({
+      name: `sparse-${mode}-key-batch`,
+      keysetEquality: mode,
+      callback: (_options: undefined, keys: readonly unknown[]) => {
+        calls++;
+        return keys;
+      },
+    });
+    const key = mode === "tuple" ? [1] : { id: 1 };
+    const keys = new Array<unknown>(2);
+    keys[1] = key;
+    const meta = {};
+    const expectedType = mode === "tuple" ? "array" : "object";
+    expect(() => batchInMeta(schema, meta, executor, keys)).to.throw(
+      `requires ${expectedType} keysets`,
+    );
+    await Promise.resolve();
+    expect(calls).to.equal(0);
+    expect(await batchInMeta(schema, meta, executor, [key])).to.deep.equal([
+      key,
+    ]);
+    expect(calls).to.equal(1);
+  });
+}
+
 it("retries a rejected asynchronous batch and an invalid result count", async () => {
   let attempts = 0;
   const executor = defineBatchExecutor({
