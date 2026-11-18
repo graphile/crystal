@@ -348,24 +348,16 @@ function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
         `batch callback returned ${loadResults.length} results for ${keysets.length} keysets`,
       );
     }
-    let promises: PromiseLike<any>[] | null = null;
     for (let pendingIndex = 0; pendingIndex < keysets.length; pendingIndex++) {
       const spec = keysets[pendingIndex];
       const result = loadResults[pendingIndex];
       family.cache.set(spec, result);
       family.pending.delete(spec);
       if (isPromiseLike(result)) {
-        if (promises === null) {
-          promises = [result];
-        } else {
-          promises.push(result);
-        }
+        result.then(null, noop);
       }
     }
     deferred.resolve(loadResults);
-    if (promises !== null) {
-      Promise.all(promises).catch(noop);
-    }
   }
   function handleError(error: unknown) {
     for (const spec of keysets) {
