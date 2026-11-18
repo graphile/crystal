@@ -1,0 +1,42 @@
+{
+  allRefSources: {
+    nodes: [
+      {
+        books: {
+          nodes: [
+            {
+              title: "Dungeon Crawler Carl",
+            },
+          ],
+          totalCount: 1,
+        },
+      },
+      {
+        books: {
+          nodes: [
+            {
+              title: "The Shining",
+            },
+          ],
+          totalCount: 1,
+        },
+      },
+      {
+        books: {
+          nodes: [],
+          totalCount: 0,
+        },
+      },
+      {
+        books: {
+          nodes: [
+            {
+              title: "Dungeon Crawler Carl",
+            },
+          ],
+          totalCount: 1,
+        },
+      },
+    ],
+  },
+}

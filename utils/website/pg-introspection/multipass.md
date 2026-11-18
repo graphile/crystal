@@ -135,6 +135,134 @@ To make a request terminal, emit a purpose for which the target policies request
 no further dependencies. In the return-type example, no policy follows types,
 so the requested return types do not cause further expansion.
 
+Purposes whose names start with `_` mark rows that are only needed to guide
+discovery. Rows whose purposes all start with `_` are moved into the `hidden`
+collections before `prune` runs, so navigation can still reach them but they
+are not exposed; a row with any other purpose is exposed as usual.
+
+## Peeking at rows
+
+`details.request` only queues a dependency. When a policy needs to inspect rows,
+for example to find an object by name when its namespace OID is not yet known,
+or to decide whether it wants an object at all, use `details.peek`. It takes the
+same arguments, except that every purpose must start with `_`, and returns every
+matching row once they are all known:
+
+```ts
+const lookupTables = defineIntrospectionPolicy({
+  name: "lookupTables",
+  entity: "classes",
+  select(table, details) {
+    if (!details.hasPurpose("initial")) {
+      return;
+    }
+
+    const schemas = details.peek("namespaces", { nspname: "app_private" }, [
+      "_lookupTables",
+    ]);
+    if (!schemas) return; // This function will run again once `schemas` exists
+    const [appPrivate] = schemas;
+    if (appPrivate == null) return; // Namespace doesn't exist (unlikely!)
+
+    const classes = details.peek(
+      "classes",
+      { relnamespace: appPrivate._id, relname: "lookup" },
+      ["_lookupTables"],
+    );
+    if (!classes) return; // This function will run again once `classes` exists
+    const [lookup] = classes;
+    if (lookup != null && lookup.relkind === "r") {
+      details.request("classes", { _id: lookup._id }, ["procedureReturnType"]);
+    }
+  },
+});
+```
+
+Until the rows are known, `peek` returns `undefined`. Return from the callback:
+once the rows have been fetched the policy is selected again for the same row,
+and the same call returns them. Collections that are not selected, and selectors
+for OID zero, return no rows. A peeked row stays hidden unless something
+requests it with a purpose that does not start with `_`, as `lookupTables` does
+above. A policy is only selected again for the rows it peeked at, so use
+`request` when you do not need to inspect them.
+
+`details.requestByName(collection, identity, purposes)` implements this pattern
+for `namespaces`, `classes`, `attributes`, `procs` and `types`. The identity is
+dot-separated, such as `app_private.lookup` or `app_private.lookup.id`; quote a
+part containing `.` or `"` (escaping `"` as `""`), or pass the parts as an
+array. Namespaces and classes fetched only to resolve the identity receive the
+built-in `_resolveName` purpose, so they are hidden unless another purpose needs
+them, and every matching object (every overload, for procedures) receives
+`purposes`:
+
+```ts
+details.requestByName("classes", "app_private.lookup", ["procedureReturnType"]);
+```
+
+`details.peekByName(collection, identity, purposes)` is the by-name form of
+`peek`, for `namespaces`, `classes`, `attributes` and `types` (not procedures,
+whose overloads share a name). Every purpose must start with `_`. A name
+identifies at most one object, so it returns that object rather than a list:
+`undefined` until it is known, then the object, or `null` if it does not exist.
+The `lookupTables` example above can be written:
+
+```ts
+const lookup = details.peekByName("classes", "app_private.lookup", [
+  "_lookupTables",
+]);
+if (lookup === undefined) return; // This function will run again once known
+if (lookup === null) return; // No such table
+if (lookup.relkind === "r") {
+  details.request("classes", { _id: lookup._id }, ["procedureReturnType"]);
+}
+```
+
+## Previews
+
+A policy defines `select`, `preview` or both. `select` only runs for rows with
+at least one purpose that does not start with `_` (the rows that will be
+exposed), so it never runs for rows fetched only to guide discovery. `preview`
+runs for every row, but may only peek (with `peek`, `peekByName` and
+`getTagsAndDescription`), not request. In each round every `preview` runs before any `select`, so a `select`
+that peeks at a row sees the effects of that row's previews.
+
+### Smart tags during discovery
+
+`details.getTagsAndDescription(collection, row)` returns the smart tags and
+description of a row. Like `peek`, it fetches the row's descriptions (with the
+built-in `_smartTags` purpose) and returns `undefined` until they are known; a
+row without a comment has no tags. The result is shared by every policy for the
+rest of the introspection run, so a `preview` may merge further tags into it,
+for example tags from configuration rather than database comments; any `select`
+that reads the tags after the descriptions arrive sees those merges. These
+merges are ephemeral: they only guide discovery and are discarded when the run
+ends. Entities in the returned introspection parse their tags afresh from the
+database comments, so tags that should also affect the schema must be merged
+again after introspection, as `pgSmartTags` does.
+
+## Policies without a row
+
+A policy with `entity: null` is not tied to a row. It is selected once at the
+start, receiving `null` in place of a row, and again once any rows it peeked at
+have been fetched. Its `select` runs even though it has no purposes. It has no purposes, so
+`details.hasPurpose` throws. Use one to include objects your application needs
+that nothing else references, whatever the entrypoint filters and privilege
+checks say:
+
+```ts
+const inclusions = defineIntrospectionPolicy({
+  name: "inclusions",
+  entity: null,
+  select(_row, details) {
+    details.requestByName("classes", "app_private.status", ["initial"]);
+    details.requestByName("procs", "utils.my_util_function", ["initial"]);
+  },
+});
+```
+
+Objects requested with the `initial` purpose are treated like the rest of
+initial discovery. Top-level `filters` still apply.
+
 ## Global filters and entrypoint filters
 
 | Option                        | Initial query | Dependency queries |

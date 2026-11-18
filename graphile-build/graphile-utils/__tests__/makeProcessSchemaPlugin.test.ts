@@ -25,7 +25,9 @@ declare global {
   }
 }
 
-const makeSchemaWithSpy = (spy: (schema: GraphQLSchema) => GraphQLSchema) =>
+const makeSchemaWithSpy = (
+  spy: Parameters<typeof makeProcessSchemaPlugin>[0],
+) =>
   buildSchema(
     {
       plugins: [
@@ -57,6 +59,21 @@ it("Gets passed the final schema", async () => {
   const schema = makeSchemaWithSpy(spy);
   expect(spySchema).toBeTruthy();
   expect(spySchema).toEqual(schema);
+});
+
+it("Gets passed the build and finalize context", () => {
+  const spy = jest.fn<
+    ReturnType<Parameters<typeof makeProcessSchemaPlugin>[0]>,
+    Parameters<Parameters<typeof makeProcessSchemaPlugin>[0]>
+  >((schema, build, context) => {
+    expect(build.options.optionKey).toBe("optionValue");
+    expect(build.graphql.GraphQLSchema).toBe(GraphQLSchema);
+    expect(context).toBeDefined();
+    return schema;
+  });
+  const schema = makeSchemaWithSpy(spy);
+  expect(spy).toHaveBeenCalledTimes(1);
+  expect(spy.mock.calls[0][0]).toBe(schema);
 });
 
 const simpleSchema = new GraphQLSchema({

@@ -5,6 +5,7 @@ import type {
 } from "../index.ts";
 import { currentFieldStreamDetails } from "../index.ts";
 import type {
+  BatchKeysetEquality,
   ExecutionDetailsStream,
   GrafastResultsList,
   Maybe,
@@ -14,9 +15,10 @@ import type {
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
 import { multistep } from "../multistep.ts";
 import { Step } from "../step.ts";
-import { canonicalJSONStringify, recordsMatch } from "../utils.ts";
+import { recordsMatch } from "../utils.ts";
 import {
   executeLoad,
+  getLoadKeysetEquality,
   type IOEquivalence,
   ioEquivalenceMatches,
   makeAccessMap,
@@ -92,9 +94,6 @@ export function loadManyLoader<
   return load;
 }
 
-const idByLoad = new WeakMap<LoadManyCallback<any, any, any, any>, string>();
-let loadCounter = 0;
-
 interface LoadManyBaseParams {
   [key: string]: Maybe<any>;
   reverse?: Maybe<boolean>;
@@ -124,17 +123,16 @@ export class LoadManyStep<
 
   public isSyncAndSafe = false;
 
-  loadInfo: Omit<
+  private loadInfo: Omit<
     LoadManyInfo<TItem, TParams, UnwrapMultistep<TShared>>,
     "shared" | "unary" | "params"
   > | null = null;
-  loadInfoKey = "";
 
-  attributes = new Set<keyof TItem>();
-  paramDepIdByKey: {
+  private attributes = new Set<keyof TItem>();
+  private paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
-  sharedDepId: number | null = null;
+  private sharedDepId: number | null = null;
   private ioEquivalence: IOEquivalence<UnwrapMultistep<TLookup>> | null;
   private load: LoadManyCallback<
     UnwrapMultistep<TLookup>,
@@ -143,8 +141,9 @@ export class LoadManyStep<
     TParams,
     UnwrapMultistep<TShared>
   >;
-  paginationSupport?: PaginationFeatures;
+  public paginationSupport?: PaginationFeatures;
   private name: Maybe<string>;
+  private keysetEquality: BatchKeysetEquality;
 
   /** Direct field stream */
   private _fieldMightStream: boolean;
@@ -174,8 +173,9 @@ export class LoadManyStep<
       );
     }
     this.ioEquivalence = ioEquivalence ?? null;
+    this.keysetEquality = getLoadKeysetEquality(lookup);
 
-    const $lookup = multistep(lookup, "load");
+    const $lookup = multistep(lookup);
     this.addDependency($lookup);
 
     if (shared != null) {
@@ -255,6 +255,7 @@ export class LoadManyStep<
     return peers.filter(
       (p) =>
         p.load === this.load &&
+        p.keysetEquality === this.keysetEquality &&
         ioEquivalenceMatches(p.ioEquivalence, this.ioEquivalence) &&
         recordsMatch(p.paramDepIdByKey, this.paramDepIdByKey),
     );
@@ -304,26 +305,25 @@ export class LoadManyStep<
     const attributes = [...this.attributes].sort();
     this.loadInfo = { attributes };
 
-    // If the canonicalJSONStringify is the same, then we deem that the options are the same
-    this.loadInfoKey = canonicalJSONStringify(this.loadInfo);
-    let loadId = idByLoad.get(this.load);
-    if (!loadId) {
-      loadId = String(++loadCounter);
-      idByLoad.set(this.load, loadId);
-    }
-    this.metaKey = `LoadManyStep|${loadId}|${this.loadInfoKey}`;
     super.finalize();
   }
 
   execute(
-    details: ExecutionDetails,
+    details: ExecutionDetails<readonly [UnwrapMultistep<TLookup>, ...any[]]>,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
-    return executeLoad(
+    return executeLoad<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      UnwrapMultistep<TShared>
+    >(
       details,
       this.sharedDepId,
       this.paramDepIdByKey,
-      this.loadInfo!,
+      this.loadInfo!.attributes,
       this.load,
+      this.keysetEquality,
     );
   }
 
@@ -338,7 +338,7 @@ export class LoadManyStep<
     const lookup = this.getDep(0) as TLookup;
     const { load, ioEquivalence } = this;
     const shared =
-      this.sharedDepId != null
+      this.sharedDepId !== null
         ? (this.getDep(this.sharedDepId) as TShared)
         : (null as any as TShared);
     const $clone = new LoadManyStep(lookup, {
@@ -346,6 +346,8 @@ export class LoadManyStep<
       shared,
       ioEquivalence,
     });
+
+    $clone.keysetEquality = this.keysetEquality;
 
     // Copy attributes?
     for (const attr of this.attributes) {

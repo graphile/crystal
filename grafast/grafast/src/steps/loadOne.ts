@@ -1,5 +1,6 @@
 import type { ExecutionDetails } from "../index.ts";
 import type {
+  BatchKeysetEquality,
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
@@ -8,10 +9,11 @@ import type {
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
 import { multistep } from "../multistep.ts";
 import { Step } from "../step.ts";
-import { canonicalJSONStringify, recordsMatch } from "../utils.ts";
+import { recordsMatch } from "../utils.ts";
 import type { IOEquivalence } from "./_loadCommon.ts";
 import {
   executeLoad,
+  getLoadKeysetEquality,
   ioEquivalenceMatches,
   makeAccessMap,
   paramSig,
@@ -78,9 +80,6 @@ export function loadOneLoader<
   return load;
 }
 
-const idByLoad = new WeakMap<LoadOneCallback<any, any, any, any>, string>();
-let loadCounter = 0;
-
 type LoadOneGetStep<
   TData,
   TAttr extends keyof Exclude<TData, null | undefined>,
@@ -100,17 +99,16 @@ export class LoadOneStep<
 
   public isSyncAndSafe = false;
 
-  loadInfo: Omit<
+  private loadInfo: Omit<
     LoadOneInfo<TItem, TParams, UnwrapMultistep<TShared>>,
     "shared" | "unary" | "params"
   > | null = null;
-  loadInfoKey = "";
 
-  attributes = new Set<keyof TItem>();
-  paramDepIdByKey: {
+  private attributes = new Set<keyof TItem>();
+  private paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
-  sharedDepId: number | null = null;
+  private sharedDepId: number | null = null;
   private ioEquivalence: IOEquivalence<UnwrapMultistep<TLookup>> | null;
   private load: LoadOneCallback<
     UnwrapMultistep<TLookup>,
@@ -120,6 +118,7 @@ export class LoadOneStep<
     UnwrapMultistep<TShared>
   >;
   private name: Maybe<string>;
+  private readonly keysetEquality: BatchKeysetEquality;
   constructor(
     lookup: TLookup,
     loader: LoadOneLoader<
@@ -141,8 +140,9 @@ export class LoadOneStep<
       );
     }
     this.ioEquivalence = ioEquivalence ?? null;
+    this.keysetEquality = getLoadKeysetEquality(lookup);
 
-    const $spec = multistep(lookup, "load");
+    const $spec = multistep(lookup);
     this.addDependency($spec);
 
     if (shared != null) {
@@ -188,6 +188,7 @@ export class LoadOneStep<
     return peers.filter(
       (p) =>
         p.load === this.load &&
+        p.keysetEquality === this.keysetEquality &&
         ioEquivalenceMatches(p.ioEquivalence, this.ioEquivalence) &&
         recordsMatch(p.paramDepIdByKey, this.paramDepIdByKey),
     );
@@ -228,26 +229,25 @@ export class LoadOneStep<
     const attributes = [...this.attributes].sort();
     this.loadInfo = { attributes };
 
-    // If the canonicalJSONStringify is the same, then we deem that the options are the same
-    this.loadInfoKey = canonicalJSONStringify(this.loadInfo);
-    let loadId = idByLoad.get(this.load);
-    if (!loadId) {
-      loadId = String(++loadCounter);
-      idByLoad.set(this.load, loadId);
-    }
-    this.metaKey = `LoadOneStep|${loadId}|${this.loadInfoKey}`;
     super.finalize();
   }
 
   execute(
-    details: ExecutionDetails,
+    details: ExecutionDetails<readonly [UnwrapMultistep<TLookup>, ...any[]]>,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
-    return executeLoad(
+    return executeLoad<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      UnwrapMultistep<TShared>
+    >(
       details,
       this.sharedDepId,
       this.paramDepIdByKey,
-      this.loadInfo!,
+      this.loadInfo!.attributes,
       this.load,
+      this.keysetEquality,
     );
   }
 

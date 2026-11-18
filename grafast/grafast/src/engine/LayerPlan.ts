@@ -1149,12 +1149,25 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     > = Object.create(null);
     let flagUnion = NO_FLAGS;
     let totalSize = 0;
+    let metaByMetaKey: Bucket["metaByMetaKey"] | null | undefined = null;
     const batchStepIdsToCopy = new Set<number>();
 
     for (const plp of this.reason.parentLayerPlans) {
       mapByParentLayerPlanId[plp.id] = new Map();
       const parentBucket = sharedState._retainedBuckets.get(plp.id);
       if (!parentBucket) continue;
+
+      if (metaByMetaKey === null) {
+        // This is the first parent bucket, copy the meta
+        metaByMetaKey = parentBucket.metaByMetaKey;
+      } else if (metaByMetaKey === undefined) {
+        // The parent buckets already don't match, and will continue to not match
+      } else if (metaByMetaKey !== parentBucket.metaByMetaKey) {
+        // One of the parent buckets doesn't match up - likely due to a side
+        // effect - force a fresh cache.
+        metaByMetaKey = undefined;
+      }
+
       flagUnion |= parentBucket.flagUnion;
       totalSize += parentBucket.size;
       const map = mapByParentLayerPlanId[plp.id]!;
@@ -1180,6 +1193,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
 
     if (totalSize === 0) return null;
+
+    if (metaByMetaKey === null) {
+      throw new Error(
+        "GrafastInternalError<3d6bd21c-bfc3-450e-bf17-bef636085f1f>: metaByMetaKey should have been set",
+      );
+    }
 
     for (const stepId of batchStepIdsToCopy) {
       const newEv = batchExecutionValue(
@@ -1287,7 +1306,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
     // Reference
     const childBucket = newBucket(
-      { metaByMetaKey: undefined /* use defaults */, sharedState },
+      { metaByMetaKey, sharedState },
       {
         layerPlan: this,
         size: totalSize,

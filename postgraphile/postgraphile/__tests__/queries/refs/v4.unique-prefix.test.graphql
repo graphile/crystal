@@ -1,0 +1,33 @@
+#> schema: ["refs"]
+#> simpleCollections: "both"
+#> setupSql: "create table refs.ref_sources (id int primary key, source_book int, source_pen int, foreign key (source_book, source_pen) references refs.book_authors(book_id, pen_name_id));\ninsert into refs.pen_names (id, person_id, pen_name) values (7, null, 'Unknown');\ninsert into refs.book_authors values (1, 7);\ninsert into refs.ref_sources values (1, 1, 3), (2, 2, 4), (3, null, null), (4, 1, 7);\ncomment on table refs.ref_sources is E'@ref author singular via:(source_book,source_pen)->book_authors(book_id,pen_name_id);(pen_name_id)->pen_names(id);(person_id)->people(id)\\n@ref authorPosts plural via:(source_book,source_pen)->book_authors(book_id,pen_name_id);(pen_name_id)->pen_names(id);(person_id)->people(id);(id)->posts(user_id)';"
+## expect(errors).toBeFalsy()
+## expect(data.allRefSources.nodes.map(n => n.author?.name ?? null)).toEqual(["Alice Smith", "Bob Jones", null, null])
+## expect(data.allRefSources.nodes.map(n => n.authorPostsList.map(p => p.id))).toEqual([[1, 3], [2], [], []])
+## expect(data.allRefSources.nodes.map(n => n.authorPosts.totalCount)).toEqual([2, 1, 0, 0])
+## expect(data.allRefSources.nodes.map(n => n.authorPosts.nodes.map(p => p.id))).toEqual([[3], [], [], []])
+## expect(data.allRefSources.nodes.map(n => n.authorPosts.pageInfo.hasPreviousPage)).toEqual([true, true, true, true])
+
+# The prefix uses differently named keys and has no via attributes. Exercise
+# both a missing first relation and a missing relation later in the prefix.
+{
+  allRefSources(orderBy: ID_ASC) {
+    nodes {
+      author {
+        name
+      }
+      authorPostsList(orderBy: ID_ASC) {
+        id
+      }
+      authorPosts(first: 1, offset: 1, orderBy: ID_ASC) {
+        totalCount
+        nodes {
+          id
+        }
+        pageInfo {
+          hasPreviousPage
+        }
+      }
+    }
+  }
+}

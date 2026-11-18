@@ -5,11 +5,23 @@ import type {
   __ValueStep,
   ConstantStep,
   DataFromObjectSteps,
+  ExecutionDetails,
+  ExecutionResultValue,
   FieldPlanResolver,
   ListStep,
+  LoadManyCallback,
+  LoadOneCallback,
+  PromiseOrDirect,
   Step,
 } from "../dist/index.js";
-import { access, constant, get, loadOne } from "../dist/index.js";
+import {
+  access,
+  constant,
+  defineBatchExecutor,
+  get,
+  loadOne,
+} from "../dist/index.js";
+import { executeLoad } from "../dist/steps/_loadCommon.js";
 
 type Expected = {
   test: number[];
@@ -44,4 +56,141 @@ const _myPlan: FieldPlanResolver = () => {
   const _$nullableA3 = access($nullableRecord, "a");
   assert<Equals<StepValue<typeof _$nullableA3>, number | undefined>>();
   return constant(null);
+};
+
+// Internal adapter types must preserve the same guarantees as the public loaders.
+const _batchTypes = (batch: ExecutionDetails["batch"]) => {
+  const executor = defineBatchExecutor({
+    name: "type-test",
+    keysetEquality: "strict",
+    callback: (options: { prefix: string }, keys: readonly number[]) =>
+      keys.map((key) => options.prefix + key),
+    optionsMatch: { prefix: "strict" },
+  });
+  const _result = batch(executor, [1], { prefix: "x" });
+  assert<
+    Equals<
+      typeof _result,
+      PromiseOrDirect<ReadonlyArray<ExecutionResultValue<string>>>
+    >
+  >();
+  // @ts-expect-error Options are required by this executor.
+  batch(executor, [1]);
+  // @ts-expect-error Incorrect options type.
+  batch(executor, [1], { prefix: 123 });
+  // @ts-expect-error Incorrect keyset type.
+  batch(executor, ["wrong"], { prefix: "x" });
+  // @ts-expect-error Every executor must explicitly declare keyset equality.
+  defineBatchExecutor({
+    name: "missing-equality",
+    callback: executor.callback,
+  });
+  const optionalExecutor = defineBatchExecutor({
+    name: "optional-type-test",
+    keysetEquality: "strict",
+    callback: (
+      options: { prefix: string } | undefined,
+      keys: readonly number[],
+    ) => keys.map((key) => `${options?.prefix}:${key}`),
+  });
+  batch(optionalExecutor, [1]);
+  batch(optionalExecutor, [1], { prefix: "x" });
+  batch(optionalExecutor, [1], undefined);
+  // @ts-expect-error Options must be a record, not an array.
+  batch(optionalExecutor, [1], []);
+  // @ts-expect-error Options must be a record, not a primitive.
+  batch(optionalExecutor, [1], "x");
+  // @ts-expect-error Null is not a valid options record.
+  batch(optionalExecutor, [1], null);
+  defineBatchExecutor({
+    name: "invalid-tuple-options",
+    keysetEquality: "strict",
+    // @ts-expect-error Executors cannot declare tuple options.
+    callback: (_options: readonly [string], keys: readonly number[]) => keys,
+  });
+  defineBatchExecutor({
+    name: "invalid-options-match",
+    keysetEquality: "strict",
+    callback: executor.callback,
+    // @ts-expect-error A string option cannot use tuple matching.
+    optionsMatch: { prefix: "tuple" },
+  });
+};
+
+const _executeLoadTypes = (
+  details: ExecutionDetails<readonly [number, ...unknown[]]>,
+  wrongDetails: ExecutionDetails<readonly [string, ...unknown[]]>,
+  one: LoadOneCallback<
+    number,
+    { id: number },
+    { id: number } | null,
+    { limit: number },
+    { tenant: string }
+  >,
+  many: LoadManyCallback<
+    number,
+    { id: number },
+    readonly { id: number }[],
+    { limit: number },
+    { tenant: string }
+  >,
+) => {
+  type Item = { id: number };
+  type Params = { limit: number };
+  type Shared = { tenant: string };
+  const executeOne = executeLoad<number, Item, Item | null, Params, Shared>;
+  const _result = executeOne(details, 1, { limit: 2 }, ["id"], one, "strict");
+  assert<
+    Equals<
+      typeof _result,
+      PromiseOrDirect<
+        ReadonlyArray<PromiseOrDirect<ExecutionResultValue<Item | null>>>
+      >
+    >
+  >();
+  const _inferred = executeLoad(
+    details,
+    1,
+    { limit: 2 },
+    ["id"],
+    one,
+    "strict",
+  );
+  assert<Equals<typeof _inferred, typeof _result>>();
+  executeOne(
+    // @ts-expect-error The lookup dependency must yield the callback's key type.
+    wrongDetails,
+    1,
+    { limit: 2 },
+    ["id"],
+    one,
+    "strict",
+  );
+  executeOne(
+    details,
+    1,
+    { limit: 2 },
+    // @ts-expect-error Attributes must belong to the loaded item type.
+    ["missing"],
+    one,
+    "strict",
+  );
+  // @ts-expect-error A loadMany callback cannot yield a loadOne result.
+  executeOne(details, 1, { limit: 2 }, ["id"], many, "strict");
+  const _results = executeLoad<number, Item, readonly Item[], Params, Shared>(
+    details,
+    1,
+    { limit: 2 },
+    ["id"],
+    many,
+    "strict",
+  );
+  assert<
+    Equals<
+      typeof _results,
+      PromiseOrDirect<
+        ReadonlyArray<PromiseOrDirect<ExecutionResultValue<readonly Item[]>>>
+      >
+    >
+  >();
 };

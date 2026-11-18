@@ -726,6 +726,59 @@ export interface UnaryExecutionValue<TData = any>
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
 
+/** Keyset comparisons use Map equality (`===` with `NaN` equal to itself). */
+export type BatchKeysetEquality = "strict" | "tuple" | "object";
+export type BatchCallback<
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+> = (
+  options: TOptions,
+  keysets: ReadonlyArray<TKeyset>,
+) => PromiseOrDirect<ReadonlyArray<TResult>>;
+
+type BatchOptionComparison<T> =
+  | "strict"
+  | "record"
+  | (unknown extends T
+      ? "tuple" | BatchOptionsMatch<Record<PropertyKey, unknown>>
+      : T extends readonly unknown[]
+        ? "tuple" | BatchOptionsMatch<T>
+        : T extends object
+          ? BatchOptionsMatch<T>
+          : never);
+
+/** How to compare the own properties of an options object. */
+export type BatchOptionsMatch<TOptions extends object> = {
+  readonly [TKey in keyof TOptions as TKey]?: BatchOptionComparison<
+    TOptions[TKey]
+  >;
+};
+
+/** A stable, named batch executor. Define once, outside step execution. */
+export interface BatchExecutor<
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+> {
+  readonly name: string;
+  readonly keysetEquality: BatchKeysetEquality;
+  readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
+  /** Unspecified own properties are compared using strict equality. */
+  readonly optionsMatch?: BatchOptionsMatch<NonNullable<TOptions>>;
+}
+export type BatchFunction = <
+  TOptions extends Record<string, unknown> | undefined,
+  TKeyset,
+  TResult,
+>(
+  executor: BatchExecutor<TOptions, TKeyset, TResult>,
+  keysets: ReadonlyArray<TKeyset>,
+  ...options: undefined extends TOptions
+    ? [options?: NoInfer<TOptions>]
+    : [options: NoInfer<TOptions>]
+) => PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>>;
+
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;
   initialCount: number;
@@ -749,6 +802,18 @@ export interface ExecutionDetails<
   indexMap: IndexMap;
   /** Helper; calls `callback` for each batchIndex in the batch; no return value */
   indexForEach: IndexForEach;
+
+  /**
+   * Batches equivalent keysets across steps in the same execution scope during
+   * the current runloop tick, caching results for the scope's lifetime.
+   * Mutation fields and subscription events each
+   * have separate scopes.
+   * Define executors outside step execution; pass all varying values in
+   * `options`.
+   *
+   * @experimental
+   */
+  batch: BatchFunction;
 
   /**
    * If this step is expected to return a stream (e.g. because it's a

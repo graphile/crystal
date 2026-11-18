@@ -11,6 +11,7 @@ import type {
 } from "graphql";
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
+import { defineBatchExecutor } from "./batch/defineBatchExecutor.ts";
 import { promiseWithResolve } from "./promiseWithResolve.ts";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.ts";
 import type { DataFromObjectSteps } from "./steps/object.ts";
@@ -82,6 +83,7 @@ import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   BatchExecutionValue,
+  BatchExecutor,
   CacheByOperationEntry,
   DataFromStep,
   EnumValueApplyResolver,
@@ -321,6 +323,7 @@ export type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   BatchExecutionValue,
+  BatchExecutor,
   ConnectionHandlingResult,
   ConnectionHandlingStep,
   ConnectionOptimizedStep,
@@ -575,9 +578,12 @@ export {
   UnbatchedStep,
   variableValues,
 };
+export { defineBatchExecutor };
+
 export type { PromiseWithResolve } from "./promiseWithResolve.ts";
 
 exportAsMany("grafast", {
+  defineBatchExecutor,
   exportAs,
   promiseWithResolve,
   exportAsMany,

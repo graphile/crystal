@@ -1,0 +1,69 @@
+{
+  allRefSources: {
+    nodes: [
+      {
+        author: {
+          name: "Alice Smith",
+        },
+        authorPostsList: [
+          {
+            id: 1,
+          },
+          {
+            id: 3,
+          },
+        ],
+        authorPosts: {
+          totalCount: 2,
+          nodes: [
+            {
+              id: 3,
+            },
+          ],
+          pageInfo: {
+            hasPreviousPage: true,
+          },
+        },
+      },
+      {
+        author: {
+          name: "Bob Jones",
+        },
+        authorPostsList: [
+          {
+            id: 2,
+          },
+        ],
+        authorPosts: {
+          totalCount: 1,
+          nodes: [],
+          pageInfo: {
+            hasPreviousPage: true,
+          },
+        },
+      },
+      {
+        author: null,
+        authorPostsList: [],
+        authorPosts: {
+          totalCount: 0,
+          nodes: [],
+          pageInfo: {
+            hasPreviousPage: true,
+          },
+        },
+      },
+      {
+        author: null,
+        authorPostsList: [],
+        authorPosts: {
+          totalCount: 0,
+          nodes: [],
+          pageInfo: {
+            hasPreviousPage: true,
+          },
+        },
+      },
+    ],
+  },
+}

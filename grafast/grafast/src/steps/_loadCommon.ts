@@ -1,19 +1,21 @@
-import { noop } from "../dev.ts";
 import type {
+  BatchExecutor,
+  BatchKeysetEquality,
   ExecutionDetails,
-  Maybe,
+  ExecutionResultValue,
   PromiseOrDirect,
 } from "../interfaces.ts";
 import type { Multistep, UnwrapMultistep } from "../multistep.ts";
-import type { Step } from "../step.ts";
-import { isListLikeStep, isObjectLikeStep } from "../step.ts";
+import { isListLikeStep, isObjectLikeStep, Step } from "../step.ts";
 import {
+  arrayOfLength,
   arraysMatch,
   isTuple,
   recordsMatch,
   stableStringSortFirstTupleEntry,
 } from "../utils.ts";
 import { access } from "./access.ts";
+import type { LoadOneInfo } from "./loadOne.ts";
 
 export type IOEquivalence<TSpec> =
   | null
@@ -86,164 +88,128 @@ export function paramSig(
   );
 }
 
-interface LoadBatch {
-  deferred: PromiseWithResolvers<any>;
-  batchSpecs: readonly any[];
+type LoadBatchOptions<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+> = {
+  load: LoadCallback<TSpec, TItem, TData, TParams, TShared>;
+  attributes: readonly (keyof TItem)[];
+  shared: TShared;
+  params: Partial<TParams>;
+};
+
+function executeLoadBatch<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+>(
+  {
+    load,
+    attributes,
+    shared,
+    params,
+  }: LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
+  specs: readonly TSpec[],
+): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>> {
+  return load(specs, {
+    shared,
+    attributes,
+    params,
+    unary: shared,
+  });
 }
 
-export async function executeBatches<
-  TLoadInfo extends {
-    shared: any;
-    attributes: readonly any[];
-    params: any;
-    /** @deprecated use `shared` instead (it's identical) */
-    unary: any;
+// Preserve the generic callbacks: each use specializes this same executor
+// object, without erasing the relationship between its options, keys and data.
+const loadBatchExecutor = {
+  name: "grafast/load",
+  keysetEquality: "strict",
+  callback: executeLoadBatch,
+  optionsMatch: {
+    load: "strict",
+    params: "record",
+    shared: "strict",
+    attributes: "tuple",
   },
-  TCallback extends (
-    specs: ReadonlyArray<any>,
-    info: TLoadInfo,
-  ) => PromiseOrDirect<ReadonlyArray<any>>,
->(loadBatches: readonly LoadBatch[], loadInfo: TLoadInfo, load: TCallback) {
-  try {
-    const numberOfBatches = loadBatches.length;
-    if (numberOfBatches === 1) {
-      const [loadBatch] = loadBatches;
-      loadBatch.deferred.resolve(load(loadBatch.batchSpecs, loadInfo));
-      return;
-    } else {
-      // Do some tick-batching!
-      const indexStarts: number[] = [];
-      const allBatchSpecs: any[] = [];
-      for (let i = 0; i < numberOfBatches; i++) {
-        const loadBatch = loadBatches[i];
-        indexStarts[i] = allBatchSpecs.length;
-        for (const batchSpec of loadBatch.batchSpecs) {
-          allBatchSpecs.push(batchSpec);
-        }
-      }
-      const results = await load(allBatchSpecs, loadInfo);
-      for (let i = 0; i < numberOfBatches; i++) {
-        const loadBatch = loadBatches[i];
-        const start = indexStarts[i];
-        const stop = indexStarts[i + 1] ?? allBatchSpecs.length;
-        const entries = results.slice(start, stop);
-        loadBatch.deferred.resolve(entries);
-      }
-    }
-  } catch (e) {
-    for (const loadBatch of loadBatches) {
-      loadBatch.deferred.reject(e);
-    }
-  }
+} satisfies BatchExecutor<
+  LoadBatchOptions<unknown, unknown, unknown, Record<string, unknown>, unknown>,
+  unknown,
+  unknown
+>;
+
+const loadBatchExecutors = {
+  strict: loadBatchExecutor,
+  tuple: {
+    ...loadBatchExecutor,
+    name: "grafast/load/tuple",
+    keysetEquality: "tuple" as const,
+  },
+  object: {
+    ...loadBatchExecutor,
+    name: "grafast/load/object",
+    keysetEquality: "object" as const,
+  },
+};
+
+export function getLoadKeysetEquality(lookup: Multistep): BatchKeysetEquality {
+  return lookup == null || lookup instanceof Step
+    ? "strict"
+    : isTuple(lookup)
+      ? "tuple"
+      : "object";
 }
 
-type LoadCallback = (...args: any[]) => any;
-
-interface LoadMeta {
-  cache?: Map<any, any>;
-  loadBatchesByLoad?: Map<LoadCallback, LoadBatch[]> | undefined;
-}
+type LoadCallback<
+  TSpec,
+  TItem,
+  TData,
+  TParams extends Record<string, any>,
+  TShared,
+> = (
+  specs: readonly TSpec[],
+  info: LoadOneInfo<TItem, TParams, TShared>,
+) => PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
 
 export function executeLoad<
-  const TLookup extends Multistep,
+  TSpec,
   TItem,
-  TData extends Maybe<TItem> | Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TData,
   TParams extends Record<string, any>,
-  const TLoadContext extends Multistep = never,
+  TShared,
 >(
-  details: ExecutionDetails,
+  details: ExecutionDetails<readonly [TSpec, ...any[]]>,
   sharedDepId: number | null,
   paramDepIdByKey: Record<string, number>,
-  baseLoadInfo: {
-    attributes: readonly any[];
-  },
-  load: LoadCallback,
-) {
-  const { count, extra, values } = details;
-  const values0 = values[0] as UnwrapMultistep<TLookup>;
-  const shared =
-    sharedDepId != null
-      ? (values[sharedDepId].unaryValue() as UnwrapMultistep<TLoadContext>)
-      : (undefined as never);
-  const meta = extra.meta as LoadMeta;
-  let cache = meta.cache;
-  if (!cache) {
-    cache = new Map();
-    meta.cache = cache;
-  }
-  const batch = new Map<UnwrapMultistep<TLookup>, number[]>();
+  attributes: readonly (keyof TItem)[],
+  load: LoadCallback<TSpec, TItem, TData, TParams, TShared>,
+  keysetEquality: BatchKeysetEquality,
+): PromiseOrDirect<
+  ReadonlyArray<PromiseOrDirect<ExecutionResultValue<TData>>>
+> {
+  const { count, values } = details;
+  const values0 = values[0];
+  const shared = (
+    sharedDepId !== null ? values[sharedDepId].unaryValue() : undefined
+  ) as TShared;
   const params = Object.fromEntries(
     Object.entries(paramDepIdByKey).map(([key, depId]) => [
       key,
       values[depId].unaryValue(),
     ]),
   ) as Partial<TParams>;
-  const loadInfo: {
-    attributes: ReadonlyArray<any>;
-    params: Partial<TParams>;
-    shared: TLoadContext;
-    /** @deprecated use `shared` instead (it's identical) */
-    unary: TLoadContext;
-  } = {
-    ...baseLoadInfo,
-    params,
-    shared,
-    unary: shared,
-  };
 
-  const results: Array<PromiseOrDirect<TData>> = [];
-  for (let i = 0; i < count; i++) {
-    const spec = values0.at(i);
-    if (cache.has(spec)) {
-      results.push(cache.get(spec)!);
-    } else {
-      // We'll fill this in in a minute
-      const index = results.push(null as any) - 1;
-      const existingIdx = batch.get(spec);
-      if (existingIdx !== undefined) {
-        existingIdx.push(index);
-      } else {
-        batch.set(spec, [index]);
-      }
-    }
-  }
-  const pendingCount = batch.size;
-  if (pendingCount > 0) {
-    const deferred = Promise.withResolvers<ReadonlyArray<TData>>();
-    deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
-    const batchSpecs = [...batch.keys()];
-    const loadBatch: LoadBatch = { deferred, batchSpecs };
-    if (!meta.loadBatchesByLoad) {
-      meta.loadBatchesByLoad = new Map();
-    }
-    let loadBatches = meta.loadBatchesByLoad.get(load);
-    if (loadBatches) {
-      // Add to existing batch load
-      loadBatches.push(loadBatch);
-    } else {
-      // Create new batch load
-      loadBatches = [loadBatch];
-      meta.loadBatchesByLoad.set(load, loadBatches);
-      // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
-      queueMicrotask(() => {
-        // Don't allow adding anything else to the batch
-        meta.loadBatchesByLoad!.delete(load);
-        void executeBatches(loadBatches!, loadInfo, load);
-      });
-    }
-    return (async () => {
-      const loadResults = await deferred.promise;
-      for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {
-        const spec = batchSpecs[pendingIndex];
-        const targetIndexes = batch.get(spec)!;
-        const loadResult = loadResults[pendingIndex];
-        cache.set(spec, loadResult);
-        for (const targetIndex of targetIndexes) {
-          results[targetIndex] = loadResult;
-        }
-      }
-      return results;
-    })();
-  }
-  return results;
+  return details.batch<
+    LoadBatchOptions<TSpec, TItem, TData, TParams, TShared>,
+    TSpec,
+    PromiseOrDirect<TData>
+  >(
+    loadBatchExecutors[keysetEquality],
+    values0.isBatch ? values0.entries : arrayOfLength(count, values0.value),
+    { load, attributes, shared, params },
+  );
 }

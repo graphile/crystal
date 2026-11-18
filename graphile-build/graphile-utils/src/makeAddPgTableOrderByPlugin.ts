@@ -1,5 +1,7 @@
 import type {
+  GetPgResourceAttributes,
   PgOrderSpec,
+  PgResource,
   PgSelectQueryBuilder,
   PgUnionAllQueryBuilder,
 } from "@dataplan/pg";
@@ -11,13 +13,30 @@ import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 type ArrayOrDirect<T> = T | Array<T>;
 
-type OrderBySpecIdentity =
-  | string // Attribute name
-  | Omit<PgOrderSpec, "direction"> // Expression
+type OrderSpecWithoutDirection<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+> =
+  PgOrderSpec<GetPgResourceAttributes<TResource>> extends infer TSpec
+    ? TSpec extends unknown
+      ? Omit<TSpec, "direction">
+      : never
+    : never;
+
+type OrderBySpecIdentity<
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
+> =
+  | (keyof GetPgResourceAttributes<TResource> & string) // Attribute name
+  | OrderSpecWithoutDirection<TResource> // Expression
   | ((
-      queryBuilder: PgSelectQueryBuilder,
+      queryBuilder: PgSelectQueryBuilder<TResource>,
       info: { scope: unknown }, // The `info` argument to `EnumValueApplyResolver`
-    ) => ArrayOrDirect<Omit<PgOrderSpec, "direction">>); // Callback, allows for joins/etc
+    ) => ArrayOrDirect<OrderSpecWithoutDirection<TResource>>); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
@@ -96,6 +115,19 @@ export interface OrderByAscDescOptions {
   nullable?: boolean;
 }
 
+export function orderByAscDesc<
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
+>(
+  baseName: string,
+  attributeOrSqlFragment: OrderBySpecIdentity<TResource>,
+  uniqueOrOptions?: boolean | OrderByAscDescOptions,
+): MakeAddPgTableOrderByPluginOrders;
 export function orderByAscDesc(
   baseName: string,
   attributeOrSqlFragment: OrderBySpecIdentity,

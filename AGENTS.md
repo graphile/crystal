@@ -103,7 +103,43 @@ into 4 main categories based on the root folders, each of which have a
 - Modal verbs: avoid unnecessary language which suggests some is tentative or
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
   verbs.
-- Always use a block body for `if`, `for`, and `while` statements.
+- Use block bodies for `if`, `else`, `for`, and `while`. In a short function, a
+  standalone `if` can omit braces when its condition is a single comparison and
+  the entire statement fits comfortably on one line.
+- Use a block body for any `switch` clause that declares or assigns a variable,
+  or contains more than four statements. If one clause uses a block body, use
+  block bodies for all clauses in that `switch`.
+- Prefix named symbol constants with `$$`.
+- Keep internal object shapes stable for V8. Initialize fields at construction
+  time. When a field is populated lazily, declare it as required (no `?`) and
+  extend the type with `| null` or `| undefined`. Explicitly initialize it (to
+  `null` or `undefined`) when constructing the object..
+- Add object properties in the order declared by their TypeScript interface or
+  type. Use the same order at every construction site. List properties
+  explicitly when spreading an object would make their order depend on the
+  caller.
+- Use descriptive names for variables and generic type parameters. Reserve
+  single-letter names for: simple loop indices/lengths (`i`, `j`, `l`), `e` for
+  errors, `a` and `z` for sort callback parameters (so that sort is intuitively
+  `a-z` or `z-a`), `T` where there's only one generic type parameter and it has
+  no constraints, `U` where there's only one inferred type, and `K` where
+  there's only one inferred key type. Variables in tests may use single letter
+  names.
+- Do not reassign function parameters; use a local variable instead.
+- When handling all members of a union, include an explicit exhaustiveness check
+  such as `const never: never = value;` in a `switch` default or an unreachable
+  `else`, followed by an appropriate error. Adding a union member must cause a
+  TypeScript error until it is handled; do not rely solely on the branches
+  covering today's union members.
+- This codebase is very performance sensitive. Always perform cheaper
+  comparisons before more expensive comparisons unless there is a strong reason
+  not to.
+- Prefer explicit checks over implicit boolean coercion: use `foo.length > 0`
+  rather than `foo.length`, and use `foo == null` to check for non-existence
+  rather than `!foo`. (If you know something can only be `undefined` and never
+  `null` then use `=== undefined` explicitly, and vice versa - but not on public
+  facing APIs.) Nullish assignment (`??=`) is fine for initializing internal
+  optional fields; do not expand it into an explicit check and assignment.
 - Prefer `if`/`else if`/`else` over early return in general, but not when
   determining if a hook or middleware should apply, and not where it would cause
   deep nesting. (In hooks/middleware we want to return ASAP if the hook isn't
@@ -166,6 +202,10 @@ the query shape.
 - If the package lacks a lifecycle helper, add a local wrapper around
   `@localrepo/test-helpers`. Follow the relevant runner's lifecycle hooks
   (`before`/`after` for `node:test`, `beforeAll`/`afterAll` for Jest).
+- Use node builtins where possible; we're phasing out usage of `jest`, `mocha`,
+  etc.
+- Do not have tests write files (except snapshots); there should be no need to
+  create temporary directories.
 
 Note: many of the integration tests work by writing `*.test.graphql` files,
 which the system will run and capture snapshots of data, plans, errors and

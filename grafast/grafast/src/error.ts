@@ -38,14 +38,9 @@ export function flaggedValue<T>(
   planId: null | number,
 ): FlaggedValue<T> {
   if (isDev) {
-    if (value === null && !(flags & FLAG_NULL)) {
+    if (value == null && !(flags & FLAG_NULL)) {
       throw new Error(
         `flaggedValue called with null, but not flagged as null.`,
-      );
-    }
-    if (value === null && !(flags & FLAG_INHIBITED)) {
-      throw new Error(
-        `flaggedValue called with null, but not flagged as inhibited.`,
       );
     }
   }
@@ -72,7 +67,11 @@ export function flagError<TError extends Error = Error>(
   value: TError,
   planId: number | null = null,
 ): FlaggedValue<TError> {
-  return flaggedValue(FLAG_ERROR, value, planId);
+  return flaggedValue(
+    FLAG_ERROR | (value == null ? FLAG_NULL : 0),
+    value,
+    planId,
+  );
 }
 
 /**

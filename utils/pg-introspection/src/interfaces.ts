@@ -15,6 +15,7 @@ import type {
   PgRangeData,
   PgTypeData,
 } from "./introspection.ts";
+import type { DESCRIBED_ENTITIES } from "./introspectionConstants.ts";
 import type { defaultEntities } from "./query.ts";
 import type {
   PgSmartTagsAndDescription,
@@ -41,13 +42,14 @@ type IntrospectionRowType = {
 export type IntrospectionRow<TEntity extends EntityType = EntityType> =
   IntrospectionRowType[TEntity];
 
-type IntrospectionMatch<TEntity extends EntityType> = TEntity extends EntityType
-  ? Partial<{
-      [TColumn in keyof IntrospectionRow<TEntity>]: NonNullable<
-        IntrospectionRow<TEntity>[TColumn]
-      >;
-    }>
-  : never;
+export type IntrospectionMatch<TEntity extends EntityType> =
+  TEntity extends EntityType
+    ? Partial<{
+        [TColumn in keyof IntrospectionRow<TEntity>]: NonNullable<
+          IntrospectionRow<TEntity>[TColumn]
+        >;
+      }>
+    : never;
 
 /** Keep each entity paired with its own selector when entities form a union. */
 export type IntrospectionRequest<TEntity extends EntityType = EntityType> =
@@ -66,14 +68,81 @@ export interface IntrospectionPolicyDetails {
    */
   request<TEntity extends EntityType>(
     entity: TEntity,
-    match: IntrospectionRequest<NoInfer<TEntity>>["match"],
+    match: IntrospectionMatch<NoInfer<TEntity>>,
     purposes: PurposeList,
   ): void;
-  /** False results subscribe this policy to run again when the purpose is added. */
+  /**
+   * As `request`, but returns every matching row once they are all known, so
+   * the policy can inspect them; every purpose must start with `_`. Until the
+   * rows are known it returns `undefined`, and this policy will be selected
+   * again for the current row once they have been fetched. Collections that
+   * are not selected, and zero selectors, return no rows.
+   */
+  peek<TEntity extends EntityType>(
+    entity: TEntity,
+    match: IntrospectionMatch<NoInfer<TEntity>>,
+    purposes: PurposeList,
+  ): ReadonlyArray<IntrospectionRow<TEntity>> | undefined;
+  /**
+   * Request the objects with the given identity, such as `app.users` for a
+   * class or `app.users.id` for an attribute; pass the parts as an array to
+   * avoid quoting. Every procedure overload matches. Namespaces and classes
+   * fetched only to resolve the identity get the `_resolveName` purpose, so
+   * are hidden unless another purpose needs them.
+   */
+  requestByName(
+    entity: NamedEntity,
+    identity: string | readonly string[],
+    purposes: PurposeList,
+  ): void;
+  /**
+   * As `requestByName`, but peeks at the named object, so every purpose must
+   * start with `_`. Returns the object once it is known, `null` if it does not
+   * exist, and `undefined` until then (selecting this policy again once it is
+   * known). Procedures are excluded since overloads share a name.
+   */
+  peekByName<TEntity extends Exclude<NamedEntity, "procs">>(
+    entity: TEntity,
+    identity: string | readonly string[],
+    purposes: PurposeList,
+  ): IntrospectionRow<TEntity> | null | undefined;
+  /**
+   * False results subscribe this policy to run again when the purpose is
+   * added. Throws in policies with `entity: null`, which have no row.
+   */
   hasPurpose(purpose: PgIntrospection.Purpose): boolean;
+  /**
+   * The smart tags and description of `row`. Peeks at its descriptions (with
+   * the `_smartTags` purpose) like `peek`, returning `undefined` until they
+   * have been fetched. The result is shared by every policy for the rest of
+   * this introspection run, so a policy's `preview` may merge additional tags
+   * into it; every `preview` in a round runs before any `select`, so selects
+   * that read the tags see those merges. Selects should not merge tags.
+   *
+   * Merged tags are ephemeral: they only guide discovery and are discarded
+   * when the run ends. Entities in the resulting introspection parse their
+   * tags afresh from the database comments, so anything that should affect
+   * the schema must also be merged after introspection (as `pgSmartTags`
+   * does).
+   */
+  getTagsAndDescription<TEntity extends TaggedEntity>(
+    entity: TEntity,
+    row: IntrospectionRow<TEntity>,
+  ): PgSmartTagsAndDescription | undefined;
   /** Immutable metadata captured before dependency discovery begins. */
   catalogByOid: Readonly<Record<string, string>>;
 }
+
+/** Collections whose rows can be described with `comment on`. */
+export type TaggedEntity = (typeof DESCRIBED_ENTITIES)[number] | "attributes";
+
+/** Collections whose objects can be requested by name. */
+export type NamedEntity =
+  | "namespaces"
+  | "classes"
+  | "attributes"
+  | "procs"
+  | "types";
 
 export type Maybe<T> = T | null | undefined;
 export type ReadonlyArrayOrDirect<T> = T | readonly T[];
@@ -81,18 +150,50 @@ export type ReadonlyArrayOrDirect<T> = T | readonly T[];
 /**
  * Policies must depend only on the row, inspected purposes and fixed configuration.
  * Requests are additive: later purposes cannot retract requests already issued.
+ * A policy defines `select`, `preview` or both.
  */
-export interface IntrospectionPolicy<TEntity extends EntityType = EntityType> {
+export interface IntrospectionPolicy<
+  TEntity extends EntityType | null = EntityType,
+> {
   name: string;
+  /**
+   * The collection whose rows this policy is selected for. With `null`, the
+   * policy is selected once at the start with `null` in place of a row (and
+   * again once rows it peeked at have been fetched).
+   */
   entity: TEntity;
-  select: (
-    row: IntrospectionRow<TEntity>,
+  /**
+   * Selected for rows with at least one purpose that does not start with `_`,
+   * that is, rows that will be exposed.
+   */
+  select?: (
+    row: PolicyRow<TEntity>,
     details: IntrospectionPolicyDetails,
+  ) => void;
+  /**
+   * Selected for every row, including those fetched only to guide discovery.
+   * It may only peek, not request. In each round, every `preview` runs before
+   * any `select`.
+   */
+  preview?: (
+    row: PolicyRow<TEntity>,
+    details: IntrospectionPreviewDetails,
   ) => void;
 }
 
+/** The details given to `preview`, which may only peek. */
+export type IntrospectionPreviewDetails = Omit<
+  IntrospectionPolicyDetails,
+  "request" | "requestByName"
+>;
+
+/** The row a policy receives; `null` for policies with `entity: null`. */
+type PolicyRow<TEntity extends EntityType | null> = TEntity extends EntityType
+  ? IntrospectionRow<TEntity>
+  : null;
+
 /** Infer a policy's row type from its source collection. */
-export function defineIntrospectionPolicy<TEntity extends EntityType>(
+export function defineIntrospectionPolicy<TEntity extends EntityType | null>(
   policy: IntrospectionPolicy<TEntity>,
 ): IntrospectionPolicy<TEntity> {
   return policy;
@@ -100,9 +201,10 @@ export function defineIntrospectionPolicy<TEntity extends EntityType>(
 
 export interface MultipassOptions {
   onlyAccessible?: { role?: string; includeNoInherit?: boolean };
-  policies?: readonly {
-    [TEntity in EntityType]: IntrospectionPolicy<TEntity>;
-  }[EntityType][];
+  policies?: readonly (
+    | { [TEntity in EntityType]: IntrospectionPolicy<TEntity> }[EntityType]
+    | IntrospectionPolicy<null>
+  )[];
   /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
   entrypointFilters?: Partial<Record<EntityType, string>>;
 }
@@ -142,7 +244,7 @@ export interface MultipassIntrospectOptions<TEntities extends EntityType>
   multipass: MultipassOptions;
 }
 
-type CollectionEntity = {
+export type CollectionEntity = {
   [T in EntityType]: IntrospectionData[T] extends readonly unknown[]
     ? T
     : never;

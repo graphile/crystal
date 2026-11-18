@@ -15,6 +15,7 @@ import sql, { $$toSQL } from "pg-sql2";
 import type { PgCodecAttribute } from "../codecs.ts";
 import { sqlValueWithCodec } from "../codecs.ts";
 import type { PgResource } from "../datasource.ts";
+import { PgExecutor } from "../executor.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -140,6 +141,7 @@ export class PgInsertSingleStep<
     },
   ) {
     super();
+    this.metaKey = PgExecutor.metaKey;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);
@@ -389,6 +391,7 @@ export class PgInsertSingleStep<
   async execute({
     indexMap,
     values,
+    extra: { meta: store },
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { resource, contextId, finalizeResults, alias } = this;
     const executor = this.resource.executor;
@@ -514,7 +517,7 @@ export class PgInsertSingleStep<
         );
       };
       const { rows, notices, rowCount } = await executor.executeMutation(
-        { context, useTransaction: this.wrappers.length > 0 },
+        { context, store, useTransaction: this.wrappers.length > 0 },
         this.wrappers.length > 0
           ? makeWrappedMutationExecute<PgInsertSingleQueryBuilder, any>(
               this.wrappers,
