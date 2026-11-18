@@ -64,16 +64,16 @@ function symbolRank(order: Map<symbol, number>, key: symbol): number {
 
 function compareOptionKeys(
   a: string | symbol,
-  b: string | symbol,
+  z: string | symbol,
   order: KeyOrder,
 ): number {
   if (typeof a === "string") {
-    return typeof b === "string" ? (a < b ? -1 : a === b ? 0 : 1) : -1;
-  } else if (typeof b === "string") {
+    return typeof z === "string" ? (a < z ? -1 : a === z ? 0 : 1) : -1;
+  } else if (typeof z === "string") {
     return 1;
   } else {
     const ranks = (order.symbolOrder ??= new Map());
-    return symbolRank(ranks, a) - symbolRank(ranks, b);
+    return symbolRank(ranks, a) - symbolRank(ranks, z);
   }
 }
 
@@ -130,7 +130,7 @@ function makeObjectMatcher(
         ownKeys.length = remaining;
       }
       if (ownKeys.length > 1) {
-        ownKeys.sort((a, b) => compareOptionKeys(a, b, order));
+        ownKeys.sort((a, z) => compareOptionKeys(a, z, order));
       }
       for (const key of ownKeys) {
         keys.push(key, value[key]);

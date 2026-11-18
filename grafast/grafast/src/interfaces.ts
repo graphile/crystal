@@ -749,8 +749,10 @@ type BatchOptionComparison<T> =
           : never);
 
 /** How to compare the own properties of an options object. */
-export type BatchOptionsMatch<T extends object> = {
-  readonly [K in keyof T as K]?: BatchOptionComparison<T[K]>;
+export type BatchOptionsMatch<TOptions extends object> = {
+  readonly [TKey in keyof TOptions as TKey]?: BatchOptionComparison<
+    TOptions[TKey]
+  >;
 };
 
 /** A stable, named batch executor. Define once, outside step execution. */
