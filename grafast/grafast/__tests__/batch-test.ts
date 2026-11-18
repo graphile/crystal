@@ -150,7 +150,9 @@ it("matches executors by identity and options shallowly", async () => {
 
   expect(callbackCount).to.equal(4);
   expect(first).to.deep.equal([firstKeyset, firstKeyset]);
-  expect(second).to.deep.equal([sameLookingKeyset, firstKeyset]);
+  expect(second[0]).to.equal(sameLookingKeyset);
+  expect(second[1]).to.equal(firstKeyset);
+  expect(second).to.have.lengthOf(2);
   expect(third).to.deep.equal([firstKeyset]);
   expect(fourth).to.deep.equal([firstKeyset]);
   expect(fifth).to.deep.equal([[1]]);
@@ -244,7 +246,7 @@ if (!isDev) {
 }
 
 it("matches POJO options shallowly and ignores property order", async () => {
-  let calls = 0;
+  const batches: Array<readonly number[]> = [];
   const schema = makeSchema();
   const meta = {};
   const nested = { id: 1 };
@@ -255,7 +257,7 @@ it("matches POJO options shallowly and ignores property order", async () => {
       _options: { prefix: string; nested: object },
       keys: readonly number[],
     ) => {
-      calls++;
+      batches.push([...keys]);
       return keys;
     },
   });
@@ -268,7 +270,7 @@ it("matches POJO options shallowly and ignores property order", async () => {
     }),
     batchInMeta(schema, meta, executor, [4], { prefix: "y", nested }),
   ]);
-  expect(calls).to.equal(3);
+  expect(batches).to.deep.equal([[1, 2], [3], [4]]);
   expect(results).to.deep.equal([[1], [2], [3], [4]]);
 });
 
@@ -734,7 +736,9 @@ it("allocates promises per batch rather than per key and returns cache hits sync
     keysetEquality: "strict",
     callback: (_options: undefined, keys: readonly number[]) => keys,
   });
-  function measure(keys: number[]) {
+  async function measure(keys: number[]) {
+    // Let the caller attach its await before counting promises.
+    await Promise.resolve();
     const meta = {};
     let promises = 0;
     const hook = createHook({
@@ -745,20 +749,18 @@ it("allocates promises per batch rather than per key and returns cache hits sync
       },
     });
     hook.enable();
-    let result;
     try {
-      result = batchInMeta(schema, meta, executor, keys);
+      const result = await batchInMeta(schema, meta, executor, keys);
+      return { result, promises, meta };
     } finally {
       hook.disable();
     }
-    return { result, promises, meta };
   }
-  const small = measure([1]);
+  const small = await measure([1]);
   const keys = Array.from({ length: 1000 }, (_, i) => i);
-  const large = measure(keys);
+  const large = await measure(keys);
   expect(large.promises).to.equal(small.promises);
-  await small.result;
-  expect(await large.result).to.deep.equal(keys);
+  expect(large.result).to.deep.equal(keys);
   const cached = batchInMeta(schema, large.meta, executor, keys);
   expect(Array.isArray(cached)).to.equal(true);
   expect(cached).to.deep.equal(keys);
