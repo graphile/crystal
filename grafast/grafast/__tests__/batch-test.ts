@@ -6,6 +6,7 @@ import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { it } from "mocha";
 
 import { batchInMeta, defineBatchExecutor } from "../dist/batch.js";
+import { getOptionsMatcher } from "../dist/batchOptions.js";
 import { isDev } from "../dist/dev.js";
 import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
 import {
@@ -394,6 +395,45 @@ it("matches nested option rules and compares unspecified properties strictly", a
     }),
   ]);
   expect(calls).to.deep.equal([[1, 3], [2], [4], [5], [6]]);
+});
+
+it("indexes explicit option rules in declaration order before unspecified keys", () => {
+  const matcher = getOptionsMatcher({
+    priority: "strict",
+    group: { later: "strict", early: "strict" },
+    absent: "strict",
+  });
+  const priority = Symbol();
+  const later = Symbol();
+  const early = Symbol();
+  const other = Symbol();
+  const alpha = Symbol();
+  const zeta = Symbol();
+  const first = {
+    zeta,
+    group: { early, other, later },
+    priority,
+    alpha,
+  };
+  const second = {
+    alpha,
+    priority,
+    group: { later, early, other },
+    zeta,
+  };
+  const firstKeys: unknown[] = [];
+  const secondKeys: unknown[] = [];
+  matcher.appendKeys(first, firstKeys, {});
+  matcher.appendKeys(second, secondKeys, {});
+  expect(firstKeys.filter((value) => typeof value === "symbol")).to.deep.equal([
+    priority,
+    later,
+    early,
+    other,
+    alpha,
+    zeta,
+  ]);
+  expect(secondKeys).to.deep.equal(firstKeys);
 });
 
 it("indexes option symbols irrespective of order and checks non-enumerable values", async () => {

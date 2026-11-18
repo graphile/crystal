@@ -32,7 +32,7 @@ export function pgStepBatchOptions(
 export const pgStepBatchExecutor = defineBatchExecutor({
   name: "@dataplan/pg/step",
   keysetEquality: "tuple",
-  optionsMatch: { rawSqlValues: "tuple" },
+  optionsMatch: { text: "strict", rawSqlValues: "tuple" },
   callback: async (
     { executor, context, cacheToken: _cacheToken, ...options },
     keysets,

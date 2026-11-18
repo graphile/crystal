@@ -146,9 +146,9 @@ const loadBatchExecutor = {
   callback: executeLoadBatch,
   optionsMatch: {
     load: "strict",
+    params: "record",
     shared: "strict",
     attributes: "tuple",
-    params: "record",
   },
 } satisfies BatchExecutor<
   LoadBatchOptions<unknown, unknown, unknown, Record<string, unknown>, unknown>,

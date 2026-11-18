@@ -220,8 +220,8 @@ each property is compared. Properties you leave unspecified still use `===`.
 ```ts
 const optionsMatch = {
   context: {
-    pgSettings: "record",
     withPgClient: "strict",
+    pgSettings: "record",
   },
   params: "tuple",
 } as const;
@@ -231,10 +231,12 @@ const optionsMatch = {
 and their values. `"tuple"` compares an array by prototype, length, and its
 elements in order. A nested descriptor applies the same own-property rules to
 that object. Gra*fast* uses these rules to narrow the search for equivalent
-options, then checks the remaining candidates against the descriptor. Only use
-structural rules where the callback treats the resulting values as equivalent.
-A combined batch uses the first caller's options. Omit the third argument when
-the executor accepts `undefined`.
+options, then checks the remaining candidates against the descriptor. The index
+uses explicit rules in declaration order, followed by the other own keys in a
+canonical order. Put distinctive values early to reduce index branching. Only
+use structural rules where the callback treats the resulting values as
+equivalent. A combined batch uses the first caller's options. Omit the third
+argument when the executor accepts `undefined`.
 
 Executor names must identify the same executor object within each schema.
 Gra*fast* checks this when `details.batch` is called: conflicting definitions

@@ -105,14 +105,28 @@ function makeObjectMatcher(
         return;
       }
       const ownKeys = Reflect.ownKeys(value);
+      keys.push(Object.getPrototypeOf(value), ownKeys.length);
+      if (rules !== undefined) {
+        // Explicit rules put the most useful discriminators nearest the root.
+        for (const [key, rule] of rules) {
+          if (Object.hasOwn(value, key)) {
+            keys.push(key);
+            rule.appendKeys(value[key], keys, order);
+          }
+        }
+        let remaining = 0;
+        for (const key of ownKeys) {
+          if (!rules.has(key)) {
+            ownKeys[remaining++] = key;
+          }
+        }
+        ownKeys.length = remaining;
+      }
       if (ownKeys.length > 1) {
         ownKeys.sort((a, b) => compareOptionKeys(a, b, order));
       }
-      keys.push(Object.getPrototypeOf(value), ownKeys.length);
       for (const key of ownKeys) {
-        keys.push(key);
-        const rule = rules?.get(key) ?? strictMatcher;
-        rule.appendKeys(value[key], keys, order);
+        keys.push(key, value[key]);
       }
     },
   };
@@ -128,9 +142,11 @@ function compileOptionsMatch(descriptor: object): OptionsMatcher {
       rules.set(key, tupleMatcher);
     } else if (rule === "record") {
       rules.set(key, recordMatcher);
+    } else if (rule === "strict") {
+      rules.set(key, strictMatcher);
     } else if (isPojo(rule)) {
       rules.set(key, compileOptionsMatch(rule));
-    } else if (rule !== "strict" && rule !== undefined) {
+    } else if (rule !== undefined) {
       throw new Error(`Invalid batch optionsMatch rule for '${String(key)}'`);
     }
   }
