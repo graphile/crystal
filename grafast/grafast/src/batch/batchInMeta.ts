@@ -8,7 +8,7 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.ts";
 import { isPojo } from "../utils.ts";
-import type { CompositeEntry } from "./batchInterfaces.ts";
+import type { CompositeEntry, PendingBatch } from "./batchInterfaces.ts";
 import { BatchOptionsIndex } from "./batchOptions.ts";
 import { canonicalizeObject, canonicalizeTuple } from "./canonicalize.ts";
 import { checkExecutor } from "./checkExecutor.ts";
@@ -109,10 +109,10 @@ export function batchInMeta<
       // Placeholder; we'll overwrite this once fetched
       const targetIndex = results.push(null as TResult) - 1;
 
-      const existing = entryI === undefined ? pending.get(keyset) : entryI;
-      let batchForKey = existing?.batch;
-      let sourceIndex = existing?.index;
-      if (batchForKey == null) {
+      const request = entryI === undefined ? pending.get(keyset) : entryI;
+      let batchForKey: PendingBatch<TKeyset, TResult>;
+      let sourceIndex: number;
+      if (request?.batch == null) {
         let loadBatch = family.queued;
         if (loadBatch === null) {
           const deferred = Promise.withResolvers<ReadonlyArray<TResult>>();
@@ -139,6 +139,9 @@ export function batchInMeta<
           entryI.index = index;
           (loadBatch.entries ??= []).push(entryI);
         }
+      } else {
+        batchForKey = request.batch;
+        sourceIndex = request.index;
       }
       const indexesByPromise = (pendingIndexes ??= new Map());
       const promise = batchForKey.deferred.promise;
@@ -148,7 +151,7 @@ export function batchInMeta<
         indexesByPromise.set(promise, indexes);
       }
       // Pairs of source index in the pending batch and target result index.
-      indexes.push(sourceIndex!, targetIndex);
+      indexes.push(sourceIndex, targetIndex);
     }
   }
   if (pendingIndexes === null) {

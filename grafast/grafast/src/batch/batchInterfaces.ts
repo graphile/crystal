@@ -14,11 +14,18 @@ export interface PendingBatch<TKeyset, TResult> {
   keysets: TKeyset[];
 }
 
+/** The location of a keyset's result in an in-flight batch. */
+export interface PendingItem<TKeyset, TResult> {
+  batch: PendingBatch<TKeyset, TResult>;
+  index: number;
+}
+
 /** The canonical keyset and its pending or cached result for a tuple or object. */
 export interface CompositeEntry<K, R> {
   keyset: K;
   /** Undefined before queuing or after failure, null once the result is cached. */
   batch: PendingBatch<K, R> | null | undefined;
+  /** Position in `batch.keysets`. A value of `-1` means no batch is pending. */
   index: number;
   result: R | undefined;
 }
@@ -29,13 +36,7 @@ export type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
   /** In `strict` mode, cached results by keyset. */
   cache: Map<TKeyset, TResult>;
   /** In `strict` mode, the pending batch and position for each in-flight keyset. */
-  pending: Map<
-    TKeyset,
-    {
-      batch: PendingBatch<TKeyset, TResult>;
-      index: number;
-    }
-  >;
+  pending: Map<TKeyset, PendingItem<TKeyset, TResult>>;
   /** The batch currently collecting keys, scheduled to start in a microtask. */
   queued: PendingBatch<TKeyset, TResult> | null;
   /**

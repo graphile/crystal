@@ -42,6 +42,7 @@ export function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
       } else {
         entry.result = result;
         entry.batch = null;
+        entry.index = -1;
       }
       if (isPromiseLike(result)) {
         result.then(null, noop);
@@ -53,6 +54,7 @@ export function executeBatch<TOptions extends BatchOptions, TKeyset, TResult>(
     if (loadBatch.entries !== null) {
       for (const entry of loadBatch.entries) {
         entry.batch = undefined;
+        entry.index = -1;
         entry.result = undefined;
       }
     } else {
