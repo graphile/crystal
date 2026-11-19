@@ -470,8 +470,8 @@ export class ConnectionStep<
   }
 
   public mightStream() {
-    // A later nodes or edges field can still request streaming during planning.
-    return this._mightStream ?? this.operationPlan.phase === "plan";
+    // Later nodes or edges fields can still change this during planning.
+    return this._mightStream ?? !this.isArgumentsFinalized;
   }
 
   public getSubplan(): TCollectionStep {
@@ -1634,14 +1634,12 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $first = first($connection._items(), isArray);
+        const $first = first($connection._items(), false);
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get last node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $last = last($connection._items(), isArray);
+        const $last = last($connection._items(), false);
         return $connection.cursorPlan($last);
       }
       default: {
@@ -1683,8 +1681,11 @@ export class ConnectionItemsStep extends Step {
     >;
   }
 
+  public willNotStream(): boolean {
+    return !this.getConnection().mightStream();
+  }
+
   public optimize(_options: StepOptimizeOptions): Step {
-    // If false, connection guarantees an array
     this.cloneStreams = this.getConnection().mightStream();
     return this;
   }
