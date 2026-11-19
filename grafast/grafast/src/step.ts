@@ -774,6 +774,11 @@ ${printDeps(step, 1)}
    * will always yield the complete list as an array (or a nullish value).
    * Steps that can yield an iterable or a partial list must leave this
    * unspecified or return false.
+   *
+   * We probably want to change this so that it's automatically determined,
+   * rather than step classes having to declare it.
+   *
+   * @experimental
    */
   public willNotStream?(): boolean;
 
