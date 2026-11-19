@@ -470,7 +470,8 @@ export class ConnectionStep<
   }
 
   public mightStream() {
-    return this._mightStream === true;
+    // A later nodes or edges field can still request streaming during planning.
+    return this._mightStream ?? this.operationPlan.phase === "plan";
   }
 
   public getSubplan(): TCollectionStep {
@@ -727,13 +728,11 @@ export class ConnectionStep<
 
   public edges(): Step {
     this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.edgePlan as any);
   }
 
   public nodes() {
     this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.nodePlan as any);
   }
 
@@ -743,6 +742,7 @@ export class ConnectionStep<
 
   /** @internal */
   public _items() {
+    this.neededCollection = true;
     return this.withMyLayerPlan(() =>
       this.operationPlan.cacheStep(
         this,
@@ -833,7 +833,7 @@ export class ConnectionStep<
       replacement.needsHasMore = true;
     }
     // Consumers may already rely on either connection yielding an array.
-    if (replacement.mightStream() && !this.mightStream()) {
+    if (replacement._mightStream !== this._mightStream) {
       replacement._mightStream = false;
       replacement.getHandler(false).addStreamDetails?.(null);
     }
