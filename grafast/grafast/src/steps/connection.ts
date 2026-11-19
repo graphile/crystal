@@ -470,8 +470,12 @@ export class ConnectionStep<
   }
 
   public mightStream() {
-    // Later nodes or edges fields can still change this during planning.
-    return this._mightStream ?? !this.isArgumentsFinalized;
+    // Later `nodes` or `edges` fields can change this during planning, so
+    // default to "yes, I might stream" until we know for certain one way or
+    // the other. Note: `endCursor` wants to do `last($items)`; it makes a
+    // difference whether this will definitely yield a list versus maybe a
+    // stream.
+    return this._mightStream ?? this.operationPlan.phase === "plan";
   }
 
   public getSubplan(): TCollectionStep {
