@@ -3218,7 +3218,10 @@ function buildTheQueryCore<
 
   const { count, values } = info.executionDetails;
   let stream: ExecutionDetailsStream | null = null;
-  if (info.executionDetails.stream != null) {
+  if (info.fetchOneExtra) {
+    // Forbid streaming; use the buffered result to trim the extra row and
+    // determine page info.
+  } else if (info.executionDetails.stream != null) {
     stream = info.executionDetails.stream;
   } else if (
     rawInfo.streamDetailsDepIds != null &&
