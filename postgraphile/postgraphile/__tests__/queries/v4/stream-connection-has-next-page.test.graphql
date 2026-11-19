@@ -1,0 +1,14 @@
+## expect(errors).toBeFalsy();
+## expect(payloads[0].data.allPeople).toEqual({ nodes: [{ id: 1 }], pageInfo: { hasNextPage: true } });
+## expect(payloads.slice(1).map(({ data, path }) => [path, data.id])).toEqual([[["allPeople", "nodes", 1], 2], [["allPeople", "nodes", 2], 3]]);
+## expect(queries.some(({ text }) => /^declare /im.test(text))).toBe(false);
+{
+  allPeople(first: 3, orderBy: PRIMARY_KEY_ASC) {
+    nodes @stream(initialCount: 1) {
+      id
+    }
+    pageInfo {
+      hasNextPage
+    }
+  }
+}
