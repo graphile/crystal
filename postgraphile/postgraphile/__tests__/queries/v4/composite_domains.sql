@@ -36,8 +36,11 @@ left outer join lateral (select (__posts__."content").*) as __frmcdc_user_update
 on TRUE
 order by __posts__."id" asc;
 
+with __frmcdc_user_update_content_line_node_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"composite_domains"."user_update_content_line_node"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_user_update_content_line_node_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"composite_domains"."user_update_content_line_node"[] as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_user_update_content_line_node_identifiers__,
+from __frmcdc_user_update_content_line_node_identifiers__,
 lateral (
   select
     __frmcdc_user_update_content_line_node__."line_node_type"::text as "0",
@@ -46,8 +49,11 @@ lateral (
   from unnest(__frmcdc_user_update_content_line_node_identifiers__."id0") as __frmcdc_user_update_content_line_node__
 ) as __frmcdc_user_update_content_line_node_result__;
 
+with __frmcdc_user_update_content_line_node_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"composite_domains"."user_update_content_line_node"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_user_update_content_line_node_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"composite_domains"."user_update_content_line_node"[] as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_user_update_content_line_node_identifiers__,
+from __frmcdc_user_update_content_line_node_identifiers__,
 lateral (
   select
     __frmcdc_user_update_content_line_node__."line_node_type"::text as "0",

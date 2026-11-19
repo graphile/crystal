@@ -1,0 +1,9 @@
+## expect(errors).toBeFalsy()
+{
+  forums {
+    name
+    firstFeaturedMessageAuthor {
+      username
+    }
+  }
+}

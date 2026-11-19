@@ -1,0 +1,6 @@
+{
+  created: "{\"enabled\":true,\"json\":{\"nested\":[1,true,null]},\"jsonb\":{\"ok\":true},\"duration\":{\"years\":0,\"months\":0,\"days\":1,\"hours\":2,\"minutes\":3,\"seconds\":4.5},\"date\":\"2024-01-02\",\"tags\":[\"hello\",\"world\"],\"nullable_json\":null}",
+  updatedFalse: "{\"enabled\":false,\"json\":{\"nested\":[1,true,null]},\"jsonb\":{\"ok\":true},\"duration\":{\"years\":0,\"months\":0,\"days\":1,\"hours\":2,\"minutes\":3,\"seconds\":4.5},\"date\":\"2024-01-02\",\"tags\":[\"hello\",\"world\"],\"nullable_json\":null}",
+  updatedTrue: "{\"enabled\":true,\"json\":{\"nested\":[1,true,null]},\"jsonb\":{\"ok\":true},\"duration\":{\"years\":0,\"months\":0,\"days\":1,\"hours\":2,\"minutes\":3,\"seconds\":4.5},\"date\":\"2024-01-02\",\"tags\":[\"hello\",\"world\"],\"nullable_json\":null}",
+  deleted: "{\"enabled\":true,\"json\":{\"nested\":[1,true,null]},\"jsonb\":{\"ok\":true},\"duration\":{\"years\":0,\"months\":0,\"days\":1,\"hours\":2,\"minutes\":3,\"seconds\":4.5},\"date\":\"2024-01-02\",\"tags\":[\"hello\",\"world\"],\"nullable_json\":null}",
+}

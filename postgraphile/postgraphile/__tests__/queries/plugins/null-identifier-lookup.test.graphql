@@ -1,0 +1,9 @@
+## expect(errors).toBeFalsy()
+#> schema: ["a", "b", "c"]
+#> extends: ["./NullIdentifierLookup.ts:preset"]
+#> simpleCollections: "both"
+
+{
+  personIdByNullableIdentifier(id: null)
+  peopleCountByNullableIdentifiers(id: null, email: "john@example.com")
+}

@@ -85,6 +85,47 @@ from (
 
 
 select
+  (count(*))::text as "0",
+  null as "1",
+  null as "2"
+from (
+    select
+      __first_party_vulnerabilities__."1",
+      __first_party_vulnerabilities__."2",
+      "n"
+    from (
+      select
+        'FirstPartyVulnerability' as "1",
+        json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
+        row_number() over (
+          order by
+            __first_party_vulnerabilities__."id" asc
+        ) as "n"
+      from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+      order by
+        __first_party_vulnerabilities__."id" asc
+    ) as __first_party_vulnerabilities__
+  union all
+    select
+      __third_party_vulnerabilities__."1",
+      __third_party_vulnerabilities__."2",
+      "n"
+    from (
+      select
+        'ThirdPartyVulnerability' as "1",
+        json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
+        row_number() over (
+          order by
+            __third_party_vulnerabilities__."id" asc
+        ) as "n"
+      from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
+      order by
+        __third_party_vulnerabilities__."id" asc
+    ) as __third_party_vulnerabilities__
+) __vulnerability__
+
+
+select
   __vulnerability__."0" as "0",
   __vulnerability__."1"::text as "1",
   __vulnerability__."2"::text as "2"
@@ -142,47 +183,6 @@ from (
 
 
 select
-  (count(*))::text as "0",
-  null as "1",
-  null as "2"
-from (
-    select
-      __first_party_vulnerabilities__."1",
-      __first_party_vulnerabilities__."2",
-      "n"
-    from (
-      select
-        'FirstPartyVulnerability' as "1",
-        json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
-        row_number() over (
-          order by
-            __first_party_vulnerabilities__."id" asc
-        ) as "n"
-      from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-      order by
-        __first_party_vulnerabilities__."id" asc
-    ) as __first_party_vulnerabilities__
-  union all
-    select
-      __third_party_vulnerabilities__."1",
-      __third_party_vulnerabilities__."2",
-      "n"
-    from (
-      select
-        'ThirdPartyVulnerability' as "1",
-        json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
-        row_number() over (
-          order by
-            __third_party_vulnerabilities__."id" asc
-        ) as "n"
-      from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
-      order by
-        __third_party_vulnerabilities__."id" asc
-    ) as __third_party_vulnerabilities__
-) __vulnerability__
-
-
-select
   __first_party_vulnerabilities__."id"::text as "0",
   __first_party_vulnerabilities__."name" as "1",
   __first_party_vulnerabilities__."cvss_score"::text as "2"
@@ -191,8 +191,11 @@ where (
   __first_party_vulnerabilities__."id" = $1::"int4"
 );
 
+with __third_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __third_party_vulnerabilities_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __third_party_vulnerabilities_identifiers__,
+from __third_party_vulnerabilities_identifiers__,
 lateral (
   select
     __third_party_vulnerabilities__."id"::text as "0",

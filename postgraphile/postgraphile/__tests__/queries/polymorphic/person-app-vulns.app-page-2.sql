@@ -5,8 +5,11 @@ from "polymorphic"."people" as __people__
 order by __people__."person_id" asc
 limit 4;
 
+with __union_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($3::json) with ordinality as ids
+)
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($3::json) with ordinality as ids) as __union_identifiers__,
+from __union_identifiers__,
 lateral (
   select
     __applications__."0" as "0",
@@ -75,8 +78,11 @@ lateral (
   ) __applications__
 ) as __union_result__;
 
+with __aws_applications_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __aws_applications_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __aws_applications_identifiers__,
+from __aws_applications_identifiers__,
 lateral (
   select
     __aws_applications__."id"::text as "0",
@@ -94,8 +100,11 @@ where (
   __gcp_applications__."id" = $1::"int4"
 );
 
+with __union_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from __union_identifiers__,
 lateral (
   select
     __vulnerabilities__."0" as "0",
@@ -210,8 +219,11 @@ from (
 ) __vulnerabilities__
 
 
+with __first_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __first_party_vulnerabilities_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __first_party_vulnerabilities_identifiers__,
+from __first_party_vulnerabilities_identifiers__,
 lateral (
   select
     __first_party_vulnerabilities__."id"::text as "0",

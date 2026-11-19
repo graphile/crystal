@@ -1,6 +1,6 @@
 import { assertInputObjectType } from "graphql";
 
-import { PostGraphileRelayPreset } from "../../../src/presets/relay.ts";
+import { PostGraphileRelayPreset } from "../../../dist/presets/relay.js";
 import * as core from "./core.ts";
 
 test(

@@ -7,8 +7,11 @@ where (
 )
 order by __people__."person_id" asc;
 
+with __relational_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_items_identifiers__,
+from __relational_items_identifiers__,
 lateral (
   select
     __relational_items__."id"::text as "0",
@@ -26,8 +29,11 @@ lateral (
   order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
+with __relational_topics_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_topics_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_topics_identifiers__,
+from __relational_topics_identifiers__,
 lateral (
   select
     __relational_topics__."id"::text as "0",
@@ -41,36 +47,6 @@ lateral (
     )
 ) as __relational_topics_result__;
 
-select __relational_posts_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_posts_identifiers__,
-lateral (
-  select
-    __relational_posts__."id"::text as "0",
-    __relational_posts_identifiers__.idx as "1"
-  from interfaces_and_unions.relational_posts as __relational_posts__
-  where
-    (
-      __relational_posts__."id" = __relational_posts_identifiers__."id0"
-    ) and (
-      true /* authorization checks */
-    )
-) as __relational_posts_result__;
-
-select __relational_dividers_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_dividers_identifiers__,
-lateral (
-  select
-    __relational_dividers__."id"::text as "0",
-    __relational_dividers_identifiers__.idx as "1"
-  from interfaces_and_unions.relational_dividers as __relational_dividers__
-  where
-    (
-      __relational_dividers__."id" = __relational_dividers_identifiers__."id0"
-    ) and (
-      true /* authorization checks */
-    )
-) as __relational_dividers_result__;
-
 select
   __relational_checklists__."id"::text as "0"
 from interfaces_and_unions.relational_checklists as __relational_checklists__
@@ -81,8 +57,11 @@ where
     true /* authorization checks */
   );
 
+with __relational_checklist_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_checklist_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_checklist_items_identifiers__,
+from __relational_checklist_items_identifiers__,
 lateral (
   select
     __relational_checklist_items__."id"::text as "0",
@@ -96,8 +75,47 @@ lateral (
     )
 ) as __relational_checklist_items_result__;
 
+with __relational_posts_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __relational_posts_result__.*
+from __relational_posts_identifiers__,
+lateral (
+  select
+    __relational_posts__."id"::text as "0",
+    __relational_posts_identifiers__.idx as "1"
+  from interfaces_and_unions.relational_posts as __relational_posts__
+  where
+    (
+      __relational_posts__."id" = __relational_posts_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
+    )
+) as __relational_posts_result__;
+
+with __relational_dividers_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __relational_dividers_result__.*
+from __relational_dividers_identifiers__,
+lateral (
+  select
+    __relational_dividers__."id"::text as "0",
+    __relational_dividers_identifiers__.idx as "1"
+  from interfaces_and_unions.relational_dividers as __relational_dividers__
+  where
+    (
+      __relational_dividers__."id" = __relational_dividers_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
+    )
+) as __relational_dividers_result__;
+
+with __relational_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_items_identifiers__,
+from __relational_items_identifiers__,
 lateral (
   select
     __relational_items__."id"::text as "0",
@@ -123,8 +141,11 @@ where
     true /* authorization checks */
   );
 
+with __relational_checklists_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_checklists_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_checklists_identifiers__,
+from __relational_checklists_identifiers__,
 lateral (
   select
     __relational_checklists__."id"::text as "0",

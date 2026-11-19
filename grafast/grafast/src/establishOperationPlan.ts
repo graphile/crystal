@@ -83,19 +83,21 @@ function isOperationPlanResultCompatible<
   errorBehavior: ErrorBehavior,
 ): boolean {
   if (operationPlanResult.errorBehavior !== errorBehavior) return false;
-  const {
-    variableValuesConstraints,
-    contextConstraints,
-    rootValueConstraints,
-  } = operationPlanResult;
-  if (!matchesConstraints(variableValuesConstraints, variableValues)) {
-    return false;
-  }
-  if (!matchesConstraints(contextConstraints, context)) {
-    return false;
-  }
-  if (!matchesConstraints(rootValueConstraints, rootValue)) {
-    return false;
+  if (operationPlanResult.operationPlan?.hasNoConstraints !== true) {
+    const {
+      variableValuesConstraints,
+      contextConstraints,
+      rootValueConstraints,
+    } = operationPlanResult;
+    if (!matchesConstraints(variableValuesConstraints, variableValues)) {
+      return false;
+    }
+    if (!matchesConstraints(contextConstraints, context)) {
+      return false;
+    }
+    if (!matchesConstraints(rootValueConstraints, rootValue)) {
+      return false;
+    }
   }
   return true;
 }

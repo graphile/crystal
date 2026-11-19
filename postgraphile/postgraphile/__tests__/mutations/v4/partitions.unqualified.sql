@@ -1,6 +1,6 @@
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 insert into "measurements" as __measurements__ ("timestamp", "key", "value", "user_id") values ($1::"timestamptz", $2::"text", $3::"float8", $4::"int4") returning
   to_char(__measurements__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
@@ -12,7 +12,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __users__."id"::text as "0",
@@ -26,7 +26,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 update "measurements" as __measurements__ set "value" = $1::"float8" where ((__measurements__."timestamp" = $2::"timestamptz") and (__measurements__."key" = $3::"text")) returning
   to_char(__measurements__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
@@ -38,7 +38,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __users__."id"::text as "0",

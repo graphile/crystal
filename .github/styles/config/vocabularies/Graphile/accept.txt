@@ -18,6 +18,11 @@ namespace
 booleans
 preprocessor
 unformatted
+inline
+inlined
+inlining
+subquery
+subqueries
 (?i)autofixed
 pg-sql2
 [Gg]rafast

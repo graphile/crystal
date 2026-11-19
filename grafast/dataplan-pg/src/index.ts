@@ -9,7 +9,10 @@ import type {
   PgCodecAttributes,
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
+  PgCodecJSDatatype,
+  PgCodecPGDatatype,
   PgEnumCodecSpec,
+  PgRangeValue,
   PgRecordTypeCodecSpec,
 } from "./codecs.ts";
 import {
@@ -44,6 +47,10 @@ import type {
   PgCodecRefs,
   PgFunctionResourceOptions,
   PgRegistryBuilder,
+  PgResourceExecuteArguments,
+  PgResourceExecuteNamedArguments,
+  PgResourceExecutePositionalArguments,
+  PgResourceExecuteResult,
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
@@ -103,6 +110,7 @@ import type {
   PgConditionLike,
   PgDecode,
   PgEncode,
+  PgEncodedValue,
   PgEnumCodec,
   PgEnumValue,
   PgGroupSpec,
@@ -115,7 +123,6 @@ import type {
   PgTypedStep,
   PgUnionAllQueryBuilderCallback,
   PlanByUniques,
-  TuplePlanMap,
 } from "./interfaces.ts";
 import type { PgLockableParameter, PgLockCallback } from "./pgLocker.ts";
 import type { PgAdaptor } from "./pgServices.ts";
@@ -143,6 +150,7 @@ import type { PgDeleteSingleQueryBuilder } from "./steps/pgDeleteSingle.ts";
 import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
 import type { PgInsertSingleQueryBuilder } from "./steps/pgInsertSingle.ts";
 import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
+import type { PgWrapCallback } from "./steps/pgMutationWrapper.ts";
 import type {
   PgGroupDetails,
   PgRootStep,
@@ -150,6 +158,7 @@ import type {
   PgSelectArgumentRuntimeValue,
   PgSelectArgumentSpec,
   PgSelectIdentifierSpec,
+  PgSelectInliningStrategy,
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
@@ -233,7 +242,9 @@ export type {
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
   PgCodecExtensions,
+  PgCodecJSDatatype,
   PgCodecList,
+  PgCodecPGDatatype,
   PgCodecPolymorphism,
   PgCodecPolymorphismRelational,
   PgCodecPolymorphismRelationalTypeSpec,
@@ -255,6 +266,7 @@ export type {
   PgDecode,
   PgDeleteSingleQueryBuilder,
   PgEncode,
+  PgEncodedValue,
   PgEnumCodec,
   PgEnumCodecSpec,
   PgEnumValue,
@@ -278,12 +290,17 @@ export type {
   PgPath,
   PgPoint,
   PgPolygon,
+  PgRangeValue,
   PgRecordTypeCodecSpec,
   PgRefDefinition,
   PgRefDefinitionExtensions,
   PgRefDefinitions,
   PgRegistry,
   PgRegistryBuilder,
+  PgResourceExecuteArguments,
+  PgResourceExecuteNamedArguments,
+  PgResourceExecutePositionalArguments,
+  PgResourceExecuteResult,
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
@@ -294,6 +311,7 @@ export type {
   PgSelectArgumentRuntimeValue,
   PgSelectArgumentSpec,
   PgSelectIdentifierSpec,
+  PgSelectInliningStrategy,
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
@@ -310,9 +328,9 @@ export type {
   PgUnionAllStepOrder,
   PgUpdateSingleQueryBuilder,
   PgWhereConditionSpec,
+  PgWrapCallback,
   PlanByUniques,
   SideEffectWithPgClientStepCallback,
-  TuplePlanMap,
   WithPgClient,
 };
 export {
@@ -521,6 +539,15 @@ declare global {
        * ```
        */
     }
+
+    /**
+     * The union of clients supplied by the configured PostgreSQL adaptors.
+     * Falls back to the common client interface when no adaptor has been
+     * imported.
+     */
+    type DataplanPgClient = [keyof PgAdaptors] extends [never]
+      ? PgClient
+      : PgAdaptors[keyof PgAdaptors]["client"];
   }
   namespace DataplanPg {
     interface PgConditionExtensions {}

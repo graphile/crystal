@@ -19,26 +19,6 @@ where
 order by __applicants__."id" asc;
 
 select
-  __text_length__.v as "0"
-from "function_returning_enum"."text_length"(
-  $1::"text",
-  $2::"int4"
-) as __text_length__(v);
-
-select
-  __applicants_by_stage__."id"::text as "0",
-  __applicants_by_stage__."first_name" as "1",
-  __applicants_by_stage__."last_name" as "2",
-  __applicants_by_stage__."stage"::text as "3",
-  "function_returning_enum"."applicants_next_stage"(__applicants_by_stage__) as "4",
-  __applicants_by_stage__."favorite_pet"::text as "5",
-  ("function_returning_enum"."applicants_pet_food"(__applicants_by_stage__))::text as "6",
-  "function_returning_enum"."applicants_name_length"(__applicants_by_stage__) as "7",
-  __applicants_by_stage__."transportation"::text as "8",
-  "function_returning_enum"."applicants_favorite_pet_transportation"(__applicants_by_stage__) as "9"
-from "function_returning_enum"."applicants_by_stage"($1::"function_returning_enum"."stage_options_enum_domain") as __applicants_by_stage__;
-
-select
   __applicants_by_favorite_pet__."id"::text as "0",
   __applicants_by_favorite_pet__."first_name" as "1",
   __applicants_by_favorite_pet__."last_name" as "2",
@@ -63,3 +43,23 @@ select
   __applicants_by_transportation__."transportation"::text as "8",
   "function_returning_enum"."applicants_favorite_pet_transportation"(__applicants_by_transportation__) as "9"
 from "function_returning_enum"."applicants_by_transportation"($1::"function_returning_enum"."transportation") as __applicants_by_transportation__;
+
+select
+  __text_length__.v as "0"
+from "function_returning_enum"."text_length"(
+  $1::"text",
+  $2::"int4"
+) as __text_length__(v);
+
+select
+  __applicants_by_stage__."id"::text as "0",
+  __applicants_by_stage__."first_name" as "1",
+  __applicants_by_stage__."last_name" as "2",
+  __applicants_by_stage__."stage"::text as "3",
+  "function_returning_enum"."applicants_next_stage"(__applicants_by_stage__) as "4",
+  __applicants_by_stage__."favorite_pet"::text as "5",
+  ("function_returning_enum"."applicants_pet_food"(__applicants_by_stage__))::text as "6",
+  "function_returning_enum"."applicants_name_length"(__applicants_by_stage__) as "7",
+  __applicants_by_stage__."transportation"::text as "8",
+  "function_returning_enum"."applicants_favorite_pet_transportation"(__applicants_by_stage__) as "9"
+from "function_returning_enum"."applicants_by_stage"($1::"function_returning_enum"."stage_options_enum_domain") as __applicants_by_stage__;

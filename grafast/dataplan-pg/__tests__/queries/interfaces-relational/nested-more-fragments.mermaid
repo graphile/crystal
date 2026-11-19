@@ -12,18 +12,18 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 344, 10<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 344, 12, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 345, 346<br />2: PgSelectRows[20]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 346, 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 340, 23, 26, 27, 118, 153, 158, 163, 168, 173, 341, 342<br />2: PgSelectRows[127]<br />ᐳ: First[126], PgSelectSingle[128]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[27]<br />Deps: 27, 10, 23, 128, 346, 22, 26, 118, 153, 158, 163, 168, 173"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 10, 23, 128, 346, 22, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalTopic<br /><br />1: PgSelect[29]<br />2: PgSelectRows[34]<br />ᐳ: 33, 35, 178"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|RelationalPost<br />Deps: 10, 23, 128, 346, 22, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalPost<br /><br />1: PgSelect[37]<br />2: PgSelectRows[42]<br />ᐳ: 41, 43, 179, 183, 186"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|RelationalDivider<br />Deps: 10, 23, 128, 346, 22, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalDivider<br /><br />1: PgSelect[45]<br />2: PgSelectRows[50]<br />ᐳ: 49, 51, 180, 184"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />|RelationalChecklist<br />Deps: 10, 23, 128, 346, 22, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalChecklist<br /><br />1: PgSelect[53]<br />2: PgSelectRows[58]<br />ᐳ: 57, 59, 181"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />|RelationalChecklistItem<br />Deps: 10, 23, 128, 346, 22, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalChecklistItem<br /><br />1: PgSelect[61]<br />2: PgSelectRows[66]<br />ᐳ: 65, 67, 182, 185"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[27]<br />Deps: 27, 10, 23, 128, 346, 21, 26, 118, 153, 158, 163, 168, 173"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 10, 23, 128, 346, 21, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalTopic<br /><br />1: PgSelect[29]<br />2: PgSelectRows[34]<br />ᐳ: 33, 35, 178"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|RelationalPost<br />Deps: 10, 23, 128, 346, 21, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalPost<br /><br />1: PgSelect[37]<br />2: PgSelectRows[42]<br />ᐳ: 41, 43, 179, 183, 186"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|RelationalDivider<br />Deps: 10, 23, 128, 346, 21, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalDivider<br /><br />1: PgSelect[45]<br />2: PgSelectRows[50]<br />ᐳ: 49, 51, 180, 184"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|RelationalChecklist<br />Deps: 10, 23, 128, 346, 21, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalChecklist<br /><br />1: PgSelect[53]<br />2: PgSelectRows[58]<br />ᐳ: 57, 59, 181"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|RelationalChecklistItem<br />Deps: 10, 23, 128, 346, 21, 26, 118, 153, 158, 163, 168, 173<br />ᐳRelationalChecklistItem<br /><br />1: PgSelect[61]<br />2: PgSelectRows[66]<br />ᐳ: 65, 67, 182, 185"):::bucket
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 128<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[128]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 128<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[128]"):::bucket
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 128<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[128]"):::bucket
     Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 128<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[128]"):::bucket
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 128<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[128]"):::bucket
-    Bucket15("Bucket 15 (combined)<br />Deps: 346, 22, 10<br /><br />1: <br />ᐳ: 336, 337, 338, 332<br />2: PgSelectRows[74]<br />ᐳ: 73, 75, 187, 190, 191, 247, 292, 297, 302, 307, 312, 333, 334<br />3: PgSelectRows[258]<br />ᐳ: First[257], PgSelectSingle[259]"):::bucket
+    Bucket15("Bucket 15 (combined)<br />Deps: 346, 21, 10<br /><br />1: <br />ᐳ: 336, 337, 338, 332<br />2: PgSelectRows[74]<br />ᐳ: 73, 75, 187, 190, 191, 247, 292, 297, 302, 307, 312, 333, 334<br />3: PgSelectRows[258]<br />ᐳ: First[257], PgSelectSingle[259]"):::bucket
     Bucket16("Bucket 16 (polymorphic)<br />__typename: Lambda[191]<br />Deps: 191, 10, 187, 259, 190, 247, 292, 297, 302, 307, 312"):::bucket
     Bucket17("Bucket 17 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 10, 187, 259, 190, 247, 292, 297, 302, 307, 312<br />(5) ...ᐳRelationalTopic<br /><br />1: PgSelect[193]<br />2: PgSelectRows[198]<br />ᐳ: 197, 199, 317"):::bucket
     Bucket18("Bucket 18 (polymorphicPartition)<br />|RelationalPost<br />Deps: 10, 187, 259, 190, 247, 292, 297, 302, 307, 312<br />(5) ...ᐳRelationalPost<br /><br />1: PgSelect[201]<br />2: PgSelectRows[206]<br />ᐳ: 205, 207, 318, 322, 325"):::bucket
@@ -192,13 +192,13 @@ graph TD
     Access332{{"Access[332∈15]<br />ᐸ338.m.joinDetailsFor253ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
     PgSelectSingle75{{"PgSelectSingle[75∈15]<br />ᐸrelational_itemsᐳ"}}:::plan
     Access332 & PgSelectSingle75 --> List333
-    List337{{"List[337∈15]<br />ᐸ336,22ᐳ"}}:::plan
-    Access336{{"Access[336∈15]<br />ᐸ346.m.joinDetailsFor69ᐳ"}}:::plan
-    Access336 & PgSelectSingle22 --> List337
+    List337{{"List[337∈15]<br />ᐸ336,21ᐳ"}}:::plan
+    Access336{{"Access[336∈15]<br />ᐸ346.m.subqueryDetailsFor69ᐳ"}}:::plan
+    Access336 & __Item21 --> List337
     First73{{"First[73∈15]"}}:::plan
     PgSelectRows74[["PgSelectRows[74∈15]"]]:::plan
     PgSelectRows74 --> First73
-    Lambda338{{"Lambda[338∈15]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda338{{"Lambda[338∈15]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda338 --> PgSelectRows74
     First73 --> PgSelectSingle75
     PgClassExpression187{{"PgClassExpression[187∈15]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan

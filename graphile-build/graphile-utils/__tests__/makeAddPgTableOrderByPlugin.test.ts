@@ -13,8 +13,8 @@ import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
-import type { NullsSortMethod } from "../src/index.ts";
-import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../src/index.ts";
+import type { NullsSortMethod } from "../dist/index.js";
+import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../dist/index.js";
 
 let pgPool: Pool | null = null;
 let connectionString = "";

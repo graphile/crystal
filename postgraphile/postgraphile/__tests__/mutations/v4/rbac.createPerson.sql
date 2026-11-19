@@ -1,6 +1,6 @@
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 insert into "c"."person" as __person__ ("person_full_name", "aliases", "about", "email", "site") values ($1::"varchar", $2::"text"[], $3::"text", $4::"b"."email", $5::"b"."wrapped_url") returning
   __person__."id"::text as "0",
@@ -16,7 +16,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __frmcdc_wrapped_url__."url" as "0"

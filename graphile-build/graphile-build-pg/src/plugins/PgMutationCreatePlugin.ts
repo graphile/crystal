@@ -38,20 +38,20 @@ declare global {
     interface Inflection {
       createField(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
       createInputType(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
       createPayloadType(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
       // TODO: move this to PgTablesPlugin and give it a better definition
       tableFieldName(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
     }
   }
@@ -59,7 +59,7 @@ declare global {
 
 const isInsertable = (
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;

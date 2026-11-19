@@ -7,13 +7,13 @@ import {
   parseAcl,
   PUBLIC_ROLE,
   resolvePermissions,
-} from "../src/acl.ts";
-import { augmentIntrospectionParsed } from "../src/augmentIntrospection.ts";
+} from "../dist/acl.js";
+import { augmentIntrospectionParsed } from "../dist/augmentIntrospection.js";
 import type {
   Introspection,
   PgAuthMembers,
   PgRoles,
-} from "../src/introspection.ts";
+} from "../dist/introspection.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 function makeRole(

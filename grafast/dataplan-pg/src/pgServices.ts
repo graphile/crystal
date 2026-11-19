@@ -29,7 +29,9 @@ export function isPromiseLike<T>(
 
 const isTest = process.env.NODE_ENV === "test";
 
-interface PgClientBySourceCacheValue<TPgClient extends PgClient = PgClient> {
+interface PgClientBySourceCacheValue<
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
+> {
   withPgClient: WithPgClient<TPgClient>;
   retainers: number;
 }
@@ -115,7 +117,7 @@ export function getWithPgClientFromPgService<
 export async function withPgClientFromPgService<T>(
   config: GraphileConfig.PgServiceConfiguration,
   pgSettings: Record<string, string | undefined> | null,
-  callback: (client: PgClient) => T | Promise<T>,
+  callback: (client: GraphileConfig.DataplanPgClient) => T | Promise<T>,
 ): Promise<T> {
   const withPgClientFromPgService = getWithPgClientFromPgService(config);
   const withPgClient = isPromiseLike(withPgClientFromPgService)
@@ -132,7 +134,7 @@ export async function withPgClientFromPgService<T>(
 export async function withSuperuserPgClientFromPgService<T>(
   config: GraphileConfig.PgServiceConfiguration,
   pgSettings: Record<string, string | undefined> | null,
-  callback: (client: PgClient) => T | Promise<T>,
+  callback: (client: GraphileConfig.DataplanPgClient) => T | Promise<T>,
 ): Promise<T> {
   const withPgClient = await config.adaptor.createWithPgClient(
     config.adaptorSettings,

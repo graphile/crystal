@@ -11,6 +11,7 @@ yarn-error.log
 npm-debug.log
 tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
+tsconfig.test.tsbuildinfo
 .env
 _LOCAL
 .DS_Store

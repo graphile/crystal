@@ -1,0 +1,11 @@
+{
+  created: 99999,
+  createdResult: "Updated person 99999's name to \"Mutation Wrapper Integration Test\"; {\"id\":99999,\"person_full_name\":\"Mutation Wrapper Integration Test\",\"about\":null}",
+  updated: 99999,
+  updatedResult: "Updated person 99999's name to \"Bob Jones\"; {\"id\":99999,\"person_full_name\":\"Bob Jones\",\"about\":null}",
+  emptyUpdate: null,
+  deleted: 99999,
+  deletedResult: "Deleted person 99999 named \"Bob Jones\"; {\"id\":99999,\"person_full_name\":\"Bob Jones\",\"about\":null}",
+  nested: 99998,
+  nestedResult: "Updated person 99998's name to \"Alice (wrap1) (wrap2) (wrap3)\"; {\"id\":99998,\"person_full_name\":\"Alice (wrap1) (wrap2) (wrap3)\",\"about\":null} (wrap3) (wrap2) (wrap1)",
+}

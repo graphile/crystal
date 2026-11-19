@@ -15,7 +15,7 @@ import {
   SubscriptionPlugin,
 } from "graphile-build";
 
-import { makeProcessSchemaPlugin } from "../src/index.ts";
+import { makeProcessSchemaPlugin } from "../dist/index.js";
 
 declare global {
   namespace GraphileBuild {
@@ -41,7 +41,7 @@ const makeSchemaWithSpy = (spy: (schema: GraphQLSchema) => GraphQLSchema) =>
         optionKey: "optionValue",
       },
     },
-    {},
+    {} as GraphileBuild.BuildInput,
     {},
   );
 
@@ -49,7 +49,7 @@ const makeSpy = (fn?: (schema: GraphQLSchema) => GraphQLSchema) =>
   jest.fn(fn || ((schema) => schema));
 
 it("Gets passed the final schema", async () => {
-  let spySchema: GraphQLSchema;
+  let spySchema!: GraphQLSchema;
   const spy = makeSpy((_schema: GraphQLSchema) => {
     spySchema = _schema;
     return _schema;
@@ -72,7 +72,7 @@ const simpleSchema = new GraphQLSchema({
 });
 
 it("Can replace the schema", async () => {
-  let spySchema: GraphQLSchema;
+  let spySchema!: GraphQLSchema;
   const spy = makeSpy((_schema) => {
     spySchema = _schema;
     return simpleSchema;
@@ -84,9 +84,9 @@ it("Can replace the schema", async () => {
 });
 
 it("Can tweak the schema", async () => {
-  let spySchema: GraphQLSchema;
+  let spySchema!: GraphQLSchema;
   const spy = makeSpy((_schema) => {
-    _schema.getQueryType().description = "MODIFIED DESCRIPTION";
+    _schema.getQueryType()!.description = "MODIFIED DESCRIPTION";
     spySchema = _schema;
     return _schema;
   });

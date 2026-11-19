@@ -65,7 +65,6 @@ const executor = new PgExecutor({
     });
   }
 });
-const tIdentifier = sql.identifier("nested_arrays", "t");
 const workHourPartsCodec = recordCodec({
   name: "workHourParts",
   identifier: sql.identifier("nested_arrays", "work_hour_parts"),
@@ -144,6 +143,7 @@ const workingHoursCodec = domainOfCodec(workhoursArrayCodec, "workingHours", sql
   },
   description: "Mo, Tu, We, Th, Fr, Sa, Su, Ho"
 });
+const tIdentifier = sql.identifier("nested_arrays", "t");
 const tCodec = recordCodec({
   name: "t",
   identifier: tIdentifier,
@@ -168,11 +168,11 @@ const tCodec = recordCodec({
   },
   executor: executor
 });
-const check_work_hoursFunctionIdentifer = sql.identifier("nested_arrays", "check_work_hours");
 const tUniques = [{
   attributes: ["k"],
   isPrimary: true
 }];
+const check_work_hoursFunctionIdentifer = sql.identifier("nested_arrays", "check_work_hours");
 const registry = makeRegistry({
   pgExecutors: {
     __proto__: null,
@@ -180,19 +180,19 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
+    text: TYPES.text,
+    varchar: TYPES.varchar,
+    bpchar: TYPES.bpchar,
     bool: TYPES.boolean,
-    t: tCodec,
     int4: TYPES.int,
     workingHours: workingHoursCodec,
     workhours: workhoursCodec,
     workHour: workHourCodec,
     workHourParts: workHourPartsCodec,
     int2: TYPES.int2,
-    text: TYPES.text,
-    varchar: TYPES.varchar,
-    bpchar: TYPES.bpchar,
     workHourArray: workHourArrayCodec,
     workhoursArray: workhoursArrayCodec,
+    t: tCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -535,6 +535,21 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
+    t: {
+      executor: executor,
+      name: "t",
+      identifier: "main.nested_arrays.t",
+      from: tIdentifier,
+      codec: tCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "nested_arrays",
+          name: "t"
+        }
+      },
+      uniques: tUniques
+    },
     check_work_hours: {
       executor: executor,
       name: "check_work_hours",
@@ -557,21 +572,6 @@ const registry = makeRegistry({
         }
       },
       isUnique: true
-    },
-    t: {
-      executor: executor,
-      name: "t",
-      identifier: "main.nested_arrays.t",
-      from: tIdentifier,
-      codec: tCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "nested_arrays",
-          name: "t"
-        }
-      },
-      uniques: tUniques
     }
   },
   pgRelations: {

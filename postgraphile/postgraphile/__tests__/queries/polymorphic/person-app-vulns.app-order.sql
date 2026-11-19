@@ -5,8 +5,11 @@ from "polymorphic"."people" as __people__
 order by __people__."person_id" asc
 limit 4;
 
+with __union_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from __union_identifiers__,
 lateral (
   select
     __applications__."0" as "0",
@@ -74,8 +77,11 @@ lateral (
   ) __applications__
 ) as __union_result__;
 
+with __aws_applications_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __aws_applications_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __aws_applications_identifiers__,
+from __aws_applications_identifiers__,
 lateral (
   select
     __aws_applications__."id"::text as "0",
@@ -88,8 +94,11 @@ lateral (
   )
 ) as __aws_applications_result__;
 
+with __gcp_applications_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __gcp_applications_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __gcp_applications_identifiers__,
+from __gcp_applications_identifiers__,
 lateral (
   select
     __gcp_applications__."id"::text as "0",

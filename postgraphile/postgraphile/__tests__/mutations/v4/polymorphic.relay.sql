@@ -4,8 +4,8 @@ insert into "polymorphic"."relational_item_relations" as __relational_item_relat
   __relational_item_relations__."parent_id"::text as "2";
 
 select
-  __relational_items__."id"::text as "0",
-  __relational_items__."type"::text as "1"
+  __relational_items__."type"::text as "0",
+  __relational_items__."id"::text as "1"
 from "polymorphic"."relational_items" as __relational_items__
 where (
   __relational_items__."id" = $1::"int4"
@@ -38,8 +38,8 @@ insert into "polymorphic"."relational_item_relation_composite_pks" as __relation
   __relational_item_relation_composite_pks__."child_id"::text as "1";
 
 select
-  __relational_items__."id"::text as "0",
-  __relational_items__."type"::text as "1"
+  __relational_items__."type"::text as "0",
+  __relational_items__."id"::text as "1"
 from "polymorphic"."relational_items" as __relational_items__
 where (
   __relational_items__."id" = $1::"int4"
@@ -73,8 +73,8 @@ insert into "polymorphic"."single_table_item_relations" as __single_table_item_r
   __single_table_item_relations__."parent_id"::text as "2";
 
 select
-  __single_table_items__."id"::text as "0",
-  __single_table_items__."type"::text as "1"
+  __single_table_items__."type"::text as "0",
+  __single_table_items__."id"::text as "1"
 from "polymorphic"."single_table_items" as __single_table_items__
 where (
   __single_table_items__."id" = $1::"int4"
@@ -93,8 +93,8 @@ insert into "polymorphic"."single_table_item_relation_composite_pks" as __single
   __single_table_item_relation_composite_pks__."child_id"::text as "1";
 
 select
-  __single_table_items__."id"::text as "0",
-  __single_table_items__."type"::text as "1"
+  __single_table_items__."type"::text as "0",
+  __single_table_items__."id"::text as "1"
 from "polymorphic"."single_table_items" as __single_table_items__
 where (
   __single_table_items__."id" = $1::"int4"

@@ -1,13 +1,13 @@
 {
   "name": "jest-serializer-graphql-schema",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Jest serializer for GraphQLSchema objects",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
-    "test": "jest",
+    "test": "tsc -b tsconfig.test.json && jest",
     "build": "tsc -b",
     "watch": "tsc -b --watch"
   },

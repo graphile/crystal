@@ -7,9 +7,9 @@ import { makeSchema } from "graphile-build";
 import { exportSchemaAsString } from "graphile-export";
 import type { PoolClient } from "pg";
 
-import AmberPreset from "../../../src/presets/amber.ts";
-import type { V4Options } from "../../../src/presets/v4.ts";
-import { makeV4Preset } from "../../../src/presets/v4.ts";
+import AmberPreset from "../../../dist/presets/amber.js";
+import type { V4Options } from "../../../dist/presets/v4.js";
+import { makeV4Preset } from "../../../dist/presets/v4.js";
 import {
   snapshot,
   StripOidsPlugin,

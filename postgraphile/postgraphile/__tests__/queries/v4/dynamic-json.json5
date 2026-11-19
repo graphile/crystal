@@ -162,4 +162,12 @@
       },
     ],
   },
+  jsonIdentityBatch: [
+    {
+      message: "json",
+    },
+    {
+      message: "json",
+    },
+  ],
 }

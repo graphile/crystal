@@ -1,6 +1,6 @@
 {
   "name": "graphile-config",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Standard plugin interface and helpers to be used across the Graphile stack.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -22,7 +22,7 @@
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
-    "test": "mocha '__tests__/**/*.test.ts'",
+    "test": "tsc -b tsconfig.test.json && mocha '__tests__/**/*.test.ts'",
     "build": "tsc -b"
   },
   "repository": {

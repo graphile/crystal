@@ -112,9 +112,9 @@ const resource_networkPgResource = makeRegistry({
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
     inet: TYPES.inet,
-    network: networkCodec,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr,
+    network: networkCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,

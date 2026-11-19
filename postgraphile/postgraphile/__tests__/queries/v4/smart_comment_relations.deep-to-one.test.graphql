@@ -1,0 +1,94 @@
+## expect(errors).toBeFalsy();
+#> schema: ["smart_comment_relations"]
+{
+  allHouses(first: 1) {
+    nodes {
+      nodeId
+      buildingByBuildingId {
+        id
+        name
+        namedAfterStreet {
+          id
+          name
+        }
+        propertyByPropertyId {
+          id
+          nameOrNumber
+          streetByStreetId {
+            id
+            name
+          }
+        }
+      }
+      propertyByPropertyId {
+        id
+        nameOrNumber
+        streetByStreetId {
+          id
+          name
+        }
+      }
+      streetByStreetId {
+        id
+        name
+      }
+      streetPropertyByStreetIdAndPropertyId {
+        currentOwner
+        streetByStrId {
+          id
+          name
+        }
+        propertyByPropId {
+          id
+          nameOrNumber
+          streetByStreetId {
+            id
+            name
+          }
+        }
+        houseByStreetIdAndPropertyId {
+          nodeId
+          buildingByBuildingId {
+            id
+            name
+            namedAfterStreet {
+              id
+              name
+            }
+            propertyByPropertyId {
+              id
+              nameOrNumber
+              streetByStreetId {
+                id
+                name
+              }
+            }
+          }
+          propertyByPropertyId {
+            id
+            nameOrNumber
+            streetByStreetId {
+              id
+              name
+            }
+          }
+          streetPropertyByStreetIdAndPropertyId {
+            currentOwner
+            streetByStrId {
+              id
+              name
+            }
+            propertyByPropId {
+              id
+              nameOrNumber
+              streetByStreetId {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

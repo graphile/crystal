@@ -57,6 +57,9 @@ declare global {
        * Default: true
        */
       installWatchFixtures?: boolean;
+
+      /** The `maxClientQueues` option to be passed to PgExecutor */
+      pgExecutorMaxClientQueues?: number;
     }
   }
 
@@ -290,7 +293,7 @@ function makeGetEntity<
       "_id" in entity
         ? entity._id === id
         : "indexrelid" in entity
-          ? entity.indexrelid
+          ? entity.indexrelid === id
           : false,
     );
   };
@@ -380,10 +383,27 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 [constant, context, object, withPgClientKey],
                 "contextCallback",
               );
+        const maxClientQueues = info.options.pgExecutorMaxClientQueues;
+        const pgExecutorConfig =
+          maxClientQueues !== undefined
+            ? EXPORTABLE(
+                (contextCallback, maxClientQueues, serviceName) => ({
+                  name: serviceName,
+                  context: contextCallback,
+                  maxClientQueues,
+                }),
+                [contextCallback, maxClientQueues, serviceName],
+              )
+            : EXPORTABLE(
+                (contextCallback, serviceName) => ({
+                  name: serviceName,
+                  context: contextCallback,
+                }),
+                [contextCallback, serviceName],
+              );
         const executor = EXPORTABLE(
-          (PgExecutor, contextCallback, serviceName) =>
-            new PgExecutor({ name: serviceName, context: contextCallback }),
-          [PgExecutor, contextCallback, serviceName],
+          (PgExecutor, pgExecutorConfig) => new PgExecutor(pgExecutorConfig),
+          [PgExecutor, pgExecutorConfig],
           serviceName === "main" ? `executor` : `${serviceName}Executor`,
         );
 

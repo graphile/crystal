@@ -6,6 +6,10 @@ import type {
 import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
+import type { ScopedTableMatch } from "./resolveTableMatch.ts";
+import { resolveTableMatch } from "./resolveTableMatch.ts";
+
+type ArrayOrDirect<T> = T | Array<T>;
 
 type OrderBySpecIdentity =
   | string // Attribute name
@@ -13,7 +17,7 @@ type OrderBySpecIdentity =
   | ((
       queryBuilder: PgSelectQueryBuilder,
       info: { scope: unknown }, // The `info` argument to `EnumValueApplyResolver`
-    ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+    ) => ArrayOrDirect<Omit<PgOrderSpec, "direction">>); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
@@ -21,18 +25,16 @@ export interface MakeAddPgTableOrderByPluginOrders {
 
 const counterByName = new Map<string, number>();
 
-export function addPgTableOrderBy(
-  match: {
-    serviceName?: string;
-    schemaName: string;
-    tableName: string;
-  },
+export function addPgTableOrderBy<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
+  match: ScopedTableMatch<TScope>,
   ordersGenerator: (
-    build: GraphileBuild.Build,
+    build: GraphileBuild.ScopedBuild<TScope>,
   ) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with addPgTableOrderBy to "${match.schemaName}"."${match.tableName}"`,
+  hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
-  const { serviceName = "main", schemaName, tableName } = match;
+  const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const baseDisplayName = `addPgTableOrderBy_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);
   if (!counter) {
@@ -64,7 +66,9 @@ export function addPgTableOrderBy(
           ) {
             return values;
           }
-          const newValues = ordersGenerator(build);
+          const newValues = ordersGenerator(
+            build as GraphileBuild.ScopedBuild<TScope>,
+          );
 
           return extend(values, newValues, hint);
         },
@@ -162,12 +166,18 @@ export function orderByAscDesc(
                 queryBuilder: PgSelectQueryBuilder,
                 info: { scope: unknown },
               ) {
-                queryBuilder.orderBy({
-                  nulls: ascendingNulls,
-                  nullable,
-                  ...attributeOrSqlFragment(queryBuilder, info),
-                  direction: "ASC",
-                } as PgOrderSpec);
+                const specOrSpecs = attributeOrSqlFragment(queryBuilder, info);
+                const specs = Array.isArray(specOrSpecs)
+                  ? specOrSpecs
+                  : [specOrSpecs];
+                specs.forEach((spec) => {
+                  queryBuilder.orderBy({
+                    nulls: ascendingNulls,
+                    nullable,
+                    ...spec,
+                    direction: "ASC",
+                  } as PgOrderSpec);
+                });
                 if (unique) {
                   queryBuilder.setOrderIsUnique();
                 }
@@ -216,12 +226,18 @@ export function orderByAscDesc(
                 queryBuilder: PgSelectQueryBuilder,
                 info: { scope: unknown },
               ) {
-                queryBuilder.orderBy({
-                  nulls: descendingNulls,
-                  nullable,
-                  ...attributeOrSqlFragment(queryBuilder, info),
-                  direction: "DESC",
-                } as PgOrderSpec);
+                const specOrSpecs = attributeOrSqlFragment(queryBuilder, info);
+                const specs = Array.isArray(specOrSpecs)
+                  ? specOrSpecs
+                  : [specOrSpecs];
+                specs.forEach((spec) => {
+                  queryBuilder.orderBy({
+                    nulls: descendingNulls,
+                    nullable,
+                    ...spec,
+                    direction: "DESC",
+                  } as PgOrderSpec);
+                });
                 if (unique) {
                   queryBuilder.setOrderIsUnique();
                 }

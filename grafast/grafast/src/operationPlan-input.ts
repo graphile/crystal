@@ -58,6 +58,46 @@ export function withFieldArgsForArguments<T extends Step>(
   const applied = new Map<string, Step>();
   let autoApplyDisabled = false;
 
+  function getRaw(): Step;
+  function getRaw<TKey extends string>(path: TKey): Step;
+  function getRaw(path: ReadonlyArray<string | number>): AnyInputStep;
+  function getRaw(
+    path?: string | ReadonlyArray<string | number>,
+  ): AnyInputStep | Step {
+    return operationPlan.withRootLayerPlan(() => {
+      assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
+      if (path === undefined) {
+        return object(trackedArguments);
+      } else if (typeof path === "string") {
+        return trackedArguments[path];
+      } else if (Array.isArray(path)) {
+        const [first, ...rest] = path;
+        if (!first) {
+          throw new Error(`getRaw() must be called with a non-empty path`);
+        }
+        let $entry = trackedArguments[first];
+        for (const pathSegment of rest) {
+          if (typeof pathSegment === "number" && "at" in $entry) {
+            $entry = $entry.at(pathSegment);
+          } else if ("get" in $entry) {
+            $entry = ($entry.get as any)(pathSegment);
+          } else {
+            throw new Error(
+              `'getRaw' path must only relate to input objects right now; path was: '${path}' (failed at '${pathSegment}')`,
+            );
+          }
+        }
+        return $entry;
+      } else {
+        throw new Error(
+          `Invalid path passed to FieldArgs.getRaw(); please check your code. Path: ${inspect(
+            path,
+          )}`,
+        );
+      }
+    });
+  }
+
   const fieldArgs: FieldArgs = {
     typeAt(path) {
       if (typeof path === "string") {
@@ -111,40 +151,7 @@ export function withFieldArgsForArguments<T extends Step>(
         return type;
       }
     },
-    getRaw(path?: string | ReadonlyArray<string | number>) {
-      return operationPlan.withRootLayerPlan(() => {
-        assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
-        if (path === undefined) {
-          return object(trackedArguments);
-        } else if (typeof path === "string") {
-          return trackedArguments[path];
-        } else if (Array.isArray(path)) {
-          const [first, ...rest] = path;
-          if (!first) {
-            throw new Error(`getRaw() must be called with a non-empty path`);
-          }
-          let $entry = trackedArguments[first];
-          for (const pathSegment of rest) {
-            if (typeof pathSegment === "number" && "at" in $entry) {
-              $entry = $entry.at(pathSegment);
-            } else if ("get" in $entry) {
-              $entry = ($entry.get as any)(pathSegment);
-            } else {
-              throw new Error(
-                `'getRaw' path must only relate to input objects right now; path was: '${path}' (failed at '${pathSegment}')`,
-              );
-            }
-          }
-          return $entry;
-        } else {
-          throw new Error(
-            `Invalid path passed to FieldArgs.getRaw(); please check your code. Path: ${inspect(
-              path,
-            )}`,
-          );
-        }
-      });
-    },
+    getRaw,
     getBaked(inPath: string | ReadonlyArray<string | number>) {
       return operationPlan.withRootLayerPlan(() => {
         const path = typeof inPath === "string" ? [inPath] : inPath;

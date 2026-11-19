@@ -15,8 +15,8 @@ import {
   SubscriptionPlugin,
 } from "graphile-build";
 
-import type { NullabilitySpecString } from "../src/index.ts";
-import { changeNullability, extendSchema, gql } from "../src/index.ts";
+import type { NullabilitySpecString } from "../dist/index.js";
+import { changeNullability, extendSchema, gql } from "../dist/index.js";
 
 const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
   buildSchema(

@@ -112,6 +112,21 @@ declare global {
       pgRegistry: PgRegistry;
     }
 
+    interface BuildInputScopedExtensions<TScope extends keyof PluginScopes> {
+      pgRegistry: [PluginScopes[TScope]] extends [never]
+        ? PgRegistry
+        : PluginScopes[TScope] extends {
+              pgRegistry: infer TRegistry extends PgRegistry<
+                any,
+                any,
+                any,
+                any
+              >;
+            }
+          ? TRegistry
+          : PgRegistry;
+    }
+
     interface SchemaOptions {
       /**
        * What to expose when we see a partitioned table (or its child partitions).
@@ -181,6 +196,7 @@ declare global {
          */
         // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         persistence?: "p" | "u" | "t" | (string & {}) | null;
+        typeModifier?: string | number | null;
       };
     }
   }
