@@ -24,16 +24,6 @@ where
   )
 order by __messages__."id" asc;
 
-select
-  (count(*))::text as "0"
-from app_public.messages as __messages__
-where
-  (
-    __messages__."forum_id" = $1::"uuid"
-  ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
-  );
-
 with __users_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
@@ -52,3 +42,13 @@ lateral (
       true /* authorization checks */
     )
 ) as __users_result__;
+
+select
+  (count(*))::text as "0"
+from app_public.messages as __messages__
+where
+  (
+    __messages__."forum_id" = $1::"uuid"
+  ) and (
+    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
+  );
