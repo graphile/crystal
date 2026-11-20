@@ -91,6 +91,7 @@ function resolveOptions(
 
 export class PgCondition<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
+    TAttribute extends string = string,
   >
   extends Modifier<TParent>
   implements PgConditionCapableParent, PgConditionLike
@@ -100,7 +101,7 @@ export class PgCondition<
     exportName: "PgCondition",
   };
 
-  private conditions: PgWhereConditionSpec<any>[] = [];
+  private conditions: PgWhereConditionSpec<TAttribute>[] = [];
   private havingConditions: PgHavingConditionSpec<any>[] = [];
   private minimumConditionsLength = 0;
 
@@ -178,29 +179,32 @@ export class PgCondition<
   }
 
   orPlan() {
-    return new PgCondition(this, this.isHaving, "OR");
+    return new PgCondition<this, TAttribute>(this, this.isHaving, "OR");
   }
 
   andPlan() {
-    return new PgCondition(this, this.isHaving, "AND");
+    return new PgCondition<this, TAttribute>(this, this.isHaving, "AND");
   }
 
   notPlan() {
-    return new PgCondition(this, this.isHaving, "NOT");
+    return new PgCondition<this, TAttribute>(this, this.isHaving, "NOT");
   }
 
-  existsPlan(options: Omit<PgConditionModeExists, "mode">) {
+  /** The subquery has its own attribute names. */
+  existsPlan<TExistsAttribute extends string = string>(
+    options: Omit<PgConditionModeExists, "mode">,
+  ) {
     if (this.isHaving) {
       // Is this true?
       throw new Error(`EXISTS inside having is currently unsupported`);
     }
-    return new PgCondition(this, this.isHaving, {
+    return new PgCondition<this, TExistsAttribute>(this, this.isHaving, {
       ...options,
       mode: "EXISTS",
     });
   }
 
-  where(condition: PgWhereConditionSpec<any>): void {
+  where(condition: PgWhereConditionSpec<TAttribute>): void {
     if (this.isHaving) {
       throw new Error(`Cannot call .where() on a 'having' condition`);
     }

@@ -74,6 +74,75 @@ function typecheckGeneratedHelpers() {
     },
   );
 
+  addPgTableCondition("public.users", "matchesId", () => ({
+    type: GraphQLInt,
+    apply(condition) {
+      const spec = {
+        type: "attribute",
+        attribute: "id",
+        callback: (fragment: ReturnType<typeof sql>) => sql`${fragment} > 0`,
+      } as const;
+      condition.where(spec);
+      condition.where(sql`true`);
+      // @ts-expect-error The attribute must belong to users.
+      condition.where({ ...spec, attribute: "missing" });
+      const nested = condition.andPlan().orPlan().notPlan();
+      nested.where(spec);
+      // @ts-expect-error Boolean conditions share the table's attributes.
+      nested.where({ ...spec, attribute: "missing" });
+      condition
+        .existsPlan({ tableExpression: sql.identifier("other") })
+        .where({ ...spec, attribute: "other_id" });
+    },
+  }));
+
+  addPgTableCondition<"generatedHelpersTest", number, "main.public.users">(
+    "main.public.users",
+    "explicitScope",
+    () => ({
+      type: GraphQLInt,
+      extensions: {
+        grafast: {
+          apply(condition, value) {
+            const input: number = value;
+            condition.where({
+              type: "attribute",
+              // @ts-expect-error The extension callback has the same attributes.
+              attribute: "missing",
+              callback: (fragment) => fragment,
+            });
+          },
+        },
+      },
+    }),
+  );
+
+  addPgTableCondition(
+    "public.users",
+    "legacy",
+    () => ({ type: GraphQLInt }),
+    (_value, { condition }) => {
+      condition.where({
+        type: "attribute",
+        // @ts-expect-error The deprecated callback has the same attributes.
+        attribute: "missing",
+        callback: (fragment) => fragment,
+      });
+      return null;
+    },
+  );
+
+  addPgTableCondition("untyped.users", "matchesId", () => ({
+    type: GraphQLInt,
+    apply(condition) {
+      condition.where({
+        type: "attribute",
+        attribute: "any_attribute",
+        callback: (fragment) => fragment,
+      });
+    },
+  }));
+
   addPgTableOrderBy("public.users", (_build, orderBy) => {
     orderBy("ID", "id");
     // @ts-expect-error Only attributes of users are accepted.
