@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PgCodec, PgRegistry, PgResource } from "@dataplan/pg";
-import { TYPES } from "@dataplan/pg";
+import { sql, TYPES } from "@dataplan/pg";
 import { GraphQLInt } from "grafast/graphql";
 
 import {
@@ -87,6 +87,15 @@ function typecheckGeneratedHelpers() {
   // @ts-expect-error Callback results must also reference valid attributes.
   orderByAscDesc<UserResource>("MISSING", () => ({ attribute: "missing" }));
   orderByAscDesc("UNTYPED", "any_attribute");
+  orderByAscDesc("UNTYPED_CALLBACK", () => ({
+    attribute: "any_attribute",
+    nulls: "LAST",
+  }));
+  orderByAscDesc("UNTYPED_FRAGMENT", (queryBuilder) => ({
+    fragment: sql`${queryBuilder.alias}.any_attribute`,
+    codec: TYPES.int,
+    nulls: "FIRST",
+  }));
 }
 
 it("preserves callback arrays for typed ordering helpers", () => {
