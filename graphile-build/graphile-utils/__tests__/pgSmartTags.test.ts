@@ -15,7 +15,7 @@ import { makeSchema, watchSchema } from "postgraphile";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import { jsonPgSmartTags, pgSmartTags } from "../dist/index.js";
+import { jsonPgSmartTags, pgSmartTags, scopedUtils } from "../dist/index.js";
 import {
   type PgSmartTagRule,
   pgSmartTagRulesFromJSON,
@@ -60,7 +60,10 @@ function _typecheckScopedJsonPgSmartTags(): void {
     },
   });
 
-  jsonPgSmartTags<"pgSmartTagsTypecheck">({
+  const { jsonPgSmartTags: scopedJsonPgSmartTags } = scopedUtils(
+    "pgSmartTagsTypecheck",
+  );
+  scopedJsonPgSmartTags({
     version: 1,
     config: {
       procedure: {

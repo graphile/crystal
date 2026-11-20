@@ -53,6 +53,7 @@ function typecheckGeneratedHelpers() {
     addPgTableOrderBy: addApiOrderBy,
     extendSchema,
     wrapPlans,
+    processSchema,
   } = scopedUtils("generatedHelpersTest");
 
   extendSchema((build) => {
@@ -64,7 +65,7 @@ function typecheckGeneratedHelpers() {
     return {};
   });
 
-  processSchema<"generatedHelpersTest">((schema, build, context) => {
+  processSchema((schema, build, context) => {
     const registry: TestRegistry = build.input.pgRegistry;
     const finalizeContext: GraphileBuild.ContextFinalize = context;
     // @ts-expect-error The generated registry marker is a boolean, not a string.
@@ -78,14 +79,14 @@ function typecheckGeneratedHelpers() {
     return schema;
   });
 
-  addPgTableCondition<"generatedHelpersTest", number>(
+  addApiCondition(
     "public.users",
     "minimumId",
     (build) => {
       const registry: TestRegistry = build.input.pgRegistry;
       return {
         type: GraphQLInt,
-        apply(_$condition, value) {
+        apply(_$condition, value: number) {
           const input: number = value;
           // @ts-expect-error The input value is numeric.
           const invalid: string = value;
@@ -142,26 +143,22 @@ function typecheckGeneratedHelpers() {
     };
   });
 
-  addPgTableCondition<"generatedHelpersTest", number, "main.public.users">(
-    "main.public.users",
-    "explicitScope",
-    () => ({
-      type: GraphQLInt,
-      extensions: {
-        grafast: {
-          apply(condition, value) {
-            const input: number = value;
-            condition.where({
-              type: "attribute",
-              // @ts-expect-error The extension callback has the same attributes.
-              attribute: "missing",
-              callback: (fragment) => fragment,
-            });
-          },
+  addApiCondition("main.public.users", "explicitScope", () => ({
+    type: GraphQLInt,
+    extensions: {
+      grafast: {
+        apply(condition, value: number) {
+          const input: number = value;
+          condition.where({
+            type: "attribute",
+            // @ts-expect-error The extension callback has the same attributes.
+            attribute: "missing",
+            callback: (fragment) => fragment,
+          });
         },
       },
-    }),
-  );
+    },
+  }));
 
   addPgTableCondition(
     "public.users",
@@ -250,15 +247,12 @@ function typecheckGeneratedHelpers() {
   // @ts-expect-error Only scopes declared in PluginScopes are accepted.
   scopedUtils("unknownScope");
 
-  addPgTableOrderBy<"generatedHelpersTest", "main.public.users">(
-    "main.public.users",
-    (build, orderBy) => {
-      const registry: TestRegistry = build.input.pgRegistry;
-      // @ts-expect-error An explicit scope and match resolve the resource.
-      orderBy("MISSING", "missing");
-      return orderBy("ID", "id");
-    },
-  );
+  addApiOrderBy("main.public.users", (build, orderBy) => {
+    const registry: TestRegistry = build.input.pgRegistry;
+    // @ts-expect-error The scoped helper resolves a service-qualified table match.
+    orderBy("MISSING", "missing");
+    return orderBy("ID", "id");
+  });
 
   addPgTableOrderBy("untyped.users", (_build, orderBy) =>
     orderBy("UNTYPED", () => ({ attribute: "any_attribute", nulls: "LAST" })),
