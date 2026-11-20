@@ -32,45 +32,11 @@ type ConditionFieldConfig<TCondition, TValue> = Omit<
   };
 };
 
-type ConditionFieldSpecGenerator<
-  TScope extends keyof GraphileBuild.PluginScopes,
-  TValue,
-  TMatch extends ScopedTableMatch<TScope>,
-> = (
-  build: GraphileBuild.ScopedBuild<TScope>,
-) => ConditionFieldConfig<TableCondition<TScope, TMatch>, TValue>;
-
-type ConditionGenerator<
-  TScope extends keyof GraphileBuild.PluginScopes,
-  TValue,
-  TMatch extends ScopedTableMatch<TScope>,
-> = (
-  value: TValue,
-  helpers: {
-    sql: typeof sql;
-    sqlTableAlias: SQL;
-    sqlValueWithCodec: typeof sqlValueWithCodec;
-    // The build must be pruned before it can be exported.
-    build: PrunedBuild<TScope>;
-    /** @internal */
-    condition: TableCondition<TScope, TMatch>;
-  },
-) => SQL | null | undefined;
-
 export type TableConditionArgs<
   TScope extends keyof GraphileBuild.PluginScopes,
   TValue,
   TMatch extends ScopedTableMatch<TScope>,
-> = [
-  match: TMatch,
-  conditionFieldName: string,
-  conditionFieldSpecGenerator: ConditionFieldSpecGenerator<
-    TScope,
-    TValue,
-    TMatch
-  >,
-  conditionGenerator?: ConditionGenerator<TScope, TValue, TMatch>,
-];
+> = Parameters<typeof addPgTableCondition<TScope, TValue, TMatch>>;
 
 /** Adds a condition typed to the matched table's generated resource. */
 export function addPgTableCondition<
@@ -80,13 +46,22 @@ export function addPgTableCondition<
 >(
   match: TMatch,
   conditionFieldName: string,
-  conditionFieldSpecGenerator: ConditionFieldSpecGenerator<
-    TScope,
-    TValue,
-    TMatch
-  >,
+  conditionFieldSpecGenerator: (
+    build: GraphileBuild.ScopedBuild<TScope>,
+  ) => ConditionFieldConfig<TableCondition<TScope, TMatch>, TValue>,
   // DEPRECATED! Use `apply` instead.
-  conditionGenerator?: ConditionGenerator<TScope, TValue, TMatch>,
+  conditionGenerator?: (
+    value: TValue,
+    helpers: {
+      sql: typeof sql;
+      sqlTableAlias: SQL;
+      sqlValueWithCodec: typeof sqlValueWithCodec;
+      // The build must be pruned before it can be exported.
+      build: PrunedBuild<TScope>;
+      /** @internal */
+      condition: TableCondition<TScope, TMatch>;
+    },
+  ) => SQL | null | undefined,
 ): GraphileConfig.Plugin {
   const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;

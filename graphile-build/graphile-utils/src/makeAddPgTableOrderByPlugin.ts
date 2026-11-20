@@ -42,22 +42,10 @@ export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
 }
 
-type OrdersGenerator<
-  TScope extends keyof GraphileBuild.PluginScopes,
-  TMatch extends ScopedTableMatch<TScope>,
-> = (
-  build: GraphileBuild.ScopedBuild<TScope>,
-  orderBy: typeof orderByAscDesc<TableResource<TScope, TMatch>>,
-) => MakeAddPgTableOrderByPluginOrders;
-
 export type TableOrderByArgs<
   TScope extends keyof GraphileBuild.PluginScopes,
   TMatch extends ScopedTableMatch<TScope>,
-> = [
-  match: TMatch,
-  ordersGenerator: OrdersGenerator<TScope, TMatch>,
-  hint?: string,
-];
+> = Parameters<typeof addPgTableOrderBy<TScope, TMatch>>;
 
 const counterByName = new Map<string, number>();
 
@@ -67,7 +55,10 @@ export function addPgTableOrderBy<
   const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
 >(
   match: TMatch,
-  ordersGenerator: OrdersGenerator<TScope, TMatch>,
+  ordersGenerator: (
+    build: GraphileBuild.ScopedBuild<TScope>,
+    orderBy: typeof orderByAscDesc<TableResource<TScope, TMatch>>,
+  ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
   const { serviceName, schemaName, tableName } = resolveTableMatch(match);
