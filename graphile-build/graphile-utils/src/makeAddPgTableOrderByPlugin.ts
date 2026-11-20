@@ -45,6 +45,9 @@ export interface MakeAddPgTableOrderByPluginOrders {
 const counterByName = new Map<string, number>();
 
 /**
+ * Adds `orderBy:` enum values for the given table, allowing you to add custom
+ * ordering criteria to existing tables.
+ *
  * The callback's order helper is typed to the table when generated resource
  * types are available. With an explicit scope type argument, also specify the
  * match type to retain table-specific inference.
