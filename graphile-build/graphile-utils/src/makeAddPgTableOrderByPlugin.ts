@@ -125,7 +125,7 @@ export function orderByAscDesc<
   >,
 >(
   baseName: string,
-  attributeOrSqlFragment: OrderBySpecIdentity<TResource>,
+  attributeOrSqlFragment: NoInfer<OrderBySpecIdentity<TResource>>,
   uniqueOrOptions?: boolean | OrderByAscDescOptions,
 ): MakeAddPgTableOrderByPluginOrders;
 export function orderByAscDesc(
