@@ -102,6 +102,7 @@ export const PgRegistryReductionPlugin: GraphileConfig.Plugin = {
   description:
     "[EXPERIMENTAL] Strips extensions from pgRegistry to reduce export size",
   version,
+  provides: ["minify"],
 
   // **IMPORTANT**: this is a _schema_ hook not a _gather_ hook because if we
   // trim these things out during the gather phase before we build the schema,
