@@ -32,6 +32,31 @@ type ConditionFieldConfig<TCondition, TValue> = Omit<
   };
 };
 
+type ConditionFieldSpecGenerator<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TValue,
+  TMatch extends ScopedTableMatch<TScope>,
+> = (
+  build: GraphileBuild.ScopedBuild<TScope>,
+) => ConditionFieldConfig<TableCondition<TScope, TMatch>, TValue>;
+
+type ConditionGenerator<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TValue,
+  TMatch extends ScopedTableMatch<TScope>,
+> = (
+  value: TValue,
+  helpers: {
+    sql: typeof sql;
+    sqlTableAlias: SQL;
+    sqlValueWithCodec: typeof sqlValueWithCodec;
+    // The build must be pruned before it can be exported.
+    build: PrunedBuild<TScope>;
+    /** @internal */
+    condition: TableCondition<TScope, TMatch>;
+  },
+) => SQL | null | undefined;
+
 export type TableConditionArgs<
   TScope extends keyof GraphileBuild.PluginScopes,
   TValue,
@@ -39,23 +64,12 @@ export type TableConditionArgs<
 > = [
   match: TMatch,
   conditionFieldName: string,
-  conditionFieldSpecGenerator: (
-    build: GraphileBuild.ScopedBuild<TScope>,
-  ) => ConditionFieldConfig<TableCondition<TScope, TMatch>, TValue>,
-  // DEPRECATED! Use `apply` instead.
-  conditionGenerator?: (
-    value: TValue,
-    helpers: {
-      sql: typeof sql;
-      sqlTableAlias: SQL;
-      sqlValueWithCodec: typeof sqlValueWithCodec;
-      // We can't afford to make the entire of build EXPORTABLE, and people
-      // really ought to move to using the `apply` method, so...
-      build: PrunedBuild<TScope>;
-      /** @internal We might expose this in future if needed */
-      condition: TableCondition<TScope, TMatch>;
-    },
-  ) => SQL | null | undefined,
+  conditionFieldSpecGenerator: ConditionFieldSpecGenerator<
+    TScope,
+    TValue,
+    TMatch
+  >,
+  conditionGenerator?: ConditionGenerator<TScope, TValue, TMatch>,
 ];
 
 /** Adds a condition typed to the matched table's generated resource. */
@@ -64,12 +78,15 @@ export function addPgTableCondition<
   TValue = any,
   const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
 >(
-  ...[
-    match,
-    conditionFieldName,
-    conditionFieldSpecGenerator,
-    conditionGenerator,
-  ]: TableConditionArgs<TScope, TValue, TMatch>
+  match: TMatch,
+  conditionFieldName: string,
+  conditionFieldSpecGenerator: ConditionFieldSpecGenerator<
+    TScope,
+    TValue,
+    TMatch
+  >,
+  // DEPRECATED! Use `apply` instead.
+  conditionGenerator?: ConditionGenerator<TScope, TValue, TMatch>,
 ): GraphileConfig.Plugin {
   const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
