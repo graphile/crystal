@@ -72,6 +72,11 @@ export const SwallowAllErrorsPlugin: GraphileConfig.Plugin = {
   },
 };
 
+// Opt the integration fixtures into multipass independently of the production default.
+export const MultipassIntrospectionPreset: GraphileConfig.Preset = {
+  gather: { pgMultipassIntrospection: true },
+};
+
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
  * If UPDATE_SNAPSHOTS is set then we'll write updated snapshots, otherwise
@@ -338,7 +343,7 @@ export async function runTestQuery(
   );
 
   const preset: GraphileConfig.Preset = {
-    extends: [AmberPreset, ...presets],
+    extends: [AmberPreset, MultipassIntrospectionPreset, ...presets],
     plugins: [
       StreamDeferPlugin,
       ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),

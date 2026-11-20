@@ -75,7 +75,7 @@ function makeContext(
 afterEach(() => jest.restoreAllMocks());
 
 test("ignores a missing foreign table outside the configured schemas", async () => {
-  const { info, introspection } = makeContext();
+  const { info, introspection } = makeContext({ multipass: true });
   const log = jest.spyOn(console, "error").mockImplementation(() => {});
   await hook(info as never, { serviceName: "main", introspection } as never);
   expect(log).not.toHaveBeenCalled();
@@ -83,7 +83,10 @@ test("ignores a missing foreign table outside the configured schemas", async () 
 });
 
 test("logs a missing foreign table in a configured schema", async () => {
-  const { info, introspection } = makeContext({ schemas: ["app", "private"] });
+  const { info, introspection } = makeContext({
+    schemas: ["app", "private"],
+    multipass: true,
+  });
   const log = jest.spyOn(console, "error").mockImplementation(() => {});
   await hook(info as never, { serviceName: "main", introspection } as never);
   expect(log).toHaveBeenCalledWith(
@@ -94,15 +97,21 @@ test("logs a missing foreign table in a configured schema", async () => {
   expect(introspection.constraints).toHaveLength(0);
 });
 
-test("retains the missing-table error in single-pass mode", async () => {
-  const { info, introspection } = makeContext({ multipass: false });
-  await expect(
-    hook(info as never, { serviceName: "main", introspection } as never),
-  ).rejects.toThrow(/referenced non-existent table\/view 'private.parent'/);
-});
+test.each([undefined, false])(
+  "retains the missing-table error in single-pass mode (option: %s)",
+  async (multipass) => {
+    const { info, introspection } = makeContext({ multipass });
+    await expect(
+      hook(info as never, { serviceName: "main", introspection } as never),
+    ).rejects.toThrow(/referenced non-existent table\/view 'private.parent'/);
+  },
+);
 
 test("creates the constraint when the external target was discovered", async () => {
-  const { info, introspection } = makeContext({ target: true });
+  const { info, introspection } = makeContext({
+    multipass: true,
+    target: true,
+  });
   await hook(info as never, { serviceName: "main", introspection } as never);
   expect(introspection.constraints).toHaveLength(1);
   expect(introspection.constraints[0].confrelid).toBe("2");
@@ -113,6 +122,7 @@ test.each([{ schemas: ["app"] }, { schemas: ["app", "private"] }])(
   async ({ schemas }) => {
     const { info, introspection } = makeContext({
       schemas,
+      multipass: true,
       target: true,
       targetAttributes: false,
     });
