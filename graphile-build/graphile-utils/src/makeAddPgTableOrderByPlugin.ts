@@ -49,7 +49,6 @@ export type TableOrderByArgs<
 
 const counterByName = new Map<string, number>();
 
-/** Adds custom ordering for a table using its generated resource types. */
 export function addPgTableOrderBy<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
   const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,

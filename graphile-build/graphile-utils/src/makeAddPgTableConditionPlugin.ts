@@ -38,7 +38,6 @@ export type TableConditionArgs<
   TMatch extends ScopedTableMatch<TScope>,
 > = Parameters<typeof addPgTableCondition<TScope, TValue, TMatch>>;
 
-/** Adds a condition typed to the matched table's generated resource. */
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
   TValue = any,
