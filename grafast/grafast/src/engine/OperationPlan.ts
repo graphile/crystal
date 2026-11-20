@@ -1789,6 +1789,10 @@ export class OperationPlan {
         LayerPlan,
         Map<Step, Array<PolymorphicPlanObjectTypeDetails>>
       >();
+      const partitionedFieldEntriesByStep = new Map<
+        Step,
+        Array<PlanFieldReturnTypeDetails>
+      >();
       for (const entry of batch) {
         const [method, rawArgs] = entry;
 
@@ -1831,6 +1835,46 @@ export class OperationPlan {
             list = [args];
             planFieldReturnTypeEntriesByStep.set(step, list);
           }
+        } else if (method === this.planFieldReturnType) {
+          const args = rawArgs as PlanFieldReturnTypeDetails;
+          const nullableType = getNullableType(args.positionType);
+          if (
+            args.layerPlan.reason.type === "polymorphicPartition" &&
+            !isScalarType(nullableType) &&
+            !isEnumType(nullableType)
+          ) {
+            const step = args.parentStep;
+            const list = partitionedFieldEntriesByStep.get(step);
+            if (list) {
+              list.push(args);
+            } else {
+              partitionedFieldEntriesByStep.set(step, [args]);
+            }
+          }
+        }
+      }
+
+      // A field planned directly in several polymorphic partitions to the
+      // same step (for example a field of the interface that every type
+      // plans to the same step) has its return type planned in the combined
+      // layer plan of those partitions, so its nullable boundaries, list
+      // items and nested polymorphism are not repeated per partition. A step
+      // shared deeper (beneath a field each type plans to its own step) is
+      // not combined here.
+      for (const entries of partitionedFieldEntriesByStep.values()) {
+        const layerPlans = new Set<LayerPlan>();
+        for (const entry of entries) {
+          layerPlans.add(entry.layerPlan);
+        }
+        if (layerPlans.size < 2) {
+          continue;
+        }
+        // Sibling partitions can only share a step that lives above them, so
+        // the step remains available in the combined layer plan.
+        const combinedLayerPlan =
+          this.getCombinedLayerPlanForLayerPlans(layerPlans);
+        for (const entry of entries) {
+          entry.layerPlan = combinedLayerPlan;
         }
       }
 
