@@ -38,17 +38,31 @@ const eachCallbackForListPlan = (
   return result;
 };
 
-function eachOptimize(this: __ListTransformStep<any>) {
+/**
+ * True if the mapper doesn't do anything in our own subroutine (it's applied
+ * to each item in the consuming list's layer plan instead), so our list is
+ * our list step's list, unchanged.
+ */
+function eachYieldsListStep(this: __ListTransformStep<any>) {
   const layerPlan = this.subroutineLayer;
   const rootStep = layerPlan.rootStep;
-  if (
+  return (
     rootStep instanceof __ItemStep &&
     rootStep.getParentStep().layerPlan !== layerPlan
-  ) {
+  );
+}
+
+function eachOptimize(this: __ListTransformStep<any>) {
+  if (eachYieldsListStep.call(this)) {
     // We don't do anything; replace ourself with our parent
     return this.getListStep();
   }
   return this;
+}
+
+function eachStreamSourceDepIndex(this: __ListTransformStep<any>) {
+  // A stream of our list step's list is a stream of ours.
+  return eachYieldsListStep.call(this) ? this.listStepDepId : null;
 }
 
 /**
@@ -69,7 +83,7 @@ export function each<
       : Step<TListStep extends Step<Maybe<ReadonlyArray<infer U>>> ? U : any>,
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {
-  return listTransform<any, any, any, any>({
+  const $each = listTransform<any, any, any, any>({
     listStep,
     itemPlanCallback: eachItemPlanCallback,
     initialState: eachInitialState,
@@ -98,6 +112,8 @@ export function each<
         }
       : null),
   });
+  $each.streamSourceDepIndex = eachStreamSourceDepIndex;
+  return $each;
 }
 
 export function isSkippableEach($step: Step): $step is __ListTransformStep {

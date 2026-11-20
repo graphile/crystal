@@ -90,7 +90,8 @@ export class __ListTransformStep<
   // OPTIMIZE: if all the steps in the inner bucket are synchronous then theoretically we can be synchronous too
   isSyncAndSafe = false;
 
-  private listStepDepId: number;
+  /** @internal */
+  public readonly listStepDepId: number;
   private rawListStepRefId: number | null;
   public itemPlanCallback: ListTransformItemPlanCallback<
     ItemsStep<TListStep>,

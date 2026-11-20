@@ -1,0 +1,36 @@
+[
+  {
+    data: {
+      allPeople: {
+        nodes: [
+          {
+            id: 1,
+          },
+        ],
+        pageInfo: {
+          hasNextPage: true,
+        },
+      },
+    },
+  },
+  {
+    data: {
+      id: 2,
+    },
+    path: [
+      "allPeople",
+      "nodes",
+      1,
+    ],
+  },
+  {
+    data: {
+      id: 3,
+    },
+    path: [
+      "allPeople",
+      "nodes",
+      2,
+    ],
+  },
+]

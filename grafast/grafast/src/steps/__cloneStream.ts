@@ -17,6 +17,10 @@ export class __CloneStreamStep extends Step {
   [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
   }
+  /** We yield (a clone of) our dependency's list. */
+  streamSourceDepIndex(): number {
+    return 0;
+  }
   listItem($item: __ItemStep<any>): Step {
     const $dep = this.getDepOptions(0).step as Step &
       Partial<ListCapableStep<any, any, any>>;

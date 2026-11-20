@@ -1,0 +1,38 @@
+[
+  {
+    data: {
+      sharedPeople: {
+        streamed: [
+          {
+            id: 1,
+          },
+        ],
+        plain: {
+          pageInfo: {
+            hasNextPage: true,
+          },
+        },
+      },
+    },
+  },
+  {
+    data: {
+      id: 2,
+    },
+    path: [
+      "sharedPeople",
+      "streamed",
+      1,
+    ],
+  },
+  {
+    data: {
+      id: 3,
+    },
+    path: [
+      "sharedPeople",
+      "streamed",
+      2,
+    ],
+  },
+]
