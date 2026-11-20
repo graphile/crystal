@@ -1,5 +1,5 @@
-import type {} from "graphile-build";
 import type { PgResource } from "@dataplan/pg";
+import type {} from "graphile-build";
 
 import {
   type IdentifierPart,
