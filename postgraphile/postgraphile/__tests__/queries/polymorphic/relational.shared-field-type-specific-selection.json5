@@ -1,0 +1,332 @@
+{
+  allRelationalItems: {
+    nodes: [
+      {
+        __typename: "RelationalTopic",
+        id: 1,
+        personByAuthorId: {
+          username: "Benjie",
+          personId: 2,
+        },
+        position: "0",
+        relationalItemsByParentId: {
+          nodes: [
+            {
+              __typename: "RelationalDivider",
+              id: 3,
+            },
+            {
+              __typename: "RelationalPost",
+              id: 4,
+            },
+            {
+              __typename: "RelationalPost",
+              id: 5,
+            },
+            {
+              __typename: "RelationalPost",
+              id: 6,
+            },
+            {
+              __typename: "RelationalPost",
+              id: 7,
+            },
+            {
+              __typename: "RelationalDivider",
+              id: 8,
+            },
+            {
+              __typename: "RelationalPost",
+              id: 9,
+            },
+            {
+              __typename: "RelationalTopic",
+              id: 10,
+            },
+          ],
+        },
+      },
+      {
+        __typename: "RelationalTopic",
+        id: 2,
+        personByAuthorId: {
+          username: "Alice",
+          personId: 1,
+        },
+        position: "0",
+        relationalItemsByParentId: {
+          nodes: [
+            {
+              __typename: "RelationalPost",
+              id: 15,
+            },
+          ],
+        },
+      },
+      {
+        __typename: "RelationalDivider",
+        id: 3,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "0",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 4,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "1",
+        title: "Better planning",
+        relationalItemsByParentId: {
+          nodes: [
+            {
+              __typename: "RelationalChecklist",
+              id: 16,
+            },
+          ],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 5,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "2",
+        title: "Easier to code",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 6,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "3",
+        title: "More features",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 7,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "4",
+        title: "Better performance",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalDivider",
+        id: 8,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "5",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 9,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "6",
+        title: "When have I ever committed to a timescale?",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalTopic",
+        id: 10,
+        personByAuthorId: {
+          username: "Benjie",
+          personId: 2,
+        },
+        position: "7",
+        relationalItemsByParentId: {
+          nodes: [
+            {
+              __typename: "RelationalTopic",
+              id: 11,
+            },
+          ],
+        },
+      },
+      {
+        __typename: "RelationalTopic",
+        id: 11,
+        personByAuthorId: {
+          username: "Benjie",
+          personId: 2,
+        },
+        position: "0",
+        relationalItemsByParentId: {
+          nodes: [
+            {
+              __typename: "RelationalPost",
+              id: 12,
+            },
+            {
+              __typename: "RelationalPost",
+              id: 13,
+            },
+            {
+              __typename: "RelationalPost",
+              id: 14,
+            },
+          ],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 12,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "0",
+        title: "Fix legacy issues",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 13,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "1",
+        title: "Full TypeScript conversion",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 14,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "2",
+        title: "Monorepo",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalPost",
+        id: 15,
+        personByAuthorId: {
+          username: "Alice",
+        },
+        position: "0",
+        title: "Just a test",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalChecklist",
+        id: 16,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "0",
+        relationalItemsByParentId: {
+          nodes: [
+            {
+              __typename: "RelationalChecklistItem",
+              id: 17,
+            },
+            {
+              __typename: "RelationalChecklistItem",
+              id: 18,
+            },
+            {
+              __typename: "RelationalChecklistItem",
+              id: 19,
+            },
+            {
+              __typename: "RelationalChecklistItem",
+              id: 20,
+            },
+            {
+              __typename: "RelationalChecklistItem",
+              id: 21,
+            },
+          ],
+        },
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 17,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "0",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 18,
+        personByAuthorId: {
+          username: "Caroline",
+        },
+        position: "1",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 19,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "2",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 20,
+        personByAuthorId: {
+          username: "Benjie",
+        },
+        position: "3",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 21,
+        personByAuthorId: {
+          username: "Alice",
+        },
+        position: "4",
+        relationalItemsByParentId: {
+          nodes: [],
+        },
+      },
+    ],
+  },
+}
