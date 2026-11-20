@@ -8,7 +8,8 @@ import type {
 import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
-import type { ScopedTableMatch } from "./resolveTableMatch.ts";
+import type { IdentifierPart } from "./parseIdentifierParts.ts";
+import type { ScopedTableMatch, TableMatch } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 type ArrayOrDirect<T> = T | Array<T>;
@@ -42,14 +43,84 @@ export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
 }
 
+type AnyPgResource = PgResource<any, any, any, any, any, any, any>;
+
+type MatchService<TMatch extends TableMatch> =
+  | IdentifierPart<NonNullable<TMatch["serviceName"]>>
+  | (undefined extends TMatch["serviceName"] ? "main" : never);
+
+type QualifiedTableMatch<TMatch> = TMatch extends TableMatch
+  ? `${"serviceName" extends keyof TMatch ? MatchService<TMatch> : "main"}.${IdentifierPart<TMatch["schemaName"]>}.${IdentifierPart<TMatch["tableName"]>}`
+  : TMatch;
+
+type TableResourcesByIdentifier<TTables> = {
+  [TTable in keyof TTables & string as IdentifierPart<TTable>]: TTables[TTable];
+};
+
+type TableResourceForSchema<
+  TMatch,
+  TSchema extends string,
+  TTables,
+> = TMatch extends `${IdentifierPart<TSchema>}.${infer TTable extends keyof TableResourcesByIdentifier<TTables> & string}`
+  ? TableResourcesByIdentifier<TTables>[TTable]
+  : never;
+
+type TableResourceForSchemas<TMatch, TSchemas> = {
+  [TSchema in keyof TSchemas & string]: TableResourceForSchema<
+    TMatch,
+    TSchema,
+    TSchemas[TSchema]
+  >;
+}[keyof TSchemas & string];
+
+type TableResourceForService<TMatch, TService extends string, TSchemas> =
+  | (TMatch extends `${IdentifierPart<TService>}.${infer TRest}`
+      ? TableResourceForSchemas<TRest, TSchemas>
+      : never)
+  | (TService extends "main"
+      ? TableResourceForSchemas<TMatch, TSchemas>
+      : never);
+
+type ResourceForTableMatch<TMatch, TServices> = TMatch extends string
+  ? {
+      [TService in keyof TServices & string]: TableResourceForService<
+        TMatch,
+        TService,
+        TServices[TService]
+      >;
+    }[keyof TServices & string] extends infer TResource
+    ? [TResource] extends [never]
+      ? AnyPgResource
+      : TResource extends AnyPgResource
+        ? TResource
+        : AnyPgResource
+    : never
+  : AnyPgResource;
+
+type TableResource<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TMatch,
+> = GraphileBuild.PluginScopes[TScope] extends {
+  pgTableResources: infer TServices;
+}
+  ? ResourceForTableMatch<QualifiedTableMatch<TMatch>, TServices>
+  : AnyPgResource;
+
 const counterByName = new Map<string, number>();
 
+/**
+ * The callback's order helper is typed to the table when generated resource
+ * types are available. With an explicit scope type argument, also specify the
+ * match type to retain table-specific inference.
+ */
 export function addPgTableOrderBy<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
+  const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
 >(
-  match: ScopedTableMatch<TScope>,
+  match: TMatch,
   ordersGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,
+    orderBy: typeof orderByAscDesc<TableResource<TScope, TMatch>>,
   ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
@@ -87,6 +158,7 @@ export function addPgTableOrderBy<
           }
           const newValues = ordersGenerator(
             build as GraphileBuild.ScopedBuild<TScope>,
+            orderByAscDesc<TableResource<TScope, TMatch>>,
           );
 
           return extend(values, newValues, hint);
