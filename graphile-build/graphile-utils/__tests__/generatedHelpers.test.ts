@@ -5,6 +5,7 @@ import { GraphQLInt } from "grafast/graphql";
 
 import {
   addPgTableCondition,
+  addPgTableOrderBy,
   orderByAscDesc,
   processSchema,
 } from "../dist/index.js";
@@ -16,10 +17,21 @@ type UserCodec = PgCodec<
 type UserResource = PgResource<"users", UserCodec>;
 type TestRegistry = PgRegistry & { generatedHelpersMarker: true };
 
+type TestTableResources = {
+  main: { public: { users: UserResource } };
+  "read.only": { "other.schema": { 'other"users': UserResource } };
+};
+
 declare global {
   namespace GraphileBuild {
+    interface PluginScope_default {
+      pgTableResources: TestTableResources;
+    }
     interface PluginScopes {
-      generatedHelpersTest: { pgRegistry: TestRegistry };
+      generatedHelpersTest: {
+        pgRegistry: TestRegistry;
+        pgTableResources: TestTableResources;
+      };
     }
   }
 }
@@ -60,6 +72,68 @@ function typecheckGeneratedHelpers() {
       const invalid: string = value;
       return null;
     },
+  );
+
+  addPgTableOrderBy("public.users", (_build, orderBy) => {
+    orderBy("ID", "id");
+    // @ts-expect-error Only attributes of users are accepted.
+    orderBy("MISSING", "missing");
+
+    orderBy("ID", "id", { nulls: "last" });
+    // @ts-expect-error Only attributes of users are accepted.
+    orderBy("MISSING", "missing", { nulls: "last" });
+
+    orderBy("ID", { attribute: "id", nulls: "LAST" });
+    // @ts-expect-error The attribute is checked with explicit null ordering too.
+    orderBy("MISSING", { attribute: "missing", nulls: "FIRST" });
+
+    orderBy("ID", () => ({ attribute: "id", nulls: "LAST" }));
+    // @ts-expect-error Callback specs are checked against the same resource.
+    orderBy("MISSING", () => ({ attribute: "missing", nulls: "LAST" }));
+
+    return orderBy("ID", (queryBuilder) => {
+      queryBuilder.orderBy({ attribute: "id", direction: "ASC" });
+      // @ts-expect-error The callback also receives a typed query builder.
+      queryBuilder.orderBy({ attribute: "missing", direction: "ASC" });
+
+      return { attribute: "id", nulls: "FIRST" };
+    });
+  });
+
+  addPgTableOrderBy(
+    {
+      serviceName: "read.only",
+      schemaName: "other.schema",
+      tableName: 'other"users',
+    },
+    (_build, orderBy) => {
+      // @ts-expect-error Object matches also resolve to the generated resource.
+      orderBy("MISSING", "missing");
+      return orderBy("ID", "id");
+    },
+  );
+
+  addPgTableOrderBy(
+    '"read.only"."other.schema"."other""users"',
+    (_build, orderBy) => {
+      // @ts-expect-error Quoted parts resolve to the same resource as the raw names.
+      orderBy("MISSING", "missing");
+      return orderBy("ID", "id");
+    },
+  );
+
+  addPgTableOrderBy<"generatedHelpersTest", "main.public.users">(
+    "main.public.users",
+    (build, orderBy) => {
+      const registry: TestRegistry = build.input.pgRegistry;
+      // @ts-expect-error An explicit scope and match resolve the resource.
+      orderBy("MISSING", "missing");
+      return orderBy("ID", "id");
+    },
+  );
+
+  addPgTableOrderBy("untyped.users", (_build, orderBy) =>
+    orderBy("UNTYPED", () => ({ attribute: "any_attribute", nulls: "LAST" })),
   );
 
   orderByAscDesc<UserResource>("ID", "id");

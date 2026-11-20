@@ -323,6 +323,7 @@ export const MinifySchemaPlugin: GraphileConfig.Plugin = {
   description:
     "[EXPERIMENTAL] Removes all descriptions and deprecation reasons from the schema, resulting in smaller exports (but no docs!)",
   version,
+  provides: ["minify"],
 
   schema: {
     hooks: {

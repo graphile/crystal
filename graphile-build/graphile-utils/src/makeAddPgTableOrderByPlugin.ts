@@ -8,7 +8,7 @@ import type {
 import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
-import type { ScopedTableMatch } from "./resolveTableMatch.ts";
+import type { ScopedTableMatch, TableResource } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 type ArrayOrDirect<T> = T | Array<T>;
@@ -44,12 +44,22 @@ export interface MakeAddPgTableOrderByPluginOrders {
 
 const counterByName = new Map<string, number>();
 
+/**
+ * Adds `orderBy:` enum values for the given table, allowing you to add custom
+ * ordering criteria to existing tables.
+ *
+ * The callback's order helper is typed to the table when generated resource
+ * types are available. With an explicit scope type argument, also specify the
+ * match type to retain table-specific inference.
+ */
 export function addPgTableOrderBy<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
+  const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
 >(
-  match: ScopedTableMatch<TScope>,
+  match: TMatch,
   ordersGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,
+    orderBy: typeof orderByAscDesc<TableResource<TScope, TMatch>>,
   ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
@@ -87,6 +97,7 @@ export function addPgTableOrderBy<
           }
           const newValues = ordersGenerator(
             build as GraphileBuild.ScopedBuild<TScope>,
+            orderByAscDesc<TableResource<TScope, TMatch>>,
           );
 
           return extend(values, newValues, hint);
