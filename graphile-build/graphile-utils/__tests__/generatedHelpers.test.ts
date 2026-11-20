@@ -75,18 +75,27 @@ function typecheckGeneratedHelpers() {
   );
 
   addPgTableOrderBy("public.users", (_build, orderBy) => {
-    orderBy("ID", "id", { nulls: "last" });
+    orderBy("ID", "id");
     // @ts-expect-error Only attributes of users are accepted.
     orderBy("MISSING", "missing");
+
+    orderBy("ID", "id", { nulls: "last" });
+    // @ts-expect-error Only attributes of users are accepted.
+    orderBy("MISSING", "missing", { nulls: "last" });
+
     orderBy("ID", { attribute: "id", nulls: "LAST" });
     // @ts-expect-error The attribute is checked with explicit null ordering too.
     orderBy("MISSING", { attribute: "missing", nulls: "FIRST" });
+
+    orderBy("ID", () => ({ attribute: "id", nulls: "LAST" }));
     // @ts-expect-error Callback specs are checked against the same resource.
     orderBy("MISSING", () => ({ attribute: "missing", nulls: "LAST" }));
+
     return orderBy("ID", (queryBuilder) => {
       queryBuilder.orderBy({ attribute: "id", direction: "ASC" });
       // @ts-expect-error The callback also receives a typed query builder.
       queryBuilder.orderBy({ attribute: "missing", direction: "ASC" });
+
       return { attribute: "id", nulls: "FIRST" };
     });
   });
