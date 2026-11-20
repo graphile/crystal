@@ -112,7 +112,12 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build) {
         const codec = build.pgCodecs.ltree;
-        if (codec) {
+        if (!codec) return _;
+
+        // Respect GraphQL types set by plugins that ran before us
+        const needsOutput = !build.hasGraphQLTypeForPgCodec(codec, "output");
+        const needsInput = !build.hasGraphQLTypeForPgCodec(codec, "input");
+        if (needsOutput || needsInput) {
           // Highly recommended you use your own inflector here, choosing
           // `builtin` will mean your users may get conflicts which they cannot
           // then resolve through inflection.
@@ -131,8 +136,12 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
             }),
             'Adding "LTree" scalar type from PgLtreePlugin.',
           );
-          build.setGraphQLTypeForPgCodec(codec, "output", ltreeTypeName);
-          build.setGraphQLTypeForPgCodec(codec, "input", ltreeTypeName);
+          if (needsOutput) {
+            build.setGraphQLTypeForPgCodec(codec, "output", ltreeTypeName);
+          }
+          if (needsInput) {
+            build.setGraphQLTypeForPgCodec(codec, "input", ltreeTypeName);
+          }
         }
         return _;
       },
