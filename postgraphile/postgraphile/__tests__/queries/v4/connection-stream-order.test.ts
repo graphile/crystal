@@ -1,5 +1,10 @@
 import { runTestQuery } from "../../helpers.ts";
 
+// Each test builds its own schema, and with `EXPORT_SCHEMA` set it also
+// exports and re-imports it, which takes longer than Jest's default 5s. The
+// `.test.graphql` queries get the same allowance via their `beforeAll`.
+jest.setTimeout(60000);
+
 async function runConnectionQuery(
   document: string,
   config: Parameters<typeof runTestQuery>[1] = {},
