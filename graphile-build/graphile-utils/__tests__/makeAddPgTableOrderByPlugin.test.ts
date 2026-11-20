@@ -11,11 +11,7 @@ import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
 import type { NullsSortMethod } from "../dist/index.js";
-import {
-  makeAddPgTableOrderByPlugin,
-  orderByAscDesc,
-  scopedUtils,
-} from "../dist/index.js";
+import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../dist/index.js";
 
 let pgPool: Pool | null = null;
 let connectionString = "";
@@ -46,7 +42,7 @@ afterAll(async () => {
 const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
   makeAddPgTableOrderByPlugin(
     { schemaName: "graphile_utils", tableName: "users" },
-    (build) => {
+    (build, orderByAscDesc) => {
       const { sql } = build;
       const sqlIdentifier = sql.identifier(Symbol("pet"));
 
@@ -68,12 +64,10 @@ const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
     },
   );
 
-const { addPgTableOrderBy } = scopedUtils("default");
-
 const makeScopeApplyPlugin = (nullsSortMethod: NullsSortMethod) =>
-  addPgTableOrderBy(
+  makeAddPgTableOrderByPlugin(
     { schemaName: "graphile_utils", tableName: "users" },
-    (build, orderByAscDesc) => {
+    (build) => {
       const { sql } = build;
 
       const customOrderBy = orderByAscDesc(
