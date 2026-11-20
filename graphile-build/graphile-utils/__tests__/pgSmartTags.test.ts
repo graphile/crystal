@@ -112,6 +112,7 @@ const makePreset = (
     }),
   ],
   plugins,
+  gather: { pgMultipassIntrospection: true },
   pgServices: [
     makePgService({
       pool: pgPool!,

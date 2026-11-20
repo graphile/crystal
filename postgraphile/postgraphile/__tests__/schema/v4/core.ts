@@ -11,6 +11,7 @@ import AmberPreset from "../../../dist/presets/amber.js";
 import type { V4Options } from "../../../dist/presets/v4.js";
 import { makeV4Preset } from "../../../dist/presets/v4.js";
 import {
+  MultipassIntrospectionPreset,
   snapshot,
   StripOidsPlugin,
   SwallowAllErrorsPlugin,
@@ -22,9 +23,11 @@ jest.setTimeout(60000);
 
 let countByPath = Object.create(null);
 
-export const test =
+const makeTest =
+  (enableMultipass: boolean) =>
   (
-    testPath: string,
+    // Omit the path for tests that only assert specific schema behavior.
+    testPath: string | undefined,
     schemata: string | string[],
     options: V4Options = {},
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
@@ -50,7 +53,12 @@ export const test =
       let introspectionPasses: number | undefined;
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
-        extends: [AmberPreset, v4Preset, additionalPreset],
+        extends: [
+          AmberPreset,
+          v4Preset,
+          ...(enableMultipass ? [MultipassIntrospectionPreset] : []),
+          additionalPreset,
+        ],
         plugins: [
           {
             name: "CountIntrospectionPasses",
@@ -90,6 +98,7 @@ export const test =
             schemas: schemas,
             adaptorSettings: {
               poolClient: client,
+              poolClientIsInTransaction: true,
             },
           } satisfies GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
         ],
@@ -98,9 +107,18 @@ export const test =
           ...graphileBuildOptions,
         },
       };
-      const { schema, resolvedPreset: _resolvedPreset } =
-        await makeSchema(preset);
-      assertIntrospectionPasses(schemas, introspectionPasses, options);
+      const { schema, resolvedPreset } = await makeSchema(preset);
+      if (resolvedPreset.gather?.pgMultipassIntrospection) {
+        assertIntrospectionPasses(schemas, introspectionPasses, options);
+      } else {
+        expect(introspectionPasses).toBe(1);
+      }
+      if (finalCheck) {
+        await finalCheck(schema, introspectionPasses);
+      }
+      if (testPath === undefined) {
+        return;
+      }
       const i = testPath in countByPath ? countByPath[testPath] + 1 : 1;
       countByPath[testPath] = i;
       const sorted = sort ? lexicographicSortSchema(schema) : schema;
@@ -109,9 +127,6 @@ export const test =
         sort || i > 1 ? `.${i}` : ""
       }.graphql`;
       await snapshot(printed + "\n", filePath);
-      if (finalCheck) {
-        await finalCheck(schema, introspectionPasses);
-      }
       // Now check the schema exports
       const { code: exportString } = await exportSchemaAsString(schema, {
         mode: "typeDefs",
@@ -127,3 +142,6 @@ export const test =
       await writeFile(executableSchemaPath, exportString.trim() + "\n");
       //await snapshot(exportString.trim() + "\n", executableSchemaPath);
     });
+
+export const test = makeTest(true);
+export const testDefaultOptions = makeTest(false);

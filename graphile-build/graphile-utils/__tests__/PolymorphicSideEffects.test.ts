@@ -144,6 +144,7 @@ it("handles basic side effects in polymorphic positions", async () => {
   const { schema, resolvedPreset } = await makeSchema({
     extends: [PostGraphileAmberPreset, makeV4Preset()],
     plugins: [AchinthaSideEffectsPlugin],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({ pool: pgPool!, schemas: ["achintha_side_effects"] }),
     ],
