@@ -20,6 +20,7 @@
     "changeset-publish": "yarn workspaces-prepack && changeset publish",
     "w": "yarn workspace",
     "postgraphile": "cd postgraphile/postgraphile && node dist/cli-run.js",
+    "website:update": "node scripts/website-import-config.mjs && yarn prettier:fix",
     "website:grafast": "cd grafast/website && yarn start",
     "website:postgraphile": "cd postgraphile/website && yarn start",
     "website:build": "cd graphile-build/website && yarn start",
