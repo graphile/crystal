@@ -75,6 +75,9 @@ export type {
 } from "./makeWrapPlansPlugin.ts";
 export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.ts";
 
+export { scopedUtils } from "./scopedUtils.ts";
+export type { ScopedUtils } from "./scopedUtils.ts";
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {
   interface ScalarPlan<TInternal = any, TExternal = any> {

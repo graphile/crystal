@@ -12,9 +12,9 @@ import { makeV4Preset } from "postgraphile/presets/v4";
 
 import type { NullsSortMethod } from "../dist/index.js";
 import {
-  addPgTableOrderBy,
   makeAddPgTableOrderByPlugin,
   orderByAscDesc,
+  scopedUtils,
 } from "../dist/index.js";
 
 let pgPool: Pool | null = null;
@@ -68,9 +68,10 @@ const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
     },
   );
 
+const { addPgTableOrderBy } = scopedUtils("default");
+
 const makeScopeApplyPlugin = (nullsSortMethod: NullsSortMethod) =>
   addPgTableOrderBy(
-    "default",
     { schemaName: "graphile_utils", tableName: "users" },
     (build, orderByAscDesc) => {
       const { sql } = build;

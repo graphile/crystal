@@ -10,7 +10,7 @@ import { makeSchema } from "postgraphile";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import { addPgTableCondition } from "../dist/index.js";
+import { scopedUtils } from "../dist/index.js";
 
 let pgPool: Pool | null = null;
 let connectionString = "";
@@ -38,8 +38,9 @@ afterAll(async () => {
   }
 });
 
+const { addPgTableCondition } = scopedUtils("default");
+
 const PetsCountPlugin = addPgTableCondition(
-  "default",
   { schemaName: "graphile_utils", tableName: "users" },
   "petCountAtLeast",
   (build) => ({

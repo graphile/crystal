@@ -32,7 +32,7 @@ type ConditionFieldConfig<TCondition, TValue> = Omit<
   };
 };
 
-type TableConditionArgs<
+export type TableConditionArgs<
   TScope extends keyof GraphileBuild.PluginScopes,
   TValue,
   TMatch extends ScopedTableMatch<TScope>,
@@ -58,40 +58,19 @@ type TableConditionArgs<
   ) => SQL | null | undefined,
 ];
 
-/**
- * Uses the generated types for the given scope. The scope affects typing only.
- */
-export function addPgTableCondition<
-  const TScope extends keyof GraphileBuild.PluginScopes,
-  const TMatch extends ScopedTableMatch<TScope>,
-  TValue = any,
->(
-  scope: TScope,
-  ...args: TableConditionArgs<TScope, TValue, TMatch>
-): GraphileConfig.Plugin;
 /** Adds a condition typed to the matched table's generated resource. */
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
   TValue = any,
   const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
->(...args: TableConditionArgs<TScope, TValue, TMatch>): GraphileConfig.Plugin;
-export function addPgTableCondition<
-  TScope extends keyof GraphileBuild.PluginScopes,
-  TValue,
-  TMatch extends ScopedTableMatch<TScope>,
 >(
-  ...args:
-    | TableConditionArgs<TScope, TValue, TMatch>
-    | [TScope, ...TableConditionArgs<TScope, TValue, TMatch>]
-): GraphileConfig.Plugin {
-  const [
+  ...[
     match,
     conditionFieldName,
     conditionFieldSpecGenerator,
     conditionGenerator,
-  ] = (
-    typeof args[2] === "function" ? args : args.slice(1)
-  ) as TableConditionArgs<TScope, TValue, TMatch>;
+  ]: TableConditionArgs<TScope, TValue, TMatch>
+): GraphileConfig.Plugin {
   const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
   const plugin: GraphileConfig.Plugin = {

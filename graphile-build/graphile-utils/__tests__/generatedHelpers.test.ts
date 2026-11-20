@@ -8,6 +8,7 @@ import {
   addPgTableOrderBy,
   orderByAscDesc,
   processSchema,
+  scopedUtils,
 } from "../dist/index.js";
 
 type UserCodec = PgCodec<
@@ -47,6 +48,22 @@ declare global {
 
 // Compile-only assertions; executing these plugins requires a schema build.
 function typecheckGeneratedHelpers() {
+  const {
+    addPgTableCondition: addApiCondition,
+    addPgTableOrderBy: addApiOrderBy,
+    extendSchema,
+    wrapPlans,
+  } = scopedUtils("generatedHelpersTest");
+
+  extendSchema((build) => {
+    const registry: TestRegistry = build.input.pgRegistry;
+    return { typeDefs: "extend type Query { example: Int }" };
+  });
+  wrapPlans((build) => {
+    const registry: TestRegistry = build.input.pgRegistry;
+    return {};
+  });
+
   processSchema<"generatedHelpersTest">((schema, build, context) => {
     const registry: TestRegistry = build.input.pgRegistry;
     const finalizeContext: GraphileBuild.ContextFinalize = context;
@@ -105,30 +122,25 @@ function typecheckGeneratedHelpers() {
     },
   }));
 
-  addPgTableCondition(
-    "generatedHelpersTest",
-    "main.public.api_users",
-    "matchesId",
-    (build) => {
-      const registry: TestRegistry = build.input.pgRegistry;
-      return {
-        type: GraphQLInt,
-        apply(condition, value: number) {
-          condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback: (fragment) => sql`${fragment} = ${sql.value(value)}`,
-          });
-          condition.where({
-            type: "attribute",
-            // @ts-expect-error The scope-first form infers the table's attributes.
-            attribute: "missing",
-            callback: (fragment) => fragment,
-          });
-        },
-      };
-    },
-  );
+  addApiCondition("main.public.api_users", "matchesId", (build) => {
+    const registry: TestRegistry = build.input.pgRegistry;
+    return {
+      type: GraphQLInt,
+      apply(condition, value: number) {
+        condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback: (fragment) => sql`${fragment} = ${sql.value(value)}`,
+        });
+        condition.where({
+          type: "attribute",
+          // @ts-expect-error The scope-bound helper infers the table's attributes.
+          attribute: "missing",
+          callback: (fragment) => fragment,
+        });
+      },
+    };
+  });
 
   addPgTableCondition<"generatedHelpersTest", number, "main.public.users">(
     "main.public.users",
@@ -225,22 +237,18 @@ function typecheckGeneratedHelpers() {
     },
   );
 
-  addPgTableOrderBy(
-    "generatedHelpersTest",
-    "main.public.api_users",
-    (build, orderBy) => {
-      const registry: TestRegistry = build.input.pgRegistry;
-      // @ts-expect-error The match is inferred when the scope is passed as a value.
-      orderBy("MISSING", "missing");
-      return orderBy("ID", { attribute: "id", nulls: "LAST" });
-    },
-  );
+  addApiOrderBy("main.public.api_users", (build, orderBy) => {
+    const registry: TestRegistry = build.input.pgRegistry;
+    // @ts-expect-error The match is inferred when the scope is passed as a value.
+    orderBy("MISSING", "missing");
+    return orderBy("ID", { attribute: "id", nulls: "LAST" });
+  });
 
   // @ts-expect-error The named scope's gather types reject unknown tables.
-  addPgTableOrderBy("generatedHelpersTest", "public.missing", () => ({}));
+  addApiOrderBy("public.missing", () => ({}));
 
   // @ts-expect-error Only scopes declared in PluginScopes are accepted.
-  addPgTableOrderBy("unknownScope", "public.users", () => ({}));
+  scopedUtils("unknownScope");
 
   addPgTableOrderBy<"generatedHelpersTest", "main.public.users">(
     "main.public.users",
