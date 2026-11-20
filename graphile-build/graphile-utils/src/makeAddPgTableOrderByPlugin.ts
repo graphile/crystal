@@ -42,27 +42,53 @@ export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
 }
 
-const counterByName = new Map<string, number>();
-
-/**
- * Adds `orderBy:` enum values for the given table, allowing you to add custom
- * ordering criteria to existing tables.
- *
- * The callback's order helper is typed to the table when generated resource
- * types are available. With an explicit scope type argument, also specify the
- * match type to retain table-specific inference.
- */
-export function addPgTableOrderBy<
-  TScope extends keyof GraphileBuild.PluginScopes = "default",
-  const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
->(
+type TableOrderByArgs<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TMatch extends ScopedTableMatch<TScope>,
+> = [
   match: TMatch,
   ordersGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,
     orderBy: typeof orderByAscDesc<TableResource<TScope, TMatch>>,
   ) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
+  hint?: string,
+];
+
+const counterByName = new Map<string, number>();
+
+/**
+ * Uses the generated types for the given scope. The scope affects typing only.
+ */
+export function addPgTableOrderBy<
+  const TScope extends keyof GraphileBuild.PluginScopes,
+  const TMatch extends ScopedTableMatch<TScope>,
+>(
+  scope: TScope,
+  ...args: TableOrderByArgs<TScope, TMatch>
+): GraphileConfig.Plugin;
+/**
+ * Adds custom ordering for a table. When generated resource types are
+ * available, the callback receives an order helper typed to the matched table.
+ */
+export function addPgTableOrderBy<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+  const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
+>(...args: TableOrderByArgs<TScope, TMatch>): GraphileConfig.Plugin;
+export function addPgTableOrderBy<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TMatch extends ScopedTableMatch<TScope>,
+>(
+  ...args:
+    | TableOrderByArgs<TScope, TMatch>
+    | [TScope, ...TableOrderByArgs<TScope, TMatch>]
 ): GraphileConfig.Plugin {
+  const [
+    match,
+    ordersGenerator,
+    hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
+  ] = (
+    typeof args[1] === "function" ? args : args.slice(1)
+  ) as TableOrderByArgs<TScope, TMatch>;
   const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const baseDisplayName = `addPgTableOrderBy_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);

@@ -30,7 +30,16 @@ declare global {
     interface PluginScopes {
       generatedHelpersTest: {
         pgRegistry: TestRegistry;
-        pgTableResources: TestTableResources;
+        pgTableResources: {
+          main: { public: { users: UserResource; api_users: UserResource } };
+        };
+        gather: {
+          pgIntrospection: {
+            main: {
+              schemas: { public: { classes: { users: {}; api_users: {} } } };
+            };
+          };
+        };
       };
     }
   }
@@ -95,6 +104,31 @@ function typecheckGeneratedHelpers() {
         .where({ ...spec, attribute: "other_id" });
     },
   }));
+
+  addPgTableCondition(
+    "generatedHelpersTest",
+    "main.public.api_users",
+    "matchesId",
+    (build) => {
+      const registry: TestRegistry = build.input.pgRegistry;
+      return {
+        type: GraphQLInt,
+        apply(condition, value: number) {
+          condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback: (fragment) => sql`${fragment} = ${sql.value(value)}`,
+          });
+          condition.where({
+            type: "attribute",
+            // @ts-expect-error The scope-first form infers the table's attributes.
+            attribute: "missing",
+            callback: (fragment) => fragment,
+          });
+        },
+      };
+    },
+  );
 
   addPgTableCondition<"generatedHelpersTest", number, "main.public.users">(
     "main.public.users",
@@ -190,6 +224,23 @@ function typecheckGeneratedHelpers() {
       return orderBy("ID", "id");
     },
   );
+
+  addPgTableOrderBy(
+    "generatedHelpersTest",
+    "main.public.api_users",
+    (build, orderBy) => {
+      const registry: TestRegistry = build.input.pgRegistry;
+      // @ts-expect-error The match is inferred when the scope is passed as a value.
+      orderBy("MISSING", "missing");
+      return orderBy("ID", { attribute: "id", nulls: "LAST" });
+    },
+  );
+
+  // @ts-expect-error The named scope's gather types reject unknown tables.
+  addPgTableOrderBy("generatedHelpersTest", "public.missing", () => ({}));
+
+  // @ts-expect-error Only scopes declared in PluginScopes are accepted.
+  addPgTableOrderBy("unknownScope", "public.users", () => ({}));
 
   addPgTableOrderBy<"generatedHelpersTest", "main.public.users">(
     "main.public.users",
