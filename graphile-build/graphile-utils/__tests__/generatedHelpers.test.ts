@@ -37,7 +37,14 @@ declare global {
         gather: {
           pgIntrospection: {
             main: {
-              schemas: { public: { classes: { users: {}; api_users: {} } } };
+              schemas: {
+                public: {
+                  classes: {
+                    users: Record<string, never>;
+                    api_users: Record<string, never>;
+                  };
+                };
+              };
             };
           };
         };
