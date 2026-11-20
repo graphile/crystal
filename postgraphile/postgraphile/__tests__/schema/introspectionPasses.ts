@@ -36,6 +36,6 @@ export function assertIntrospectionPasses(
     maximum = 4;
   }
   expect(maximum).toBeDefined();
-  expect(passes).toBeGreaterThan(0);
+  expect(passes).toBeGreaterThan(1);
   expect(passes).toBeLessThanOrEqual(maximum);
 }
