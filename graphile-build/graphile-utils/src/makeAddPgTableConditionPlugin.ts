@@ -56,9 +56,10 @@ export function addPgTableCondition<
       sql: typeof sql;
       sqlTableAlias: SQL;
       sqlValueWithCodec: typeof sqlValueWithCodec;
-      // The build must be pruned before it can be exported.
+      // We can't afford to make the entire of build EXPORTABLE, and people
+      // really ought to move to using the `apply` method, so...
       build: PrunedBuild<TScope>;
-      /** @internal */
+      /** @internal We might expose this in future if needed */
       condition: TableCondition<TScope, TMatch>;
     },
   ) => SQL | null | undefined,
