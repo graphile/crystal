@@ -42,7 +42,7 @@ afterAll(async () => {
 const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
   makeAddPgTableOrderByPlugin(
     { schemaName: "graphile_utils", tableName: "users" },
-    (build) => {
+    (build, orderByAscDesc) => {
       const { sql } = build;
       const sqlIdentifier = sql.identifier(Symbol("pet"));
 

@@ -74,6 +74,8 @@ export type {
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.ts";
 export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.ts";
+export type { ScopedUtils } from "./scopedUtils.ts";
+export { scopedUtils } from "./scopedUtils.ts";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {

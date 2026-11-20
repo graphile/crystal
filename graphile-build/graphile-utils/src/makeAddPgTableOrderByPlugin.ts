@@ -42,16 +42,13 @@ export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
 }
 
+export type TableOrderByArgs<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TMatch extends ScopedTableMatch<TScope>,
+> = Parameters<typeof addPgTableOrderBy<TScope, TMatch>>;
+
 const counterByName = new Map<string, number>();
 
-/**
- * Adds `orderBy:` enum values for the given table, allowing you to add custom
- * ordering criteria to existing tables.
- *
- * The callback's order helper is typed to the table when generated resource
- * types are available. With an explicit scope type argument, also specify the
- * match type to retain table-specific inference.
- */
 export function addPgTableOrderBy<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
   const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,

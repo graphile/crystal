@@ -32,11 +32,12 @@ type ConditionFieldConfig<TCondition, TValue> = Omit<
   };
 };
 
-/**
- * Generated table resources supply the attribute names accepted by the
- * condition. If specifying the scope or value type explicitly, supply the
- * table match as the third type argument to keep the attribute type.
- */
+export type TableConditionArgs<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TValue,
+  TMatch extends ScopedTableMatch<TScope>,
+> = Parameters<typeof addPgTableCondition<TScope, TValue, TMatch>>;
+
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
   TValue = any,
