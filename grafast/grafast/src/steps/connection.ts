@@ -1,7 +1,6 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
-import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.ts";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
@@ -411,10 +410,6 @@ export class ConnectionStep<
 
   private neededCollection = false;
   private collectionDepId: number;
-  /**
-   * null = unknown
-   */
-  private _mightStream: boolean | null = null;
 
   // Pagination stuff
   private _firstDepId: number | null = null;
@@ -469,13 +464,22 @@ export class ConnectionStep<
     }
   }
 
+  /**
+   * Whether our items may be a stream; known from the `optimize` phase
+   * onwards (Grafast works it out from the lists consuming our items).
+   */
   public mightStream() {
-    // Later `nodes` or `edges` fields can change this during planning, so
-    // default to "yes, I might stream" until we know for certain one way or
-    // the other. Note: `endCursor` wants to do `last($items)`; it makes a
-    // difference whether this will definitely yield a list versus maybe a
-    // stream.
-    return this._mightStream ?? this.operationPlan.phase === "plan";
+    return this._mayStream === true;
+  }
+
+  /**
+   * Grafast tells us what each list consuming our items needs; we pass it on
+   * to whichever step handles our pagination.
+   */
+  public addStreamDetails(
+    $streamDetails: Step<ExecutionDetailsStream | null> | null,
+  ) {
+    this.getHandler(true).addStreamDetails?.($streamDetails);
   }
 
   public getSubplan(): TCollectionStep {
@@ -714,29 +718,11 @@ export class ConnectionStep<
     }
   };
 
-  private captureStream() {
-    const $streamDetails = currentFieldStreamDetails();
-    if ($streamDetails === null || $streamDetails === true) {
-      this.getHandler(true).addStreamDetails?.(null);
-
-      this._mightStream = false;
-    } else {
-      this.getHandler(true).addStreamDetails?.($streamDetails);
-
-      if (this._mightStream === null) {
-        // Only override if it was unknown
-        this._mightStream = true;
-      }
-    }
-  }
-
   public edges(): Step {
-    this.captureStream();
     return each(this._items(), this.edgePlan as any);
   }
 
   public nodes() {
-    this.captureStream();
     return each(this._items(), this.nodePlan as any);
   }
 
@@ -836,11 +822,6 @@ export class ConnectionStep<
     if (this.needsHasMore) {
       replacement.needsHasMore = true;
     }
-    // Consumers may already rely on either connection yielding an array.
-    if (replacement._mightStream !== this._mightStream) {
-      replacement._mightStream = false;
-      replacement.getHandler(false).addStreamDetails?.(null);
-    }
   }
 
   public execute({
@@ -867,7 +848,7 @@ export class ConnectionStep<
         // collection handles everything
         const result = collectionValue as ConnectionHandlingResult<any>;
         if (
-          !this._mightStream &&
+          this._mayStream !== true &&
           result.items != null &&
           !Array.isArray(result.items)
         ) {
@@ -929,7 +910,7 @@ export class ConnectionStep<
       }
 
       if (
-        this._mightStream !== true &&
+        this._mayStream !== true &&
         (mode === MODE_ITERABLE || mode === MODE_ASYNC_ITERABLE)
       ) {
         // Convert to array, then process
@@ -1685,12 +1666,13 @@ export class ConnectionItemsStep extends Step {
     >;
   }
 
-  public willNotStream(): boolean {
-    return !this.getConnection().mightStream();
+  /** We yield our connection's items as our list. */
+  public streamSourceDepIndex(): number {
+    return 0;
   }
 
   public optimize(_options: StepOptimizeOptions): Step {
-    this.cloneStreams = this.getConnection().mightStream();
+    this.cloneStreams = this._mayStream === true;
     return this;
   }
 

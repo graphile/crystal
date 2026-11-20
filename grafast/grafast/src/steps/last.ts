@@ -41,7 +41,7 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
     const parent = this.getDepOptions(0).step;
     if (
       this.isSyncAndSafe ||
-      (!parent.cloneStreams && parent.willNotStream?.() === true)
+      (!parent.cloneStreams && parent.mayStream() === false)
     ) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;

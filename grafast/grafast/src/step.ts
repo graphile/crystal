@@ -28,6 +28,7 @@ import type {
   AddUnaryDependencyOptions,
   DependencyOptions,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEntryFlags,
   ExecutionResults,
   GrafastResultsList,
@@ -770,17 +771,47 @@ ${printDeps(step, 1)}
   public optimize?(_options: StepOptimizeOptions): Step;
 
   /**
-   * Called during finalization on a list-producing step. Return true if it
-   * will always yield the complete list as an array (or a nullish value).
-   * Steps that can yield an iterable or a partial list must leave this
-   * unspecified or return false.
-   *
-   * We probably want to change this so that it's automatically determined,
-   * rather than step classes having to declare it.
+   * If this step yields, as its own list, the list (or stream) of one of its
+   * dependencies, return that dependency's index (or `null` if not). Grafast
+   * follows these links from each list it walks to find the step that
+   * decides whether to stream (the one with `addStreamDetails`).
    *
    * @experimental
    */
-  public willNotStream?(): boolean;
+  public streamSourceDepIndex?(): number | null;
+
+  /**
+   * Implemented by steps that can produce their list as a stream. After
+   * planning (and deduplication), Grafast calls this once for every list
+   * that will consume this step's list: with the `@stream` details step if
+   * that list is streamed, or with `null` if it needs the whole list (a
+   * non-streamed list, or any other step reading the list). `null` wins.
+   *
+   * @experimental
+   */
+  public addStreamDetails?(
+    $details: Step<ExecutionDetailsStream | null> | null,
+  ): void;
+
+  /**
+   * Set by Grafast after planning: `true` if this step may yield a stream,
+   * `false` if it will always yield the whole list (or a nullish value),
+   * `null` if Grafast doesn't know (the step neither decides on streaming
+   * nor forwards a stream).
+   *
+   * @internal
+   */
+  public _mayStream: boolean | null = null;
+
+  /**
+   * Whether this step may yield a stream rather than the whole list; only
+   * known from the `optimize` phase onwards. `null` if Grafast doesn't know.
+   *
+   * @experimental
+   */
+  public mayStream(): boolean | null {
+    return this._mayStream;
+  }
 
   public finalize() {
     if (typeof (this as any).isSyncAndSafe !== "boolean") {

@@ -3,7 +3,6 @@ import type {
   ConnectionOptimizedStep,
   ExecutionDetails,
 } from "../index.ts";
-import { currentFieldStreamDetails } from "../index.ts";
 import type {
   BatchKeysetEquality,
   ExecutionDetailsStream,
@@ -145,10 +144,11 @@ export class LoadManyStep<
   private name: Maybe<string>;
   private keysetEquality: BatchKeysetEquality;
 
-  /** Direct field stream */
-  private _fieldMightStream: boolean;
-  /** Maybe its a connection with a `nodes @stream` or `edges @stream`. Null = unknown */
-  private _fieldMightStreamViaConnection: boolean | null = null;
+  /**
+   * Whether every list consuming us is streamed (`null` until Grafast has
+   * told us about any of them).
+   */
+  private _streamDemanded: boolean | null = null;
 
   constructor(
     lookup: TLookup,
@@ -161,9 +161,6 @@ export class LoadManyStep<
     >,
   ) {
     super();
-    const $streamDetails = currentFieldStreamDetails();
-    this._fieldMightStream = $streamDetails != null && $streamDetails !== true;
-
     const { load, shared, ioEquivalence, paginationSupport } = loader;
     this.name = loader.name || load.displayName || load.name;
     this.load = load;
@@ -190,22 +187,17 @@ export class LoadManyStep<
     }
   }
 
-  addStreamDetails?(
-    $streamDetails: Step<ExecutionDetailsStream | null> | null,
-  ) {
+  addStreamDetails($streamDetails: Step<ExecutionDetailsStream | null> | null) {
     if ($streamDetails === null) {
-      this._fieldMightStreamViaConnection = false;
-    } else {
-      if (this._fieldMightStreamViaConnection === null) {
-        this._fieldMightStreamViaConnection = true;
-      }
+      // Null wins
+      this._streamDemanded = false;
+    } else if (this._streamDemanded === null) {
+      this._streamDemanded = true;
     }
   }
 
   private mightHaveStream() {
-    return (
-      this._fieldMightStream || this._fieldMightStreamViaConnection || false
-    );
+    return this._streamDemanded === true;
   }
 
   toStringMeta() {

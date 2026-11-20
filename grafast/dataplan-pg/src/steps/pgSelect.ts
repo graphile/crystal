@@ -21,7 +21,6 @@ import {
   access,
   arrayOfLength,
   ConstantStep,
-  currentFieldStreamDetails,
   DEFAULT_ACCEPT_FLAGS,
   exportAs,
   first,
@@ -712,8 +711,6 @@ export class PgSelectStep<
     return $clone;
   }
 
-  _fieldMightStream: boolean;
-
   constructor(options: PgSelectOptions<TResource>) {
     super();
     this.metaKey = PgExecutor.metaKey;
@@ -740,13 +737,6 @@ export class PgSelectStep<
       _internalCloneAlias,
       _internalCloneExecutionAffinity,
     } = options;
-
-    const $streamDetails = currentFieldStreamDetails();
-    this._fieldMightStream =
-      $streamDetails != null &&
-      $streamDetails !== true &&
-      !resource.isMutation &&
-      !resource.isUnique;
 
     this.mode = mode ?? "normal";
 
@@ -1996,7 +1986,7 @@ export class PgSelectStep<
   addStreamDetails(
     $details: Step<ExecutionDetailsStream | null> | false | null,
   ) {
-    if ($details) {
+    if ($details && !this.resource.isMutation && !this.resource.isUnique) {
       this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
     } else {
       // Explicitly disable streaming
@@ -2005,7 +1995,6 @@ export class PgSelectStep<
   }
 
   mightHaveStream() {
-    if (this._fieldMightStream) return true;
     if (this.streamDetailsDepIds != null && this.streamDetailsDepIds.length > 0)
       return true;
     return false;
@@ -2390,6 +2379,11 @@ export class PgSelectRowsStep<
 
   public getClassStep(): PgSelectStep<TResource> {
     return this.getDepOptions<PgSelectStep<TResource>>(0).step;
+  }
+
+  /** We yield our select's rows as our list. */
+  public streamSourceDepIndex(): number {
+    return 0;
   }
 
   listItem(itemPlan: Step) {

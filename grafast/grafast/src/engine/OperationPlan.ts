@@ -124,6 +124,7 @@ import { defaultPlanResolver } from "./lib/defaultPlanResolver.ts";
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
+  streamDetailsStep,
   withGlobalLayerPlan,
 } from "./lib/withGlobalLayerPlan.ts";
 import { lock, unlock } from "./lock.ts";
@@ -472,6 +473,13 @@ export class OperationPlan {
 
     this.checkTimeout();
     this.lap("hoistSteps", "planOperation");
+
+    // Now that steps are deduplicated, tell each step that can stream what
+    // the lists consuming it need.
+    this.planStreams();
+
+    this.checkTimeout();
+    this.lap("planStreams");
 
     if (isDev) {
       this.phase = "validate";
@@ -4362,6 +4370,112 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
     // Even if step wasn't hoisted, its deps may have been so we should still
     // re-deduplicate it.
     return step.deduplicate ? this.deduplicateStep(step) : step;
+  }
+
+  /**
+   * Streaming is a requirement of the lists that consume a step, but the step
+   * that would produce the stream (e.g. a database fetch) sits further up and
+   * is planned first. So rather than steps guessing while planning, once
+   * every step exists and is deduplicated we work it out here:
+   *
+   * 1. For each walked list, follow `streamSourceDepIndex()` up to the step
+   *    that decides on streaming (it has `addStreamDetails()`); every step on
+   *    the way forwards its list.
+   * 2. That list's demand is its `@stream` details, or `null` if it's not
+   *    streamed.
+   * 3. Each deciding step receives every demand via `addStreamDetails()`
+   *    (`null` wins), and it and the steps forwarding it learn whether they
+   *    may stream (`_mayStream`).
+   *
+   * Other steps reading a forwarded list (e.g. `first()`/`last()` for page
+   * cursors) don't make demands; they receive a clone of the stream.
+   */
+  private planStreams() {
+    /** Demands on each deciding step; `null` means "the whole list". */
+    const demandsBySource = new Map<Step, Array<StepStreamOptions | null>>();
+    /** The steps forwarding each deciding step's list. */
+    const forwardersBySource = new Map<Step, Set<Step>>();
+
+    const sourceOf = ($step: Step, forwarders: Step[]): Step | null => {
+      let $current = $step;
+      for (;;) {
+        if (typeof $current.addStreamDetails === "function") {
+          return $current;
+        }
+        const depIndex = $current.streamSourceDepIndex?.();
+        if (depIndex == null) {
+          return null;
+        }
+        forwarders.push($current);
+        $current = sudo($current).dependencies[depIndex];
+      }
+    };
+
+    const addDemand = (
+      $source: Step,
+      demand: StepStreamOptions | null,
+      forwarders: readonly Step[],
+    ) => {
+      let demands = demandsBySource.get($source);
+      if (demands === undefined) {
+        demands = [];
+        demandsBySource.set($source, demands);
+        forwardersBySource.set($source, new Set());
+      }
+      demands.push(demand);
+      const set = forwardersBySource.get($source)!;
+      for (const $forwarder of forwarders) {
+        set.add($forwarder);
+      }
+    };
+
+    for (const $step of this.stepTracker.activeSteps) {
+      const { walkIterable, stream } = $step._stepOptions;
+      // Only lists that are walked; subscriptions (`stream === true`) aren't
+      // streams in this sense.
+      if (!walkIterable || stream === true) continue;
+      const forwarders: Step[] = [];
+      const $source = sourceOf($step, forwarders);
+      if ($source !== null) {
+        addDemand($source, stream, forwarders);
+      }
+    }
+
+    // Steps that forward a list but aren't walked (e.g. a connection's items
+    // read only for its cursors) still need to know whether they may stream.
+    for (const $step of this.stepTracker.activeSteps) {
+      if ($step.streamSourceDepIndex == null) continue;
+      const forwarders: Step[] = [];
+      const $source = sourceOf($step, forwarders);
+      if ($source === null) continue;
+      if (!demandsBySource.has($source)) {
+        demandsBySource.set($source, []);
+        forwardersBySource.set($source, new Set());
+      }
+      const set = forwardersBySource.get($source)!;
+      for (const $forwarder of forwarders) {
+        set.add($forwarder);
+      }
+    }
+
+    for (const [$source, demands] of demandsBySource) {
+      const mayStream =
+        demands.length > 0 && demands.every((demand) => demand !== null);
+      for (const demand of demands) {
+        $source.addStreamDetails!(
+          demand === null
+            ? null
+            : this.withRootLayerPlan(() => streamDetailsStep(demand)),
+        );
+      }
+      $source._mayStream = mayStream;
+      for (const $forwarder of forwardersBySource.get($source)!) {
+        $forwarder._mayStream = mayStream;
+      }
+    }
+
+    // The stream details steps may duplicate each other.
+    this.deduplicateSteps();
   }
 
   private hoistSteps() {

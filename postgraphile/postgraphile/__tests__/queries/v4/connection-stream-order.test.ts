@@ -56,12 +56,15 @@ test.each([
   ]);
 });
 
+// Whichever wrapper is planned first, the shared connection is planned the
+// same way: `hasNextPage` needs the extra row, so the page is buffered;
+// `endCursor` reads the last item from a clone of the stream.
 test.each([
-  { field: "hasNextPage", value: true },
-  { field: "endCursor", value: "WyJjM2QzZjIwYmMyIiwzLDNd" },
+  { field: "hasNextPage", value: true, cursors: 0 },
+  { field: "endCursor", value: "WyJjM2QzZjIwYmMyIiwzLDNd", cursors: 1 },
 ])(
-  "buffers the page when the wrapper requesting $field wins",
-  async ({ field, value }) => {
+  "shares the page with a wrapper requesting $field",
+  async ({ field, value, cursors }) => {
     const { payloads, pgCursorCount } = await runConnectionQuery(
       `{
         sharedPeople {
@@ -71,7 +74,7 @@ test.each([
       }`,
       { extends: "./StreamConnectionDeduplication.ts:preset" },
     );
-    expect(pgCursorCount).toBe(0);
+    expect(pgCursorCount).toBe(cursors);
     expect(payloads).toMatchObject([
       {
         data: {
