@@ -1,24 +1,19 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(8);
+## expect(queries).toHaveLength(3);
+# No `author` here: its query would race the deferred `totalCount` query (the
+# deferred batch starts on a timer), making the SQL snapshot order depend on
+# timing. Streamed authors are covered by stream-1 to stream-5.
 {
   forums(includeArchived: EXCLUSIVELY) {
     name
     messagesConnection(includeArchived: INHERIT) {
       nodes @stream {
         body
-        author {
-          username
-          gravatarUrl
-        }
       }
       edges @stream {
         cursor
         node {
           body
-          author {
-            username
-            gravatarUrl
-          }
         }
       }
       ... @defer {
