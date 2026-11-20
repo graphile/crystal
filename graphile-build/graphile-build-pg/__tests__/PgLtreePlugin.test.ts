@@ -20,10 +20,10 @@ function makeBuild(alreadySet: ReadonlyArray<"input" | "output">) {
   };
 }
 
-function runInit(build: ReturnType<typeof makeBuild>) {
+const runInit = (build: ReturnType<typeof makeBuild>) => {
   const init = {};
-  expect(hook!(init as never, build as never, {} as never)).toBe(init);
-}
+  expect(hook(init as never, build as never, {} as never)).toBe(init);
+};
 
 test("registers the LTree scalar for input and output by default", () => {
   const build = makeBuild([]);
