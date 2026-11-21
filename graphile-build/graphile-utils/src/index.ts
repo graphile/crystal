@@ -74,6 +74,7 @@ export type {
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.ts";
 export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.ts";
+export { multipassInclude } from "./multipassInclude.ts";
 export type { ScopedUtils } from "./scopedUtils.ts";
 export { scopedUtils } from "./scopedUtils.ts";
 
