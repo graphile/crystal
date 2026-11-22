@@ -36,6 +36,7 @@ import type {
   RunQuery,
   TaggedEntity,
 } from "./interfaces.ts";
+export { includePolicy } from "./includePolicy.ts";
 export { defineIntrospectionPolicy } from "./interfaces.ts";
 export { introspect, introspectRaw } from "./multipass.ts";
 import type { AclObject } from "./acl.ts";

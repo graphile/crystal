@@ -4,6 +4,7 @@ import { it } from "node:test";
 import {
   augmentIntrospectionData,
   defineIntrospectionPolicy,
+  includePolicy,
   type IntrospectionPolicy,
   type IntrospectionPolicyDetails,
   type IntrospectionPreviewDetails,
@@ -1180,6 +1181,23 @@ it("requests objects by name, resolving their namespace and class", async () => 
     "proc 8": ["terminal"],
     "attribute col": ["terminal"],
   });
+});
+
+it("rejects an unterminated quoted identifier in an inclusion policy", async () => {
+  await assert.rejects(
+    introspectRaw({
+      async runQuery() {
+        return JSON.stringify({ ...metadata, namespaces: [], classes: [] });
+      },
+      onlyEntities: ["namespaces", "classes"],
+      multipass: {
+        policies: [
+          includePolicy("include", "classes", ['app."my.table'], ["terminal"]),
+        ],
+      },
+    }),
+    /Unterminated quoted identifier/,
+  );
 });
 
 it("selects null-entity policies at the start, without a row", async () => {

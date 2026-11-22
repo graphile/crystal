@@ -1,6 +1,10 @@
 import type { PgResource } from "@dataplan/pg";
 import type {} from "graphile-build";
 
+import type {
+  QualifiedPgNames,
+  ScopedGatherPgIntrospection,
+} from "./interfaces.ts";
 import {
   type IdentifierPart,
   parseIdentifierParts,
@@ -14,31 +18,15 @@ export type TableMatch = {
   tableName: string;
 };
 
-type ScopedGatherPgIntrospection<
-  TScope extends keyof GraphileBuild.PluginScopes,
-> = GraphileBuild.PluginScopes[TScope] extends {
-  gather: { pgIntrospection: infer TPgIntrospection };
-}
-  ? TPgIntrospection
-  : never;
-
 type TableMatchStringsForService<
   TServiceName extends string,
   TService,
 > = TService extends { schemas: infer TSchemas }
-  ? {
-      [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends {
-        classes: infer TClasses;
-      }
-        ? {
-            [TTableName in keyof TClasses & string]:
-              | `${IdentifierPart<TServiceName>}.${IdentifierPart<TSchemaName>}.${IdentifierPart<TTableName>}`
-              | (TServiceName extends "main"
-                  ? `${IdentifierPart<TSchemaName>}.${IdentifierPart<TTableName>}`
-                  : never);
-          }[keyof TClasses & string]
-        : never;
-    }[keyof TSchemas & string]
+  ?
+      | `${IdentifierPart<TServiceName>}.${QualifiedPgNames<TSchemas, "classes">}`
+      | (TServiceName extends "main"
+          ? QualifiedPgNames<TSchemas, "classes">
+          : never)
   : never;
 
 /** Valid string table matches from gather-time generated types, when present. */

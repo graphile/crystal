@@ -36,9 +36,14 @@ declare global {
         };
         gather: {
           pgIntrospection: {
+            analytics: {
+              schemas: { "other.schema": { classes: { 'other"users': true } } };
+            };
             main: {
               schemas: {
                 public: {
+                  functions: { lookup: true };
+                  types: { result: true };
                   classes: {
                     users: Record<string, never>;
                     api_users: Record<string, never>;
@@ -59,9 +64,30 @@ function typecheckGeneratedHelpers() {
     addPgTableCondition: addApiCondition,
     addPgTableOrderBy: addApiOrderBy,
     extendSchema,
+    multipassInclude,
     wrapPlans,
     processSchema,
   } = scopedUtils("generatedHelpersTest");
+
+  multipassInclude({
+    tables: ["public.users"],
+    functions: ["public.lookup"],
+    types: ["public.result"],
+  });
+  multipassInclude({
+    serviceName: "analytics",
+    tables: ['"other.schema"."other""users"'],
+  });
+  // @ts-expect-error Omitting serviceName selects main.
+  multipassInclude({ tables: ['"other.schema"."other""users"'] });
+  // @ts-expect-error Service names come from the scope.
+  multipassInclude({ serviceName: "missing" });
+  // @ts-expect-error Functions require schema-qualified names.
+  multipassInclude({ functions: ["lookup"] });
+  // @ts-expect-error A function is not a type.
+  multipassInclude({ types: ["public.lookup"] });
+  // @ts-expect-error Tables must belong to the selected service.
+  multipassInclude({ serviceName: "analytics", tables: ["public.users"] });
 
   extendSchema((build) => {
     const registry: TestRegistry = build.input.pgRegistry;

@@ -1,4 +1,7 @@
 import type { BaseGraphQLArguments } from "grafast";
+import type {} from "graphile-build";
+
+import type { IdentifierPart } from "./parseIdentifierParts.ts";
 
 /** Converts generated field argument metadata into its runtime argument type. */
 export type GeneratedFieldArgs<TArgs> = {
@@ -26,3 +29,25 @@ export type CommonKeys<T> = {
 
 export type ValueForKey<T, TKey extends PropertyKey> =
   T extends Record<TKey, infer TValue> ? TValue : never;
+
+/** The generated PostgreSQL introspection metadata for a plugin scope. */
+export type ScopedGatherPgIntrospection<
+  TScope extends keyof GraphileBuild.PluginScopes,
+> = GraphileBuild.PluginScopes[TScope] extends {
+  gather: { pgIntrospection: infer TPgIntrospection };
+}
+  ? TPgIntrospection
+  : never;
+
+/** Schema-qualified PostgreSQL object names from generated introspection metadata. */
+export type QualifiedPgNames<
+  TSchemas,
+  TKind extends "classes" | "functions" | "types",
+> = {
+  [TSchema in keyof TSchemas & string]: TSchemas[TSchema] extends Record<
+    TKind,
+    infer TEntries
+  >
+    ? `${IdentifierPart<TSchema>}.${IdentifierPart<keyof TEntries & string>}`
+    : never;
+}[keyof TSchemas & string];
