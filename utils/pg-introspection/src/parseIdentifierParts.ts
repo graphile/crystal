@@ -42,6 +42,11 @@ export function parseIdentifierParts(identifier: string): string[] {
       current += char;
     }
   }
+  if (inQuotes) {
+    throw new Error(
+      `Unterminated quoted identifier in ${JSON.stringify(identifier)}`,
+    );
+  }
   parts.push(current);
   return parts;
 }
