@@ -24,6 +24,7 @@ test("includes named objects outside the exposed schema", () =>
     let inspected = false;
     await makeSchema({
       extends: [AmberPreset],
+      gather: { pgMultipassIntrospection: true },
       plugins: [
         multipassInclude({
           tables: ["sys.priority"],
