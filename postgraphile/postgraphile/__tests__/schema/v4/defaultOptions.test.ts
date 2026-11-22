@@ -4,7 +4,7 @@ import { PgMinifySchemaPreset } from "../../../dist/presets/minify.js";
 import * as core from "./core.ts";
 
 const makeTest = ({ minified = false }: { minified?: boolean } = {}) =>
-  core.testDefaultOptions(
+  (minified ? core.test : core.testDefaultOptions)(
     __filename,
     ["a", "b", "c"],
     undefined,
@@ -20,7 +20,9 @@ comment on function c.query_output_two_rows is '
 Tests outputting two rows using in/out/inout parameters';
 `,
     (schema, introspectionPasses) => {
-      expect(introspectionPasses).toBe(1);
+      if (!minified) {
+        expect(introspectionPasses).toBe(1);
+      }
       const Query = assertObjectType(schema.getType("Query"));
       const field = Query.getFields().queryOutputTwoRows;
       const leftArmId = field.args.find((f) => f.name === "leftArmId")!;

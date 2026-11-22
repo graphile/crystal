@@ -110,6 +110,8 @@ declare global {
   namespace GraphileBuild {
     interface GatherOptions {
       /**
+       * Default: `false`
+       *
        * Multipass introspection helps to minimize the amount of data fetched
        * from the database for introspection, and in doing so reduces memory
        * usage and schema build times. It starts by looking just at the
@@ -121,10 +123,9 @@ declare global {
        * you want for your plans but are not using in your generated schema (or
        * maybe you're using a plugin it's not compatible with).
        *
-       * We recommend that you enable it. If it is disabled the entire database
-       * will be introspected at once in a single SQL query; this might
-       * significantly increase memory usage and the size of the pgRegistry that
-       * is generated.
+       * We recommend setting this option to `true` to enable multipass introspection.
+       * By default, PostGraphile introspects the entire database in a single SQL query,
+       * which can increase memory usage and produce a larger `pgRegistry`.
        *
        * Multipass introspection produces a filtered view of the database. For
        * example, a table's introspected constraints do not necessarily include
