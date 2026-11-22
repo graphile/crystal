@@ -17,6 +17,7 @@ import type {
 import type {} from "graphile-config";
 import JSON5 from "json5";
 
+import type { ScopedGatherPgIntrospection } from "./interfaces.ts";
 import {
   type IdentifierPart,
   parseIdentifierParts,
@@ -59,14 +60,6 @@ type PgSmartTagRules = {
 export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
 > = PgSmartTagRules[TKind];
-
-type ScopedGatherPgIntrospection<
-  TScope extends keyof GraphileBuild.PluginScopes,
-> = GraphileBuild.PluginScopes[TScope] extends {
-  gather: { pgIntrospection: infer TPgIntrospection };
-}
-  ? TPgIntrospection
-  : never;
 
 type SmartTagClassMatches<TIntrospection> = {
   [TServiceName in keyof TIntrospection &

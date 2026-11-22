@@ -1,3 +1,4 @@
+import type {} from "graphile-build";
 import type { BaseGraphQLArguments } from "grafast";
 
 /** Converts generated field argument metadata into its runtime argument type. */
@@ -26,3 +27,12 @@ export type CommonKeys<T> = {
 
 export type ValueForKey<T, TKey extends PropertyKey> =
   T extends Record<TKey, infer TValue> ? TValue : never;
+
+/** The generated PostgreSQL introspection metadata for a plugin scope. */
+export type ScopedGatherPgIntrospection<
+  TScope extends keyof GraphileBuild.PluginScopes,
+> = GraphileBuild.PluginScopes[TScope] extends {
+  gather: { pgIntrospection: infer TPgIntrospection };
+}
+  ? TPgIntrospection
+  : never;

@@ -1,9 +1,11 @@
 import * as adaptor from "@dataplan/pg/adaptors/pg";
 import { makeSchema } from "graphile-build";
-import { multipassInclude } from "graphile-utils";
+import { scopedUtils } from "graphile-utils";
 
 import AmberPreset from "../../../dist/presets/amber.js";
 import { withPoolClientTransaction } from "../../helpers.ts";
+
+const { multipassInclude } = scopedUtils("default");
 
 test("includes named objects outside the exposed schema", () =>
   withPoolClientTransaction(async (client) => {

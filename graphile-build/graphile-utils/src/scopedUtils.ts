@@ -14,6 +14,7 @@ import type {
   WrapPlansOptions,
 } from "./makeWrapPlansPlugin.ts";
 import { wrapPlans } from "./makeWrapPlansPlugin.ts";
+import { multipassInclude } from "./multipassInclude.ts";
 import type { ScopedTableMatch } from "./resolveTableMatch.ts";
 
 export type ScopedUtils<TScope extends keyof GraphileBuild.PluginScopes> =
@@ -30,6 +31,7 @@ export type ScopedUtils<TScope extends keyof GraphileBuild.PluginScopes> =
     changeNullability: typeof changeNullability<TScope>;
     extendSchema: typeof extendSchema<TScope>;
     jsonPgSmartTags: typeof jsonPgSmartTags<TScope>;
+    multipassInclude: typeof multipassInclude<TScope>;
     pgSmartTags: typeof pgSmartTags<TScope>;
     processSchema: typeof processSchema<TScope>;
     wrapPlans: {
@@ -53,6 +55,7 @@ const utils = Object.freeze({
   changeNullability,
   extendSchema,
   jsonPgSmartTags,
+  multipassInclude,
   pgSmartTags,
   processSchema,
   wrapPlans,

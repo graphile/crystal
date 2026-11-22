@@ -1,6 +1,7 @@
 import type { PgResource } from "@dataplan/pg";
 import type {} from "graphile-build";
 
+import type { ScopedGatherPgIntrospection } from "./interfaces.ts";
 import {
   type IdentifierPart,
   parseIdentifierParts,
@@ -13,14 +14,6 @@ export type TableMatch = {
   schemaName: string;
   tableName: string;
 };
-
-type ScopedGatherPgIntrospection<
-  TScope extends keyof GraphileBuild.PluginScopes,
-> = GraphileBuild.PluginScopes[TScope] extends {
-  gather: { pgIntrospection: infer TPgIntrospection };
-}
-  ? TPgIntrospection
-  : never;
 
 type TableMatchStringsForService<
   TServiceName extends string,
