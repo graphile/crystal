@@ -1,5 +1,5 @@
 import type {} from "graphile-build-pg";
-import { includePolicy } from "graphile-build-pg/pg-introspection";
+import type { IntrospectionPolicy } from "graphile-build-pg/pg-introspection";
 
 import type {
   QualifiedPgNames,
@@ -44,31 +44,44 @@ export function multipassInclude<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
   options: ScopedOptions<ScopedGatherPgIntrospection<TScope>>,
+  name = `MultipassIncludePlugin_${++counter}`,
 ): GraphileConfig.Plugin {
-  const {
-    serviceName = "main",
-    tables = [],
-    functions = [],
-    types = [],
-  } = options;
-  const name = `MultipassIncludePlugin_${++counter}`;
+  const { serviceName = "main", tables, functions, types } = options;
   return {
     name,
     gather: {
       hooks: {
-        pgIntrospection_options(_info, event) {
+        pgIntrospection_options(info, event) {
           const { multipass } = event.options;
           if (event.serviceName !== serviceName || !multipass) return;
-          multipass.policies = [
-            ...(multipass.policies ?? []),
-            includePolicy(`${name}_tables`, "classes", tables, [
-              "registryCodec",
-            ]),
-            includePolicy(`${name}_functions`, "procs", functions, [
-              "registryCodec",
-            ]),
-            includePolicy(`${name}_types`, "types", types, ["registryCodec"]),
-          ];
+
+          const { includePolicy } = info.lib.pgIntrospection;
+          const newPolicies: IntrospectionPolicy<null>[] = [];
+          if (tables != null) {
+            newPolicies.push(
+              includePolicy(`${name}_tables`, "classes", tables, [
+                "registryCodec",
+              ]),
+            );
+          }
+          if (functions != null) {
+            newPolicies.push(
+              includePolicy(`${name}_functions`, "procs", functions, [
+                "registryCodec",
+              ]),
+            );
+          }
+          if (types != null) {
+            newPolicies.push(
+              includePolicy(`${name}_types`, "types", types, ["registryCodec"]),
+            );
+          }
+          if (newPolicies.length > 0) {
+            multipass.policies = [
+              ...(multipass.policies ?? []),
+              ...newPolicies,
+            ];
+          }
         },
       },
     },
