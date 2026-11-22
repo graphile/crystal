@@ -1,20 +1,10 @@
 import type {} from "graphile-build-pg";
 import { includePolicy } from "graphile-build-pg/pg-introspection";
 
-import type { ScopedGatherPgIntrospection } from "./interfaces.ts";
-import type { IdentifierPart } from "./parseIdentifierParts.ts";
-
-type QualifiedNames<
-  TSchemas,
-  TKind extends "classes" | "functions" | "types",
-> = {
-  [TSchema in keyof TSchemas & string]: TSchemas[TSchema] extends Record<
-    TKind,
-    infer TEntries
-  >
-    ? `${IdentifierPart<TSchema>}.${IdentifierPart<keyof TEntries & string>}`
-    : never;
-}[keyof TSchemas & string];
+import type {
+  QualifiedPgNames,
+  ScopedGatherPgIntrospection,
+} from "./interfaces.ts";
 
 type IncludeOptions<
   TTable extends string,
@@ -41,9 +31,9 @@ type ScopedOptions<TIntrospection> = [TIntrospection] extends [never]
             ? { serviceName?: TService }
             : { serviceName: TService }) &
             IncludeOptions<
-              QualifiedNames<TSchemas, "classes">,
-              QualifiedNames<TSchemas, "functions">,
-              QualifiedNames<TSchemas, "types">
+              QualifiedPgNames<TSchemas, "classes">,
+              QualifiedPgNames<TSchemas, "functions">,
+              QualifiedPgNames<TSchemas, "types">
             >
         : never;
     }[keyof TIntrospection & string];
