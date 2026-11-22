@@ -1,8 +1,9 @@
 ---
-"graphile-utils": minor
-"pg-introspection": minor
+"graphile-utils": patch
+"pg-introspection": patch
+"postgraphile": patch
 ---
 
-Add `multipassInclude` to include named PostgreSQL tables, functions, and
-types in a service's multipass introspection results. Custom introspection
-clients can create their own named-object policies with `includePolicy`.
+`pg-introspection` gains `includePolicy` multipass introspection helper to make
+it easy to explicitly request certain database entities be included in the
+introspection results.
