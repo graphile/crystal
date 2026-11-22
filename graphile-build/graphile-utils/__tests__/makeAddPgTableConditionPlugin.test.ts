@@ -64,6 +64,7 @@ it("allows adding a condition to a Relay connection", async () => {
       }),
     ],
     plugins: [PetsCountPlugin],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -114,6 +115,7 @@ it("allows adding a condition to a simple collection", async () => {
       }),
     ],
     plugins: [PetsCountPlugin],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,

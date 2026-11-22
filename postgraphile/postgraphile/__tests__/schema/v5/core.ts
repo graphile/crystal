@@ -9,6 +9,7 @@ import type { PoolClient } from "pg";
 
 import AmberPreset from "../../../dist/presets/amber.js";
 import {
+  MultipassIntrospectionPreset,
   snapshot,
   StripOidsPlugin,
   SwallowAllErrorsPlugin,
@@ -46,7 +47,7 @@ export const test =
       let introspectionPasses: number | undefined;
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
-        extends: [AmberPreset, additionalPreset],
+        extends: [AmberPreset, MultipassIntrospectionPreset, additionalPreset],
         plugins: [
           {
             name: "CountIntrospectionPasses",
@@ -83,9 +84,12 @@ export const test =
           ...graphileBuildOptions,
         },
       };
-      const { schema, resolvedPreset: _resolvedPreset } =
-        await makeSchema(preset);
-      assertIntrospectionPasses(schemas, introspectionPasses);
+      const { schema, resolvedPreset } = await makeSchema(preset);
+      if (resolvedPreset.gather?.pgMultipassIntrospection) {
+        assertIntrospectionPasses(schemas, introspectionPasses);
+      } else {
+        expect(introspectionPasses).toBe(1);
+      }
       const i = testPath in countByPath ? countByPath[testPath] + 1 : 1;
       countByPath[testPath] = i;
       const sorted = sort ? lexicographicSortSchema(schema) : schema;

@@ -45,6 +45,7 @@ it("supports scalars", async () => {
   const { schema, resolvedPreset } = await makeSchema({
     extends: [PostGraphileAmberPreset, makeV4Preset()],
     plugins: [RegisterUserPlugin],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({ pool: pgPool!, schemas: ["graphile_utils_2"] }),
     ],

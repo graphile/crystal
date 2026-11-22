@@ -110,24 +110,26 @@ declare global {
   namespace GraphileBuild {
     interface GatherOptions {
       /**
-       * Multipass introspection (enabled by default) helps to minimize the
-       * amount of data fetched from the database for introspection, and in
-       * doing so reduces memory usage and schema build times. It starts by
-       * looking just at the resources in your chosen schemas (and only those
-       * you have access to) and then spiders out from there based on runtime
+       * Default: `false`
+       *
+       * Multipass introspection helps to minimize the amount of data fetched
+       * from the database for introspection, and in doing so reduces memory
+       * usage and schema build times. It starts by looking just at the
+       * resources in your chosen schemas (and only those you have access to)
+       * and then spiders out from there based on runtime
        * discovery of dependencies.
        *
        * However, this optimization might omit things from your pgRegistry that
        * you want for your plans but are not using in your generated schema (or
-       * maybe you're using a plugin it's not compatible with). In this case
-       * you may set `pgMultipassIntrospection: false` to disable this
-       * optimization, and instead the entire database will be introspected at
-       * once in a single SQL query. This might significantly increase memory
-       * usage and the size of the pgRegistry that is generated.
+       * maybe you're using a plugin it's not compatible with).
+       *
+       * We recommend setting this option to `true` to enable multipass introspection.
+       * By default, PostGraphile introspects the entire database in a single SQL query,
+       * which can increase memory usage and produce a larger `pgRegistry`.
        *
        * Multipass introspection produces a filtered view of the database. For
        * example, a table's introspected constraints do not necessarily include
-       * every constraint in PostgreSQL.        *
+       * every constraint in PostgreSQL.
        */
       pgMultipassIntrospection?: boolean;
 
@@ -961,10 +963,9 @@ function introspectPgServices(
               filters: { depends: "deptype in ('a', 'e')" },
               prune: postgraphilePrune,
               onlyEntities: [...DEFAULT_ENTITIES],
-              multipass:
-                info.resolvedPreset.gather?.pgMultipassIntrospection === false
-                  ? false
-                  : postgraphileMultipass({ schemas: pgService.schemas }),
+              multipass: info.resolvedPreset.gather?.pgMultipassIntrospection
+                ? postgraphileMultipass({ schemas: pgService.schemas })
+                : false,
             };
           await info.process("pgIntrospection_options", {
             serviceName: name,

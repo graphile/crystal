@@ -30,6 +30,7 @@ test("follows one foreign key to an enum table outside the exposed schema", () =
     let introspectionPasses: number | undefined;
     const { schema } = await makeSchema({
       extends: [AmberPreset],
+      gather: { pgMultipassIntrospection: true },
       plugins: [
         pgSmartTags({
           kind: "class",
@@ -82,6 +83,6 @@ test("follows one foreign key to an enum table outside the exposed schema", () =
     expect(schema.getType("MultipassEnumOtherUnrelated")).toBeUndefined();
     expect(foreignKeys).toContain("tasks_priority_fkey");
     expect(foreignKeys).not.toContain("priority_unrelated_id_fkey");
-    expect(introspectionPasses).toBeGreaterThan(0);
+    expect(introspectionPasses).toBeGreaterThan(1);
     expect(introspectionPasses).toBeLessThanOrEqual(5);
   }));

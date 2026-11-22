@@ -124,6 +124,7 @@ const getSchema = async (nullsSortMethod?: NullsSortMethod) => {
         ],
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [makePgService({ pool: pgPool!, schemas: ["graphile_utils"] })],
   });
 

@@ -153,6 +153,7 @@ it("infers scope", async () => {
         `,
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -191,6 +192,7 @@ it("enables overriding scope", async () => {
         },
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -250,6 +252,7 @@ it("supports unary steps in loadOne", async () => {
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -366,6 +369,7 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -454,6 +458,7 @@ it("supports arbitrary sql queries with unknown placeholders", async () => {
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -666,6 +671,7 @@ it("scope", async () => {
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
