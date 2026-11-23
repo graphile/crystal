@@ -1,5 +1,6 @@
 ## expect(errors).toBeFalsy()
 ## expect(queries).toHaveLength(8);
+## expect(queries.some(({ text }) => /^declare /m.test(text))).toBe(true);
 {
   forums(includeArchived: EXCLUSIVELY) {
     name

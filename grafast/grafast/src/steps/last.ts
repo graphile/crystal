@@ -34,13 +34,20 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
   constructor(parentPlan: StepRepresentingList<TData>, isArray = true) {
     super();
     this.addDependency(itemsOrStep(parentPlan));
-    if (isArray) {
+    this.isSyncAndSafe = isArray;
+  }
+
+  finalize() {
+    const parent = this.getDepOptions(0).step;
+    if (
+      this.isSyncAndSafe ||
+      (!parent.cloneStreams && parent.willNotStream?.() === true)
+    ) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;
       this.isSyncAndSafe = true;
-    } else {
-      this.isSyncAndSafe = false;
     }
+    super.finalize();
   }
 
   [$$deepDepSkip](): Step {

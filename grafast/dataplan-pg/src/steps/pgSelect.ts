@@ -20,7 +20,9 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
+  asyncIteratorWithCleanup,
   ConstantStep,
+  consume,
   currentFieldStreamDetails,
   DEFAULT_ACCEPT_FLAGS,
   exportAs,
@@ -31,11 +33,13 @@ import {
   isPromiseLike,
   lambda,
   maybeArraysMatch,
+  noop,
   reverseArray,
   SafeError,
   Step,
   stepAMayDependOnStepB,
   stepAShouldTryAndInlineIntoStepB,
+  stepsAreInSamePhase,
   UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
@@ -126,6 +130,8 @@ const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
   hasNextPage: false,
   hasPreviousPage: false,
+  getHasOneExtra: () => false,
+  getLastItem: () => null,
   items: [],
   cursorDetails: undefined,
   groupDetails: undefined,
@@ -383,14 +389,22 @@ interface QueryBuildResult {
 }
 
 interface PgSelectStepResult extends ConnectionHandlingResult<unknown> {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+  getHasOneExtra(): PromiseOrDirect<boolean>;
+  getLastItem(): PromiseOrDirect<unknown[] | null>;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
   cursorDetails: PgCursorDetails | undefined;
   groupDetails: PgGroupDetails | undefined;
   m: Record<string, unknown>;
 }
+
+const pgSelectResultGetters = {
+  hasOneExtra: (result: PgSelectStepResult) => result.getHasOneExtra(),
+  hasNextPage: (result: PgSelectStepResult) => result.hasNextPage,
+  hasPreviousPage: (result: PgSelectStepResult) => result.hasPreviousPage,
+  lastItem: (result: PgSelectStepResult) => result.getLastItem(),
+};
+type PgSelectResultKey = keyof typeof pgSelectResultGetters;
 
 export interface PgGroupDetails {
   readonly indicies: ReadonlyArray<{
@@ -506,6 +520,7 @@ export class PgSelectStep<
   protected firstStepId: number | null = null;
   protected lastStepId: number | null = null;
   protected fetchOneExtra = false;
+  private requiresCompletePage = false;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
   protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
@@ -700,6 +715,7 @@ export class PgSelectStep<
       $clone.firstStepId = cloneFromMatchingMode.firstStepId;
       $clone.lastStepId = cloneFromMatchingMode.lastStepId;
       $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
+      $clone.requiresCompletePage = cloneFromMatchingMode.requiresCompletePage;
       $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
 
       // dependencies were already added, so we can just copy the dependency references
@@ -1168,6 +1184,54 @@ export class PgSelectStep<
     return new PgCursorStep($item, this.getCursorDetails());
   }
 
+  public override setNeedsHasMore() {
+    super.setNeedsHasMore();
+    this.requiresCompletePage = true;
+  }
+
+  public get(key: "lastItem"): Step<unknown[] | null>;
+  public get(
+    key: "hasOneExtra" | "hasNextPage" | "hasPreviousPage",
+  ): Step<boolean>;
+  public get(key: PgSelectResultKey): Step<boolean | unknown[] | null> {
+    const $getter = lambda<PgSelectStep<TResource>, boolean | unknown[] | null>(
+      this,
+      pgSelectResultGetters[key],
+    );
+    this.requirePageValue(key, $getter);
+    return $getter;
+  }
+
+  private requirePageValue(key: PgSelectResultKey, $getter: Step): boolean {
+    if (key !== "lastItem") {
+      this.fetchOneExtra = true;
+    }
+    // A streamed list item can run in the initial payload (initialCount).
+    // Require an explicit defer boundary before waiting for stream completion.
+    const { ancestry } = $getter.layerPlan;
+    const { depth } = this.layerPlan;
+    const eager =
+      stepsAreInSamePhase(this, $getter) ||
+      ancestry[depth] !== this.layerPlan ||
+      !ancestry.slice(depth + 1).some((layer) => layer.reason.type === "defer");
+    if (eager) {
+      this.requiresCompletePage = true;
+    }
+    return eager;
+  }
+
+  public planPageInfo(
+    key: "hasNextPage" | "hasPreviousPage" | "endCursor",
+    fallback: Step,
+  ): Step {
+    if (key === "endCursor") {
+      return this.requirePageValue("lastItem", fallback)
+        ? fallback
+        : this.cursorForItem(this.get("lastItem"));
+    }
+    return this.requirePageValue(key, fallback) ? fallback : this.get(key);
+  }
+
   private needsGroups = false;
   public getGroupDetails(): Step<PgGroupDetails> {
     this.needsGroups = true;
@@ -1422,65 +1486,21 @@ export class PgSelectStep<
           // Must be an error
           return iterable as never;
         }
-        if (!initialFetchResult) {
-          return {
-            hasNextPage: false,
-            hasPreviousPage: false,
-            items: iterable,
-            cursorDetails,
-            groupDetails,
-            m: meta,
-          };
+        const initialRows = initialFetchResult?.[idx] ?? EMPTY_ARRAY;
+        if (isPromiseLike(initialRows)) {
+          consume(iterable[Symbol.asyncIterator]().return?.());
+          return initialRows as never;
         }
-
-        // Munge the initialCount records into the streams
-        const innerIterator = iterable[Symbol.asyncIterator]();
-
-        let i = 0;
-        let done = false;
-        const l = initialFetchResult[idx].length;
-        const mergedGenerator: AsyncGenerator<PromiseOrDirect<unknown[]>> = {
-          async [Symbol.asyncDispose]() {
-            await this.return(undefined);
-          },
-          next() {
-            if (done) {
-              return Promise.resolve({ value: undefined, done });
-            } else if (i < l) {
-              return Promise.resolve({
-                value: initialFetchResult[idx][i++],
-                done,
-              });
-            } else if (streamInitialCount != null && l < streamInitialCount) {
-              done = true;
-              const r = innerIterator.return?.();
-              return r ?? Promise.resolve({ value: undefined, done });
-            } else {
-              return innerIterator.next();
-            }
-          },
-          return(value) {
-            done = true;
-            const r = innerIterator.return?.(value);
-            return r ?? Promise.resolve({ value: undefined, done });
-          },
-          throw(e) {
-            done = true;
-            const r = innerIterator.throw?.(e);
-            return r ?? Promise.resolve({ value: undefined, done });
-          },
-          [Symbol.asyncIterator]() {
-            return this;
-          },
-        };
-        return {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          items: mergedGenerator,
+        return createStreamedSelectResult(iterable, initialRows, {
+          initialCount: streamInitialCount,
+          first,
+          last,
+          offset,
+          fetchOneExtra: this.fetchOneExtra,
           cursorDetails,
           groupDetails,
-          m: meta,
-        };
+          meta,
+        });
       });
     }
   }
@@ -1710,6 +1730,9 @@ export class PgSelectStep<
 
     if (this.fetchOneExtra) {
       replacement.fetchOneExtra = true;
+    }
+    if (this.requiresCompletePage) {
+      replacement.requiresCompletePage = true;
     }
     if (this.needsCursor) {
       replacement.needsCursor = true;
@@ -2344,6 +2367,7 @@ export class PgSelectStep<
       orders: $source.orders,
       selects: $source.selects,
       fetchOneExtra: $source.fetchOneExtra,
+      requiresCompletePage: $source.requiresCompletePage,
       isOrderUnique: $source.isOrderUnique,
       isUnique: $source.isUnique,
       isSimpleUnique:
@@ -3019,6 +3043,7 @@ interface PgSelectQueryInfo<
   readonly meta: { readonly [key: string]: any };
 
   readonly streamDetailsDepIds: null | readonly number[];
+  readonly requiresCompletePage: boolean;
 }
 
 type CoreInfo<TResource extends PgResource<any, any, any, any, any, any, any>> =
@@ -3315,6 +3340,10 @@ function buildTheQueryCore<
   applyConditionFromCursor(info, "before", before);
 
   applyCommonPaginationStuff(info);
+  if (info.requiresCompletePage || (info.fetchOneExtra && info.last != null)) {
+    // For backwards pagination the extra row can precede the visible rows.
+    stream = null;
+  }
 
   /****************************************
    *                                      *
@@ -3695,6 +3724,7 @@ type StaticKeys =
   | "orders"
   | "selects"
   | "fetchOneExtra"
+  | "requiresCompletePage"
   | "isOrderUnique"
   | "isUnique"
   | "isSimpleUnique"
@@ -4377,6 +4407,99 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
   return sql.join(sqlAliases, "");
 }
 
+function createStreamedSelectResult(
+  iterable: AsyncIterable<unknown[]>,
+  initialRows: ReadonlyArray<unknown[]>,
+  {
+    initialCount,
+    first,
+    last,
+    offset,
+    fetchOneExtra,
+    cursorDetails,
+    groupDetails,
+    meta,
+  }: {
+    initialCount: number;
+    first: Maybe<number>;
+    last: Maybe<number>;
+    offset: Maybe<number>;
+    fetchOneExtra: boolean;
+    cursorDetails: PgCursorDetails | undefined;
+    groupDetails: PgGroupDetails | undefined;
+    meta: Record<string, unknown>;
+  },
+): PgSelectStepResult {
+  const iterator = iterable[Symbol.asyncIterator]();
+  const limit = fetchOneExtra ? first : null;
+  const completion = Promise.withResolvers<{
+    hasOneExtra: boolean;
+    lastItem: unknown[] | null;
+  }>();
+  void completion.promise.catch(noop);
+  let started = false;
+  let completed = false;
+  const items = asyncIteratorWithCleanup(
+    (async function* () {
+      started = true;
+      let lastItem: unknown[] | null = null;
+      let hasOneExtra = false;
+      try {
+        for (let index = 0; ; index++) {
+          let item: unknown[];
+          if (index < initialRows.length) {
+            item = initialRows[index];
+          } else {
+            if (initialRows.length < initialCount) {
+              break;
+            }
+            const next = await iterator.next();
+            if (next.done) {
+              break;
+            }
+            item = next.value;
+          }
+          if (index === limit) {
+            hasOneExtra = true;
+            break;
+          }
+          lastItem = item;
+          yield item;
+        }
+        completed = true;
+        completion.resolve({ hasOneExtra, lastItem });
+      } finally {
+        await iterator.return?.();
+      }
+    })(),
+    (error) => {
+      if (!completed) {
+        completion.reject(
+          error ??
+            new Error("Page stream ended before page info was available"),
+        );
+      }
+      if (!started) {
+        consume(iterator.return?.());
+      }
+    },
+  );
+  const getHasOneExtra = () =>
+    limit == null ? false : completion.promise.then((page) => page.hasOneExtra);
+  return {
+    get hasNextPage() {
+      return getHasOneExtra();
+    },
+    hasPreviousPage: hasPreviousPageCb(first, last, offset, false),
+    getHasOneExtra,
+    getLastItem: () => completion.promise.then((page) => page.lastItem),
+    items,
+    cursorDetails,
+    groupDetails,
+    m: meta,
+  };
+}
+
 function createSelectResult(
   allVals: ExecutionResultValue<null | readonly any[]>,
   {
@@ -4423,6 +4546,8 @@ function createSelectResult(
   return {
     hasNextPage,
     hasPreviousPage,
+    getHasOneExtra: () => hasMore,
+    getLastItem: () => orderedRows[orderedRows.length - 1] ?? null,
     items: orderedRows,
     cursorDetails,
     groupDetails,
@@ -4444,8 +4569,10 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     items.push(newItem);
   }
   return {
-    hasPreviousPage: false,
     hasNextPage: false,
+    hasPreviousPage: false,
+    getHasOneExtra: NO_ROWS.getHasOneExtra,
+    getLastItem: () => items[items.length - 1] ?? null,
     // We return a list here because our children are going to use a
     // `first` plan on us.
     // NOTE: we don't need to reverse the list for relay pagination

@@ -318,6 +318,12 @@ export interface ConnectionHandlingStep<
    */
   setNeedsHasMore(): void;
 
+  /** Plan a page-info field using the collection's pagination implementation. */
+  planPageInfo?(
+    key: "hasNextPage" | "hasPreviousPage" | "endCursor",
+    fallback: Step,
+  ): Step;
+
   // TODO: would be better to expose this as
   // `setInitialCount(Step<number | null>): void` and only call it once.
   /**
@@ -726,13 +732,11 @@ export class ConnectionStep<
 
   public edges(): Step {
     this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.edgePlan as any);
   }
 
   public nodes() {
     this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.nodePlan as any);
   }
 
@@ -742,6 +746,7 @@ export class ConnectionStep<
 
   /** @internal */
   public _items() {
+    this.neededCollection = true;
     return this.withMyLayerPlan(() =>
       this.operationPlan.cacheStep(
         this,
@@ -776,6 +781,20 @@ export class ConnectionStep<
 
   public pageInfo() {
     return new PageInfoStep(this);
+  }
+
+  public planPageInfo(
+    key: "hasNextPage" | "hasPreviousPage" | "endCursor",
+    fallback: Step,
+  ): Step {
+    const handler = this.getHandler(true);
+    if ("planPageInfo" in handler && handler.planPageInfo != null) {
+      return handler.planPageInfo(key, fallback);
+    }
+    if (key !== "endCursor") {
+      this.setNeedsHasMore();
+    }
+    return fallback;
   }
 
   public optimize() {
@@ -1576,25 +1595,19 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       any
     >;
     switch (key) {
-      case "hasNextPage": {
-        $connection.setNeedsHasMore();
-        return access($connection, "hasNextPage");
-      }
+      case "hasNextPage":
       case "hasPreviousPage": {
-        $connection.setNeedsHasMore();
-        return access($connection, "hasPreviousPage");
+        return $connection.planPageInfo(key, access($connection, key));
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $first = first($connection._items(), isArray);
+        const $first = first($connection._items(), false);
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get last node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $last = last($connection._items(), isArray);
-        return $connection.cursorPlan($last);
+        const $last = last($connection._items(), false);
+        return $connection.planPageInfo(key, $connection.cursorPlan($last));
       }
       default: {
         // TODO: allow expansion
@@ -1635,8 +1648,11 @@ export class ConnectionItemsStep extends Step {
     >;
   }
 
+  public willNotStream(): boolean {
+    return !this.getConnection().mightStream();
+  }
+
   public optimize(_options: StepOptimizeOptions): Step {
-    // If false, connection guarantees an array
     this.cloneStreams = this.getConnection().mightStream();
     return this;
   }
