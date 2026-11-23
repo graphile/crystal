@@ -46,7 +46,7 @@ export const pgStepBatchExecutor = defineBatchExecutor({
   // Affinity routes the query to a connection queue without affecting its rows.
   optionsMatch: {
     text: "strict",
-    rawSqlValues: "deepTuple",
+    rawSqlValues: "deep",
     affinity: "ignore",
   },
   mergeOptions: (current, incoming) =>

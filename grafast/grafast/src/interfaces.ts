@@ -741,10 +741,11 @@ type BatchOptionComparison<T> =
   | "strict"
   | "ignore"
   | "record"
+  | "deep"
   | (unknown extends T
-      ? "tuple" | "deepTuple" | BatchOptionsMatch<Record<PropertyKey, unknown>>
+      ? "tuple" | BatchOptionsMatch<Record<PropertyKey, unknown>>
       : T extends readonly unknown[]
-        ? "tuple" | "deepTuple" | BatchOptionsMatch<T>
+        ? "tuple" | BatchOptionsMatch<T>
         : T extends object
           ? BatchOptionsMatch<T>
           : never);

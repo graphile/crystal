@@ -400,6 +400,53 @@ it("matches nested option rules and compares unspecified properties strictly", a
   expect(calls).to.deep.equal([[1, 3], [2], [4], [5], [6]]);
 });
 
+it("indexes deeply matching arrays and plain objects", async () => {
+  const calls: Array<readonly number[]> = [];
+  const executor = defineBatchExecutor({
+    name: "deep-options",
+    keysetEquality: "strict",
+    optionsMatch: { filter: "deep" },
+    callback: (_options: { filter: unknown }, keys: readonly number[]) => {
+      calls.push(keys);
+      return keys;
+    },
+  });
+  const scope = {};
+  await Promise.all([
+    batchInMeta(schema, scope, executor, [1], {
+      filter: [{ active: true, range: [1, 2] }],
+    }),
+    batchInMeta(schema, scope, executor, [2], {
+      filter: [{ active: true, range: [2, 1] }],
+    }),
+    batchInMeta(schema, scope, executor, [3], {
+      filter: [{ range: [1, 2], active: true }],
+    }),
+  ]);
+  expect(calls).to.deep.equal([[1, 3], [2]]);
+});
+
+it("rejects unsupported values in deep options before and after indexing", async () => {
+  const executor = defineBatchExecutor({
+    name: "deep-options-validation",
+    keysetEquality: "strict",
+    optionsMatch: { lookup: { filter: "deep" } },
+    callback: (
+      _options: { lookup: { filter: unknown } },
+      keys: readonly number[],
+    ) => keys,
+  });
+  const scope = {};
+  const load = (value: unknown) =>
+    batchInMeta(schema, scope, executor, [1], {
+      lookup: { filter: [{ value }] },
+    });
+  expect(() => load(new Date(0))).to.throw('"deep" batch option rule');
+  expect(await load(1)).to.deep.equal([1]);
+  expect(await load(2)).to.deep.equal([1]);
+  expect(() => load(() => 1)).to.throw('"deep" batch option rule');
+});
+
 it("matches arrays structurally and class instances by identity", () => {
   const matcher = getOptionsMatcher({
     record: "record",

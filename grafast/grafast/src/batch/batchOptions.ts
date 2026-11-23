@@ -12,6 +12,8 @@ interface KeyOrder {
 /** @internal */
 interface OptionsMatcher {
   matches(left: unknown, right: unknown): boolean;
+  /** Validate the first value before any matching or indexing takes place. */
+  validate?(value: unknown): void;
   /**
    * Appends this value's components to the flat key used to find candidate
    * batches. Nested matchers append to the same array. The index shares
@@ -54,31 +56,62 @@ const tupleMatcher: OptionsMatcher = {
   },
 };
 
-const deepTupleMatcher: OptionsMatcher = {
+function assertDeepScalar(value: unknown): void {
+  if (
+    value != null &&
+    (typeof value === "object" || typeof value === "function")
+  ) {
+    throw new Error(
+      'The "deep" batch option rule requires arrays, plain objects, or primitive values.',
+    );
+  }
+}
+
+function validateDeepOption(value: unknown): void {
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      validateDeepOption(value[i]);
+    }
+  } else if (isPojo(value)) {
+    for (const key of Reflect.ownKeys(value)) {
+      validateDeepOption(value[key]);
+    }
+  } else {
+    assertDeepScalar(value);
+  }
+}
+
+const deepMatcher: OptionsMatcher = {
+  validate: validateDeepOption,
   matches(left, right) {
     if (left === right) {
       return true;
-    } else if (
-      !Array.isArray(left) ||
-      !Array.isArray(right) ||
-      left.length !== right.length
-    ) {
+    } else if (left == null || typeof left !== "object") {
       return false;
-    }
-    for (let i = 0; i < left.length; i++) {
-      if (!deepTupleMatcher.matches(left[i], right[i])) {
+    } else if (Array.isArray(left)) {
+      if (!Array.isArray(right) || left.length !== right.length) {
         return false;
       }
+      for (let i = 0; i < left.length; i++) {
+        if (!deepMatcher.matches(left[i], right[i])) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return !Array.isArray(right) && deepRecordMatcher.matches(left, right);
     }
-    return true;
   },
   appendKeys(value, keys, order) {
     if (Array.isArray(value)) {
       keys.push(value.length);
       for (let i = 0; i < value.length; i++) {
-        deepTupleMatcher.appendKeys(value[i], keys, order);
+        deepMatcher.appendKeys(value[i], keys, order);
       }
+    } else if (isPojo(value)) {
+      deepRecordMatcher.appendKeys(value, keys, order);
     } else {
+      assertDeepScalar(value);
       keys.push($$scalar, value);
     }
   },
@@ -116,8 +149,25 @@ function isOptionsObject(
 
 function makeObjectMatcher(
   rules?: Map<PropertyKey, OptionsMatcher>,
+  defaultRule = strictMatcher,
 ): OptionsMatcher {
+  const validatingRules =
+    rules === undefined
+      ? undefined
+      : [...rules].filter(([, rule]) => rule.validate !== undefined);
   return {
+    validate:
+      validatingRules === undefined || validatingRules.length === 0
+        ? undefined
+        : (value) => {
+            if (isOptionsObject(value)) {
+              for (const [key, rule] of validatingRules) {
+                if (Object.hasOwn(value, key)) {
+                  rule.validate?.(value[key]);
+                }
+              }
+            }
+          },
     matches(left, right) {
       if (left === right) {
         return true;
@@ -136,7 +186,7 @@ function makeObjectMatcher(
         if (!Object.hasOwn(right, key)) {
           return false;
         }
-        const rule = rules?.get(key) ?? strictMatcher;
+        const rule = rules?.get(key) ?? defaultRule;
         if (!rule.matches(left[key], right[key])) {
           return false;
         }
@@ -169,21 +219,29 @@ function makeObjectMatcher(
       if (ownKeys.length > 1) {
         ownKeys.sort((a, z) => compareOptionKeys(a, z, order));
       }
-      for (const key of ownKeys) {
-        keys.push(key, value[key]);
+      if (defaultRule === strictMatcher) {
+        for (const key of ownKeys) {
+          keys.push(key, value[key]);
+        }
+      } else {
+        for (const key of ownKeys) {
+          keys.push(key);
+          defaultRule.appendKeys(value[key], keys, order);
+        }
       }
     },
   };
 }
 
 const recordMatcher = makeObjectMatcher();
+const deepRecordMatcher = makeObjectMatcher(undefined, deepMatcher);
 
 interface OptionsMatchDescriptor {
   readonly [key: PropertyKey]:
     | "strict"
     | "ignore"
     | "tuple"
-    | "deepTuple"
+    | "deep"
     | "record"
     | OptionsMatchDescriptor
     | undefined;
@@ -197,8 +255,8 @@ function compileOptionsMatch(
     const rule = descriptor[key];
     if (rule === "tuple") {
       rules.set(key, tupleMatcher);
-    } else if (rule === "deepTuple") {
-      rules.set(key, deepTupleMatcher);
+    } else if (rule === "deep") {
+      rules.set(key, deepMatcher);
     } else if (rule === "record") {
       rules.set(key, recordMatcher);
     } else if (rule === "strict") {
@@ -278,6 +336,7 @@ export class BatchOptionsIndex<
   getOrCreate(options: TOptions): BatchFamily<TOptions, TKeyset, TResult> {
     const first = this.first;
     if (first === null) {
+      this.matcher.validate?.(options);
       return (this.first = this.createFamily(options));
     }
 
