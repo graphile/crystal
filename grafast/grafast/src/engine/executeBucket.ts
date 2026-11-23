@@ -1,7 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
-import { batchInMeta } from "../batch/batchInMeta.ts";
+import { makeBatch } from "../batch/batchInMeta.ts";
 import type { Bucket, RequestTools, SharedBucketState } from "../bucket.ts";
 import {
   $$streamMore,
@@ -17,7 +17,6 @@ import { flagError, isFlaggedValue, SafeError } from "../error.ts";
 import { inspect } from "../inspect.ts";
 import type {
   BatchExecutionValue,
-  BatchFunction,
   ExecuteStepEvent,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -138,14 +137,7 @@ export function executeBucket(
     layerPlan: { phases, operationPlan },
   } = bucket;
 
-  const batch: BatchFunction = (executor, keysets, options?) =>
-    batchInMeta(
-      operationPlan.schema,
-      metaByMetaKey,
-      executor,
-      keysets,
-      options,
-    );
+  const batch = makeBatch(operationPlan.schema, metaByMetaKey);
   const phaseCount = phases.length;
 
   // Like a `for(i = 0; i < phaseCount; i++)` loop with some `await`s in it, except it does promise
@@ -841,7 +833,6 @@ export function executeBucket(
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
       batch,
-      batchScope: metaByMetaKey,
       stream: evaluateStream(bucket, step, distributorOptions),
       extra,
     };

@@ -773,17 +773,18 @@ export interface BatchExecutor<
    */
   readonly mergeOptions?: (current: TOptions, incoming: TOptions) => TOptions;
 }
-export type BatchFunction = <
-  TOptions extends Record<string, unknown> | undefined,
-  TKeyset,
-  TResult,
->(
-  executor: BatchExecutor<TOptions, TKeyset, TResult>,
-  keysets: ReadonlyArray<TKeyset>,
-  ...options: undefined extends TOptions
-    ? [options?: NoInfer<TOptions>]
-    : [options: NoInfer<TOptions>]
-) => PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>>;
+export interface BatchFunction {
+  <TOptions extends Record<string, unknown> | undefined, TKeyset, TResult>(
+    executor: BatchExecutor<TOptions, TKeyset, TResult>,
+    keysets: ReadonlyArray<TKeyset>,
+    ...options: undefined extends TOptions
+      ? [options?: NoInfer<TOptions>]
+      : [options: NoInfer<TOptions>]
+  ): PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>>;
+
+  /** Clear cached results in this scope after a successful mutation. */
+  invalidate(): void;
+}
 
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;
@@ -820,9 +821,6 @@ export interface ExecutionDetails<
    * @experimental
    */
   batch: BatchFunction;
-
-  /** Opaque cache scope; pass to invalidateBatchCache after a successful mutation. */
-  batchScope: object;
 
   /**
    * If this step is expected to return a stream (e.g. because it's a

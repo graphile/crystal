@@ -977,7 +977,6 @@ on (${sql.indent(
     const {
       indexMap,
       values,
-      batchScope: store,
       extra: { eventEmitter },
     } = executionDetails;
     const { fetchOneExtra } = this;
@@ -1039,7 +1038,6 @@ on (${sql.indent(
         : EMPTY_ARRAY,
     );
     const common = {
-      store,
       text,
       rawSqlValues,
       identifierIndex,
@@ -1051,7 +1049,7 @@ on (${sql.indent(
     const executionResult = this.hasSideEffects
       ? await this.executor.executeWithoutCache(
           keysets.map((queryValues) => ({ context, queryValues })),
-          common,
+          { ...common, onMutationSuccess: executionDetails.batch.invalidate },
         )
       : {
           values: await executionDetails.batch(

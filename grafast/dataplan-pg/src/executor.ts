@@ -11,7 +11,6 @@ import {
   asyncIteratorWithCleanup,
   exportAs,
   inspect,
-  invalidateBatchCache,
   isAsyncIterable,
   isDev,
   noop,
@@ -137,11 +136,8 @@ export interface WithPgClient<
 }
 
 /**
- * The identity of this object scopes in-flight client queues and cached reads.
- * With `PgExecutorOptions.store`, cached reads are also scoped to that store.
- * Built-in steps use execution metadata as the store, so subscription events
- * and mutation fields have separate caches even when sharing this context.
- * Callers omitting the store must use a new context when fresh reads are needed.
+ * The identity of this object scopes in-flight client queues and separates
+ * cached reads within a Gra*fast* batching scope.
  */
 export type PgExecutorContext<
   TSettings = any,
@@ -167,8 +163,6 @@ export type PgExecutorInput<TInput> = {
 };
 
 export type PgExecutorOptions = {
-  /** Execution batching scope, used to invalidate reads after a mutation. */
-  store?: object;
   text: string;
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
@@ -180,6 +174,8 @@ export type PgExecutorOptions = {
   affinity?: symbol;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
+  /** Called after each successful side-effecting query. */
+  onMutationSuccess?: () => void;
   /** @internal Enable client-queue sharing for normal batched reads. */
   queue?: boolean;
 };
@@ -280,11 +276,11 @@ function takePending(
 }
 
 export type PgExecutorMutationOptions = {
-  /** The ExecutionDetails.batchScope used by reads in this execution. */
-  store?: object;
   context: PgExecutorContext;
   /** @defaultValue `true` */
   useTransaction?: boolean;
+  /** Called after a successful mutation and any associated transaction. */
+  onMutationSuccess?: () => void;
 };
 type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
   /** @deprecated Pass a callback instead. */
@@ -306,7 +302,7 @@ export type PgExecutorSubscribeOptions = {
  * query scheduling.
  */
 export class PgExecutor<const TName extends string = string, TSettings = any> {
-  /** @deprecated PostgreSQL steps now use ExecutionDetails.batchScope. */
+  /** @deprecated PostgreSQL steps now use ExecutionDetails.batch. */
   public static readonly metaKey = Symbol("PgExecutor cache");
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
@@ -675,7 +671,8 @@ ${duration}
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
-    const { rawSqlValues, identifierIndex, eventEmitter, store } = common;
+    const { rawSqlValues, identifierIndex, eventEmitter, onMutationSuccess } =
+      common;
     const publishExecute: PublishFunction | undefined = eventEmitter
       ? (text, name, explain) => {
           eventEmitter.emit("explainOperation", {
@@ -733,7 +730,11 @@ ${duration}
                 ];
           const queryResult = common.useTransaction
             ? await this.executeMutation<PgClientResult<TOutput>>(
-                { context, store, useTransaction: common.useTransaction },
+                {
+                  context,
+                  useTransaction: common.useTransaction,
+                  onMutationSuccess,
+                },
                 (client) =>
                   this._executeWithClient(
                     client,
@@ -1121,7 +1122,7 @@ ${duration}
     options: PgExecutorMutationOptions,
     maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
-    const { context, store, useTransaction } = options;
+    const { context, useTransaction, onMutationSuccess } = options;
     const { withPgClient, pgSettings } = context;
     let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
@@ -1150,9 +1151,7 @@ ${duration}
         ? callback
         : (client) => client.withTransaction(callback),
     );
-    if (store !== undefined) {
-      invalidateBatchCache(store);
-    }
+    onMutationSuccess?.();
 
     return result;
   }

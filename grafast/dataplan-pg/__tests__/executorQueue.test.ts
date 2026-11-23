@@ -354,13 +354,12 @@ test("cross-step batch caches respect scope mutation invalidation", async () => 
   // eslint-disable-next-line graphile-export/export-subclasses
   class ReadAroundMutationStep extends Step<string> {
     async execute(details: ExecutionDetails) {
-      const store = details.batchScope;
+      const onMutationSuccess = details.batch.invalidate;
       const read = () =>
         details.batch(
           pgStepBatchExecutor,
           [[], []],
           pgStepBatchOptions(executor, context, {
-            store,
             text: "select value",
             rawSqlValues: [],
             eventEmitter: undefined,
@@ -370,15 +369,18 @@ test("cross-step batch caches respect scope mutation invalidation", async () => 
       expect((await read())[0]).toBe(first[0]);
       expect(seen).toHaveLength(1);
       await expect(
-        executor.executeMutation({ context, store }, async () => {
+        executor.executeMutation({ context, onMutationSuccess }, async () => {
           throw new Error("rolled back");
         }),
       ).rejects.toThrow("rolled back");
       expect((await read())[0]).toBe(first[0]);
       expect(seen).toHaveLength(1);
-      await executor.executeMutation({ context, store }, async () => {
-        version = 2;
-      });
+      await executor.executeMutation(
+        { context, onMutationSuccess },
+        async () => {
+          version = 2;
+        },
+      );
       expect(await read()).toEqual([[[2]], [[2]]]);
       expect(seen).toHaveLength(2);
       return ["ok"];

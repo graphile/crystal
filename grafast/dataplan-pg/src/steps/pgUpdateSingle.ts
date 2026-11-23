@@ -421,7 +421,7 @@ export class PgUpdateSingleStep<
   async execute({
     indexMap,
     values,
-    batchScope: store,
+    batch,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { alias, contextId, finalizeResults, resource } = this;
     if (!finalizeResults) {
@@ -560,7 +560,11 @@ export class PgUpdateSingleStep<
       };
       const { rows, rowCount, notices } =
         await this.resource.executor.executeMutation(
-          { context, store, useTransaction: this.wrappers.length > 0 },
+          {
+            context,
+            useTransaction: this.wrappers.length > 0,
+            onMutationSuccess: batch.invalidate,
+          },
           this.wrappers.length > 0
             ? makeWrappedMutationExecute<PgUpdateSingleQueryBuilder, any>(
                 this.wrappers,

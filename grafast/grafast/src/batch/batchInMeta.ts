@@ -4,6 +4,7 @@ import { isDev, noop } from "../dev.ts";
 import { flagError } from "../error.ts";
 import type {
   BatchExecutor,
+  BatchFunction,
   ExecutionResultValue,
   PromiseOrDirect,
 } from "../interfaces.ts";
@@ -23,9 +24,26 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 
 const $$batches = Symbol("Grafast batch caches");
 
-/** Replace this scope's cache generation; already dispatched work can finish. */
-export function invalidateBatchCache(scope: object): void {
-  delete (scope as BatchMeta)[$$batches];
+/** @internal Bind batching and invalidation to the current execution scope. */
+export function makeBatch(
+  schema: GraphQLSchema,
+  metaByMetaKey: BatchMeta,
+): BatchFunction {
+  function batch<
+    TOptions extends Record<string, unknown> | undefined,
+    TKeyset,
+    TResult,
+  >(
+    executor: BatchExecutor<TOptions, TKeyset, TResult>,
+    keysets: readonly TKeyset[],
+    options?: TOptions,
+  ) {
+    return batchInMeta(schema, metaByMetaKey, executor, keysets, options);
+  }
+  batch.invalidate = () => {
+    delete metaByMetaKey[$$batches];
+  };
+  return batch;
 }
 
 /** @internal Used to implement `ExecutionDetails.batch`. */

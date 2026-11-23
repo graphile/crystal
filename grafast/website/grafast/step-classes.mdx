@@ -274,12 +274,11 @@ per key, and calls whose keys are all cached return synchronously. The cache bel
 with that scope; root executions, mutation fields and subscription events have
 separate scopes. Failed batch calls are evicted so later calls can retry.
 
-#### details.batchScope
+#### details.batch.invalidate()
 
-`details.batchScope` is the opaque owner of the current batching cache. After a
-successful mutation, call `invalidateBatchCache(details.batchScope)` to replace
-its cache generation. Later calls fetch fresh values; work already in flight
-can finish for its original callers without populating the new cache.
+After a successful mutation, call `details.batch.invalidate()` to clear cached
+results in the current execution scope. Later calls fetch fresh values. Work
+already in flight can finish for its original callers.
 
 #### details.values
 

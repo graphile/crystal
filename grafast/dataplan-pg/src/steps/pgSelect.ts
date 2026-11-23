@@ -1191,7 +1191,6 @@ export class PgSelectStep<
       indexMap,
       count,
       values,
-      batchScope: store,
       extra: { eventEmitter },
     } = executionDetails;
     const {
@@ -1311,7 +1310,6 @@ export class PgSelectStep<
         });
       }
       const common = {
-        store,
         text,
         rawSqlValues,
         identifierIndex,
@@ -1326,7 +1324,10 @@ export class PgSelectStep<
           : isMutation
             ? await this.resource.executeWithoutCache(
                 keysets.map((queryValues) => ({ context, queryValues })),
-                common,
+                {
+                  ...common,
+                  onMutationSuccess: executionDetails.batch.invalidate,
+                },
               )
             : {
                 values: await executionDetails.batch(
@@ -1385,7 +1386,6 @@ export class PgSelectStep<
       const initialFetchResult = specs
         ? (
             await this.resource.executeWithoutCache(specs, {
-              store,
               text,
               rawSqlValues,
               identifierIndex,

@@ -8,7 +8,7 @@ import type {
   PgExecutorOptions,
 } from "../executor.ts";
 
-type PgStepBatchOptions = Omit<PgExecutorOptions, "store"> & {
+type PgStepBatchOptions = Omit<PgExecutorOptions, "onMutationSuccess"> & {
   executor: PgExecutor;
   context: PgExecutorContext;
 };

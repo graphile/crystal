@@ -389,7 +389,7 @@ export class PgInsertSingleStep<
   async execute({
     indexMap,
     values,
-    batchScope: store,
+    batch,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { resource, contextId, finalizeResults, alias } = this;
     const executor = this.resource.executor;
@@ -515,7 +515,11 @@ export class PgInsertSingleStep<
         );
       };
       const { rows, notices, rowCount } = await executor.executeMutation(
-        { context, store, useTransaction: this.wrappers.length > 0 },
+        {
+          context,
+          useTransaction: this.wrappers.length > 0,
+          onMutationSuccess: batch.invalidate,
+        },
         this.wrappers.length > 0
           ? makeWrappedMutationExecute<PgInsertSingleQueryBuilder, any>(
               this.wrappers,

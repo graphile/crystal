@@ -11,7 +11,6 @@ import type {
 } from "graphql";
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
-import { invalidateBatchCache } from "./batch/batchInMeta.ts";
 import { defineBatchExecutor } from "./batch/defineBatchExecutor.ts";
 import { promiseWithResolve } from "./promiseWithResolve.ts";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.ts";
@@ -579,13 +578,12 @@ export {
   UnbatchedStep,
   variableValues,
 };
-export { defineBatchExecutor, invalidateBatchCache };
+export { defineBatchExecutor };
 
 export type { PromiseWithResolve } from "./promiseWithResolve.ts";
 
 exportAsMany("grafast", {
   defineBatchExecutor,
-  invalidateBatchCache,
   exportAs,
   promiseWithResolve,
   exportAsMany,

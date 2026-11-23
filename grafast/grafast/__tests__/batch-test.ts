@@ -5,7 +5,7 @@ import { expect } from "chai";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { it } from "mocha";
 
-import { batchInMeta } from "../dist/batch/batchInMeta.js";
+import { batchInMeta, makeBatch } from "../dist/batch/batchInMeta.js";
 import { getOptionsMatcher } from "../dist/batch/batchOptions.js";
 import { isDev } from "../dist/dev.js";
 import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
@@ -15,7 +15,6 @@ import {
   each,
   flagError,
   grafast,
-  invalidateBatchCache,
   lambda,
   makeGrafastSchema,
   Step,
@@ -1235,15 +1234,17 @@ it("invalidates a scope without letting old in-flight results populate its new c
     },
   });
   const scope = {};
-  const old = batchInMeta(schema, scope, executor, [1]);
+  const batch = makeBatch(schema, scope);
+  const otherBatch = makeBatch(schema, scope);
+  const old = batch(executor, [1]);
   await Promise.resolve();
-  invalidateBatchCache(scope);
+  otherBatch.invalidate();
   version = 2;
   try {
-    expect(await batchInMeta(schema, scope, executor, [1])).to.deep.equal([2]);
+    expect(await batch(executor, [1])).to.deep.equal([2]);
   } finally {
     release();
   }
   expect(await old).to.deep.equal([1]);
-  expect(batchInMeta(schema, scope, executor, [1])).to.deep.equal([2]);
+  expect(otherBatch(executor, [1])).to.deep.equal([2]);
 });
