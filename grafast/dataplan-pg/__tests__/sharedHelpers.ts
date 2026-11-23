@@ -6,6 +6,8 @@ import { createWithPgClient } from "../dist/adaptors/pg.js";
 import {
   type PgClientQuery,
   PgExecutor,
+  type PgExecutorInput,
+  type PgExecutorOptions,
   type WithPgClient,
 } from "../dist/index.js";
 
@@ -35,8 +37,7 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   };
 }
 
-const originalPgExecutorMethod = (PgExecutor.prototype as any)
-  ._executeWithOrWithoutCache;
+const originalExecuteWithoutCache = PgExecutor.prototype.executeWithoutCache;
 
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
@@ -72,7 +73,7 @@ export async function withTestWithPgClient<T>(
     queries.push(...currentBatchQueries);
     endBatch();
   }
-  function addBatch(promise: Promise<any>) {
+  function addBatch<TResult>(promise: Promise<TResult>): Promise<TResult> {
     if (!currentBatch) {
       currentBatch = {
         promises: new Set([promise]),
@@ -136,18 +137,19 @@ export async function withTestWithPgClient<T>(
     }
     return (oldQuery as (...args: any[]) => unknown).apply(this, args);
   } as typeof poolClient.query;
-  // Monkey patch to capture queries
+  // Release concurrent executor calls together for consistent SQL snapshots.
   if (
-    originalPgExecutorMethod !==
-    (PgExecutor.prototype as any)._executeWithOrWithoutCache
+    originalExecuteWithoutCache !== PgExecutor.prototype.executeWithoutCache
   ) {
     throw new Error("Already patched!");
   }
-  (PgExecutor.prototype as any)._executeWithOrWithoutCache = function (
-    ...args: any[]
+  PgExecutor.prototype.executeWithoutCache = function <TInput, TOutput>(
+    this: PgExecutor,
+    values: readonly PgExecutorInput<TInput>[],
+    options: PgExecutorOptions,
   ) {
-    const promise = originalPgExecutorMethod.apply(this, args);
-    return addBatch(promise);
+    const execute = originalExecuteWithoutCache<TInput, TOutput>;
+    return addBatch(execute.call(this, values, options));
   };
   try {
     if (direct) {
@@ -213,8 +215,7 @@ export async function withTestWithPgClient<T>(
       }
     }
   } finally {
-    (PgExecutor.prototype as any)._executeWithOrWithoutCache =
-      originalPgExecutorMethod;
+    PgExecutor.prototype.executeWithoutCache = originalExecuteWithoutCache;
     poolClient.query = oldQuery;
     poolClient.release();
   }
