@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/connections/order.variables.strings"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 10, 12, 15, 16, 55, 56, 17, 21, 54, 19<br />2: PgSelect[14], PgSelect[26]<br />ᐳ: Access[36]<br />3: Connection[18], PgSelectRows[28]<br />ᐳ: 27, 29, 30<br />4: ConnectionItems[22]<br />ᐳ: 35, 37, 38, 39"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 10, 12, 15, 16, 55, 56, 17, 21, 54, 19<br />2: PgSelect[14], PgSelect[26]<br />ᐳ: Access[36]<br />3: 18, 28, 35, 38<br />ᐳ: 27, 29, 30, 37, 39<br />4: ConnectionItems[22]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 36, 22, 17, 30, 37, 39<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 36, 17<br /><br />ROOT __Item{3}ᐸ22ᐳ[31]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31, 32, 17, 41<br /><br />ROOT Edge{3}[32]"):::bucket
@@ -45,25 +45,28 @@ graph TD
     __Value2 --> Access15
     __Value2 --> Access16
     List54 --> ApplyInput19
-    ConnectionItems22[["ConnectionItems[22∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[18]"]]:::plan
+    ConnectionItems22[["ConnectionItems[22∈0] ➊<br />More deps:<br />- Connection[18]"]]:::plan
     First27{{"First[27∈0] ➊"}}:::plan
     PgSelectRows28[["PgSelectRows[28∈0] ➊"]]:::plan
     PgSelectRows28 --> First27
     PgSelect26 --> PgSelectRows28
     PgSelectSingle29{{"PgSelectSingle[29∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
     First27 --> PgSelectSingle29
-    First35{{"First[35∈0] ➊<br />More deps:<br />- ConnectionItems[22]"}}:::plan
+    Lambda35[["Lambda[35∈0] ➊<br />ᐸfirstItemᐳ"]]:::unbatchedplan
+    PgSelect14 --> Lambda35
     Access36{{"Access[36∈0] ➊<br />ᐸ14.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect14 --> Access36
-    Last38{{"Last[38∈0] ➊<br />More deps:<br />- ConnectionItems[22]"}}:::plan
+    Lambda38[["Lambda[38∈0] ➊<br />ᐸlastItemᐳ"]]:::unbatchedplan
+    PgSelect14 --> Lambda38
     PageInfo25{{"PageInfo[25∈1] ➊<br />More deps:<br />- Connection[18]"}}:::plan
     Access33{{"Access[33∈1] ➊<br />ᐸ18.hasNextPageᐳ<br />More deps:<br />- Connection[18]"}}:::plan
     Access34{{"Access[34∈1] ➊<br />ᐸ18.hasPreviousPageᐳ<br />More deps:<br />- Connection[18]"}}:::plan
     Edge32{{"Edge[32∈3]"}}:::plan
-    __Item31[/"__Item[31∈3]<br />ᐸ22ᐳ<br />More deps:<br />- ConnectionItems[22]"\]:::itemplan
+    __Item31[/"__Item[31∈3]<br />ᐸ22ᐳ"\]:::itemplan
     PgCursor41{{"PgCursor[41∈3]<br />More deps:<br />- Access[36]"}}:::plan
     __Item31 & PgCursor41 --> Edge32
     __Item31 --> PgCursor41
+    ConnectionItems22 ==> __Item31
     PgSelectSingle42{{"PgSelectSingle[42∈4]<br />ᐸmessagesᐳ"}}:::plan
     __Item31 --> PgSelectSingle42
     PgSelect45[["PgSelect[45∈5]<br />ᐸusersᐳ<br />More deps:<br />- Object[17]"]]:::plan
@@ -85,7 +88,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,Access10,Access12,PgSelect14,Access15,Access16,Object17,Connection18,ApplyInput19,Lambda21,ConnectionItems22,PgSelect26,First27,PgSelectRows28,PgSelectSingle29,First35,Access36,Last38,List54 bucket0
+    class Bucket0,__Value0,__Value2,Access10,Access12,PgSelect14,Access15,Access16,Object17,Connection18,ApplyInput19,Lambda21,ConnectionItems22,PgSelect26,First27,PgSelectRows28,PgSelectSingle29,Lambda35,Access36,Lambda38,List54 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PageInfo25,Access33,Access34 bucket1
     classDef bucket3 stroke:#ffa500

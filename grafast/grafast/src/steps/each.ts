@@ -7,6 +7,7 @@ import { __ItemStep } from "./__item.ts";
 import type {
   ConnectionHandlingStep,
   ConnectionOptimizedStep,
+  FullPaginationResult,
   ItemsStep,
   StepRepresentingList,
 } from "./connection.ts";
@@ -58,7 +59,7 @@ export function each<
   TListStep extends StepRepresentingList<any> &
     Partial<
       | ConnectionOptimizedStep<any, any, any, any>
-      | ConnectionHandlingStep<any, any, any, any>
+      | ConnectionHandlingStep<any, any, any, any, FullPaginationResult<any>>
     >,
   TResultItemStep extends Step,
 >(

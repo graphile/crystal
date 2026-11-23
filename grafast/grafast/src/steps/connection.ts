@@ -95,7 +95,8 @@ export interface PaginationFeatures {
    * each individual parameter through to your collection step. Your collection
    * step is also responsible for implementing the
    * `hasNextPage`/`hasPreviousPage` logic, and must yield from execution an
-   * object conforming to `ConnectionHandlingResult`.
+   * object conforming to `ConnectionHandlingResult` or
+   * `ConnectionHandlingResultWithGetters`.
    */
   full?: boolean;
 }
@@ -278,6 +279,23 @@ export interface ConnectionHandlingResult<
   items: ReadonlyArray<TItem> | AsyncIterable<TItem>;
 }
 
+/** A full pagination result that computes the page flags on demand. */
+export interface ConnectionHandlingResultWithGetters<TItem> {
+  items: ConnectionHandlingResult<TItem>["items"];
+  getHasNextPage(): PromiseOrDirect<boolean>;
+  getHasPreviousPage(): PromiseOrDirect<boolean>;
+}
+
+export type FullPaginationResult<TItem> =
+  | ConnectionHandlingResult<TItem>
+  | ConnectionHandlingResultWithGetters<TItem>;
+
+type PageInfoKey =
+  | "hasNextPage"
+  | "hasPreviousPage"
+  | "startCursor"
+  | "endCursor";
+
 export interface ConnectionHandlingStep<
   TItem,
   TNodeStep extends Step = Step<TItem>,
@@ -286,7 +304,8 @@ export interface ConnectionHandlingStep<
     TNodeStep
   >,
   TCursorValue = string,
-> extends Step<Maybe<ConnectionHandlingResult<TItem>>>,
+  TResult extends FullPaginationResult<TItem> = ConnectionHandlingResult<TItem>,
+> extends Step<Maybe<TResult>>,
     Pick<
       ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>,
       "parseCursor" | "nodeForItem" | "edgeForItem" | "listItem"
@@ -304,7 +323,7 @@ export interface ConnectionHandlingStep<
    */
   connectionClone?(
     ...args: any[]
-  ): ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>; // TODO: `this`
+  ): ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue, TResult>; // TODO: `this`
 
   paginationSupport: {
     full: true;
@@ -323,7 +342,7 @@ export interface ConnectionHandlingStep<
 
   /** Plan a page-info field using the collection's pagination implementation. */
   planPageInfo?(
-    key: "hasNextPage" | "hasPreviousPage" | "endCursor",
+    key: PageInfoKey,
     layerPlan: Step["layerPlan"],
     fallback: () => Step,
   ): Step;
@@ -518,7 +537,13 @@ export class ConnectionStep<
     needsCollection: boolean,
   ):
     | (TCollectionStep &
-        ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>)
+        ConnectionHandlingStep<
+          TItem,
+          TNodeStep,
+          TEdgeStep,
+          TCursorValue,
+          FullPaginationResult<TItem>
+        >)
     | ConnectionParamsStep<TCursorValue> {
     if (this.collectionPaginationSupport?.full) {
       return this.setupSubplanWithPagination(needsCollection) as any;
@@ -637,7 +662,13 @@ export class ConnectionStep<
     ...args: Parameters<
       TCollectionStep extends
         | ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
-        | ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
+        | ConnectionHandlingStep<
+            TItem,
+            TNodeStep,
+            TEdgeStep,
+            TCursorValue,
+            FullPaginationResult<TItem>
+          >
         ? Exclude<TCollectionStep["connectionClone"], undefined>
         : never
     >
@@ -787,15 +818,12 @@ export class ConnectionStep<
     return new PageInfoStep(this);
   }
 
-  public planPageInfo(
-    key: "hasNextPage" | "hasPreviousPage" | "endCursor",
-    fallback: () => Step,
-  ): Step {
+  public planPageInfo(key: PageInfoKey, fallback: () => Step): Step {
     const handler = this.getHandler(true);
     if ("planPageInfo" in handler && handler.planPageInfo != null) {
       return handler.planPageInfo(key, currentLayerPlan(), fallback);
     }
-    if (key !== "endCursor") {
+    if (key === "hasNextPage" || key === "hasPreviousPage") {
       this.setNeedsHasMore();
     }
     return fallback();
@@ -849,19 +877,18 @@ export class ConnectionStep<
 
       if (params === null) {
         // collection handles everything
-        const result = collectionValue as ConnectionHandlingResult<any>;
-        if (
-          !this._mightStream &&
-          result.items != null &&
-          !Array.isArray(result.items)
-        ) {
+        if (collectionValue == null) {
+          return null;
+        }
+        const result = collectionValue as FullPaginationResult<TItem>;
+        const { items } = result;
+        if (!this._mightStream && items != null && !Array.isArray(items)) {
           // Except it might return a stream which we should turn into an array.
-          return (async () => ({
-            ...result,
-            items: await iterableToArray(result.items),
-          }))();
+          return iterableToArray(items).then((items) =>
+            fullPaginationConnectionResult(result, items),
+          );
         } else {
-          return result;
+          return fullPaginationConnectionResult(result, items);
         }
       }
 
@@ -935,6 +962,24 @@ export class ConnectionStep<
       }
     });
   }
+}
+
+function fullPaginationConnectionResult<TItem>(
+  result: FullPaginationResult<TItem>,
+  items: ConnectionHandlingResult<TItem>["items"],
+): ConnectionHandlingResult<TItem> {
+  if ("getHasNextPage" in result) {
+    return {
+      items,
+      get hasNextPage() {
+        return result.getHasNextPage();
+      },
+      get hasPreviousPage() {
+        return result.getHasPreviousPage();
+      },
+    };
+  }
+  return items === result.items ? result : { ...result, items };
 }
 
 const MODE_NULL = 0;
@@ -1604,9 +1649,10 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
         return $connection.planPageInfo(key, () => access($connection, key));
       }
       case "startCursor": {
-        // Get first node, get cursor for it
-        const $first = first($connection._items(), "auto");
-        return $connection.cursorPlan($first);
+        return $connection.planPageInfo(key, () => {
+          const $first = first($connection._items(), "auto");
+          return $connection.cursorPlan($first);
+        });
       }
       case "endCursor": {
         return $connection.planPageInfo(key, () => {

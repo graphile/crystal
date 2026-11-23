@@ -15,6 +15,7 @@ async function runConnectionQuery(document: string) {
 }
 
 test.each([
+  { first: 3, initialCount: 0, ids: [1, 2, 3], hasNextPage: true },
   { first: 3, initialCount: 1, ids: [1, 2, 3], hasNextPage: true },
   { first: 3, initialCount: 5, ids: [1, 2, 3], hasNextPage: true },
   { first: 6, initialCount: 1, ids: [1, 2, 3, 4, 5, 6], hasNextPage: false },

@@ -1,6 +1,7 @@
 import type {
   __InputStaticLeafStep,
   ConnectionHandlingResult,
+  ConnectionHandlingResultWithGetters,
   ConnectionHandlingStep,
   ExecutionDetails,
   Maybe,
@@ -57,15 +58,20 @@ export type PgStmtDeferredSQL = {
 const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled placeholder! */`;
 const UNHANDLED_DEFERRED = sql`(1/0) /* ERROR! Unhandled deferred! */`;
 
-export abstract class PgStmtBaseStep<T>
-  extends Step<Maybe<ConnectionHandlingResult<T>>>
+export abstract class PgStmtBaseStep<
+    TResult extends
+      | ConnectionHandlingResult<unknown>
+      | ConnectionHandlingResultWithGetters<unknown>,
+  >
+  extends Step<Maybe<TResult>>
   implements
     PgQueryRootStep,
     ConnectionHandlingStep<
       any,
       PgSelectSingleStep<any>,
       any,
-      null | readonly any[]
+      null | readonly any[],
+      TResult
     >
 {
   static $$export = {

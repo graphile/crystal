@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
-  ConnectionHandlingResult,
+  ConnectionHandlingResultWithGetters,
   ConnectionHandlingStep,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -127,11 +127,11 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
-  hasNextPage: false,
-  hasPreviousPage: false,
-  getHasOneExtra: () => false,
-  getLastItem: () => null,
   items: [],
+  getFirstItem: () => null,
+  getLastItem: () => null,
+  getHasNextPage: () => false,
+  getHasPreviousPage: () => false,
   cursorDetails: undefined,
   groupDetails: undefined,
   m: Object.create(null),
@@ -387,20 +387,21 @@ interface QueryBuildResult {
   groupDetails: PgGroupDetails | undefined;
 }
 
-interface PgSelectStepResult extends ConnectionHandlingResult<unknown> {
-  getHasOneExtra(): PromiseOrDirect<boolean>;
-  getLastItem(): PromiseOrDirect<unknown[] | null>;
+interface PgSelectStepResult
+  extends ConnectionHandlingResultWithGetters<unknown> {
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
+  getFirstItem(): PromiseOrDirect<unknown[] | null>;
+  getLastItem(): PromiseOrDirect<unknown[] | null>;
   cursorDetails: PgCursorDetails | undefined;
   groupDetails: PgGroupDetails | undefined;
   m: Record<string, unknown>;
 }
 
 const pgSelectResultGetters = {
-  hasOneExtra: (result: PgSelectStepResult) => result.getHasOneExtra(),
-  hasNextPage: (result: PgSelectStepResult) => result.hasNextPage,
-  hasPreviousPage: (result: PgSelectStepResult) => result.hasPreviousPage,
+  hasNextPage: (result: PgSelectStepResult) => result.getHasNextPage(),
+  hasPreviousPage: (result: PgSelectStepResult) => result.getHasPreviousPage(),
+  firstItem: (result: PgSelectStepResult) => result.getFirstItem(),
   lastItem: (result: PgSelectStepResult) => result.getLastItem(),
 };
 type PgSelectResultKey = keyof typeof pgSelectResultGetters;
@@ -432,13 +433,14 @@ export class PgSelectStep<
       any
     > = PgResource,
   >
-  extends PgStmtBaseStep<any>
+  extends PgStmtBaseStep<PgSelectStepResult>
   implements
     ConnectionHandlingStep<
       any,
       PgSelectSingleStep<TResource> | PgClassExpressionStep<any, TResource>,
       any,
-      null | readonly any[]
+      null | readonly any[],
+      PgSelectStepResult
     >,
     /**
      * @internal PgSelectStep might not always implement PgSelectQueryBuilder;
@@ -1188,21 +1190,21 @@ export class PgSelectStep<
     this.requiresCompletePage = true;
   }
 
-  public get(key: "lastItem"): Step<unknown[] | null>;
-  public get(
-    key: "hasOneExtra" | "hasNextPage" | "hasPreviousPage",
-  ): Step<boolean>;
+  public get(key: "firstItem" | "lastItem"): Step<unknown[] | null>;
+  public get(key: "hasNextPage" | "hasPreviousPage"): Step<boolean>;
   public get(key: PgSelectResultKey): Step<boolean | unknown[] | null> {
     const $getter = lambda<PgSelectStep<TResource>, boolean | unknown[] | null>(
       this,
       pgSelectResultGetters[key],
     );
-    this.requirePageValue(key, $getter.layerPlan);
+    if (key !== "firstItem") {
+      this.requirePageValue(key, $getter.layerPlan);
+    }
     return $getter;
   }
 
   private requirePageValue(
-    key: PgSelectResultKey,
+    key: Exclude<PgSelectResultKey, "firstItem">,
     layerPlan: Step["layerPlan"],
   ): boolean {
     if (key !== "lastItem") {
@@ -1222,18 +1224,15 @@ export class PgSelectStep<
   }
 
   public planPageInfo(
-    key: "hasNextPage" | "hasPreviousPage" | "endCursor",
+    key: "hasNextPage" | "hasPreviousPage" | "startCursor" | "endCursor",
     layerPlan: Step["layerPlan"],
     fallback: () => Step,
   ): Step {
-    if (
-      this.requirePageValue(key === "endCursor" ? "lastItem" : key, layerPlan)
-    ) {
-      return fallback();
+    if (key === "startCursor" || key === "endCursor") {
+      const $item = this.get(key === "startCursor" ? "firstItem" : "lastItem");
+      return this.cursorForItem($item);
     }
-    return key === "endCursor"
-      ? this.cursorForItem(this.get("lastItem"))
-      : this.get(key);
+    return this.requirePageValue(key, layerPlan) ? fallback() : this.get(key);
   }
 
   private needsGroups = false;
@@ -4436,6 +4435,9 @@ function createStreamedSelectResult(
 ): PgSelectStepResult {
   const iterator = iterable[Symbol.asyncIterator]();
   const limit = fetchOneExtra ? first : null;
+  let firstRow: Promise<IteratorResult<unknown[]>> | undefined;
+  // startCursor and the item stream must share the first pull.
+  const readFirstRow = () => (firstRow ??= iterator.next());
   const completion = Promise.withResolvers<{
     hasOneExtra: boolean;
     lastItem: unknown[] | null;
@@ -4457,7 +4459,7 @@ function createStreamedSelectResult(
             if (initialRows.length < initialCount) {
               break;
             }
-            const next = await iterator.next();
+            const next = await (index === 0 ? readFirstRow() : iterator.next());
             if (next.done) {
               break;
             }
@@ -4488,16 +4490,19 @@ function createStreamedSelectResult(
       }
     },
   );
-  const getHasOneExtra = () =>
-    limit == null ? false : completion.promise.then((page) => page.hasOneExtra);
   return {
-    get hasNextPage() {
-      return getHasOneExtra();
-    },
-    hasPreviousPage: hasPreviousPageCb(first, last, offset, false),
-    getHasOneExtra,
-    getLastItem: () => completion.promise.then((page) => page.lastItem),
     items,
+    getFirstItem() {
+      return initialCount > 0
+        ? (initialRows[0] ?? null)
+        : readFirstRow().then((row) => (row.done ? null : row.value));
+    },
+    getLastItem: () => completion.promise.then((page) => page.lastItem),
+    getHasNextPage: () =>
+      limit == null
+        ? false
+        : completion.promise.then((page) => page.hasOneExtra),
+    getHasPreviousPage: () => hasPreviousPageCb(first, last, offset, false),
     cursorDetails,
     groupDetails,
     m: meta,
@@ -4545,14 +4550,12 @@ function createSelectResult(
   const orderedRows = shouldReverseOrder
     ? reverseArray(slicedRows)
     : slicedRows;
-  const hasNextPage = hasNextPageCb(first, last, hasMore);
-  const hasPreviousPage = hasPreviousPageCb(first, last, offset, hasMore);
   return {
-    hasNextPage,
-    hasPreviousPage,
-    getHasOneExtra: () => hasMore,
-    getLastItem: () => orderedRows[orderedRows.length - 1] ?? null,
     items: orderedRows,
+    getFirstItem: () => orderedRows[0] ?? null,
+    getLastItem: () => orderedRows[orderedRows.length - 1] ?? null,
+    getHasNextPage: () => hasNextPageCb(first, last, hasMore),
+    getHasPreviousPage: () => hasPreviousPageCb(first, last, offset, hasMore),
     cursorDetails,
     groupDetails,
     m: meta,
@@ -4573,15 +4576,15 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     items.push(newItem);
   }
   return {
-    hasNextPage: false,
-    hasPreviousPage: false,
-    getHasOneExtra: NO_ROWS.getHasOneExtra,
-    getLastItem: () => items[items.length - 1] ?? null,
     // We return a list here because our children are going to use a
     // `first` plan on us.
     // NOTE: we don't need to reverse the list for relay pagination
     // because it only contains one entry.
     items,
+    getFirstItem: () => items[0] ?? null,
+    getLastItem: () => items[items.length - 1] ?? null,
+    getHasNextPage: NO_ROWS.getHasNextPage,
+    getHasPreviousPage: NO_ROWS.getHasPreviousPage,
     cursorDetails,
     groupDetails,
     m: meta,

@@ -107,6 +107,7 @@ import {
   recordsMatch,
   setsMatch,
   stepADependsOnStepB,
+  stepsAreInSamePhase,
   sudo,
   writeableArray,
 } from "../utils.ts";
@@ -4537,7 +4538,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
       } else if ($step instanceof __CloneStreamStep) {
         const $clone = sudo($step);
         const $dep = $clone.dependencies[0];
-        if ($dep.dependents.length === 1) {
+        if ($dep.dependents.length === 1 && stepsAreInSamePhase($dep, $clone)) {
           $dep.cloneStreams = false;
           $dep._stepOptions.walkIterable ||= $clone._stepOptions.walkIterable;
           $dep._stepOptions.stream ||= $clone._stepOptions.stream;
