@@ -39,7 +39,6 @@ import {
   Step,
   stepAMayDependOnStepB,
   stepAShouldTryAndInlineIntoStepB,
-  stepsAreInSamePhase,
   UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
@@ -1198,20 +1197,22 @@ export class PgSelectStep<
       this,
       pgSelectResultGetters[key],
     );
-    this.requirePageValue(key, $getter);
+    this.requirePageValue(key, $getter.layerPlan);
     return $getter;
   }
 
-  private requirePageValue(key: PgSelectResultKey, $getter: Step): boolean {
+  private requirePageValue(
+    key: PgSelectResultKey,
+    layerPlan: Step["layerPlan"],
+  ): boolean {
     if (key !== "lastItem") {
       this.fetchOneExtra = true;
     }
     // A streamed list item can run in the initial payload (initialCount).
     // Require an explicit defer boundary before waiting for stream completion.
-    const { ancestry } = $getter.layerPlan;
+    const { ancestry } = layerPlan;
     const { depth } = this.layerPlan;
     const eager =
-      stepsAreInSamePhase(this, $getter) ||
       ancestry[depth] !== this.layerPlan ||
       !ancestry.slice(depth + 1).some((layer) => layer.reason.type === "defer");
     if (eager) {
@@ -1222,14 +1223,17 @@ export class PgSelectStep<
 
   public planPageInfo(
     key: "hasNextPage" | "hasPreviousPage" | "endCursor",
-    fallback: Step,
+    layerPlan: Step["layerPlan"],
+    fallback: () => Step,
   ): Step {
-    if (key === "endCursor") {
-      return this.requirePageValue("lastItem", fallback)
-        ? fallback
-        : this.cursorForItem(this.get("lastItem"));
+    if (
+      this.requirePageValue(key === "endCursor" ? "lastItem" : key, layerPlan)
+    ) {
+      return fallback();
     }
-    return this.requirePageValue(key, fallback) ? fallback : this.get(key);
+    return key === "endCursor"
+      ? this.cursorForItem(this.get("lastItem"))
+      : this.get(key);
   }
 
   private needsGroups = false;

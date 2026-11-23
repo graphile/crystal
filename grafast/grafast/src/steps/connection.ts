@@ -1,7 +1,10 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
-import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.ts";
+import {
+  currentFieldStreamDetails,
+  currentLayerPlan,
+} from "../engine/lib/withGlobalLayerPlan.ts";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
@@ -321,7 +324,8 @@ export interface ConnectionHandlingStep<
   /** Plan a page-info field using the collection's pagination implementation. */
   planPageInfo?(
     key: "hasNextPage" | "hasPreviousPage" | "endCursor",
-    fallback: Step,
+    layerPlan: Step["layerPlan"],
+    fallback: () => Step,
   ): Step;
 
   // TODO: would be better to expose this as
@@ -785,16 +789,16 @@ export class ConnectionStep<
 
   public planPageInfo(
     key: "hasNextPage" | "hasPreviousPage" | "endCursor",
-    fallback: Step,
+    fallback: () => Step,
   ): Step {
     const handler = this.getHandler(true);
     if ("planPageInfo" in handler && handler.planPageInfo != null) {
-      return handler.planPageInfo(key, fallback);
+      return handler.planPageInfo(key, currentLayerPlan(), fallback);
     }
     if (key !== "endCursor") {
       this.setNeedsHasMore();
     }
-    return fallback;
+    return fallback();
   }
 
   public optimize() {
@@ -1597,7 +1601,7 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
     switch (key) {
       case "hasNextPage":
       case "hasPreviousPage": {
-        return $connection.planPageInfo(key, access($connection, key));
+        return $connection.planPageInfo(key, () => access($connection, key));
       }
       case "startCursor": {
         // Get first node, get cursor for it
@@ -1605,9 +1609,10 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
-        // Get last node, get cursor for it
-        const $last = last($connection._items(), "auto");
-        return $connection.planPageInfo(key, $connection.cursorPlan($last));
+        return $connection.planPageInfo(key, () => {
+          const $last = last($connection._items(), "auto");
+          return $connection.cursorPlan($last);
+        });
       }
       default: {
         // TODO: allow expansion
