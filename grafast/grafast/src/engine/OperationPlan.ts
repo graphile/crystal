@@ -411,13 +411,10 @@ export class OperationPlan {
 
     const allTypes = Object.values(schema.getTypeMap());
 
-    const allUnions: GraphQLUnionType[] = [];
-    const allObjectTypes: GraphQLObjectType[] = [];
     this.unionsContainingObjectType = Object.create(null);
 
     for (const type of allTypes) {
       if (isUnionType(type)) {
-        allUnions.push(type);
         const members = type.getTypes();
         for (const memberType of members) {
           if (!this.unionsContainingObjectType[memberType.name]) {
@@ -429,7 +426,6 @@ export class OperationPlan {
           }
         }
       } else if (isObjectType(type)) {
-        allObjectTypes.push(type);
         if (!this.unionsContainingObjectType[type.name]) {
           this.unionsContainingObjectType[type.name] = [];
         }
@@ -5244,29 +5240,6 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
     this.stepTracker.allOutputPlans.forEach((outputPlan) =>
       outputPlan.finalize(),
     );
-  }
-
-  private walkOutputPlans(
-    outputPlan: OutputPlan,
-    callback: (outputPlan: OutputPlan) => void,
-  ): void {
-    callback(outputPlan);
-    if (outputPlan.child !== null) {
-      this.walkOutputPlans(outputPlan.child, callback);
-    }
-    if (outputPlan.childByTypeName !== undefined) {
-      Object.values(outputPlan.childByTypeName).forEach((childOutputPlan) => {
-        this.walkOutputPlans(childOutputPlan, callback);
-      });
-    }
-    for (const spec of Object.values(outputPlan.keys)) {
-      if (spec.type === "outputPlan") {
-        this.walkOutputPlans(spec.outputPlan, callback);
-      }
-    }
-    for (const defer of outputPlan.deferredOutputPlans) {
-      this.walkOutputPlans(defer, callback);
-    }
   }
 
   generatePlanJSON(): GrafastPlanJSON {
