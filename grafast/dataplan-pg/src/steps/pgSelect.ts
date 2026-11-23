@@ -1496,16 +1496,83 @@ export class PgSelectStep<
           consume(iterable[Symbol.asyncIterator]().return?.());
           return initialRows as never;
         }
-        return createStreamedSelectResult(iterable, initialRows, {
-          initialCount: streamInitialCount,
-          first,
-          last,
-          offset,
-          fetchOneExtra: this.fetchOneExtra,
+        const iterator = iterable[Symbol.asyncIterator]();
+        const limit = this.fetchOneExtra ? first : null;
+        let firstRow: Promise<IteratorResult<unknown[]>> | undefined;
+        // startCursor and the item stream must share the first pull.
+        const readFirstRow = () => (firstRow ??= iterator.next());
+        const completion = Promise.withResolvers<{
+          hasOneExtra: boolean;
+          lastItem: unknown[] | null;
+        }>();
+        void completion.promise.catch(noop);
+        let started = false;
+        let completed = false;
+        const items = asyncIteratorWithCleanup(
+          (async function* () {
+            started = true;
+            let lastItem: unknown[] | null = null;
+            let hasOneExtra = false;
+            try {
+              for (let index = 0; ; index++) {
+                let item: unknown[];
+                if (index < initialRows.length) {
+                  item = initialRows[index];
+                } else {
+                  if (initialRows.length < streamInitialCount) {
+                    break;
+                  }
+                  const next = await (index === 0
+                    ? readFirstRow()
+                    : iterator.next());
+                  if (next.done) {
+                    break;
+                  }
+                  item = next.value;
+                }
+                if (index === limit) {
+                  hasOneExtra = true;
+                  break;
+                }
+                lastItem = item;
+                yield item;
+              }
+              completed = true;
+              completion.resolve({ hasOneExtra, lastItem });
+            } finally {
+              await iterator.return?.();
+            }
+          })(),
+          (error) => {
+            if (!completed) {
+              completion.reject(
+                error ??
+                  new Error("Page stream ended before page info was available"),
+              );
+            }
+            if (!started) {
+              consume(iterator.return?.());
+            }
+          },
+        );
+        return {
+          items,
+          getFirstItem() {
+            return streamInitialCount > 0
+              ? (initialRows[0] ?? null)
+              : readFirstRow().then((row) => (row.done ? null : row.value));
+          },
+          getLastItem: () => completion.promise.then((page) => page.lastItem),
+          getHasNextPage: () =>
+            limit == null
+              ? false
+              : completion.promise.then((page) => page.hasOneExtra),
+          getHasPreviousPage: () =>
+            hasPreviousPageCb(first, last, offset, false),
           cursorDetails,
           groupDetails,
-          meta,
-        });
+          m: meta,
+        };
       });
     }
   }
@@ -4447,105 +4514,6 @@ function isDeferredAfter(
       .slice(producer.depth + 1)
       .some((layer) => layer.reason.type === "defer")
   );
-}
-
-function createStreamedSelectResult(
-  iterable: AsyncIterable<unknown[]>,
-  initialRows: ReadonlyArray<unknown[]>,
-  {
-    initialCount,
-    first,
-    last,
-    offset,
-    fetchOneExtra,
-    cursorDetails,
-    groupDetails,
-    meta,
-  }: {
-    initialCount: number;
-    first: Maybe<number>;
-    last: Maybe<number>;
-    offset: Maybe<number>;
-    fetchOneExtra: boolean;
-    cursorDetails: PgCursorDetails | undefined;
-    groupDetails: PgGroupDetails | undefined;
-    meta: Record<string, unknown>;
-  },
-): PgSelectStepResult {
-  const iterator = iterable[Symbol.asyncIterator]();
-  const limit = fetchOneExtra ? first : null;
-  let firstRow: Promise<IteratorResult<unknown[]>> | undefined;
-  // startCursor and the item stream must share the first pull.
-  const readFirstRow = () => (firstRow ??= iterator.next());
-  const completion = Promise.withResolvers<{
-    hasOneExtra: boolean;
-    lastItem: unknown[] | null;
-  }>();
-  void completion.promise.catch(noop);
-  let started = false;
-  let completed = false;
-  const items = asyncIteratorWithCleanup(
-    (async function* () {
-      started = true;
-      let lastItem: unknown[] | null = null;
-      let hasOneExtra = false;
-      try {
-        for (let index = 0; ; index++) {
-          let item: unknown[];
-          if (index < initialRows.length) {
-            item = initialRows[index];
-          } else {
-            if (initialRows.length < initialCount) {
-              break;
-            }
-            const next = await (index === 0 ? readFirstRow() : iterator.next());
-            if (next.done) {
-              break;
-            }
-            item = next.value;
-          }
-          if (index === limit) {
-            hasOneExtra = true;
-            break;
-          }
-          lastItem = item;
-          yield item;
-        }
-        completed = true;
-        completion.resolve({ hasOneExtra, lastItem });
-      } finally {
-        await iterator.return?.();
-      }
-    })(),
-    (error) => {
-      if (!completed) {
-        completion.reject(
-          error ??
-            new Error("Page stream ended before page info was available"),
-        );
-      }
-      if (!started) {
-        consume(iterator.return?.());
-      }
-    },
-  );
-  return {
-    items,
-    getFirstItem() {
-      return initialCount > 0
-        ? (initialRows[0] ?? null)
-        : readFirstRow().then((row) => (row.done ? null : row.value));
-    },
-    getLastItem: () => completion.promise.then((page) => page.lastItem),
-    getHasNextPage: () =>
-      limit == null
-        ? false
-        : completion.promise.then((page) => page.hasOneExtra),
-    getHasPreviousPage: () => hasPreviousPageCb(first, last, offset, false),
-    cursorDetails,
-    groupDetails,
-    m: meta,
-  };
 }
 
 function createSelectResult(

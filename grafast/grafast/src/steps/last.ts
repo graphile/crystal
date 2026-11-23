@@ -31,7 +31,6 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
   };
   allowMultipleOptimizations = true;
   unbatchedExecute?: typeof unbatchedExecute;
-  private readonly inferArray: boolean;
 
   constructor(
     parentPlan: StepRepresentingList<TData>,
@@ -40,8 +39,7 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
     super();
     this.addDependency(itemsOrStep(parentPlan));
     this.isSyncAndSafe = array === true;
-    this.inferArray = array === "auto";
-    if (this.inferArray) {
+    if (array === "auto") {
       this.peerKey = "auto";
     }
   }
@@ -50,7 +48,7 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
     const parent = this.getDepOptions(0).step;
     if (
       this.isSyncAndSafe ||
-      (this.inferArray && !stepMightReturnStream(parent))
+      (this.peerKey === "auto" && !stepMightReturnStream(parent))
     ) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;

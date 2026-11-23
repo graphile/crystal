@@ -4542,13 +4542,6 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
           if ($dep.layerPlan === $clone.layerPlan) {
             $dep._stepOptions.walkIterable ||= $clone._stepOptions.walkIterable;
             $dep._stepOptions.stream ||= $clone._stepOptions.stream;
-          } else if ($clone._stepOptions.walkIterable) {
-            // The consumer's bucket owns the iterator, even when the list
-            // value was produced in an earlier bucket.
-            $clone.layerPlan.streamInputs.push({
-              stepId: $dep.id,
-              stream: $clone._stepOptions.stream,
-            });
           }
           this.stepTracker.replaceStep($clone, $dep);
         }
@@ -5031,14 +5024,6 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         }
       }
 
-      for (const { stepId } of layerPlan.streamInputs) {
-        ensurePlanAvailableInLayer(
-          this.stepTracker.getStepById(stepId),
-          layerPlan,
-          isDev ? () => `${layerPlan} stream input` : null,
-        );
-      }
-
       const $root = layerPlan.rootStep;
       if ($root) {
         ensurePlanAvailableInLayer(
@@ -5102,6 +5087,13 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         );
         const stream = layerPlan.reason.stream;
         if (stream != null) {
+          // A single consumer can receive the raw iterable from an ancestor.
+          // Walk it in the bucket that will deliver the list.
+          if (!parentStep._stepOptions.walkIterable) {
+            layerPlan.reason.parentLayerPlan.streamInputs.push(
+              layerPlan.reason,
+            );
+          }
           if (stream.initialCountStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.initialCountStepId),

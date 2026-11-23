@@ -27,7 +27,6 @@ export class FirstStep<TData> extends Step<TData> {
   };
   allowMultipleOptimizations = true;
   unbatchedExecute?: typeof unbatchedExecute;
-  private readonly inferArray: boolean;
 
   constructor(
     parentPlan: StepRepresentingList<TData>,
@@ -36,8 +35,7 @@ export class FirstStep<TData> extends Step<TData> {
     super();
     this.addStrongDependency(itemsOrStep(parentPlan));
     this.isSyncAndSafe = array === true;
-    this.inferArray = array === "auto";
-    if (this.inferArray) {
+    if (array === "auto") {
       this.peerKey = "auto";
     }
   }
@@ -46,7 +44,7 @@ export class FirstStep<TData> extends Step<TData> {
     const parent = this.getDepOptions(0).step;
     if (
       this.isSyncAndSafe ||
-      (this.inferArray && !stepMightReturnStream(parent))
+      (this.peerKey === "auto" && !stepMightReturnStream(parent))
     ) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;
