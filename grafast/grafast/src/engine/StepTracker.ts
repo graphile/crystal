@@ -74,8 +74,7 @@ export class StepTracker {
   /** @internal */
   public layerPlans: Array<LayerPlan | null> = [];
   /**
-   * All the OutputPlans that were created to allow a more efficient
-   * walkOutputPlans implementation.
+   * All output plans created for this operation.
    *
    * @internal
    */

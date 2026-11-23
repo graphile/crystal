@@ -5242,29 +5242,6 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
     );
   }
 
-  private walkOutputPlans(
-    outputPlan: OutputPlan,
-    callback: (outputPlan: OutputPlan) => void,
-  ): void {
-    callback(outputPlan);
-    if (outputPlan.child !== null) {
-      this.walkOutputPlans(outputPlan.child, callback);
-    }
-    if (outputPlan.childByTypeName !== undefined) {
-      Object.values(outputPlan.childByTypeName).forEach((childOutputPlan) => {
-        this.walkOutputPlans(childOutputPlan, callback);
-      });
-    }
-    for (const spec of Object.values(outputPlan.keys)) {
-      if (spec.type === "outputPlan") {
-        this.walkOutputPlans(spec.outputPlan, callback);
-      }
-    }
-    for (const defer of outputPlan.deferredOutputPlans) {
-      this.walkOutputPlans(defer, callback);
-    }
-  }
-
   generatePlanJSON(): GrafastPlanJSON {
     function printStep(step: Step): GrafastPlanStepJSONv1 {
       const metaString = step.toStringMeta();
