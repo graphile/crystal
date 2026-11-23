@@ -72,8 +72,11 @@ const deepMatcher: OptionsMatcher = {
     } else if (left == null || right == null || typeof left !== "object") {
       return false;
     } else if (Array.isArray(left)) {
+      if (!Array.isArray(right)) {
+        return false;
+      }
       const l = left.length;
-      if (!Array.isArray(right) || l !== right.length) {
+      if (l !== right.length) {
         return false;
       }
       for (let i = 0; i < l; i++) {
@@ -83,7 +86,7 @@ const deepMatcher: OptionsMatcher = {
       }
       return true;
     } else {
-      return !Array.isArray(right) && deepRecordMatcher.matches(left, right);
+      return deepRecordMatcher.matches(left, right);
     }
   },
   appendKeys(value, keys, order) {
@@ -142,7 +145,6 @@ function makeObjectMatcher(
         return true;
       } else if (
         !isOptionsObject(left) ||
-        !isOptionsObject(right) ||
         Object.getPrototypeOf(left) !== Object.getPrototypeOf(right)
       ) {
         return false;
