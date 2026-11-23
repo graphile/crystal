@@ -274,58 +274,6 @@ lateral (
   )
 ) as __people_result__;
 
-with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids
-)
-select __union_result__.*
-from __union_identifiers__,
-lateral (
-  select
-    __owner__."0" as "0",
-    __owner__."1"::text as "1",
-    __union_identifiers__.idx as "2"
-  from (
-      select
-        __people__."0",
-        __people__."1",
-        "n"
-      from (
-        select
-          'Person' as "0",
-          json_build_array((__people__."person_id")::text) as "1",
-          row_number() over (
-            order by
-              __people__."person_id" asc
-          ) as "n"
-        from "polymorphic"."people" as __people__
-        where __people__."person_id" = __union_identifiers__."id0"
-        order by
-          __people__."person_id" asc
-      ) as __people__
-    union all
-      select
-        __organizations__."0",
-        __organizations__."1",
-        "n"
-      from (
-        select
-          'Organization' as "0",
-          json_build_array((__organizations__."organization_id")::text) as "1",
-          row_number() over (
-            order by
-              __organizations__."organization_id" asc
-          ) as "n"
-        from "polymorphic"."organizations" as __organizations__
-        where __organizations__."organization_id" = __union_identifiers__."id1"
-        order by
-          __organizations__."organization_id" asc
-      ) as __organizations__
-    order by
-      "0" asc,
-      "n" asc
-  ) __owner__
-) as __union_result__;
-
 with __gcp_applications_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
