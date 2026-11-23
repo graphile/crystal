@@ -115,21 +115,6 @@ where (
   __relational_topics__."topic_item_id" = $1::"int4"
 );
 
-with __relational_topics_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __relational_topics_result__.*
-from __relational_topics_identifiers__,
-lateral (
-  select
-    __relational_topics__."title" as "0",
-    __relational_topics_identifiers__.idx as "1"
-  from "polymorphic"."relational_topics" as __relational_topics__
-  where (
-    __relational_topics__."topic_item_id" = __relational_topics_identifiers__."id0"
-  )
-) as __relational_topics_result__;
-
 with __relational_posts_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
@@ -161,6 +146,21 @@ lateral (
     __relational_dividers__."divider_item_id" = __relational_dividers_identifiers__."id0"
   )
 ) as __relational_dividers_result__;
+
+with __relational_topics_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __relational_topics_result__.*
+from __relational_topics_identifiers__,
+lateral (
+  select
+    __relational_topics__."title" as "0",
+    __relational_topics_identifiers__.idx as "1"
+  from "polymorphic"."relational_topics" as __relational_topics__
+  where (
+    __relational_topics__."topic_item_id" = __relational_topics_identifiers__."id0"
+  )
+) as __relational_topics_result__;
 
 with __relational_items_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
