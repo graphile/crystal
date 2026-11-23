@@ -1,7 +1,9 @@
+import { planToMermaid } from "grafast/mermaid";
+
 import { runTestQuery } from "../../helpers.ts";
 
 async function runConnectionQuery(document: string) {
-  const { errors, payloads, queries } = await runTestQuery(
+  const { errors, payloads, queries, extensions } = await runTestQuery(
     document,
     {},
     { path: __filename },
@@ -9,6 +11,7 @@ async function runConnectionQuery(document: string) {
   expect(errors).toBeFalsy();
   return {
     payloads,
+    extensions,
     pgCursorCount: queries.filter(({ text }) => /^declare /im.test(text))
       .length,
   };
@@ -117,13 +120,19 @@ test("uses an ordinary query when page info and the stream share a defer", async
 });
 
 test("reads startCursor before streamed nodes planned in a later defer", async () => {
-  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+  const { payloads, pgCursorCount, extensions } = await runConnectionQuery(`{
     allPeople(first: 3) {
       pageInfo { startCursor }
       ... @defer { nodes @stream(initialCount: 1) { id } }
     }
   }`);
   expect(pgCursorCount).toBe(1);
+  const plan = extensions?.explain?.operations?.find(
+    (op: { type: string }) => op.type === "plan",
+  )?.plan;
+  const diagram = planToMermaid(plan);
+  expect(diagram).toMatch(/ConnectionItems\d+ ==> __Item\d+/);
+  expect(diagram).not.toContain("__CloneStream");
   expect(payloads).toMatchObject([
     {
       data: {

@@ -15,6 +15,7 @@ import { inspect } from "../inspect.ts";
 import type {
   BatchExecutionValue,
   ExecutionValue,
+  StepOptions,
   UnaryExecutionValue,
 } from "../interfaces.ts";
 import type { Step, UnbatchedStep } from "../step.ts";
@@ -331,6 +332,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    * @internal
    */
   public copyStepIds: number[] = [];
+
+  /** Copied lists to walk in this bucket before using their items. @internal */
+  public readonly streamInputs: {
+    stepId: number;
+    stream: StepOptions["stream"];
+  }[] = [];
 
   /** @internal */
   public children: LayerPlan[] = [];
