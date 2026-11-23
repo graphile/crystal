@@ -411,13 +411,10 @@ export class OperationPlan {
 
     const allTypes = Object.values(schema.getTypeMap());
 
-    const allUnions: GraphQLUnionType[] = [];
-    const allObjectTypes: GraphQLObjectType[] = [];
     this.unionsContainingObjectType = Object.create(null);
 
     for (const type of allTypes) {
       if (isUnionType(type)) {
-        allUnions.push(type);
         const members = type.getTypes();
         for (const memberType of members) {
           if (!this.unionsContainingObjectType[memberType.name]) {
@@ -429,7 +426,6 @@ export class OperationPlan {
           }
         }
       } else if (isObjectType(type)) {
-        allObjectTypes.push(type);
         if (!this.unionsContainingObjectType[type.name]) {
           this.unionsContainingObjectType[type.name] = [];
         }
