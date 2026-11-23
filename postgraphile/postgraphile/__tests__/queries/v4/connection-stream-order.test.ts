@@ -280,3 +280,16 @@ test("streams inside a defer when endCursor belongs to a later defer", async () 
     data: { id: 3 },
   });
 });
+
+test("streams an unbounded page with eager hasNextPage", async () => {
+  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+    allPeople {
+      nodes @stream(initialCount: 1) { id }
+      pageInfo { hasNextPage }
+    }
+  }`);
+  expect(pgCursorCount).toBe(1);
+  expect(payloads?.[0].data).toEqual({
+    allPeople: { nodes: [{ id: 1 }], pageInfo: { hasNextPage: false } },
+  });
+});

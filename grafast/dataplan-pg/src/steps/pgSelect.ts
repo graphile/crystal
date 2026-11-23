@@ -531,8 +531,12 @@ export class PgSelectStep<
   protected lastStepId: number | null = null;
   protected fetchOneExtra = false;
   private requiresCompletePage = false;
+  private requiresHasNextPage = false;
   private readonly streamConsumers = new Set<Step["layerPlan"]>();
-  private readonly completionReaders = new Set<Step["layerPlan"]>();
+  private readonly completionReaders = new Map<
+    Step["layerPlan"],
+    "lastItem" | "hasNextPage"
+  >();
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
   protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
@@ -1198,7 +1202,7 @@ export class PgSelectStep<
 
   public override setNeedsHasMore() {
     super.setNeedsHasMore();
-    this.requiresCompletePage = true;
+    this.requiresHasNextPage = true;
   }
 
   declare readonly __inferGet?: PgSelectPropertySteps;
@@ -1239,12 +1243,20 @@ export class PgSelectStep<
     // lookahead already uses array mode because the extra row comes first.
     if (key !== "hasPreviousPage") {
       if (eager) {
-        this.requiresCompletePage = true;
-      } else {
-        this.completionReaders.add(layerPlan);
+        this.requireEagerValue(key);
+      } else if (this.completionReaders.get(layerPlan) !== "lastItem") {
+        this.completionReaders.set(layerPlan, key);
       }
     }
     return eager;
+  }
+
+  private requireEagerValue(key: "lastItem" | "hasNextPage") {
+    if (key === "lastItem") {
+      this.requiresCompletePage = true;
+    } else {
+      this.requiresHasNextPage = true;
+    }
   }
 
   public planPageInfo(
@@ -1604,10 +1616,11 @@ export class PgSelectStep<
   public finalize(): void {
     // The stream only starts draining after its payload is ready. A reader
     // waiting in that same payload (including a deferred one) would deadlock.
-    for (const reader of this.completionReaders) {
+    for (const [reader, key] of this.completionReaders) {
       for (const consumer of this.streamConsumers) {
         if (!isDeferredAfter(reader, consumer)) {
-          this.requiresCompletePage = true;
+          this.requireEagerValue(key);
+          break;
         }
       }
     }
@@ -1844,11 +1857,14 @@ export class PgSelectStep<
 
   private copyPageRequirementsTo(target: PgSelectStep<TResource>) {
     target.requiresCompletePage ||= this.requiresCompletePage;
+    target.requiresHasNextPage ||= this.requiresHasNextPage;
     for (const layer of this.streamConsumers) {
       target.streamConsumers.add(layer);
     }
-    for (const layer of this.completionReaders) {
-      target.completionReaders.add(layer);
+    for (const [layer, key] of this.completionReaders) {
+      if (target.completionReaders.get(layer) !== "lastItem") {
+        target.completionReaders.set(layer, key);
+      }
     }
   }
 
@@ -2483,6 +2499,7 @@ export class PgSelectStep<
       selects: $source.selects,
       fetchOneExtra: $source.fetchOneExtra,
       requiresCompletePage: $source.requiresCompletePage,
+      requiresHasNextPage: $source.requiresHasNextPage,
       isOrderUnique: $source.isOrderUnique,
       isUnique: $source.isUnique,
       isSimpleUnique:
@@ -3159,6 +3176,7 @@ interface PgSelectQueryInfo<
 
   readonly streamDetailsDepIds: null | readonly number[];
   readonly requiresCompletePage: boolean;
+  readonly requiresHasNextPage: boolean;
 }
 
 type CoreInfo<TResource extends PgResource<any, any, any, any, any, any, any>> =
@@ -3457,6 +3475,7 @@ function buildTheQueryCore<
   applyCommonPaginationStuff(info);
   if (
     info.requiresCompletePage ||
+    (info.requiresHasNextPage && hasNextPageCb(info.first, info.last, true)) ||
     (info.last != null &&
       (info.fetchOneExtra || (info.first != null && info.last < info.first)))
   ) {
@@ -3844,6 +3863,7 @@ type StaticKeys =
   | "selects"
   | "fetchOneExtra"
   | "requiresCompletePage"
+  | "requiresHasNextPage"
   | "isOrderUnique"
   | "isUnique"
   | "isSimpleUnique"
