@@ -4,8 +4,8 @@ import type { Pool, QueryConfig } from "pg";
 
 import { createWithPgClient } from "../dist/adaptors/pg.js";
 import {
-  PgExecutor,
   type PgClientQuery,
+  PgExecutor,
   type WithPgClient,
 } from "../dist/index.js";
 
