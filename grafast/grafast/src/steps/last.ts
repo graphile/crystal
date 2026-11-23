@@ -6,7 +6,7 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.ts";
 import { Step } from "../step.ts";
-import { stepYieldsCompleteList } from "../utils.ts";
+import { stepMightReturnStream } from "../utils.ts";
 import type { StepRepresentingList } from "./connection.ts";
 import { itemsOrStep } from "./connection.ts";
 import { ListStep } from "./list.ts";
@@ -31,16 +31,27 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
   };
   allowMultipleOptimizations = true;
   unbatchedExecute?: typeof unbatchedExecute;
+  private readonly inferArray: boolean;
 
-  constructor(parentPlan: StepRepresentingList<TData>, isArray = true) {
+  constructor(
+    parentPlan: StepRepresentingList<TData>,
+    array: boolean | "auto" = true,
+  ) {
     super();
     this.addDependency(itemsOrStep(parentPlan));
-    this.isSyncAndSafe = isArray;
+    this.isSyncAndSafe = array === true;
+    this.inferArray = array === "auto";
+    if (this.inferArray) {
+      this.peerKey = "auto";
+    }
   }
 
   finalize() {
     const parent = this.getDepOptions(0).step;
-    if (this.isSyncAndSafe || stepYieldsCompleteList(parent)) {
+    if (
+      this.isSyncAndSafe ||
+      (this.inferArray && !stepMightReturnStream(parent))
+    ) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;
       this.isSyncAndSafe = true;
@@ -92,11 +103,11 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
  * @param plan - the list plan
  * @param array - set this true if the plan represents an array (or
  * null/undefined) - i.e. it' won't be an (async) iterable - to enable greater
- * optimization
+ * optimization. Use "auto" to infer this from the finalized stream options.
  */
 export function last<TData>(
   plan: StepRepresentingList<TData>,
-  array = true,
+  array: boolean | "auto" = true,
 ): LastStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,

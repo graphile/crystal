@@ -1601,12 +1601,12 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const $first = first($connection._items(), false);
+        const $first = first($connection._items(), "auto");
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get last node, get cursor for it
-        const $last = last($connection._items(), false);
+        const $last = last($connection._items(), "auto");
         return $connection.planPageInfo(key, $connection.cursorPlan($last));
       }
       default: {
@@ -1650,9 +1650,6 @@ export class ConnectionItemsStep extends Step {
 
   public optimize(_options: StepOptimizeOptions): Step {
     this.cloneStreams = this.getConnection().mightStream();
-    if (!this.cloneStreams) {
-      this._stepOptions.walkIterable = true;
-    }
     return this;
   }
 

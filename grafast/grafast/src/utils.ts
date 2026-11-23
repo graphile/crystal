@@ -1323,10 +1323,9 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
   return true;
 }
 
-/** For a list step, check whether the finalized plan fully walks its result. */
-export function stepYieldsCompleteList(step: Step): boolean {
-  const { stream, walkIterable } = step._stepOptions;
-  return walkIterable && stream === null && !step.cloneStreams;
+/** Whether the finalized plan opts the step into streaming. */
+export function stepMightReturnStream(step: Step): boolean {
+  return step._stepOptions.stream !== null || step.cloneStreams;
 }
 
 export function isPhaseTransitionLayerPlan(
