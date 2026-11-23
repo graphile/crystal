@@ -12,8 +12,6 @@ interface KeyOrder {
 /** @internal */
 interface OptionsMatcher {
   matches(left: unknown, right: unknown): boolean;
-  /** Validate the first value before any matching or indexing takes place. */
-  validate?(value: unknown): void;
   /**
    * Appends this value's components to the flat key used to find candidate
    * batches. Nested matchers append to the same array. The index shares
@@ -67,26 +65,11 @@ function assertDeepScalar(value: unknown): void {
   }
 }
 
-function validateDeepOption(value: unknown): void {
-  if (Array.isArray(value)) {
-    for (let i = 0, l = value.length; i < l; i++) {
-      validateDeepOption(value[i]);
-    }
-  } else if (isPojo(value)) {
-    for (const key of Reflect.ownKeys(value)) {
-      validateDeepOption(value[key]);
-    }
-  } else {
-    assertDeepScalar(value);
-  }
-}
-
 const deepMatcher: OptionsMatcher = {
-  validate: validateDeepOption,
   matches(left, right) {
     if (left === right) {
       return true;
-    } else if (left == null || typeof left !== "object") {
+    } else if (left == null || right == null || typeof left !== "object") {
       return false;
     } else if (Array.isArray(left)) {
       const l = left.length;
@@ -153,23 +136,7 @@ function makeObjectMatcher(
   rules?: Map<PropertyKey, OptionsMatcher>,
   defaultRule = strictMatcher,
 ): OptionsMatcher {
-  const validatingRules =
-    rules === undefined
-      ? undefined
-      : [...rules].filter(([, rule]) => rule.validate !== undefined);
   return {
-    validate:
-      validatingRules === undefined || validatingRules.length === 0
-        ? undefined
-        : (value) => {
-            if (isOptionsObject(value)) {
-              for (const [key, rule] of validatingRules) {
-                if (Object.hasOwn(value, key)) {
-                  rule.validate?.(value[key]);
-                }
-              }
-            }
-          },
     matches(left, right) {
       if (left === right) {
         return true;
@@ -338,7 +305,6 @@ export class BatchOptionsIndex<
   getOrCreate(options: TOptions): BatchFamily<TOptions, TKeyset, TResult> {
     const first = this.first;
     if (first === null) {
-      this.matcher.validate?.(options);
       return (this.first = this.createFamily(options));
     }
 

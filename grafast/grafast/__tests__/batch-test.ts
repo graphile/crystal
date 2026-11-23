@@ -426,7 +426,7 @@ it("indexes deeply matching arrays and plain objects", async () => {
   expect(calls).to.deep.equal([[1, 3], [2]]);
 });
 
-it("rejects unsupported values in deep options before and after indexing", async () => {
+it("reads deep options lazily and rejects unsupported values when indexing", async () => {
   const executor = defineBatchExecutor({
     name: "deep-options-validation",
     keysetEquality: "strict",
@@ -441,8 +441,19 @@ it("rejects unsupported values in deep options before and after indexing", async
     batchInMeta(schema, scope, executor, [1], {
       lookup: { filter: [{ value }] },
     });
+  let reads = 0;
+  expect(
+    await batchInMeta(schema, scope, executor, [1], {
+      lookup: {
+        get filter() {
+          reads++;
+          return [{ value: 1 }];
+        },
+      },
+    }),
+  ).to.deep.equal([1]);
+  expect(reads).to.equal(0);
   expect(() => load(new Date(0))).to.throw('"deep" batch option rule');
-  expect(await load(1)).to.deep.equal([1]);
   expect(await load(2)).to.deep.equal([1]);
   expect(() => load(() => 1)).to.throw('"deep" batch option rule');
 });
