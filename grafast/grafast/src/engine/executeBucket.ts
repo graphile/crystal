@@ -883,7 +883,6 @@ export function executeBucket(
 
     /** If all we see is errors, there's no need to execute! */
     let newSize = 0;
-    const newPolymorphicPathList: (string | null)[] = [];
     let stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
     const dependenciesIncludingSideEffectsCount =
@@ -996,8 +995,7 @@ export function executeBucket(
         forcedValues.flags[dataIndex] = indexFlags;
         forcedValues.results[dataIndex] = forceIndexValue;
       } else {
-        const newIndex = newSize++;
-        newPolymorphicPathList[newIndex] = polymorphicPathList[dataIndex];
+        newSize++;
         if (needsTransform) {
           // dependenciesWithoutErrors has limited content; add this non-error value
           for (
