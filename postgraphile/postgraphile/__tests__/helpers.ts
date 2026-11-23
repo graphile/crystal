@@ -290,6 +290,7 @@ export async function runTestQuery(
     ) => Promise<void>;
     path: string;
     prepare?: boolean;
+    plugins?: GraphileConfig.Plugin[];
   } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
@@ -349,6 +350,7 @@ export async function runTestQuery(
     extends: [AmberPreset, MultipassIntrospectionPreset, ...presets],
     plugins: [
       StreamDeferPlugin,
+      ...(options.plugins ?? []),
       ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),
     ],
     pgServices: [

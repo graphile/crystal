@@ -406,6 +406,15 @@ const pgSelectResultGetters = {
 };
 type PgSelectResultKey = keyof typeof pgSelectResultGetters;
 
+type PgSelectPropertySteps = {
+  [TKey in keyof PgSelectStepResult]: Step<PgSelectStepResult[TKey]>;
+} & {
+  firstItem: Step<unknown[] | null>;
+  lastItem: Step<unknown[] | null>;
+  hasNextPage: Step<boolean>;
+  hasPreviousPage: Step<boolean>;
+};
+
 export interface PgGroupDetails {
   readonly indicies: ReadonlyArray<{
     index: number;
@@ -1192,17 +1201,30 @@ export class PgSelectStep<
     this.requiresCompletePage = true;
   }
 
-  public get(key: "firstItem" | "lastItem"): Step<unknown[] | null>;
-  public get(key: "hasNextPage" | "hasPreviousPage"): Step<boolean>;
-  public get(key: PgSelectResultKey): Step<boolean | unknown[] | null> {
-    const $getter = lambda<PgSelectStep<TResource>, boolean | unknown[] | null>(
-      this,
-      pgSelectResultGetters[key],
-    );
-    if (key !== "firstItem") {
-      this.requirePageValue(key, $getter.layerPlan);
+  declare readonly __inferGet?: PgSelectPropertySteps;
+
+  public get<TKey extends keyof PgSelectPropertySteps>(
+    key: TKey,
+  ): PgSelectPropertySteps[TKey];
+  public get(key: keyof PgSelectPropertySteps): Step {
+    switch (key) {
+      case "firstItem":
+      case "lastItem":
+      case "hasNextPage":
+      case "hasPreviousPage": {
+        const $getter = lambda<
+          PgSelectStep<TResource>,
+          boolean | unknown[] | null
+        >(this, pgSelectResultGetters[key]);
+        if (key !== "firstItem") {
+          this.requirePageValue(key, $getter.layerPlan);
+        }
+        return $getter;
+      }
+      default: {
+        return access(this, key);
+      }
     }
-    return $getter;
   }
 
   private requirePageValue(

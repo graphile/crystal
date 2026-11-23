@@ -1,4 +1,6 @@
+import { get } from "grafast";
 import { planToMermaid } from "grafast/mermaid";
+import { EXPORTABLE, extendSchema } from "graphile-utils";
 
 import { runTestQuery } from "../../helpers.ts";
 
@@ -81,6 +83,32 @@ test("trims the extra row from a backwards page with deferred page info", async 
     { path: ["allPeople", "edges", 1], data: { node: { id: 5 } } },
     { path: ["allPeople", "edges", 2], data: { node: { id: 6 } } },
   ]);
+});
+
+test("reads items through the public get helper on a PostgreSQL select", async () => {
+  const plugin = extendSchema((build) => {
+    const people = build.input.pgRegistry.pgResources.person;
+    return {
+      typeDefs: "extend type Query { rawRows: [[String]] }",
+      objects: {
+        Query: {
+          plans: {
+            rawRows: EXPORTABLE(
+              (get, people) => () => get(people.find(), "items"),
+              [get, people],
+            ),
+          },
+        },
+      },
+    };
+  });
+  const { data, errors } = await runTestQuery(
+    "{ rawRows }",
+    {},
+    { path: __filename, plugins: [plugin] },
+  );
+  expect(errors).toBeFalsy();
+  expect(data?.rawRows).toHaveLength(6);
 });
 
 const firstPageCursors = {
