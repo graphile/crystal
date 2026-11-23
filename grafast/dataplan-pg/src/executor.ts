@@ -702,7 +702,11 @@ ${duration}
             resultIndex: number;
           }>
         >();
-        for (let resultIndex = 0; resultIndex < values.length; resultIndex++) {
+        for (
+          let resultIndex = 0, l = values.length;
+          resultIndex < l;
+          resultIndex++
+        ) {
           const { context, queryValues } = values[resultIndex];
           let group = groupMap.get(context);
           if (group === undefined) {
@@ -777,7 +781,7 @@ ${duration}
                 group.push(row);
               }
             }
-            for (let i = 0; i < batch.length; i++) {
+            for (let i = 0, l = batch.length; i < l; i++) {
               results[batch[i].resultIndex] = groups[i] ?? [];
             }
           }

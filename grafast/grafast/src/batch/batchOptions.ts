@@ -69,7 +69,7 @@ function assertDeepScalar(value: unknown): void {
 
 function validateDeepOption(value: unknown): void {
   if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
+    for (let i = 0, l = value.length; i < l; i++) {
       validateDeepOption(value[i]);
     }
   } else if (isPojo(value)) {
@@ -89,10 +89,11 @@ const deepMatcher: OptionsMatcher = {
     } else if (left == null || typeof left !== "object") {
       return false;
     } else if (Array.isArray(left)) {
-      if (!Array.isArray(right) || left.length !== right.length) {
+      const l = left.length;
+      if (!Array.isArray(right) || l !== right.length) {
         return false;
       }
-      for (let i = 0; i < left.length; i++) {
+      for (let i = 0; i < l; i++) {
         if (!deepMatcher.matches(left[i], right[i])) {
           return false;
         }
@@ -104,8 +105,9 @@ const deepMatcher: OptionsMatcher = {
   },
   appendKeys(value, keys, order) {
     if (Array.isArray(value)) {
-      keys.push(value.length);
-      for (let i = 0; i < value.length; i++) {
+      const l = value.length;
+      keys.push(l);
+      for (let i = 0; i < l; i++) {
         deepMatcher.appendKeys(value[i], keys, order);
       }
     } else if (isPojo(value)) {

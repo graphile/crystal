@@ -161,6 +161,9 @@ the query shape.
   extend the type with `| null` or `| undefined`. Explicitly initialize it (to
   `null` or `undefined`) when constructing the object..
 - Do not reassign function parameters; use a local variable instead.
+- Prefer `for (let i = 0, l = foo.length; i < l; i++)` for indexed loops. Use
+  `for (let i = 0; i < foo.length; i++)` only when `foo` may be mutated during
+  the loop and the loop needs to observe changes to its length.
 - Prefer explicit checks over implicit boolean coercion: use `foo.length > 0`
   rather than `foo.length`, and use `foo == null` to check for non-existence
   rather than `!foo`. (If you know something can only be `undefined` and never
