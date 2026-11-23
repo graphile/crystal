@@ -6,6 +6,7 @@ import { it } from "mocha";
 
 import {
   connection,
+  constant,
   get,
   grafast,
   loadMany,
@@ -95,6 +96,50 @@ const schema = makeGrafastSchema({
     },
   },
   enableDeferStream: true,
+});
+
+it("awaits full pagination getters without a custom page-info plan", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: `
+      type Query { connection: Connection }
+      type Connection { pageInfo: PageInfo }
+      type PageInfo { hasNextPage: Boolean!, hasPreviousPage: Boolean! }
+    `,
+    objects: {
+      Query: {
+        plans: {
+          connection() {
+            const $page = constant({
+              items: [],
+              async getHasNextPage() {
+                return true;
+              },
+              async getHasPreviousPage() {
+                return false;
+              },
+            });
+            return connection(
+              Object.assign($page, {
+                paginationSupport: { full: true },
+                items: () => $page.get("items"),
+                setNeedsHasMore() {},
+              }),
+            );
+          },
+        },
+      },
+    },
+  });
+  const result = await grafast({
+    schema,
+    source: "{ connection { pageInfo { hasNextPage hasPreviousPage } } }",
+    requestContext,
+  });
+  assertNotIterable(result);
+  expect(result.errors).not.to.exist;
+  expect(result.data).to.deep.equal({
+    connection: { pageInfo: { hasNextPage: true, hasPreviousPage: false } },
+  });
 });
 
 function fib($max: Step<number>) {

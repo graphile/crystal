@@ -340,11 +340,14 @@ export interface ConnectionHandlingStep<
    */
   setNeedsHasMore(): void;
 
-  /** Plan a page-info field using the collection's pagination implementation. */
+  /**
+   * Plan a page-info field using the collection's pagination implementation.
+   * Pass true to the fallback when the requested page flag is known to be synchronous.
+   */
   planPageInfo?(
     key: PageInfoKey,
     layerPlan: Step["layerPlan"],
-    fallback: () => Step,
+    fallback: (pageFlagIsSync?: boolean) => Step,
   ): Step;
 
   // TODO: would be better to expose this as
@@ -822,7 +825,10 @@ export class ConnectionStep<
     return new PageInfoStep(this);
   }
 
-  public planPageInfo(key: PageInfoKey, fallback: () => Step): Step {
+  public planPageInfo(
+    key: PageInfoKey,
+    fallback: (pageFlagIsSync?: boolean) => Step,
+  ): Step {
     const handler = this.getHandler(true);
     if ("planPageInfo" in handler && handler.planPageInfo != null) {
       return handler.planPageInfo(key, currentLayerPlan(), fallback);
@@ -1627,6 +1633,13 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   }
 }
 
+const pageFlagGetters = {
+  hasNextPage: (result: ConnectionResult<unknown> | null) =>
+    result?.hasNextPage,
+  hasPreviousPage: (result: ConnectionResult<unknown> | null) =>
+    result?.hasPreviousPage,
+};
+
 class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
   static $$export = {
     moduleName: "grafast",
@@ -1650,7 +1663,11 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
     switch (key) {
       case "hasNextPage":
       case "hasPreviousPage": {
-        return $connection.planPageInfo(key, () => access($connection, key));
+        return $connection.planPageInfo(key, (pageFlagIsSync) =>
+          pageFlagIsSync === true
+            ? access($connection, key)
+            : lambda($connection, pageFlagGetters[key]),
+        );
       }
       case "startCursor": {
         return $connection.planPageInfo(key, () => {

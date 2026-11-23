@@ -578,6 +578,17 @@ export class PgUnionAllStep<
     return $clone;
   }
 
+  public planPageInfo(
+    key: "hasNextPage" | "hasPreviousPage" | "startCursor" | "endCursor",
+    _layerPlan: Step["layerPlan"],
+    fallback: (pageFlagIsSync?: boolean) => Step,
+  ): Step {
+    if (key === "hasNextPage" || key === "hasPreviousPage") {
+      this.setNeedsHasMore();
+    }
+    return fallback(true);
+  }
+
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
     this.metaKey = PgExecutor.metaKey;

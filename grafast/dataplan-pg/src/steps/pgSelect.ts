@@ -1250,13 +1250,15 @@ export class PgSelectStep<
   public planPageInfo(
     key: "hasNextPage" | "hasPreviousPage" | "startCursor" | "endCursor",
     layerPlan: Step["layerPlan"],
-    fallback: () => Step,
+    fallback: (pageFlagIsSync?: boolean) => Step,
   ): Step {
     if (key === "startCursor" || key === "endCursor") {
       const $item = this.get(key === "startCursor" ? "firstItem" : "lastItem");
       return this.cursorForItem($item);
     }
-    return this.requirePageValue(key, layerPlan) ? fallback() : this.get(key);
+    return this.requirePageValue(key, layerPlan)
+      ? fallback(true)
+      : this.get(key);
   }
 
   private needsGroups = false;
