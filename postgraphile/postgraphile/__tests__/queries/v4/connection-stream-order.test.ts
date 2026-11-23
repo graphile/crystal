@@ -28,15 +28,17 @@ test.each([
   async ({ first, initialCount, ids, hasNextPage }) => {
     const { payloads, pgCursorCount } = await runConnectionQuery(`{
       allPeople(first: ${first}) {
-        pageInfo { startCursor }
+        pageInfo { startCursor hasPreviousPage ... @defer { hasNextPage endCursor } }
         nodes @stream(initialCount: ${initialCount}) { id }
-        ... @defer { deferred: pageInfo { hasNextPage endCursor } }
       }
     }`);
     expect(pgCursorCount).toBe(1);
     expect(payloads?.[0].data).toEqual({
       allPeople: {
-        pageInfo: { startCursor: firstPageCursors.startCursor },
+        pageInfo: {
+          startCursor: firstPageCursors.startCursor,
+          hasPreviousPage: false,
+        },
         nodes: ids.slice(0, initialCount).map((id) => ({ id })),
       },
     });
@@ -49,14 +51,12 @@ test.each([
       })),
     );
     expect(payloads).toContainEqual({
-      path: ["allPeople"],
+      path: ["allPeople", "pageInfo"],
       data: {
-        deferred: {
-          hasNextPage,
-          endCursor: Buffer.from(
-            JSON.stringify(["08e0d342de", ids.at(-1)]),
-          ).toString("base64"),
-        },
+        hasNextPage,
+        endCursor: Buffer.from(
+          JSON.stringify(["08e0d342de", ids.at(-1)]),
+        ).toString("base64"),
       },
     });
   },
@@ -143,4 +143,112 @@ test("reads startCursor before streamed nodes planned in a later defer", async (
     { path: ["allPeople", "nodes", 1], data: { id: 2 } },
     { path: ["allPeople", "nodes", 2], data: { id: 3 } },
   ]);
+});
+
+test("finishes page info alongside nodes in a deferred connection fragment", async () => {
+  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+    allPeople(first: 3) {
+      pageInfo { startCursor }
+      ... @defer {
+        nodes @stream(initialCount: 1) { id }
+        deferred: pageInfo { endCursor hasNextPage }
+      }
+    }
+  }`);
+  expect(pgCursorCount).toBe(0);
+  expect(payloads).toContainEqual({
+    path: ["allPeople"],
+    data: {
+      nodes: [{ id: 1 }],
+      deferred: { endCursor: firstPageCursors.endCursor, hasNextPage: true },
+    },
+  });
+});
+
+test.each([
+  { stream: true, defer: true, cursors: 1 },
+  { stream: true, defer: false, cursors: 0 },
+  { stream: false, defer: true, cursors: 0 },
+  { stream: false, defer: false, cursors: 0 },
+])(
+  "offset page with stream=$stream and defer=$defer",
+  async ({ stream, defer, cursors }) => {
+    const { errors, data, payloads, queries } = await runTestQuery(
+      `query ($stream: Boolean!, $defer: Boolean!) {
+      allPeople(first: 2, offset: 1) {
+        nodes @stream(if: $stream, initialCount: 1) { id }
+        pageInfo { startCursor hasPreviousPage ... @defer(if: $defer) { endCursor hasNextPage } }
+      }
+    }`,
+      { variableValues: { stream, defer }, expectedPlanConstraints: 1 },
+      { path: __filename },
+    );
+    expect(errors).toBeFalsy();
+    expect(queries.filter(({ text }) => /^declare /im.test(text))).toHaveLength(
+      cursors,
+    );
+    const initial = (payloads?.[0].data ?? data)!.allPeople;
+    expect(initial.nodes).toEqual(
+      stream ? [{ id: 2 }] : [{ id: 2 }, { id: 3 }],
+    );
+    expect(initial.pageInfo.hasPreviousPage).toBe(true);
+    const page = defer
+      ? payloads?.find((p) => p.data?.endCursor !== undefined)?.data
+      : initial.pageInfo;
+    expect(page).toMatchObject({
+      endCursor: firstPageCursors.endCursor,
+      hasNextPage: true,
+    });
+  },
+);
+
+test("takes the last rows of a forward page before streaming nodes", async () => {
+  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+    allPeople(first: 4, last: 2) { nodes @stream(initialCount: 1) { id } }
+  }`);
+  expect(pgCursorCount).toBe(0);
+  expect(payloads).toMatchObject([
+    { data: { allPeople: { nodes: [{ id: 3 }] } } },
+    { path: ["allPeople", "nodes", 1], data: { id: 4 } },
+  ]);
+});
+
+test("settles both cursors for an empty stream", async () => {
+  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+    allPeople(first: 2, offset: 10) {
+      pageInfo { startCursor ... @defer { endCursor hasNextPage } }
+      nodes @stream(initialCount: 0) { id }
+    }
+  }`);
+  expect(pgCursorCount).toBe(1);
+  expect(payloads).toMatchObject([
+    { data: { allPeople: { nodes: [], pageInfo: { startCursor: null } } } },
+    {
+      path: ["allPeople", "pageInfo"],
+      data: { endCursor: null, hasNextPage: false },
+    },
+  ]);
+});
+
+test("streams inside a defer when endCursor belongs to a later defer", async () => {
+  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+    allPeople(first: 3) {
+      pageInfo { startCursor }
+      ... @defer {
+        nodes @stream(initialCount: 1) { id }
+        ... @defer { deferred: pageInfo { endCursor hasNextPage } }
+      }
+    }
+  }`);
+  expect(pgCursorCount).toBe(1);
+  expect(payloads).toContainEqual({
+    path: ["allPeople"],
+    data: {
+      deferred: { endCursor: firstPageCursors.endCursor, hasNextPage: true },
+    },
+  });
+  expect(payloads).toContainEqual({
+    path: ["allPeople", "nodes", 2],
+    data: { id: 3 },
+  });
 });

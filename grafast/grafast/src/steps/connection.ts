@@ -359,6 +359,7 @@ export interface ConnectionHandlingStep<
    */
   addStreamDetails?(
     $streamDetails: Step<ExecutionDetailsStream | null> | null,
+    consumerLayer?: Step["layerPlan"],
   ): void;
 }
 
@@ -756,7 +757,10 @@ export class ConnectionStep<
 
       this._mightStream = false;
     } else {
-      this.getHandler(true).addStreamDetails?.($streamDetails);
+      this.getHandler(true).addStreamDetails?.(
+        $streamDetails,
+        currentLayerPlan(),
+      );
 
       if (this._mightStream === null) {
         // Only override if it was unknown

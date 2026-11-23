@@ -522,6 +522,8 @@ export class PgSelectStep<
   protected lastStepId: number | null = null;
   protected fetchOneExtra = false;
   private requiresCompletePage = false;
+  private readonly streamConsumers = new Set<Step["layerPlan"]>();
+  private readonly completionReaders = new Set<Step["layerPlan"]>();
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
   protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
@@ -716,7 +718,7 @@ export class PgSelectStep<
       $clone.firstStepId = cloneFromMatchingMode.firstStepId;
       $clone.lastStepId = cloneFromMatchingMode.lastStepId;
       $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
-      $clone.requiresCompletePage = cloneFromMatchingMode.requiresCompletePage;
+      cloneFromMatchingMode.copyPageRequirementsTo($clone);
       $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
 
       // dependencies were already added, so we can just copy the dependency references
@@ -1210,15 +1212,15 @@ export class PgSelectStep<
     if (key !== "lastItem") {
       this.fetchOneExtra = true;
     }
-    // A streamed list item can run in the initial payload (initialCount).
-    // Require an explicit defer boundary before waiting for stream completion.
-    const { ancestry } = layerPlan;
-    const { depth } = this.layerPlan;
-    const eager =
-      ancestry[depth] !== this.layerPlan ||
-      !ancestry.slice(depth + 1).some((layer) => layer.reason.type === "defer");
-    if (eager) {
-      this.requiresCompletePage = true;
+    const eager = !isDeferredAfter(layerPlan, this.layerPlan);
+    // A forward page knows hasPreviousPage from its offset. Backward
+    // lookahead already uses array mode because the extra row comes first.
+    if (key !== "hasPreviousPage") {
+      if (eager) {
+        this.requiresCompletePage = true;
+      } else {
+        this.completionReaders.add(layerPlan);
+      }
     }
     return eager;
   }
@@ -1509,6 +1511,15 @@ export class PgSelectStep<
   }
 
   public finalize(): void {
+    // The stream only starts draining after its payload is ready. A reader
+    // waiting in that same payload (including a deferred one) would deadlock.
+    for (const reader of this.completionReaders) {
+      for (const consumer of this.streamConsumers) {
+        if (!isDeferredAfter(reader, consumer)) {
+          this.requiresCompletePage = true;
+        }
+      }
+    }
     // In case we have any lock actions in future:
     this.lock();
 
@@ -1734,11 +1745,19 @@ export class PgSelectStep<
     if (this.fetchOneExtra) {
       replacement.fetchOneExtra = true;
     }
-    if (this.requiresCompletePage) {
-      replacement.requiresCompletePage = true;
-    }
+    this.copyPageRequirementsTo(replacement);
     if (this.needsCursor) {
       replacement.needsCursor = true;
+    }
+  }
+
+  private copyPageRequirementsTo(target: PgSelectStep<TResource>) {
+    target.requiresCompletePage ||= this.requiresCompletePage;
+    for (const layer of this.streamConsumers) {
+      target.streamConsumers.add(layer);
+    }
+    for (const layer of this.completionReaders) {
+      target.completionReaders.add(layer);
     }
   }
 
@@ -2021,8 +2040,10 @@ export class PgSelectStep<
   private streamDetailsDepIds: number[] | null = [];
   addStreamDetails(
     $details: Step<ExecutionDetailsStream | null> | false | null,
+    consumerLayer: Step["layerPlan"] = this.layerPlan,
   ) {
     if ($details) {
+      this.streamConsumers.add(consumerLayer);
       this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
     } else {
       // Explicitly disable streaming
@@ -3343,8 +3364,12 @@ function buildTheQueryCore<
   applyConditionFromCursor(info, "before", before);
 
   applyCommonPaginationStuff(info);
-  if (info.requiresCompletePage || (info.fetchOneExtra && info.last != null)) {
-    // For backwards pagination the extra row can precede the visible rows.
+  if (
+    info.requiresCompletePage ||
+    (info.last != null &&
+      (info.fetchOneExtra || (info.first != null && info.last < info.first)))
+  ) {
+    // Backward lookahead and taking the last of a forward page require slicing.
     stream = null;
   }
 
@@ -4408,6 +4433,20 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
     sqlAliases.push(sql.symbolAlias(a, b));
   }
   return sql.join(sqlAliases, "");
+}
+
+// A streamed list item can also run in its parent's initial payload.
+// Only an explicit defer guarantees the reader can wait for that stream.
+function isDeferredAfter(
+  reader: Step["layerPlan"],
+  producer: Step["layerPlan"],
+) {
+  return (
+    reader.ancestry[producer.depth] === producer &&
+    reader.ancestry
+      .slice(producer.depth + 1)
+      .some((layer) => layer.reason.type === "defer")
+  );
 }
 
 function createStreamedSelectResult(
