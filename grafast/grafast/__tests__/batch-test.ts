@@ -417,13 +417,16 @@ it("indexes deeply matching arrays and plain objects", async () => {
       filter: [{ active: true, range: [1, 2] }],
     }),
     batchInMeta(schema, scope, executor, [2], {
-      filter: [{ active: true, range: [2, 1] }],
+      filter: [{ __proto__: null, range: [1, 2], active: true }],
     }),
     batchInMeta(schema, scope, executor, [3], {
+      filter: [{ active: true, range: [2, 1] }],
+    }),
+    batchInMeta(schema, scope, executor, [4], {
       filter: [{ range: [1, 2], active: true }],
     }),
   ]);
-  expect(calls).to.deep.equal([[1, 3], [2]]);
+  expect(calls).to.deep.equal([[1, 4], [2], [3]]);
 });
 
 it("reads deep options lazily and rejects unsupported values when indexing", async () => {
