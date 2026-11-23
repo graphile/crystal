@@ -1046,18 +1046,25 @@ on (${sql.indent(
       eventEmitter,
       useTransaction: this.hasSideEffects,
     };
-    const executionResult = this.hasSideEffects
-      ? await this.executor.executeWithoutCache(
+    let executionResult;
+    if (this.hasSideEffects) {
+      try {
+        executionResult = await this.executor.executeWithoutCache(
           keysets.map((queryValues) => ({ context, queryValues })),
-          { ...common, onMutationSuccess: executionDetails.batch.invalidate },
-        )
-      : {
-          values: await executionDetails.batch(
-            pgStepBatchExecutor,
-            keysets,
-            pgStepBatchOptions(this.executor, context, common),
-          ),
-        };
+          common,
+        );
+      } finally {
+        executionDetails.batch.invalidate();
+      }
+    } else {
+      executionResult = {
+        values: await executionDetails.batch(
+          pgStepBatchExecutor,
+          keysets,
+          pgStepBatchOptions(this.executor, context, common),
+        ),
+      };
+    }
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {

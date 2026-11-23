@@ -174,8 +174,6 @@ export type PgExecutorOptions = {
   affinity?: symbol;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
-  /** Called after each successful side-effecting query. */
-  onMutationSuccess?: () => void;
   /** @internal Enable client-queue sharing for normal batched reads. */
   queue?: boolean;
 };
@@ -279,8 +277,6 @@ export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
   /** @defaultValue `true` */
   useTransaction?: boolean;
-  /** Called after a successful mutation and any associated transaction. */
-  onMutationSuccess?: () => void;
 };
 type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
   /** @deprecated Pass a callback instead. */
@@ -671,8 +667,7 @@ ${duration}
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
-    const { rawSqlValues, identifierIndex, eventEmitter, onMutationSuccess } =
-      common;
+    const { rawSqlValues, identifierIndex, eventEmitter } = common;
     const publishExecute: PublishFunction | undefined = eventEmitter
       ? (text, name, explain) => {
           eventEmitter.emit("explainOperation", {
@@ -737,7 +732,6 @@ ${duration}
                 {
                   context,
                   useTransaction: common.useTransaction,
-                  onMutationSuccess,
                 },
                 (client) =>
                   this._executeWithClient(
@@ -1126,7 +1120,7 @@ ${duration}
     options: PgExecutorMutationOptions,
     maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
-    const { context, useTransaction, onMutationSuccess } = options;
+    const { context, useTransaction } = options;
     const { withPgClient, pgSettings } = context;
     let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
@@ -1149,15 +1143,12 @@ ${duration}
 
     // We don't explicitly need a transaction for mutations; but for safety
     // create one unless caller opts out.
-    const result = await withPgClient(
+    return withPgClient(
       pgSettings,
       useTransaction === false
         ? callback
         : (client) => client.withTransaction(callback),
     );
-    onMutationSuccess?.();
-
-    return result;
   }
 }
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");

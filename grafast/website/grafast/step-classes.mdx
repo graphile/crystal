@@ -277,9 +277,10 @@ separate scopes. Failed batch calls are evicted so later calls can retry.
 
 #### details.batch.invalidate()
 
-After a successful mutation, call `details.batch.invalidate()` to clear cached
-results in the current execution scope. Later calls fetch fresh values. Work
-already in flight can finish for its original callers.
+Call `details.batch.invalidate()` in a `finally` block around a mutation attempt
+to clear cached results in the current execution scope. A failed mutation can
+still have side effects. Later calls fetch fresh values. Work already in flight
+can finish for its original callers.
 
 #### details.values
 

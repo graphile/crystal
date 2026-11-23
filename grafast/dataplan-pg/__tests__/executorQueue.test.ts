@@ -343,7 +343,7 @@ test("executeWithCache forwards uncached calls and warns only once", async () =>
   }
 });
 
-test("cross-step batch caches respect scope mutation invalidation", async () => {
+test("invalidates batch caches after successful and failed mutations", async () => {
   const executor = makeExecutor();
   let version = 1;
   const { context, seen } = makeContext(async () => ({
@@ -354,7 +354,6 @@ test("cross-step batch caches respect scope mutation invalidation", async () => 
   // eslint-disable-next-line graphile-export/export-subclasses
   class ReadAroundMutationStep extends Step<string> {
     async execute(details: ExecutionDetails) {
-      const onMutationSuccess = details.batch.invalidate;
       const read = () =>
         details.batch(
           pgStepBatchExecutor,
@@ -368,21 +367,29 @@ test("cross-step batch caches respect scope mutation invalidation", async () => 
       const first = await read();
       expect((await read())[0]).toBe(first[0]);
       expect(seen).toHaveLength(1);
+      const mutate = async (callback: () => Promise<void>) => {
+        try {
+          await executor.executeMutation(
+            { context, useTransaction: false },
+            callback,
+          );
+        } finally {
+          details.batch.invalidate();
+        }
+      };
       await expect(
-        executor.executeMutation({ context, onMutationSuccess }, async () => {
-          throw new Error("rolled back");
-        }),
-      ).rejects.toThrow("rolled back");
-      expect((await read())[0]).toBe(first[0]);
-      expect(seen).toHaveLength(1);
-      await executor.executeMutation(
-        { context, onMutationSuccess },
-        async () => {
+        mutate(async () => {
           version = 2;
-        },
-      );
+          throw new Error("failed after writing");
+        }),
+      ).rejects.toThrow("failed after writing");
       expect(await read()).toEqual([[[2]], [[2]]]);
       expect(seen).toHaveLength(2);
+      await mutate(async () => {
+        version = 3;
+      });
+      expect(await read()).toEqual([[[3]], [[3]]]);
+      expect(seen).toHaveLength(3);
       return ["ok"];
     }
   }

@@ -783,7 +783,7 @@ export interface BatchFunction {
       : [options: NoInfer<TOptions>]
   ): PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>>;
 
-  /** Clear cached results in this scope after a successful mutation. */
+  /** Clear cached results in this scope after a mutation attempt settles. */
   invalidate(): void;
 }
 
