@@ -1648,12 +1648,11 @@ export class ConnectionItemsStep extends Step {
     >;
   }
 
-  public willNotStream(): boolean {
-    return !this.getConnection().mightStream();
-  }
-
   public optimize(_options: StepOptimizeOptions): Step {
     this.cloneStreams = this.getConnection().mightStream();
+    if (!this.cloneStreams) {
+      this._stepOptions.walkIterable = true;
+    }
     return this;
   }
 

@@ -5,6 +5,7 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.ts";
 import { Step } from "../step.ts";
+import { stepYieldsCompleteList } from "../utils.ts";
 import type { StepRepresentingList } from "./connection.ts";
 import { itemsOrStep } from "./connection.ts";
 import { ListStep } from "./list.ts";
@@ -35,10 +36,7 @@ export class FirstStep<TData> extends Step<TData> {
 
   finalize() {
     const parent = this.getDepOptions(0).step;
-    if (
-      this.isSyncAndSafe ||
-      (!parent.cloneStreams && parent.willNotStream?.() === true)
-    ) {
+    if (this.isSyncAndSafe || stepYieldsCompleteList(parent)) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;
       this.isSyncAndSafe = true;

@@ -769,16 +769,6 @@ ${printDeps(step, 1)}
    */
   public optimize?(_options: StepOptimizeOptions): Step;
 
-  /**
-   * Called during finalization on a list-producing step. Return true if it
-   * will always yield the complete list as an array (or a nullish value).
-   * Steps that can yield an iterable or a partial list must leave this
-   * unspecified or return false.
-   *
-   * @experimental
-   */
-  public willNotStream?(): boolean;
-
   public finalize() {
     if (typeof (this as any).isSyncAndSafe !== "boolean") {
       // Take a guess
