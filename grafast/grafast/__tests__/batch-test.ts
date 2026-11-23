@@ -987,7 +987,7 @@ it("defineBatchExecutor returns the supplied executor unchanged", () => {
   expect(defineBatchExecutor(executor)).to.equal(executor);
 });
 
-it("looks up options by identity before comparing and retains canonical options", async () => {
+it("looks up options by identity before comparing and uses each batch's first options", async () => {
   let reads = 0;
   const received: Array<{ group: string }> = [];
   const executor = defineBatchExecutor({
@@ -1016,15 +1016,70 @@ it("looks up options by identity before comparing and retains canonical options"
   reads = 0;
   expect(batchInMeta(schema, meta, executor, [1], second)).to.deep.equal([1]);
   expect(reads).to.equal(0);
-  await batchInMeta(schema, meta, executor, [2], { group: "first" });
+  const nextBatchOptions = { group: "first" };
+  await batchInMeta(schema, meta, executor, [2], nextBatchOptions);
   expect(reads).to.equal(1);
   expect(received).to.have.length(3);
-  expect(received[2]).to.equal(first);
+  expect(received[2]).to.equal(nextBatchOptions);
   reads = 0;
   for (let i = 0; i < 100; i++) {
     await batchInMeta(schema, meta, executor, [2], { group: String(i) });
   }
   expect(reads).to.equal(0);
+});
+
+it("uses the new batch's ignored options without a merge hook", async () => {
+  const hints: string[] = [];
+  const executor = defineBatchExecutor({
+    name: "ignored-hints",
+    keysetEquality: "strict",
+    optionsMatch: { hint: "ignore" },
+    callback: (options: { hint: string }, keys: readonly number[]) => {
+      hints.push(options.hint);
+      return keys;
+    },
+  });
+  const scope = {};
+  await batchInMeta(schema, scope, executor, [1], { hint: "first" });
+  await batchInMeta(schema, scope, executor, [2], { hint: "second" });
+  expect(hints).to.deep.equal(["first", "second"]);
+});
+
+it("keeps hints from in-flight keys out of the queued batch", async () => {
+  const release = Promise.withResolvers<void>();
+  let merges = 0;
+  const executor = defineBatchExecutor({
+    name: "merge-hints",
+    keysetEquality: "strict",
+    optionsMatch: { hint: "ignore" },
+    mergeOptions: (current, incoming) => {
+      merges++;
+      return current.hint != null ? current : incoming;
+    },
+    callback: async (
+      options: { hint: symbol | undefined },
+      keys: readonly number[],
+    ) => {
+      if (keys.includes(1)) {
+        await release.promise;
+      }
+      return keys.map(() => options.hint);
+    },
+  });
+  const scope = {};
+  const hint = Symbol();
+  const first = batchInMeta(schema, scope, executor, [1], { hint });
+  await Promise.resolve();
+  const second = batchInMeta(schema, scope, executor, [2], { hint: undefined });
+  const joined = batchInMeta(schema, scope, executor, [1], { hint: Symbol() });
+  try {
+    expect(await second).to.deep.equal([undefined]);
+  } finally {
+    release.resolve();
+  }
+  expect(await first).to.deep.equal([hint]);
+  expect(await joined).to.deep.equal([hint]);
+  expect(merges).to.equal(0);
 });
 
 it("only compares options within the requested executor", async () => {

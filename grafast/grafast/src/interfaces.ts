@@ -739,6 +739,7 @@ export type BatchCallback<
 
 type BatchOptionComparison<T> =
   | "strict"
+  | "ignore"
   | "record"
   | (unknown extends T
       ? "tuple" | "deepTuple" | BatchOptionsMatch<Record<PropertyKey, unknown>>
@@ -766,6 +767,11 @@ export interface BatchExecutor<
   readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
   /** Unspecified own properties are compared using strict equality. */
   readonly optionsMatch?: BatchOptionsMatch<NonNullable<TOptions>>;
+  /**
+   * Combine options when a request adds a new key to an existing queued batch.
+   * The returned options must remain equivalent under optionsMatch.
+   */
+  readonly mergeOptions?: (current: TOptions, incoming: TOptions) => TOptions;
 }
 export type BatchFunction = <
   TOptions extends Record<string, unknown> | undefined,

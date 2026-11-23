@@ -32,6 +32,7 @@ export interface CompositeEntry<TKeyset, TResult> {
 
 export type BatchFamily<TOptions extends BatchOptions, TKeyset, TResult> = {
   executor: BatchExecutor<TOptions, TKeyset, TResult>;
+  /** Equivalent options for lookup and for dispatching the queued batch. */
   options: TOptions;
   /** The batch currently collecting keys, scheduled to start in a microtask. */
   queued: PendingBatch<TKeyset, TResult> | null;

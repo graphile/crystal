@@ -1,3 +1,4 @@
+import { noop } from "../dev.ts";
 import type { BatchExecutor } from "../interfaces.ts";
 import { arraysMatch, isPojo } from "../utils.ts";
 import type { BatchFamily, BatchOptions } from "./batchInterfaces.ts";
@@ -28,6 +29,11 @@ const strictMatcher: OptionsMatcher = {
   appendKeys(value, keys) {
     keys.push(value);
   },
+};
+
+const ignoreMatcher: OptionsMatcher = {
+  matches: () => true,
+  appendKeys: noop,
 };
 
 const $$scalar = Symbol("non-structural batch option");
@@ -175,6 +181,7 @@ const recordMatcher = makeObjectMatcher();
 interface OptionsMatchDescriptor {
   readonly [key: PropertyKey]:
     | "strict"
+    | "ignore"
     | "tuple"
     | "deepTuple"
     | "record"
@@ -196,6 +203,8 @@ function compileOptionsMatch(
       rules.set(key, recordMatcher);
     } else if (rule === "strict") {
       rules.set(key, strictMatcher);
+    } else if (rule === "ignore") {
+      rules.set(key, ignoreMatcher);
     } else if (isPojo(rule)) {
       rules.set(key, compileOptionsMatch(rule));
     } else if (rule !== undefined) {

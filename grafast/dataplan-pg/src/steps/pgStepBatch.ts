@@ -43,7 +43,14 @@ export const pgStepBatchExecutor = defineBatchExecutor({
       await executor.executeWithoutCache(inputs, { ...options, queue: true })
     ).values;
   },
-  optionsMatch: { text: "strict", rawSqlValues: "deepTuple" },
+  // Affinity routes the query to a connection queue without affecting its rows.
+  optionsMatch: {
+    text: "strict",
+    rawSqlValues: "deepTuple",
+    affinity: "ignore",
+  },
+  mergeOptions: (current, incoming) =>
+    current.affinity != null ? current : incoming,
 } satisfies BatchExecutor<
   PgStepBatchOptions,
   readonly unknown[],

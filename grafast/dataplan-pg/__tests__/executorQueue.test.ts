@@ -419,7 +419,7 @@ test("side effects execute separately for identical inputs", async () => {
   expect(seen).toHaveLength(2);
 });
 
-test("compiled SQL with equivalent nested parameter arrays shares batch work", async () => {
+test("compiled SQL with equivalent nested parameters shares batch work across connection affinity hints", async () => {
   const executor = makeExecutor();
   const { context, seen } = makeContext(async (opts) => ({
     rows: [[JSON.stringify(opts.values[0])]],
@@ -445,6 +445,7 @@ test("compiled SQL with equivalent nested parameter arrays shares batch work", a
         pgStepBatchOptions(executor, context, {
           text: "select $1",
           rawSqlValues: [[this.parameter, 2]],
+          affinity: Symbol(),
           eventEmitter: undefined,
         }),
       );
@@ -471,6 +472,78 @@ test("compiled SQL with equivalent nested parameter arrays shares batch work", a
   });
   expect(seen).toHaveLength(2);
 });
+
+test.each([
+  { hintedFirst: false, addsKey: false },
+  { hintedFirst: true, addsKey: false },
+  { hintedFirst: false, addsKey: true },
+  { hintedFirst: true, addsKey: true },
+])(
+  "merges affinity when adding keys (hinted request first: $hintedFirst, adds key: $addsKey)",
+  async ({ hintedFirst, addsKey }) => {
+    const executor = makeExecutor();
+    const { context, seen, withPgClient } = makeContext(async (opts) => {
+      const rows =
+        opts.text === "select page"
+          ? (JSON.parse(opts.values[0]) as string[][]).map(([key], index) => [
+              key,
+              index,
+            ])
+          : [[opts.text]];
+      return { rows, rowCount: rows.length };
+    });
+    const affinity = Symbol("connection");
+    // This test step closes over the test executor and context.
+    // eslint-disable-next-line graphile-export/export-subclasses
+    class ReadStep extends Step<string> {
+      async execute(details: ExecutionDetails) {
+        const read = (keys: readonly string[][], hint: symbol | undefined) =>
+          details.batch(
+            pgStepBatchExecutor,
+            keys,
+            pgStepBatchOptions(executor, context, {
+              text: "select page",
+              rawSqlValues: [],
+              identifierIndex: 1,
+              affinity: hint,
+              eventEmitter: undefined,
+            }),
+          );
+        const first = read([["first"]], hintedFirst ? affinity : undefined);
+        const second = read(
+          addsKey ? [["first"], ["second"]] : [["first"]],
+          hintedFirst ? undefined : affinity,
+        );
+        const [firstRows, secondRows, count] = await Promise.all([
+          first,
+          second,
+          run(executor, context, "select count", "count", affinity),
+        ]);
+        expect(firstRows).toEqual([[["first", 0]]]);
+        expect(secondRows).toEqual(
+          addsKey ? [[["first", 0]], [["second", 1]]] : firstRows,
+        );
+        expect(count.values).toEqual([[["select count"]]]);
+        return ["ok"];
+      }
+    }
+    const schema = makeGrafastSchema({
+      typeDefs: "type Query { value: String }",
+      objects: {
+        // eslint-disable-next-line graphile-export/export-plans
+        Query: { plans: { value: () => new ReadStep() } },
+      },
+    });
+    expect(await grafast({ schema, source: "{ value }" })).toEqual({
+      data: { value: "ok" },
+    });
+    expect(seen.map(({ text }) => text).sort()).toEqual([
+      "select count",
+      "select page",
+    ]);
+    expect(withPgClient).toHaveBeenCalledTimes(hintedFirst || addsKey ? 1 : 2);
+  },
+);
 
 test("maps compiled identifier rows back to input order, including empty groups", async () => {
   const executor = makeExecutor();
