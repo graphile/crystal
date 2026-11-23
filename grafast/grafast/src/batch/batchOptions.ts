@@ -150,15 +150,15 @@ function makeObjectMatcher(
         return false;
       }
       const keys = Reflect.ownKeys(left);
-      if (keys.length !== Reflect.ownKeys(right).length) {
+      if (keys.length !== Reflect.ownKeys(right as typeof left).length) {
         return false;
       }
       for (const key of keys) {
-        if (!Object.hasOwn(right, key)) {
+        if (!Object.hasOwn(right as typeof left, key)) {
           return false;
         }
         const rule = rules?.get(key) ?? defaultRule;
-        if (!rule.matches(left[key], right[key])) {
+        if (!rule.matches(left[key], (right as typeof left)[key])) {
           return false;
         }
       }
