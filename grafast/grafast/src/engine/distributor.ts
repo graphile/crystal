@@ -59,6 +59,8 @@ export function distributor<TData>(
    */
   let sourceIterator: AsyncIterator<TData> | Iterator<TData> | null = null;
 
+  let deliveries: PromiseWithResolvers<void>[] | null = null;
+
   /**
    * An array of the currently delivered index for each of the dependent steps.
    * One a given index has been delivered by all streams, the lowWaterMark may
@@ -223,7 +225,17 @@ export function distributor<TData>(
     // same step without waiting for previous calls to resolve.
     const index = ++requestedIndex[stepIndex];
 
-    return yieldValue(stepIndex, index);
+    const result = yieldValue(stepIndex, index);
+    const delivery = deliveries?.[stepIndex];
+    if (delivery !== undefined) {
+      // An iterator can finish in its initial payload, without processStream.
+      void result.then((row) => {
+        if (row.done) {
+          delivery.resolve();
+        }
+      }, delivery.reject);
+    }
+    return result;
   }
 
   /**
@@ -344,6 +356,7 @@ export function distributor<TData>(
   }
 
   function stop(stepIndex: number, error?: unknown, advance = true) {
+    deliveries?.[stepIndex].resolve();
     if (!terminalResult[stepIndex]) {
       deliveredIndex[stepIndex] = Infinity;
       if (error) {
@@ -379,13 +392,30 @@ export function distributor<TData>(
         Symbol.asyncIterator in sourceIterable
           ? sourceIterable[Symbol.asyncIterator]()
           : sourceIterable[Symbol.iterator]();
+      const observe = (sourceIterator as StreamDeliveryObserver)[
+        $$streamDelivery
+      ];
+      if (observe !== undefined) {
+        // Reserve delivery for every consumer before the first pull, including
+        // consumers whose deferred payload has not started yet.
+        deliveries = dependentSteps.map((_, index) => {
+          const delivery = Promise.withResolvers<void>();
+          if (terminalResult[index] !== null) {
+            delivery.resolve();
+          }
+          return delivery;
+        });
+        const delivered = Promise.all(
+          deliveries.map((entry) => entry.promise),
+        ).then(noop);
+        void delivered.catch(noop);
+        observe(delivered);
+      }
     }
 
     const onAbort = () => void iterator.return().then(undefined, noop);
     const iterator = {
-      [$$streamDelivery]: (sourceIterator as StreamDeliveryObserver)[
-        $$streamDelivery
-      ],
+      [$$streamDelivery]: deliveries?.[stepIndex].resolve,
       [Symbol.asyncIterator]() {
         return this;
       },

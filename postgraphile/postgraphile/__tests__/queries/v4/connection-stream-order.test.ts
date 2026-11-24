@@ -317,7 +317,10 @@ test("streams an unbounded page with eager hasNextPage", async () => {
   });
 });
 
-test("delivers the final streamed node before either deferred page value", async () => {
+test.each([
+  "nodes @stream { id blocked }",
+  "edges @stream { node { id } } ... @defer { __typename ... @defer { nodes @stream { id blocked } } }",
+])("delivers %s before either deferred page value", async (selection) => {
   const blocked = Promise.withResolvers<void>();
   const release = Promise.withResolvers<void>();
   const plugin = extendSchema({
@@ -347,7 +350,7 @@ test("delivers the final streamed node before either deferred page value", async
   const { payloads, errors } = await runTestQuery(
     `{
       allPeople(first: 2) {
-        nodes @stream(initialCount: 0) { id blocked }
+        ${selection}
         pageInfo {
           ... @defer { endCursor }
           ... @defer { hasNextPage }
