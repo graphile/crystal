@@ -77,6 +77,7 @@ export interface SubsequentPayloadSpec {
   bucketIndex: number;
   outputPlan: OutputPlan;
   label: string | undefined;
+  pendingIterators: Set<AsyncIterator<any> | Iterator<any>> | null;
 }
 
 export interface SubsequentStreamSpec {

@@ -321,6 +321,18 @@ export function executeBucket(
           return;
         }
 
+        if (
+          finishedStep._hasStreamInputConsumer &&
+          !Array.isArray(rawValue) &&
+          (isIterable(rawValue) || isAsyncIterable(rawValue))
+        ) {
+          // Acquire cleanup ownership now, without pulling the first item.
+          walkStream(bucket, finishedStep, resultIndex, rawValue, flags, {
+            initialCount: 0,
+          });
+          return;
+        }
+
         // PERF: do we want to handle arrays differently?
         let valueIsIterable = false;
         let valueIsAsyncIterable = false;
@@ -1706,16 +1718,27 @@ function walkStreamInputs(
     for (let index = 0; index < count; index++) {
       const value = input.at(index);
       const flags = input._flagsAt(index);
+      const pending = (value as StreamMaybeMoreableArray | null)?.[
+        $$streamMore
+      ];
       if (
         !(flags & DEFAULT_FORBIDDEN_FLAGS) &&
-        (stream !== null || !Array.isArray(value)) &&
+        (pending !== undefined || stream !== null || !Array.isArray(value)) &&
         (isIterable(value) || isAsyncIterable(value))
       ) {
         if (!input.isBatch) {
           // setResult will install a fresh unary execution value.
           store.delete(step.id);
         }
-        const promise = walkStream(bucket, step, index, value, flags, stream);
+        const promise = walkStream(
+          bucket,
+          step,
+          index,
+          value,
+          flags,
+          stream,
+          pending,
+        );
         if (promise !== undefined) {
           promises.push(promise);
         }
@@ -1732,14 +1755,17 @@ function walkStream(
   value: Iterable<unknown> | AsyncIterable<unknown>,
   flags: ExecutionEntryFlags,
   stream: ExecutionDetailsStream | null,
+  pending?: AsyncIterator<unknown> | Iterator<unknown>,
 ): PromiseOrDirect<void> {
   const initialCount = stream?.initialCount ?? Infinity;
 
   let iterator: Iterator<any, any, any> | AsyncIterator<any, any, any>;
   try {
-    iterator = isIterable(value)
-      ? value[Symbol.iterator]()
-      : (value as AsyncIterable<unknown>)[Symbol.asyncIterator]();
+    iterator =
+      pending ??
+      (isIterable(value)
+        ? value[Symbol.iterator]()
+        : (value as AsyncIterable<unknown>)[Symbol.asyncIterator]());
   } catch (e) {
     bucket.setResult(step, resultIndex, e, flags | FLAG_ERROR);
     return;

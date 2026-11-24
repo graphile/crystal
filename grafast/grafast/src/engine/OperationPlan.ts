@@ -5090,6 +5090,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
           // A single consumer can receive the raw iterable from an ancestor.
           // Walk it in the bucket that will deliver the list.
           if (!parentStep._stepOptions.walkIterable) {
+            parentStep._hasStreamInputConsumer = true;
             layerPlan.reason.parentLayerPlan.streamInputs.push(
               layerPlan.reason,
             );

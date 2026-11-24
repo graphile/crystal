@@ -306,6 +306,9 @@ export /* abstract */ class Step<TData = any> {
    */
   public cloneStreams: boolean;
 
+  /** @internal Acquire the iterator here for a list walked in a later bucket. */
+  public _hasStreamInputConsumer = false;
+
   /**
    * True if one of our dependencies has cloneStreams set. Only populated
    * during `operationPlan.finalize()`.

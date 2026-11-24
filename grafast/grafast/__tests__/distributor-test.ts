@@ -9,6 +9,7 @@ import {
   constant,
   get,
   grafast,
+  lambda,
   loadMany,
   loadManyCallback,
   makeGrafastSchema,
@@ -38,6 +39,7 @@ const schema = makeGrafastSchema({
       connection(max: Int! = 100): FibConnection
     }
     type FibConnection {
+      failure: Int!
       edges(throw: Boolean! = false): [FibEdge]
       nodes(throw: Boolean! = false): [Fib]
       pageInfo(throw: Boolean! = false): PageInfo
@@ -68,6 +70,11 @@ const schema = makeGrafastSchema({
     },
     FibConnection: {
       plans: {
+        failure() {
+          return lambda(null, () => {
+            throw new Error("connection failed");
+          });
+        },
         pageInfo($connection, { $throw }) {
           sideEffect($throw, (t) => {
             if (t) {
@@ -750,3 +757,16 @@ it(
     expect(endCount).to.equal(1);
   }),
 );
+
+it("releases the stream when a non-null sibling skips its only deferred consumer", async () => {
+  const result = await grafast({
+    schema,
+    requestContext,
+    resolvedPreset,
+    source: `{ connection { failure ... @defer { nodes @stream { value } } } }`,
+  });
+  assertNotIterable(result);
+  expect(result.errors?.[0].message).to.equal("connection failed");
+  expect(result.data).to.deep.equal({ connection: null });
+  expect(endCount).to.equal(1);
+});
