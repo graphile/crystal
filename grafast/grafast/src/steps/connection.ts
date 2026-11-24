@@ -928,9 +928,13 @@ export class ConnectionStep<
         if (
           items != null &&
           !Array.isArray(items) &&
-          (!this._mightStream || this.eagerNextPage || this.eagerPreviousPage)
+          (!this._mightStream ||
+            (this.eagerNextPage &&
+              !hasBooleanPageFlag(result, "hasNextPage")) ||
+            (this.eagerPreviousPage &&
+              !hasBooleanPageFlag(result, "hasPreviousPage")))
         ) {
-          // Except it might return a stream which we should turn into an array.
+          // An eager flag may need the stream to finish before it is ready.
           return iterableToArray(items).then((items) =>
             fullPaginationConnectionResult(result, items),
           );
@@ -1023,6 +1027,16 @@ export class ConnectionStep<
       }
     });
   }
+}
+
+// Only inspect stored values: an on-demand getter can require exhaustion.
+function hasBooleanPageFlag<TItem>(
+  result: FullPaginationResult<TItem>,
+  key: "hasNextPage" | "hasPreviousPage",
+): boolean {
+  return (
+    typeof Object.getOwnPropertyDescriptor(result, key)?.value === "boolean"
+  );
 }
 
 function fullPaginationConnectionResult<TItem>(

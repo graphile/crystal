@@ -9,6 +9,8 @@ import { it } from "mocha";
 import {
   access,
   connection,
+  type ConnectionHandlingResult,
+  type ConnectionHandlingResultWithGetters,
   get,
   grafast,
   lambda,
@@ -107,8 +109,12 @@ const schema = makeGrafastSchema({
   enableDeferStream: true,
 });
 
-it("awaits full pagination getters without a custom page-info plan", async () => {
-  const schema = makeGrafastSchema({
+function fullPaginationSchema(
+  page: () =>
+    | ConnectionHandlingResult<number>
+    | ConnectionHandlingResultWithGetters<number>,
+) {
+  return makeGrafastSchema({
     enableDeferStream: true,
     typeDefs: `
       type Query { connection: Connection }
@@ -119,22 +125,7 @@ it("awaits full pagination getters without a custom page-info plan", async () =>
       Query: {
         plans: {
           connection() {
-            const $page = lambda(null, () => {
-              const exhausted = Promise.withResolvers<void>();
-              return {
-                items: (async function* () {
-                  yield 7;
-                  exhausted.resolve();
-                })(),
-                async getHasNextPage() {
-                  await exhausted.promise;
-                  return true;
-                },
-                async getHasPreviousPage() {
-                  return false;
-                },
-              };
-            });
+            const $page = lambda(null, page);
             return connection(
               Object.assign($page, {
                 paginationSupport: { full: true, cursor: true },
@@ -146,6 +137,56 @@ it("awaits full pagination getters without a custom page-info plan", async () =>
         },
       },
     },
+  });
+}
+
+it("streams the initial node when the requested full pagination flag is known", async () => {
+  const secondRow = Promise.withResolvers<void>();
+  const schema = fullPaginationSchema(() => ({
+    items: (async function* () {
+      yield 7;
+      await secondRow.promise;
+      yield 8;
+    })(),
+    hasNextPage: Promise.resolve(true),
+    hasPreviousPage: false,
+  }));
+  try {
+    const result = await grafast({
+      schema,
+      source:
+        "{ connection { nodes @stream(initialCount: 1) pageInfo { hasPreviousPage } } }",
+      requestContext,
+    });
+    assertIterable(result);
+    const iterator = result[Symbol.asyncIterator]();
+    expect((await iterator.next()).value?.data).to.deep.equal({
+      connection: { nodes: [7], pageInfo: { hasPreviousPage: false } },
+    });
+    secondRow.resolve();
+    expect((await iterator.next()).value?.data).to.equal(8);
+    expect((await iterator.next()).value?.hasNext).to.equal(false);
+  } finally {
+    secondRow.resolve();
+  }
+});
+
+it("awaits full pagination getters without a custom page-info plan", async () => {
+  const schema = fullPaginationSchema(() => {
+    const exhausted = Promise.withResolvers<void>();
+    return {
+      items: (async function* () {
+        yield 7;
+        exhausted.resolve();
+      })(),
+      async getHasNextPage() {
+        await exhausted.promise;
+        return true;
+      },
+      async getHasPreviousPage() {
+        return false;
+      },
+    };
   });
   const result = await grafast({
     schema,
