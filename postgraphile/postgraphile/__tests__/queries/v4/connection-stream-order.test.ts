@@ -281,6 +281,29 @@ test("streams inside a defer when endCursor belongs to a later defer", async () 
   });
 });
 
+test("streams when nodes and endCursor belong to sibling defers", async () => {
+  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+    allPeople(first: 3) {
+      pageInfo { startCursor }
+      ... @defer {
+        nodes @stream(initialCount: 1) { id }
+      }
+      ... @defer { deferred: pageInfo { endCursor hasNextPage } }
+    }
+  }`);
+  expect(pgCursorCount).toBe(1);
+  expect(payloads).toContainEqual({
+    path: ["allPeople"],
+    data: {
+      deferred: { endCursor: firstPageCursors.endCursor, hasNextPage: true },
+    },
+  });
+  expect(payloads).toContainEqual({
+    path: ["allPeople", "nodes", 2],
+    data: { id: 3 },
+  });
+});
+
 test("streams an unbounded page with eager hasNextPage", async () => {
   const { payloads, pgCursorCount } = await runConnectionQuery(`{
     allPeople {

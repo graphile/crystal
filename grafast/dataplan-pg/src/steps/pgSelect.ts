@@ -1239,7 +1239,7 @@ export class PgSelectStep<
     if (key !== "lastItem") {
       this.fetchOneExtra = true;
     }
-    const eager = !isDeferredAfter(layerPlan, this.layerPlan);
+    const eager = !hasIndependentDefer(layerPlan, this.layerPlan);
     // A forward page knows hasPreviousPage from its offset. Backward
     // lookahead already uses array mode because the extra row comes first.
     if (key !== "hasPreviousPage") {
@@ -1629,7 +1629,7 @@ export class PgSelectStep<
     // waiting in that same payload (including a deferred one) would deadlock.
     for (const [reader, key] of this.completionReaders) {
       for (const consumer of this.streamConsumers) {
-        if (!isDeferredAfter(reader, consumer)) {
+        if (!hasIndependentDefer(reader, consumer)) {
           this.requireEagerValue(key);
           break;
         }
@@ -4559,15 +4559,13 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
 
 // A streamed list item can also run in its parent's initial payload.
 // Only an explicit defer guarantees the reader can wait for that stream.
-function isDeferredAfter(
+function hasIndependentDefer(
   reader: Step["layerPlan"],
   producer: Step["layerPlan"],
 ) {
-  return (
-    reader.ancestry[producer.depth] === producer &&
-    reader.ancestry
-      .slice(producer.depth + 1)
-      .some((layer) => layer.reason.type === "defer")
+  return reader.ancestry.some(
+    (layer) =>
+      layer.reason.type === "defer" && producer.ancestry[layer.depth] !== layer,
   );
 }
 
