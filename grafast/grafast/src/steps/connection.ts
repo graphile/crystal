@@ -443,9 +443,14 @@ export class ConnectionStep<
 
   private neededCollection = false;
   private collectionDepId: number;
-  /**
-   * null = unknown
-   */
+  private readonly streamConsumers = new Set<Step["layerPlan"]>();
+  private readonly flagReaders: Array<{
+    layer: Step["layerPlan"];
+    key: "hasNextPage" | "hasPreviousPage";
+  }> = [];
+  private eagerNextPage = false;
+  private eagerPreviousPage = false;
+  /** null = unknown */
   private _mightStream: boolean | null = null;
 
   // Pagination stuff
@@ -760,6 +765,7 @@ export class ConnectionStep<
 
       this._mightStream = false;
     } else {
+      this.streamConsumers.add(currentLayerPlan());
       this.getHandler(true).addStreamDetails?.(
         $streamDetails,
         currentLayerPlan(),
@@ -835,6 +841,7 @@ export class ConnectionStep<
     }
     if (key === "hasNextPage" || key === "hasPreviousPage") {
       this.setNeedsHasMore();
+      this.flagReaders.push({ layer: currentLayerPlan(), key });
     }
     return fallback();
   }
@@ -854,6 +861,10 @@ export class ConnectionStep<
     return this;
   }
   deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any>) {
+    replacement.flagReaders.push(...this.flagReaders);
+    for (const consumer of this.streamConsumers) {
+      replacement.streamConsumers.add(consumer);
+    }
     if (this.neededCollection) {
       replacement.neededCollection = true;
     }
@@ -863,6 +874,28 @@ export class ConnectionStep<
     if (this.needsHasMore) {
       replacement.needsHasMore = true;
     }
+  }
+
+  public finalize() {
+    for (const { layer, key } of this.flagReaders) {
+      for (const consumer of this.streamConsumers) {
+        if (
+          !layer.ancestry.some(
+            (ancestor) =>
+              ancestor.reason.type === "defer" &&
+              consumer.ancestry[ancestor.depth] !== ancestor,
+          )
+        ) {
+          if (key === "hasNextPage") {
+            this.eagerNextPage = true;
+          } else {
+            this.eagerPreviousPage = true;
+          }
+          break;
+        }
+      }
+    }
+    super.finalize();
   }
 
   public execute({
@@ -963,12 +996,26 @@ export class ConnectionStep<
           ),
         );
       } else {
-        return makeProcessedCollection(
+        const result = makeProcessedCollection(
           mode,
           collection,
           params,
           !this.collectionPaginationSupport?.cursor,
         );
+        // A flag that needs lookahead cannot wait for its own payload to drain.
+        if (
+          mode !== MODE_ARRAY &&
+          typeof params.__hasMore !== "boolean" &&
+          (params.__isForwardPagination
+            ? this.eagerNextPage
+            : this.eagerPreviousPage)
+        ) {
+          return iterableToArray(result.items).then((items) => ({
+            ...result,
+            items,
+          }));
+        }
+        return result;
       }
     });
   }
