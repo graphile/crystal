@@ -309,3 +309,11 @@ field, so it could be the field plan. We may need crispness here, or maybe not.
 
 "Global dependencies" is now referred to as "Unary dependencies" for more
 precision.
+
+Outside GraphQL list positions, treat iterable step results (including maps
+and sets) as regular values. `first` and `last` generally expect arrays. They
+support iterable inputs through explicit opt-in or when the plan indicates
+that the input is likely to stream.
+
+The execution-time result of `pgSelect()` is opaque. Read supported fields
+through `get($select, key)` so the step can plan the access.
