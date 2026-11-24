@@ -531,6 +531,7 @@ export class PgSelectStep<
   protected firstStepId: number | null = null;
   protected lastStepId: number | null = null;
   protected fetchOneExtra = false;
+  private needsFirstItem = false;
   private requiresCompletePage = false;
   private requiresHasNextPage = false;
   private readonly streamConsumers = new Set<Step["layerPlan"]>();
@@ -1221,7 +1222,9 @@ export class PgSelectStep<
           PgSelectStep<TResource>,
           boolean | unknown[] | null
         >(this, pgSelectResultGetters[key]);
-        if (key !== "firstItem") {
+        if (key === "firstItem") {
+          this.needsFirstItem = true;
+        } else {
           this.requirePageValue(key, $getter.layerPlan);
         }
         return $getter;
@@ -1867,6 +1870,7 @@ export class PgSelectStep<
   }
 
   private copyPageRequirementsTo(target: PgSelectStep<TResource>) {
+    target.needsFirstItem ||= this.needsFirstItem;
     target.requiresCompletePage ||= this.requiresCompletePage;
     target.requiresHasNextPage ||= this.requiresHasNextPage;
     for (const layer of this.streamConsumers) {
@@ -2509,6 +2513,7 @@ export class PgSelectStep<
       orders: $source.orders,
       selects: $source.selects,
       fetchOneExtra: $source.fetchOneExtra,
+      needsFirstItem: $source.needsFirstItem,
       requiresCompletePage: $source.requiresCompletePage,
       requiresHasNextPage: $source.requiresHasNextPage,
       isOrderUnique: $source.isOrderUnique,
@@ -3186,6 +3191,7 @@ interface PgSelectQueryInfo<
   readonly meta: { readonly [key: string]: any };
 
   readonly streamDetailsDepIds: null | readonly number[];
+  readonly needsFirstItem: boolean;
   readonly requiresCompletePage: boolean;
   readonly requiresHasNextPage: boolean;
 }
@@ -3485,12 +3491,13 @@ function buildTheQueryCore<
 
   applyCommonPaginationStuff(info);
   if (
+    info.shouldReverseOrder ||
     info.requiresCompletePage ||
     (info.requiresHasNextPage && hasNextPageCb(info.first, info.last, true)) ||
     (info.last != null &&
       (info.fetchOneExtra || (info.first != null && info.last < info.first)))
   ) {
-    // Backward lookahead and taking the last of a forward page require slicing.
+    // Materialize pages that need reversal, slicing, or eager lookahead.
     stream = null;
   }
 
@@ -3749,8 +3756,13 @@ ${lateralText};`;
     ? { indicies: groupIndicies }
     : undefined;
 
-  const initialCount = stream?.initialCount;
-  if (initialCount != null) {
+  if (stream !== null) {
+    // Fetch the first row of every parent before a shared cursor can block
+    // behind rows for another parent. GraphQL keeps its own initialCount.
+    const initialCount = Math.max(
+      stream.initialCount,
+      count > 1 && info.needsFirstItem ? 1 : 0,
+    );
     // PERF: should use the queryForSingle optimization in here too
 
     // When streaming we can't reverse order in JS - we must do it in the DB.
@@ -3873,6 +3885,7 @@ type StaticKeys =
   | "orders"
   | "selects"
   | "fetchOneExtra"
+  | "needsFirstItem"
   | "requiresCompletePage"
   | "requiresHasNextPage"
   | "isOrderUnique"

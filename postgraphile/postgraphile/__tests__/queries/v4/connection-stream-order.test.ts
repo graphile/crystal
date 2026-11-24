@@ -391,3 +391,50 @@ test.each([
     finalNode,
   );
 });
+
+test("streams a backward page in requested order without page flags", async () => {
+  const { payloads, pgCursorCount } = await runConnectionQuery(`{
+    allPeople(last: 3) {
+      nodes @stream { id }
+      pageInfo { startCursor ... @defer { endCursor } }
+    }
+  }`);
+  expect(pgCursorCount).toBe(0);
+  expect(payloads?.flatMap(({ data }) => data?.id ?? [])).toEqual([4, 5, 6]);
+  const cursor = (id: number) =>
+    Buffer.from(JSON.stringify(["08e0d342de", id])).toString("base64");
+  expect(payloads?.[0].data?.allPeople.pageInfo.startCursor).toBe(cursor(4));
+  expect(payloads).toContainEqual({
+    path: ["allPeople", "pageInfo"],
+    data: { endCursor: cursor(6) },
+  });
+});
+
+test("gets each parent's start cursor before streaming a large batch", async () => {
+  const { payloads, errors } = await runTestQuery(
+    `{
+    allPeople(first: 2) {
+      nodes {
+        postsByAuthorId {
+          nodes @stream(initialCount: 0) { id }
+          pageInfo { startCursor }
+        }
+      }
+    }
+  }`,
+    {
+      setupSql: `insert into a.post (id, headline, author_id)
+               select id, 'batched start cursor', 1 from generate_series(10000, 10110) id`,
+      cleanupSql: "delete from a.post where id between 10000 and 10110",
+    },
+    { path: __filename },
+  );
+  expect(errors).toBeFalsy();
+  for (const { postsByAuthorId } of payloads![0].data!.allPeople.nodes) {
+    expect(postsByAuthorId.nodes).toEqual([]);
+    expect(postsByAuthorId.pageInfo.startCursor).toEqual(expect.any(String));
+  }
+  expect(payloads).toContainEqual(
+    expect.objectContaining({ data: { id: 10110 } }),
+  );
+});
