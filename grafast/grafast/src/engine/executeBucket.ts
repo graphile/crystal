@@ -47,6 +47,7 @@ import {
 } from "../utils.ts";
 import type { DistributorOptions } from "./distributor.ts";
 import {
+  distributeIterator,
   distributor,
   isDistributor,
   resolveDistributorOptions,
@@ -327,9 +328,18 @@ export function executeBucket(
           (isIterable(rawValue) || isAsyncIterable(rawValue))
         ) {
           // Acquire cleanup ownership now, without pulling the first item.
-          walkStream(bucket, finishedStep, resultIndex, rawValue, flags, {
-            initialCount: 0,
-          });
+          walkStream(
+            bucket,
+            finishedStep,
+            resultIndex,
+            rawValue,
+            flags,
+            {
+              initialCount: 0,
+            },
+            requestContext.abortSignal,
+            null,
+          );
           return;
         }
 
@@ -432,6 +442,8 @@ export function executeBucket(
             rawValue as Iterable<unknown> | AsyncIterable<unknown>,
             flags,
             stream,
+            requestContext.abortSignal,
+            distributorOptions,
           );
           if (promise !== undefined) {
             (promises ??= []).push(promise);
@@ -1160,7 +1172,11 @@ export function executeBucket(
 
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
     if (bucket.layerPlan.streamInputs.length > 0) {
-      const promises = walkStreamInputs(bucket, distributorOptions);
+      const promises = walkStreamInputs(
+        bucket,
+        requestContext.abortSignal,
+        distributorOptions,
+      );
       if (promises.length > 0) {
         return Promise.all(promises).then(completeBucket);
       }
@@ -1700,6 +1716,7 @@ function executeStepFromEvent(event: ExecuteStepEvent) {
 
 function walkStreamInputs(
   bucket: Bucket,
+  abortSignal: AbortSignal,
   distributorOptions: DistributorOptions,
 ): PromiseLike<void>[] {
   const promises: PromiseLike<void>[] = [];
@@ -1739,6 +1756,8 @@ function walkStreamInputs(
           value,
           flags,
           stream,
+          abortSignal,
+          distributorOptions,
           pending,
         );
         if (promise !== undefined) {
@@ -1757,6 +1776,8 @@ function walkStream(
   value: Iterable<unknown> | AsyncIterable<unknown>,
   flags: ExecutionEntryFlags,
   stream: ExecutionDetailsStream | null,
+  abortSignal: AbortSignal,
+  distributorOptions: DistributorOptions | null,
   pending?: AsyncIterator<unknown> | Iterator<unknown>,
 ): PromiseOrDirect<void> {
   const initialCount = stream?.initialCount ?? Infinity;
@@ -1776,9 +1797,36 @@ function walkStream(
   // The bucket closes any iterator its output plan doesn't claim.
   (bucket.iterators[resultIndex] ??= new Set()).add(iterator);
   const items: StreamMaybeMoreableArray<unknown> = [];
+  function storeStream() {
+    if (step._isUnary && bucket.size > 1 && distributorOptions !== null) {
+      // One list step can yield the initial items for several output paths.
+      // Each path needs its own position in the remaining stream.
+      const consumers = distributeIterator(
+        iterator,
+        bucket.size,
+        abortSignal,
+        distributorOptions,
+      );
+      bucket.iterators[resultIndex].delete(iterator);
+      const entries = Array.from({ length: bucket.size }, (_, index) => {
+        const initial: StreamMaybeMoreableArray = items.slice();
+        const consumer = consumers.iteratorFor(index);
+        initial[$$streamMore] = consumer;
+        (bucket.iterators[index] ??= new Set()).add(consumer);
+        return initial;
+      });
+      bucket.flagUnion |= flags;
+      bucket.store.set(
+        step.id,
+        batchExecutionValue(entries, arrayOfLength(bucket.size, flags)),
+      );
+    } else {
+      items[$$streamMore] = iterator;
+      bucket.setResult(step, resultIndex, items, flags);
+    }
+  }
   if (initialCount === 0) {
-    items[$$streamMore] = iterator;
-    bucket.setResult(step, resultIndex, items, flags);
+    storeStream();
     return;
   }
 
@@ -1795,8 +1843,8 @@ function walkStream(
           items.push(flagError(e));
         }
         if (items.length >= initialCount) {
-          items[$$streamMore] = iterator;
-          break;
+          storeStream();
+          return;
         }
       }
       bucket.setResult(step, resultIndex, items, flags);

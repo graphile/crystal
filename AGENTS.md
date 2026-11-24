@@ -186,6 +186,9 @@ the query shape.
 - Prefer **incremental** tests: cover public APIs and critical paths first.
 - Use existing test utilities and patterns; mirror nearby tests.
 - Keep tests deterministic.
+- Incremental delivery payload order need not be stable. Each payload must be
+  valid, and applying the payloads in received order to the initial response
+  must yield a stable final result.
 - Do not add relative imports across package boundaries, including in tests. Add
   package-local test helpers where needed.
 - Use PostgreSQL pools in tests rather than standalone `Client` connections. Use

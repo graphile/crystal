@@ -48,6 +48,56 @@ export function distributor<TData>(
   abortSignal: AbortSignal,
   distributorOptions: DistributorOptions,
 ): Distributor<TData> {
+  function getStepIndex(stepId: number) {
+    const stepIndex = dependentSteps.findIndex((s) => s.id === stepId);
+
+    if (stepIndex === -1) {
+      throw new Error(
+        `Didn't expect step ${stepId} to depend on this distributor. Expected one of ${dependentSteps}`,
+      );
+    }
+    return stepIndex;
+  }
+
+  const consumers = distribute(
+    dependentSteps.length,
+    () =>
+      Symbol.asyncIterator in sourceIterable
+        ? sourceIterable[Symbol.asyncIterator]()
+        : sourceIterable[Symbol.iterator](),
+    sourceIterable,
+    abortSignal,
+    distributorOptions,
+  );
+  return {
+    [$$isDistributor]: true,
+    iterableFor(stepId) {
+      const index = getStepIndex(stepId);
+      return { [Symbol.asyncIterator]: () => consumers.iteratorFor(index) };
+    },
+    releaseIfUnused(stepId) {
+      consumers.releaseIfUnused(getStepIndex(stepId));
+    },
+  };
+}
+
+/** Split an already positioned list iterator between its output paths. */
+export function distributeIterator<TData>(
+  iterator: AsyncIterator<TData> | Iterator<TData>,
+  count: number,
+  abortSignal: AbortSignal,
+  options: DistributorOptions,
+) {
+  return distribute(count, () => iterator, iterator, abortSignal, options);
+}
+
+function distribute<TData>(
+  count: number,
+  getIterator: () => AsyncIterator<TData> | Iterator<TData>,
+  source: object,
+  abortSignal: AbortSignal,
+  distributorOptions: DistributorOptions,
+) {
   const {
     distributorTargetBufferSize: targetBufferSize,
     distributorTargetBufferSizeIncrement: bufferSizeIncrement,
@@ -64,13 +114,13 @@ export function distributor<TData>(
    * advance.
    * -1 indicates that no item has been delivered yet.
    */
-  const deliveredIndex: number[] = dependentSteps.map(() => -1);
+  const deliveredIndex: number[] = arrayOfLength(count, -1);
 
   /**
    * An array of the highest index requested for each of the dependent steps.
    * -1 indicates that no item has been requested yet.
    */
-  const requestedIndex: number[] = dependentSteps.map(() => -1);
+  const requestedIndex: number[] = arrayOfLength(count, -1);
 
   /**
    * If a consumer is terminated via `.return()` or `.throw()` (or if the
@@ -79,7 +129,7 @@ export function distributor<TData>(
    * further `.next()` calls, will be stored here.
    */
   const terminalResult: Array<Promise<IteratorReturnResult<void>> | null> =
-    dependentSteps.map(() => null);
+    arrayOfLength(count, null);
 
   /**
    * What's the lowest index we must retain? Equal to the lowest
@@ -133,7 +183,14 @@ export function distributor<TData>(
     if (stopped) {
       return;
     }
-    const smallest = Math.min(...deliveredIndex);
+    // Output path counts can exceed the argument limit for Math.min(...).
+    let smallest = Infinity;
+    for (const index of deliveredIndex) {
+      if (index < smallest) {
+        smallest = index;
+        if (smallest === lowWaterMark - 1) break;
+      }
+    }
     if (!Number.isFinite(smallest) || smallest >= finalIndex) {
       // They're all done
       stopped = true;
@@ -145,7 +202,7 @@ export function distributor<TData>(
 
       // Even if we never started the iterator... we should still clean it up
       // if we can.
-      const iterator = (sourceIterator ?? sourceIterable) as Partial<
+      const iterator = (sourceIterator ?? source) as Partial<
         Iterator<any> | AsyncIterator<any>
       >;
 
@@ -360,27 +417,10 @@ export function distributor<TData>(
     return terminalResult[stepIndex];
   }
 
-  function getStepIndex(stepId: number) {
-    const stepIndex = dependentSteps.findIndex((s) => s.id === stepId);
-
-    if (stepIndex === -1) {
-      throw new Error(
-        `Didn't expect step ${stepId} to depend on this distributor. Expected one of ${dependentSteps}`,
-      );
-    }
-    return stepIndex;
-  }
-
-  function newIterator(stepIndex: number): AsyncIterator<TData> {
+  function newIterator(stepIndex: number) {
     // Kick-start the source iterator if need be
-    if (sourceIterator === null) {
-      sourceIterator =
-        Symbol.asyncIterator in sourceIterable
-          ? sourceIterable[Symbol.asyncIterator]()
-          : sourceIterable[Symbol.iterator]();
-    }
+    sourceIterator ??= getIterator();
 
-    const onAbort = () => void iterator.return().then(undefined, noop);
     const iterator = {
       [Symbol.asyncIterator]() {
         return this;
@@ -389,39 +429,28 @@ export function distributor<TData>(
         return advance(stepIndex);
       },
       return() {
-        abortSignal.removeEventListener("abort", onAbort);
         return stop(stepIndex);
       },
       throw(e) {
-        abortSignal.removeEventListener("abort", onAbort);
         return stop(stepIndex, e);
       },
     } satisfies AsyncIterableIterator<TData, void, never>;
 
-    abortSignal.addEventListener("abort", onAbort);
-
     return iterator;
   }
 
-  const hasIterator = arrayOfLength(dependentSteps.length, false);
-  const distributor: Distributor<TData> = {
-    [$$isDistributor]: true,
-    iterableFor(stepId) {
-      const stepIndex = getStepIndex(stepId);
-      return {
-        [Symbol.asyncIterator]() {
-          if (hasIterator[stepIndex]) {
-            throw new Error(
-              `Attempted to create iterator a second time (or possibly after release)!`,
-            );
-          }
-          hasIterator[stepIndex] = true;
-          return newIterator(stepIndex);
-        },
-      };
+  const hasIterator = arrayOfLength(count, false);
+  const consumers = {
+    iteratorFor(stepIndex: number) {
+      if (hasIterator[stepIndex]) {
+        throw new Error(
+          `Attempted to create iterator a second time (or possibly after release)!`,
+        );
+      }
+      hasIterator[stepIndex] = true;
+      return newIterator(stepIndex);
     },
-    releaseIfUnused(stepId: number) {
-      const stepIndex = getStepIndex(stepId);
+    releaseIfUnused(stepIndex: number) {
       if (!hasIterator[stepIndex]) {
         hasIterator[stepIndex] = true;
         void stop(stepIndex);
@@ -429,17 +458,13 @@ export function distributor<TData>(
     },
   };
   abortSignal.addEventListener("abort", () => {
-    for (
-      let stepIndex = 0, l = dependentSteps.length;
-      stepIndex < l;
-      stepIndex++
-    ) {
+    for (let stepIndex = 0; stepIndex < count; stepIndex++) {
       hasIterator[stepIndex] = true;
       void stop(stepIndex, undefined, false);
     }
     maybeAdvanceLowWaterMark();
   });
-  return distributor;
+  return consumers;
 }
 
 export type DistributorOptions = Required<

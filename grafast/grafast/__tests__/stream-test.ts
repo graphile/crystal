@@ -16,7 +16,11 @@ import {
   makeGrafastSchema,
   Step,
 } from "../dist/index.js";
-import { assertIterable, streamToArray } from "./incrementalUtils.ts";
+import {
+  assertIterable,
+  resolveStreamDefer,
+  streamToArray,
+} from "./incrementalUtils.ts";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
@@ -212,3 +216,51 @@ it("rejects a string returned for a deferred streamed list", async () => {
     ["strings"],
   );
 });
+
+for (const sourceType of ["array", "async iterator"]) {
+  it(`streams a unary ${sourceType} independently for each deferred parent`, async () => {
+    const values = [10, 20, 30];
+    let pulls = 0;
+    const schema = makeGrafastSchema({
+      typeDefs: `type Query { parents: [Parent!]! } type Parent { xs: [Int!]! }`,
+      objects: {
+        Query: { plans: { parents: () => constant([1, 2]) } },
+        Parent: {
+          plans: {
+            xs: () =>
+              sourceType === "array"
+                ? constant(values)
+                : lambda(null, async function* () {
+                    pulls++;
+                    yield* values;
+                  }),
+          },
+        },
+      },
+      enableDeferStream: true,
+    });
+    const payloads = await streamToArray(
+      await grafast({
+        schema,
+        source: "{ parents { ... @defer { xs @stream(initialCount: 1) } } }",
+        resolvedPreset,
+        requestContext,
+      }),
+    );
+    if (!Array.isArray(payloads)) {
+      throw new Error("Expected incremental delivery");
+    }
+    for (let index = 0; index < 2; index++) {
+      expect(payloads).to.deep.include({
+        path: ["parents", index],
+        data: { xs: [10] },
+        hasNext: true,
+      });
+    }
+    expect(resolveStreamDefer(payloads)).to.deep.equal({
+      data: { parents: [{ xs: [10, 20, 30] }, { xs: [10, 20, 30] }] },
+      extensions: {},
+    });
+    expect(pulls).to.equal(sourceType === "array" ? 0 : 1);
+  });
+}
