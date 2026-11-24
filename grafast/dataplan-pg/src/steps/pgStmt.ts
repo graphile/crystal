@@ -321,6 +321,8 @@ export function getUnary<T>(
   return stepId == null ? undefined : (values[stepId].unaryValue() as T);
 }
 
+export type PgStreamSlice = { take: number } | { skip: number };
+
 export function calculateLimitAndOffsetSQL(params: {
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
@@ -328,12 +330,12 @@ export function calculateLimitAndOffsetSQL(params: {
   last: Maybe<number>;
   offset: Maybe<number>;
   fetchOneExtra: boolean;
+  streamSlice?: PgStreamSlice;
 }) {
   const { cursorLower, cursorUpper, first, last, offset, fetchOneExtra } =
     params;
   let limitValue: Maybe<number>;
   let offsetValue: Maybe<number>;
-  let innerLimitValue: Maybe<number>;
   if (cursorLower != null || cursorUpper != null) {
     /*
      * When using cursor-base pagination with 'natural' cursors, we are actually
@@ -438,8 +440,6 @@ export function calculateLimitAndOffsetSQL(params: {
     // Calculate the final limit/offset
     limitValue = isFinite(upper0) ? Math.max(0, upper0 - lower0 + 1) : null;
     offsetValue = lower0;
-
-    innerLimitValue = limitValue != null ? limitValue + offsetValue : null;
   } else {
     limitValue =
       first != null
@@ -448,12 +448,22 @@ export function calculateLimitAndOffsetSQL(params: {
           ? last + (fetchOneExtra ? 1 : 0)
           : null;
     offsetValue = offset;
-
-    innerLimitValue =
-      first != null || last != null
-        ? (first ?? last ?? 0) + (offset ?? 0) + (fetchOneExtra ? 1 : 0)
-        : null;
   }
+  // Split the final page (including lookahead) directly in the ordered
+  // query. Sorting a wrapper by row number would read the entire page first.
+  const { streamSlice } = params;
+  if (streamSlice !== undefined) {
+    if ("take" in streamSlice) {
+      limitValue = Math.min(limitValue ?? Infinity, streamSlice.take);
+    } else {
+      offsetValue = (offsetValue ?? 0) + streamSlice.skip;
+      if (limitValue != null) {
+        limitValue = Math.max(0, limitValue - streamSlice.skip);
+      }
+    }
+  }
+  const innerLimitValue =
+    limitValue == null ? null : limitValue + (offsetValue ?? 0);
   // PERF: consider changing from `${sql.literal(v)}` to
   // `${sql.value(v)}::"int4"`. (The advantage being that fewer SQL queries are
   // generated, and thus chances of reusing a query are greater.)
@@ -537,6 +547,7 @@ export function calculateLimitAndOffsetSQLFromInfo(
     readonly cursorLower: Maybe<number>;
     readonly cursorUpper: Maybe<number>;
   },
+  streamSlice?: PgStreamSlice,
 ) {
   const {
     executionDetails: { values },
@@ -551,6 +562,7 @@ export function calculateLimitAndOffsetSQLFromInfo(
     cursorLower,
     cursorUpper,
     fetchOneExtra,
+    streamSlice,
   });
 }
 

@@ -2,7 +2,7 @@ import { get } from "grafast";
 import { planToMermaid } from "grafast/mermaid";
 import { EXPORTABLE, extendSchema } from "graphile-utils";
 
-import { runTestQuery } from "../../helpers.ts";
+import { runTestQuery, withPoolClientTransaction } from "../../helpers.ts";
 
 async function runConnectionQuery(document: string) {
   const { errors, payloads, queries, extensions } = await runTestQuery(
@@ -63,6 +63,69 @@ test.each([
     });
   },
 );
+
+test("delivers the initial node and startCursor while later rows are blocked", async () => {
+  await withPoolClientTransaction(async (client) => {
+    // A separate session holds the lock needed to read the second row.
+    await client.query("savepoint later_rows");
+    await client.query("select pg_advisory_xact_lock(1234)");
+    const { payloads, errors, queries } = await runTestQuery(
+      `{
+          allPeople(first: 3) {
+            nodes @stream(initialCount: 1) { id: gatedId }
+            pageInfo { startCursor ... @defer { hasNextPage endCursor } }
+          }
+        }`,
+      {
+        setupSql: `create function c.person_gated_id(person c.person) returns integer
+            language plpgsql stable as $$
+            begin
+              if person.id > 1 then
+                perform pg_advisory_xact_lock(1234);
+              end if;
+              return person.id;
+            end;
+            $$`,
+        cleanupSql: "drop function c.person_gated_id(c.person)",
+        pgSettings: { lock_timeout: "3s" },
+      },
+      {
+        path: __filename,
+        preservePayloadOrder: true,
+        async onInitialPayload(payload) {
+          try {
+            expect(payload.data).toEqual({
+              allPeople: {
+                nodes: [{ id: 1 }],
+                pageInfo: { startCursor: firstPageCursors.startCursor },
+              },
+            });
+          } finally {
+            await client.query("rollback to savepoint later_rows");
+          }
+        },
+      },
+    );
+    expect(errors).toBeFalsy();
+    expect(queries.filter(({ text }) => /^declare /im.test(text))).toHaveLength(
+      1,
+    );
+    const connection = structuredClone(payloads![0].data!.allPeople);
+    for (const { path, data } of payloads!.slice(1)) {
+      if (path?.[1] === "nodes") {
+        expect(path).toEqual(["allPeople", "nodes", connection.nodes.length]);
+        connection.nodes.push(data);
+      } else {
+        expect(path).toEqual(["allPeople", "pageInfo"]);
+        Object.assign(connection.pageInfo, data);
+      }
+    }
+    expect(connection).toEqual({
+      nodes: [{ id: 1 }, { id: 2 }, { id: 3 }],
+      pageInfo: { ...firstPageCursors, hasNextPage: true },
+    });
+  });
+});
 
 test("trims the extra row from a backwards page with deferred page info", async () => {
   const { payloads, pgCursorCount } = await runConnectionQuery(
@@ -318,12 +381,13 @@ test("streams an unbounded page with eager hasNextPage", async () => {
 });
 
 test.each([
-  { liveList: true, nestedDefer: true },
-  { liveList: false, nestedDefer: true },
-  { liveList: false, nestedDefer: false },
+  { liveList: false, nestedDefer: true, startOnly: true },
+  { liveList: true, nestedDefer: true, startOnly: false },
+  { liveList: false, nestedDefer: true, startOnly: false },
+  { liveList: false, nestedDefer: false, startOnly: false },
 ])(
-  "finishes a discarded page with liveList=$liveList and nestedDefer=$nestedDefer",
-  async ({ liveList, nestedDefer }) => {
+  "finishes a discarded page with liveList=$liveList and nestedDefer=$nestedDefer, startOnly=$startOnly",
+  async ({ liveList, nestedDefer, startOnly }) => {
     const plugin = extendSchema({
       typeDefs: "extend type PeopleConnection { failure: Boolean! }",
       resolvers: {
@@ -334,7 +398,7 @@ test.each([
         },
       },
     });
-    const edges = "edges @stream(initialCount: 1) { node { id } }";
+    const edges = `edges @stream(initialCount: ${startOnly ? 0 : 1}) { node { id } }`;
     const { payloads, errors, queries } = await runTestQuery(
       `{
       allPeople(first: 2) {
@@ -343,7 +407,7 @@ test.each([
           failure
           ${nestedDefer ? `... @defer { ${edges} }` : edges}
         }
-        ... @defer { pageInfo { endCursor hasNextPage } }
+        ... @defer { ${startOnly ? "... @defer { pageInfo { startCursor } }" : "pageInfo { endCursor hasNextPage }"} }
       }
     }`,
       {},
@@ -359,12 +423,14 @@ test.each([
     expect(payloads).toContainEqual({
       path: ["allPeople"],
       data: {
-        pageInfo: {
-          endCursor: Buffer.from(JSON.stringify(["08e0d342de", 2])).toString(
-            "base64",
-          ),
-          hasNextPage: true,
-        },
+        pageInfo: startOnly
+          ? { startCursor: firstPageCursors.startCursor }
+          : {
+              endCursor: Buffer.from(
+                JSON.stringify(["08e0d342de", 2]),
+              ).toString("base64"),
+              hasNextPage: true,
+            },
       },
     });
   },

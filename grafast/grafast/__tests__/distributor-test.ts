@@ -171,6 +171,35 @@ it("streams the initial node when the requested full pagination flag is known", 
   }
 });
 
+it("preserves inherited page flags when materializing streamed items", async () => {
+  class Page {
+    items = (async function* () {
+      yield* [7, 8];
+    })();
+    get hasNextPage() {
+      return true;
+    }
+    get hasPreviousPage() {
+      return false;
+    }
+  }
+  const payloads = await streamToArray(
+    await grafast({
+      schema: fullPaginationSchema(() => new Page()),
+      source:
+        "{ connection { nodes @stream pageInfo { hasNextPage hasPreviousPage } } }",
+      requestContext,
+    }),
+  );
+  assert.ok(Array.isArray(payloads));
+  expect(resolveStreamDefer(payloads).data).to.deep.equal({
+    connection: {
+      nodes: [7, 8],
+      pageInfo: { hasNextPage: true, hasPreviousPage: false },
+    },
+  });
+});
+
 it("awaits full pagination getters without a custom page-info plan", async () => {
   const schema = fullPaginationSchema(() => {
     const exhausted = Promise.withResolvers<void>();

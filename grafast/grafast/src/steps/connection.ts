@@ -1054,7 +1054,16 @@ function fullPaginationConnectionResult<TItem>(
       },
     };
   }
-  return items === result.items ? result : { ...result, items };
+  if (items === result.items) return result;
+  return {
+    items,
+    get hasNextPage() {
+      return result.hasNextPage;
+    },
+    get hasPreviousPage() {
+      return result.hasPreviousPage;
+    },
+  };
 }
 
 const MODE_NULL = 0;

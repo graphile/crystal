@@ -218,49 +218,73 @@ it("rejects a string returned for a deferred streamed list", async () => {
 });
 
 for (const sourceType of ["array", "async iterator"]) {
-  it(`streams a unary ${sourceType} independently for each deferred parent`, async () => {
-    const values = [10, 20, 30];
-    let pulls = 0;
-    const schema = makeGrafastSchema({
-      typeDefs: `type Query { parents: [Parent!]! } type Parent { xs: [Int!]! }`,
-      objects: {
-        Query: { plans: { parents: () => constant([1, 2]) } },
-        Parent: {
-          plans: {
-            xs: () =>
-              sourceType === "array"
-                ? constant(values)
-                : lambda(null, async function* () {
-                    pulls++;
-                    yield* values;
-                  }),
+  for (const { defer, streamParents } of [
+    { defer: true, streamParents: false },
+    { defer: false, streamParents: false },
+    { defer: false, streamParents: true },
+  ]) {
+    it(`streams a unary ${sourceType} independently for each parent with defer=${defer}, streamParents=${streamParents}`, async () => {
+      const values = [10, 20, 30];
+      let pulls = 0;
+      const schema = makeGrafastSchema({
+        typeDefs: `type Query { parents: [Parent!]! } type Parent { xs: [Int!]! }`,
+        objects: {
+          Query: {
+            plans: {
+              parents: () => constant([1, 2]),
+            },
+          },
+          Parent: {
+            plans: {
+              xs: () =>
+                sourceType === "array"
+                  ? constant(values)
+                  : lambda(null, async function* () {
+                      pulls++;
+                      yield* values;
+                    }),
+            },
           },
         },
-      },
-      enableDeferStream: true,
-    });
-    const payloads = await streamToArray(
-      await grafast({
-        schema,
-        source: "{ parents { ... @defer { xs @stream(initialCount: 1) } } }",
-        resolvedPreset,
-        requestContext,
-      }),
-    );
-    if (!Array.isArray(payloads)) {
-      throw new Error("Expected incremental delivery");
-    }
-    for (let index = 0; index < 2; index++) {
-      expect(payloads).to.deep.include({
-        path: ["parents", index],
-        data: { xs: [10] },
-        hasNext: true,
+        enableDeferStream: true,
       });
-    }
-    expect(resolveStreamDefer(payloads)).to.deep.equal({
-      data: { parents: [{ xs: [10, 20, 30] }, { xs: [10, 20, 30] }] },
-      extensions: {},
+      const payloads = await streamToArray(
+        await grafast({
+          schema,
+          source: defer
+            ? "{ parents { ... @defer { xs @stream(initialCount: 1) } } }"
+            : streamParents
+              ? "{ parents @stream(initialCount: 1) { xs @stream(initialCount: 1) } }"
+              : "{ parents { xs @stream(initialCount: 1) } }",
+          resolvedPreset,
+          requestContext,
+        }),
+      );
+      if (!Array.isArray(payloads)) {
+        throw new Error("Expected incremental delivery");
+      }
+      if (defer) {
+        for (let index = 0; index < 2; index++) {
+          expect(payloads).to.deep.include({
+            path: ["parents", index],
+            data: { xs: [10] },
+            hasNext: true,
+          });
+        }
+      } else {
+        expect(payloads[0].data).to.deep.equal({
+          parents: streamParents
+            ? [{ xs: [10] }]
+            : [{ xs: [10] }, { xs: [10] }],
+        });
+      }
+      expect(resolveStreamDefer(payloads)).to.deep.equal({
+        data: { parents: [{ xs: [10, 20, 30] }, { xs: [10, 20, 30] }] },
+        extensions: {},
+      });
+      expect(pulls).to.equal(
+        sourceType === "array" ? 0 : streamParents ? 2 : 1,
+      );
     });
-    expect(pulls).to.equal(sourceType === "array" ? 0 : 1);
-  });
+  }
 }

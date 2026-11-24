@@ -95,6 +95,7 @@ import type {
   PgStmtCompileQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
+  PgStreamSlice,
   ResolvedPgStmtCommonQueryInfo,
 } from "./pgStmt.ts";
 import {
@@ -1532,6 +1533,7 @@ export class PgSelectStep<
           ? this.completionReaders.size > 0
           : Array.from(this.completionReaders.values()).includes("lastItem");
 
+      const needsFirstPull = this.needsFirstItem && streamInitialCount === 0;
       return streams.map((iterable, idx) => {
         if (!isAsyncIterable(iterable)) {
           // Must be an error
@@ -1580,6 +1582,13 @@ export class PgSelectStep<
         async function closePage() {
           try {
             try {
+              if (
+                needsFirstPull &&
+                firstRow === undefined &&
+                !abortSignal.aborted
+              ) {
+                await readFirstRow();
+              }
               while (!finished && needsCompletion && !abortSignal.aborted) {
                 await nextPageItem();
               }
@@ -3454,8 +3463,6 @@ function buildTheQueryCore<
   if (info.needsCursor || after != null || before != null) {
     info.cursorDigest = getOrderByDigest(info);
   }
-  // PERF: only calculate this if needed
-  const { sql: trueOrderBySQL } = buildOrderBy(info, false);
   if (info.cursorIndicies) {
     // PERF: calculate cursorDigest here instead?
     if (info.orders.length > 0) {
@@ -3527,7 +3534,6 @@ function buildTheQueryCore<
 
   return {
     count,
-    trueOrderBySQL,
     info,
     stream,
     meta,
@@ -3543,7 +3549,7 @@ function buildTheQuery<
     fixedPlaceholderValues,
     _symbolSubstitutes,
   } = rawInfo;
-  const { count, trueOrderBySQL, info, stream, meta } = runtimeScopedSQL(() =>
+  const { count, info, stream, meta } = runtimeScopedSQL(() =>
     buildTheQueryCore(rawInfo),
   );
 
@@ -3581,17 +3587,9 @@ function buildTheQuery<
   for (const [key, value] of fixedPlaceholderValues) {
     placeholderValues.set(key, value);
   }
-  const forceOrder = (stream && info.shouldReverseOrder) || false;
-
-  const makeQuery = ({
-    limit,
-    offset,
-    options,
-  }: {
-    limit?: number;
-    offset?: number;
-    options?: Parameters<typeof sql.compile>[1];
-  } = {}): {
+  const makeQuery = (
+    streamSlice?: PgStreamSlice,
+  ): {
     text: string;
     rawSqlValues: SQLRawValue[];
     identifierIndex: number | null;
@@ -3600,59 +3598,11 @@ function buildTheQuery<
       queryValues.length > 0 ||
       (count !== 1 && (forceIdentity || hasSideEffects))
     ) {
-      const extraSelects: SQL[] = [];
-
-      const identifierIndexOffset =
-        extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
-      // PERF: try and re-use existing trueOrderBySQL selection?
-      const rowNumberIndexOffset =
-        forceOrder || limit != null || offset != null
-          ? extraSelects.push(
-              sql`row_number() over (${sql.indent(trueOrderBySQL)})`,
-            ) - 1
-          : -1;
-
       const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
-        extraSelects,
-        forceOrder,
+        extraSelects: [sql`${identifiersAlias}.idx`],
+        streamSlice,
       });
-      const identifierIndex = extraSelectIndexes[identifierIndexOffset];
-
-      const rowNumberIndex =
-        rowNumberIndexOffset >= 0
-          ? extraSelectIndexes[rowNumberIndexOffset]
-          : null;
-      const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
-
-      /*
-       * This wrapper around the inner query is for @stream:
-       *
-       * - stream must be in the correct order, so if we have
-       *   `shouldReverseOrder` then we must reverse the order
-       *   ourselves here;
-       * - stream can have an `initialCount` - we want to satisfy all
-       *   `initialCount` records from _each identifier group_ before we then
-       *   resolve the remaining records.
-       *
-       * NOTE: if neither of the above cases apply then we can skip this,
-       * even for @stream.
-       */
-      const wrappedInnerQuery =
-        rowNumberIndex != null ||
-        limit != null ||
-        (offset != null && offset > 0)
-          ? sql`select *\nfrom (${sql.indent(
-              baseQuery,
-            )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
-              String(rowNumberIndex),
-            )}${
-              limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
-            }${
-              offset != null && offset > 0
-                ? sql`\noffset ${sql.literal(offset)}`
-                : sql.blank
-            }`
-          : baseQuery;
+      const identifierIndex = extraSelectIndexes[0];
 
       // PERF: if the query does not have a limit/offset; should we use an
       // `inner join` in a flattened query instead of a wrapped query with
@@ -3666,8 +3616,8 @@ function buildTheQuery<
         values: rawSqlValues,
         [$$symbolToIdentifier]: symbolToIdentifier,
       } = sql.compile(
-        sql`lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`,
-        options,
+        sql`lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`,
+        { placeholderValues },
       );
 
       const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
@@ -3700,68 +3650,11 @@ from ${identifiersAliasText},
 ${lateralText};`;
 
       return { text, rawSqlValues, identifierIndex };
-    } else if (
-      (limit != null && limit >= 0) ||
-      (offset != null && offset > 0)
-    ) {
-      // ENHANCEMENT: make this nicer; combine with the `if` branch above?
-
-      const extraSelects: SQL[] = [];
-      const rowNumberIndexOffset =
-        forceOrder || limit != null || offset != null
-          ? extraSelects.push(
-              sql`row_number() over (${sql.indent(trueOrderBySQL)})`,
-            ) - 1
-          : -1;
-
-      const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
-        extraSelects,
-      });
-      const rowNumberIndex =
-        rowNumberIndexOffset >= 0
-          ? extraSelectIndexes[rowNumberIndexOffset]
-          : null;
-      const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
-      /*
-       * This wrapper around the inner query is for @stream:
-       *
-       * - stream must be in the correct order, so if we have
-       *   `shouldReverseOrder` then we must reverse the order
-       *   ourselves here;
-       * - stream can have an `initialCount` - we want to satisfy all
-       *   `initialCount` records from _each identifier group_ before we then
-       *   resolve the remaining records.
-       *
-       * NOTE: if neither of the above cases apply then we can skip this,
-       * even for @stream.
-       */
-      const wrappedInnerQuery =
-        rowNumberIndex != null ||
-        limit != null ||
-        (offset != null && offset > 0)
-          ? sql`select *\nfrom (${sql.indent(
-              baseQuery,
-            )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
-              String(rowNumberIndex),
-            )}${
-              limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
-            }${
-              offset != null && offset > 0
-                ? sql`\noffset ${sql.literal(offset)}`
-                : sql.blank
-            };`
-          : sql`${baseQuery};`;
-      const { text, values: rawSqlValues } = sql.compile(
-        wrappedInnerQuery,
-        options,
-      );
-      return { text, rawSqlValues, identifierIndex: null };
     } else {
-      const { sql: query } = buildQuery(info, {});
-      const { text, values: rawSqlValues } = sql.compile(
-        sql`${query};`,
-        options,
-      );
+      const { sql: query } = buildQuery(info, { streamSlice });
+      const { text, values: rawSqlValues } = sql.compile(sql`${query};`, {
+        placeholderValues,
+      });
       return { text, rawSqlValues, identifierIndex: null };
     }
   };
@@ -3796,16 +3689,14 @@ ${lateralText};`;
         rawSqlValues,
         identifierIndex: initialFetchIdentifierIndex,
       } = makeQuery({
-        limit: initialCount,
-        options: { placeholderValues },
+        take: initialCount,
       });
       const {
         text: textForDeclare,
         rawSqlValues: rawSqlValuesForDeclare,
         identifierIndex: streamIdentifierIndex,
       } = makeQuery({
-        offset: initialCount,
-        options: { placeholderValues },
+        skip: initialCount,
       });
       if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
         throw new Error(
@@ -3839,12 +3730,7 @@ ${lateralText};`;
         text: textForDeclare,
         rawSqlValues: rawSqlValuesForDeclare,
         identifierIndex: streamIdentifierIndex,
-      } = makeQuery({
-        offset: 0,
-        options: {
-          placeholderValues,
-        },
-      });
+      } = makeQuery();
       return {
         meta,
         // This is a hack since this is the _only_ place we don't want
@@ -3867,11 +3753,7 @@ ${lateralText};`;
       };
     }
   } else {
-    const { text, rawSqlValues, identifierIndex } = makeQuery({
-      options: {
-        placeholderValues,
-      },
-    });
+    const { text, rawSqlValues, identifierIndex } = makeQuery();
     return {
       meta,
       text,
@@ -4318,9 +4200,8 @@ function buildQueryParts<
 >(
   info: ResolvedPgSelectQueryInfo<TResource>,
   options: {
-    withIdentifiers?: boolean;
     extraSelects?: SQL[];
-    forceOrder?: boolean;
+    streamSlice?: PgStreamSlice;
   } = Object.create(null),
 ) {
   const { alias, resource, selects: baseSelects, _symbolSubstitutes } = info;
@@ -4352,7 +4233,10 @@ function buildQueryParts<
   // then we do the last artificially later.
   // https://relay.dev/graphql/connections.htm#EdgesToReturn()
 
-  const [limitAndOffsetSQL] = calculateLimitAndOffsetSQLFromInfo(info);
+  const [limitAndOffsetSQL] = calculateLimitAndOffsetSQLFromInfo(
+    info,
+    options.streamSlice,
+  );
 
   function buildLimitAndOffset() {
     return {
@@ -4362,10 +4246,7 @@ function buildQueryParts<
 
   const { sql: from } = buildFrom();
   const { sql: groupBy } = buildGroupBy();
-  const { sql: orderBy } = buildOrderBy(
-    info,
-    options.forceOrder ? false : info.shouldReverseOrder,
-  );
+  const { sql: orderBy } = buildOrderBy(info, info.shouldReverseOrder);
   const { sql: limitAndOffset } = buildLimitAndOffset();
 
   const { extraSelects = EMPTY_ARRAY } = options;
@@ -4396,9 +4277,8 @@ function buildQuery<
 >(
   info: MutablePgSelectQueryInfo<TResource>,
   options: {
-    withIdentifiers?: boolean;
     extraSelects?: SQL[];
-    forceOrder?: boolean;
+    streamSlice?: PgStreamSlice;
   } = Object.create(null),
 ): {
   sql: SQL;

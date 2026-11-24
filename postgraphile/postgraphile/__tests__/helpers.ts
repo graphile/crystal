@@ -293,12 +293,14 @@ export async function runTestQuery(
     plugins?: GraphileConfig.Plugin[];
     contextValue?: Record<string, unknown>;
     preservePayloadOrder?: boolean;
+    onInitialPayload?: (payload: AsyncExecutionResult) => Promise<void>;
   } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
     data?: { [key: string]: any };
     errors?: readonly GraphQLError[];
     extensions?: any;
+    path?: readonly (string | number)[];
   }>;
   data?: { [key: string]: any };
   errors?: readonly GraphQLError[];
@@ -548,6 +550,12 @@ export async function runTestQuery(
                 if (Object.keys(rest).length > 0 || hasNext) {
                   // Do not add the trailing `{hasNext: false}` entry to the snapshot
                   originalPayloads.push(rest);
+                  if (
+                    originalPayloads.length === 1 &&
+                    options.onInitialPayload
+                  ) {
+                    await options.onInitialPayload(entry);
+                  }
                 }
                 if (entry.errors) {
                   if (!errors) {
