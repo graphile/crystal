@@ -1,4 +1,5 @@
 import * as assert from "../assert.ts";
+import { $$streamDelivery, type StreamDeliveryObserver } from "../constants.ts";
 import { isDev, noop } from "../dev.ts";
 import type { Maybe } from "../interfaces.ts";
 import type { Step } from "../step.ts";
@@ -382,6 +383,9 @@ export function distributor<TData>(
 
     const onAbort = () => void iterator.return().then(undefined, noop);
     const iterator = {
+      [$$streamDelivery]: (sourceIterator as StreamDeliveryObserver)[
+        $$streamDelivery
+      ],
       [Symbol.asyncIterator]() {
         return this;
       },
@@ -396,7 +400,8 @@ export function distributor<TData>(
         abortSignal.removeEventListener("abort", onAbort);
         return stop(stepIndex, e);
       },
-    } satisfies AsyncIterableIterator<TData, void, never>;
+    } satisfies AsyncIterableIterator<TData, void, never> &
+      StreamDeliveryObserver;
 
     abortSignal.addEventListener("abort", onAbort);
 

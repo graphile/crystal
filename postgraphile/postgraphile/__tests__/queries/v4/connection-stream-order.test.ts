@@ -293,3 +293,75 @@ test("streams an unbounded page with eager hasNextPage", async () => {
     allPeople: { nodes: [{ id: 1 }], pageInfo: { hasNextPage: false } },
   });
 });
+
+test("delivers the final streamed node before either deferred page value", async () => {
+  const blocked = Promise.withResolvers<void>();
+  const release = Promise.withResolvers<void>();
+  const plugin = extendSchema({
+    typeDefs: `
+      extend type Person { blocked: Boolean }
+      extend type Query { checkpoint: Checkpoint }
+      type Checkpoint { releaseNode: Boolean }
+    `,
+    resolvers: {
+      Person: {
+        blocked(_parent, _args, ctx) {
+          return ctx.blockNode();
+        },
+      },
+      Query: {
+        checkpoint(_parent, _args, ctx) {
+          return ctx.checkpoint();
+        },
+      },
+      Checkpoint: {
+        releaseNode(_parent, _args, ctx) {
+          return ctx.releaseNode();
+        },
+      },
+    },
+  });
+  const { payloads, errors } = await runTestQuery(
+    `{
+      allPeople(first: 2) {
+        nodes @stream(initialCount: 0) { id blocked }
+        pageInfo {
+          ... @defer { endCursor }
+          ... @defer { hasNextPage }
+        }
+      }
+      ... @defer { checkpoint { __typename ... @defer { releaseNode } } }
+    }`,
+    {},
+    {
+      path: __filename,
+      plugins: [plugin],
+      preservePayloadOrder: true,
+      contextValue: {
+        async blockNode() {
+          blocked.resolve();
+          await release.promise;
+          return true;
+        },
+        async checkpoint() {
+          await blocked.promise;
+          return {};
+        },
+        releaseNode() {
+          release.resolve();
+          return true;
+        },
+      },
+    },
+  );
+  expect(errors).toBeFalsy();
+  const data = payloads!.map((payload) => payload.data);
+  const finalNode = data.findIndex((entry) => entry?.id === 2 && entry.blocked);
+  expect(finalNode).toBeGreaterThan(0);
+  expect(data.findIndex((entry) => entry?.endCursor)).toBeGreaterThan(
+    finalNode,
+  );
+  expect(data.findIndex((entry) => entry?.hasNextPage)).toBeGreaterThan(
+    finalNode,
+  );
+});

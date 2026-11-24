@@ -53,6 +53,7 @@ import {
   $$eventEmitter,
   $$extensions,
   $$idempotent,
+  $$streamDelivery,
   $$verbatim,
   DEFAULT_ACCEPT_FLAGS,
 } from "./constants.ts";
@@ -432,6 +433,7 @@ export {
   $$extensions,
   $$idempotent,
   $$inhibit,
+  $$streamDelivery,
   $$verbatim,
   abortable,
   access,

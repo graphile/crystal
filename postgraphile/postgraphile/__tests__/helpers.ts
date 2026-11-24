@@ -291,6 +291,8 @@ export async function runTestQuery(
     path: string;
     prepare?: boolean;
     plugins?: GraphileConfig.Plugin[];
+    contextValue?: Record<string, unknown>;
+    preservePayloadOrder?: boolean;
   } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
@@ -445,6 +447,7 @@ export async function runTestQuery(
 
           // We must override the context so that we can listen to the SQL queries.
           args.contextValue = {
+            ...options.contextValue,
             pgSettings: (args.contextValue as any).pgSettings,
             withPgClient,
             pgSubscriber,
@@ -621,7 +624,7 @@ export async function runTestQuery(
               );
             };
             const payloads =
-              operationType === "subscription"
+              operationType === "subscription" || options.preservePayloadOrder
                 ? (originalPayloads as ExecutionResult[])
                 : ([
                     originalPayloads[0],
