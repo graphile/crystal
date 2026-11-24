@@ -1525,6 +1525,13 @@ export class PgSelectStep<
         })
       ).streams;
 
+      const { abortSignal } = executionDetails.extra._requestContext;
+      const limit = this.fetchOneExtra ? first : null;
+      const needsCompletion =
+        limit != null
+          ? this.completionReaders.size > 0
+          : Array.from(this.completionReaders.values()).includes("lastItem");
+
       return streams.map((iterable, idx) => {
         if (!isAsyncIterable(iterable)) {
           // Must be an error
@@ -1536,7 +1543,6 @@ export class PgSelectStep<
           return initialRows as never;
         }
         const iterator = iterable[Symbol.asyncIterator]();
-        const limit = this.fetchOneExtra ? first : null;
         let firstRow: Promise<IteratorResult<unknown[]>> | undefined;
         // startCursor and the item stream must share the first pull.
         const readFirstRow = () => (firstRow ??= iterator.next());
@@ -1545,52 +1551,75 @@ export class PgSelectStep<
           lastItem: unknown[] | null;
         }>();
         void completion.promise.catch(noop);
-        let started = false;
-        let completed = false;
-        const items = asyncIteratorWithCleanup(
-          (async function* () {
-            started = true;
-            let lastItem: unknown[] | null = null;
-            let hasOneExtra = false;
+        const hasRemainingRows = initialRows.length >= streamInitialCount;
+        let lastItem: unknown[] | null = null;
+        let index = 0;
+        let finished = false;
+        let hasOneExtra = false;
+        async function nextPageItem(): Promise<unknown[] | null> {
+          let item: unknown[] | null = null;
+          if (index < initialRows.length) {
+            item = initialRows[index];
+          } else if (hasRemainingRows) {
+            const next = await (index === 0 ? readFirstRow() : iterator.next());
+            if (!next.done) {
+              item = next.value;
+            }
+          }
+          if (item === null || index === limit) {
+            finished = true;
+            hasOneExtra = item !== null;
+            return null;
+          }
+          index++;
+          lastItem = item;
+          return item;
+        }
+
+        // A discarded list can still have a sibling reading the page info.
+        async function closePage() {
+          try {
             try {
-              for (let index = 0; ; index++) {
-                let item: unknown[];
-                if (index < initialRows.length) {
-                  item = initialRows[index];
-                } else {
-                  if (initialRows.length < streamInitialCount) {
-                    break;
-                  }
-                  const next = await (index === 0
-                    ? readFirstRow()
-                    : iterator.next());
-                  if (next.done) {
-                    break;
-                  }
-                  item = next.value;
-                }
-                if (index === limit) {
-                  hasOneExtra = true;
-                  break;
-                }
-                lastItem = item;
-                yield item;
+              while (!finished && needsCompletion && !abortSignal.aborted) {
+                await nextPageItem();
               }
-              completed = true;
-              completion.resolve({ hasOneExtra, lastItem });
             } finally {
               await iterator.return?.();
             }
-          })(),
-          (error) => {
-            if (!completed) {
+            if (finished) {
+              completion.resolve({ hasOneExtra, lastItem });
+            } else {
               completion.reject(
-                error ??
-                  new Error("Page stream ended before page info was available"),
+                abortSignal.reason ?? new Error("Page stream closed"),
               );
             }
+          } catch (e) {
+            completion.reject(e);
+            throw e;
+          }
+        }
+
+        let started = false;
+        const items = asyncIteratorWithCleanup(
+          (async function* () {
+            started = true;
+            try {
+              let item: unknown[] | null;
+              while ((item = await nextPageItem()) !== null) {
+                yield item;
+              }
+            } catch (e) {
+              finished = true;
+              completion.reject(e);
+              throw e;
+            } finally {
+              await closePage();
+            }
+          })(),
+          () => {
+            // Returning an unstarted generator skips its finally block.
             if (!started) {
-              consume(iterator.return?.());
+              consume(closePage());
             }
           },
         );

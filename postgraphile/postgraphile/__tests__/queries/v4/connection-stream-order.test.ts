@@ -317,38 +317,58 @@ test("streams an unbounded page with eager hasNextPage", async () => {
   });
 });
 
-test("finishes the page when a nested deferred stream is discarded", async () => {
-  const plugin = extendSchema({
-    typeDefs: "extend type PeopleConnection { failure: Boolean! }",
-    resolvers: {
-      PeopleConnection: {
-        failure() {
-          throw new Error("Connection field failed");
+test.each([
+  { liveList: true, nestedDefer: true },
+  { liveList: false, nestedDefer: true },
+  { liveList: false, nestedDefer: false },
+])(
+  "finishes a discarded page with liveList=$liveList and nestedDefer=$nestedDefer",
+  async ({ liveList, nestedDefer }) => {
+    const plugin = extendSchema({
+      typeDefs: "extend type PeopleConnection { failure: Boolean! }",
+      resolvers: {
+        PeopleConnection: {
+          failure() {
+            throw new Error("Connection field failed");
+          },
         },
       },
-    },
-  });
-  const { payloads, errors } = await runTestQuery(
-    `{
+    });
+    const edges = "edges @stream(initialCount: 1) { node { id } }";
+    const { payloads, errors, queries } = await runTestQuery(
+      `{
       allPeople(first: 2) {
-        nodes @stream { id }
+        ${liveList ? "nodes @stream { id }" : ""}
         ... @defer {
           failure
-          ... @defer { edges @stream { node { id } } }
+          ${nestedDefer ? `... @defer { ${edges} }` : edges}
         }
-        ... @defer { pageInfo { hasNextPage } }
+        ... @defer { pageInfo { endCursor hasNextPage } }
       }
     }`,
-    {},
-    { path: __filename, plugins: [plugin], preservePayloadOrder: true },
-  );
-  expect(errors).toMatchObject([{ path: ["allPeople", "failure"] }]);
-  expect(payloads!.flatMap(({ data }) => data?.id ?? [])).toEqual([1, 2]);
-  expect(payloads).toContainEqual({
-    path: ["allPeople"],
-    data: { pageInfo: { hasNextPage: true } },
-  });
-});
+      {},
+      { path: __filename, plugins: [plugin], preservePayloadOrder: true },
+    );
+    expect(queries.filter(({ text }) => /^declare /im.test(text))).toHaveLength(
+      1,
+    );
+    expect(errors).toMatchObject([{ path: ["allPeople", "failure"] }]);
+    expect(payloads!.flatMap(({ data }) => data?.id ?? [])).toEqual(
+      liveList ? [1, 2] : [],
+    );
+    expect(payloads).toContainEqual({
+      path: ["allPeople"],
+      data: {
+        pageInfo: {
+          endCursor: Buffer.from(JSON.stringify(["08e0d342de", 2])).toString(
+            "base64",
+          ),
+          hasNextPage: true,
+        },
+      },
+    });
+  },
+);
 
 test("streams a backward page in requested order without page flags", async () => {
   const { payloads, pgCursorCount } = await runConnectionQuery(`{
