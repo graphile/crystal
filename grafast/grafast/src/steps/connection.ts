@@ -925,7 +925,11 @@ export class ConnectionStep<
         }
         const result = collectionValue as FullPaginationResult<TItem>;
         const { items } = result;
-        if (!this._mightStream && items != null && !Array.isArray(items)) {
+        if (
+          items != null &&
+          !Array.isArray(items) &&
+          (!this._mightStream || this.eagerNextPage || this.eagerPreviousPage)
+        ) {
           // Except it might return a stream which we should turn into an array.
           return iterableToArray(items).then((items) =>
             fullPaginationConnectionResult(result, items),
