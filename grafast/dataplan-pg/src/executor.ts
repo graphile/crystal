@@ -174,8 +174,6 @@ export type PgExecutorOptions = {
   affinity?: symbol;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
-  /** @internal Enable client-queue sharing for normal batched reads. */
-  queue?: boolean;
 };
 
 type QueuedQuery = {
@@ -649,7 +647,7 @@ ${duration}
     );
   }
 
-  /** @deprecated Use ExecutionDetails.batch for caching, or executeWithoutCache. */
+  /** @deprecated Use ExecutionDetails.batch for caching or executeWithQueue for queued reads. */
   public executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
@@ -657,15 +655,32 @@ ${duration}
     if (!warnedExecuteWithCache) {
       warnedExecuteWithCache = true;
       console.warn(
-        "PgExecutor.executeWithCache is deprecated and now forwards to executeWithoutCache. Use ExecutionDetails.batch for caching.",
+        "PgExecutor.executeWithCache is deprecated and now forwards to executeWithQueue. Use ExecutionDetails.batch for caching.",
       );
     }
-    return this.executeWithoutCache<TInput, TOutput>(values, common);
+    return this.executeWithQueue<TInput, TOutput>(values, common);
   }
 
-  public async executeWithoutCache<TInput = any, TOutput = any>(
+  /** Execute reads through the client queue. Results are uncached. */
+  public executeWithQueue<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
+  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
+    return this.executeQueries<TInput, TOutput>(values, common, true);
+  }
+
+  /** Execute queries directly without caching or queueing. */
+  public executeWithoutCache<TInput = any, TOutput = any>(
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    common: PgExecutorOptions,
+  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
+    return this.executeQueries<TInput, TOutput>(values, common, false);
+  }
+
+  private async executeQueries<TInput, TOutput>(
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    common: PgExecutorOptions,
+    queue: boolean,
   ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
     const { rawSqlValues, identifierIndex, eventEmitter } = common;
     const publishExecute: PublishFunction | undefined = eventEmitter
@@ -743,7 +758,7 @@ ${duration}
                     true,
                   ),
               )
-            : common.queue
+            : queue
               ? await this._executeQueued<TOutput>(
                   context,
                   text,

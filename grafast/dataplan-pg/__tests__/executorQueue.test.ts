@@ -42,15 +42,18 @@ function run(
   executionAffinity?: symbol,
   queued = true,
 ) {
-  return executor.executeWithoutCache([{ context, queryValues: [] }], {
-    queue: queued,
+  const inputs = [{ context, queryValues: [] }];
+  const options = {
     text,
     rawSqlValues: [value],
     name: text,
     identifierIndex: null,
     affinity: executionAffinity,
     eventEmitter: undefined,
-  });
+  };
+  return queued
+    ? executor.executeWithQueue(inputs, options)
+    : executor.executeWithoutCache(inputs, options);
 }
 
 test("reuses one client and prepared statement for identical SQL", async () => {
@@ -317,10 +320,10 @@ test("rejects pending work if the last queue cannot acquire a client", async () 
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
 
-test("executeWithCache forwards uncached calls and warns only once", async () => {
+test("executeWithCache queues uncached reads and warns only once", async () => {
   const executor = makeExecutor();
   let version = 1;
-  const { context, seen } = makeContext(async () => ({
+  const { context, seen, withPgClient } = makeContext(async () => ({
     rows: [[version]],
     rowCount: 1,
   }));
@@ -334,10 +337,13 @@ test("executeWithCache forwards uncached calls and warns only once", async () =>
   try {
     expect((await read()).values).toEqual([[[1]]]);
     version = 2;
-    expect((await read()).values).toEqual([[[2]]]);
-    expect(seen).toHaveLength(2);
+    const results = await Promise.all([read(), read()]);
+    expect(results.map(({ values }) => values)).toEqual([[[[2]]], [[[2]]]]);
+    expect(seen).toHaveLength(3);
+    expect(withPgClient).toHaveBeenCalledTimes(2);
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("deprecated");
+    expect(warn.mock.calls[0][0]).toContain("executeWithQueue");
   } finally {
     warn.mockRestore();
   }

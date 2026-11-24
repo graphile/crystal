@@ -1107,7 +1107,7 @@ export class PgResource<
     return this.executor.context();
   }
 
-  /** @deprecated Use ExecutionDetails.batch or executeWithoutCache instead. */
+  /** @deprecated Use ExecutionDetails.batch for caching or executor.executeWithQueue for queued reads. */
   public executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,

@@ -231,8 +231,7 @@ test("a failed read rolls back before queued reads get a new lease", async () =>
       );
       const executionAffinity = Symbol("same select");
       const run = (text: string) =>
-        executor.executeWithoutCache([{ context, queryValues: [] }], {
-          queue: true,
+        executor.executeWithQueue([{ context, queryValues: [] }], {
           text,
           rawSqlValues: [],
           name: text,

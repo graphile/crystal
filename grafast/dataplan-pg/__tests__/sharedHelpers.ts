@@ -38,6 +38,7 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
 }
 
 const originalExecuteWithoutCache = PgExecutor.prototype.executeWithoutCache;
+const originalExecuteWithQueue = PgExecutor.prototype.executeWithQueue;
 
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
@@ -139,18 +140,27 @@ export async function withTestWithPgClient<T>(
   } as typeof poolClient.query;
   // Release concurrent executor calls together for consistent SQL snapshots.
   if (
-    originalExecuteWithoutCache !== PgExecutor.prototype.executeWithoutCache
+    originalExecuteWithoutCache !== PgExecutor.prototype.executeWithoutCache ||
+    originalExecuteWithQueue !== PgExecutor.prototype.executeWithQueue
   ) {
     throw new Error("Already patched!");
   }
-  PgExecutor.prototype.executeWithoutCache = function <TInput, TOutput>(
-    this: PgExecutor,
-    values: readonly PgExecutorInput<TInput>[],
-    options: PgExecutorOptions,
-  ) {
-    const execute = originalExecuteWithoutCache<TInput, TOutput>;
-    return addBatch(execute.call(this, values, options));
-  };
+  function withBatchCompletion(execute: PgExecutor["executeWithQueue"]) {
+    return function <TInput, TOutput>(
+      this: PgExecutor,
+      values: readonly PgExecutorInput<TInput>[],
+      options: PgExecutorOptions,
+    ) {
+      const executeTyped = execute<TInput, TOutput>;
+      return addBatch(executeTyped.call(this, values, options));
+    };
+  }
+  PgExecutor.prototype.executeWithoutCache = withBatchCompletion(
+    originalExecuteWithoutCache,
+  );
+  PgExecutor.prototype.executeWithQueue = withBatchCompletion(
+    originalExecuteWithQueue,
+  );
   try {
     if (direct) {
       const withPgClient = createWithPgClient({
@@ -216,6 +226,7 @@ export async function withTestWithPgClient<T>(
     }
   } finally {
     PgExecutor.prototype.executeWithoutCache = originalExecuteWithoutCache;
+    PgExecutor.prototype.executeWithQueue = originalExecuteWithQueue;
     poolClient.query = oldQuery;
     poolClient.release();
   }
