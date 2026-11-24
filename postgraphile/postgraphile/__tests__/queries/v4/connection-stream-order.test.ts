@@ -317,32 +317,13 @@ test("streams an unbounded page with eager hasNextPage", async () => {
   });
 });
 
-test.each([
-  "nodes @stream { id blocked }",
-  "edges @stream { node { id } } ... @defer { __typename ... @defer { nodes @stream { id blocked } } }",
-])("delivers %s before either deferred page value", async (selection) => {
-  const blocked = Promise.withResolvers<void>();
-  const release = Promise.withResolvers<void>();
+test("finishes the page when a nested deferred stream is discarded", async () => {
   const plugin = extendSchema({
-    typeDefs: `
-      extend type Person { blocked: Boolean }
-      extend type Query { checkpoint: Checkpoint }
-      type Checkpoint { releaseNode: Boolean }
-    `,
+    typeDefs: "extend type PeopleConnection { failure: Boolean! }",
     resolvers: {
-      Person: {
-        blocked(_parent, _args, ctx) {
-          return ctx.blockNode();
-        },
-      },
-      Query: {
-        checkpoint(_parent, _args, ctx) {
-          return ctx.checkpoint();
-        },
-      },
-      Checkpoint: {
-        releaseNode(_parent, _args, ctx) {
-          return ctx.releaseNode();
+      PeopleConnection: {
+        failure() {
+          throw new Error("Connection field failed");
         },
       },
     },
@@ -350,46 +331,23 @@ test.each([
   const { payloads, errors } = await runTestQuery(
     `{
       allPeople(first: 2) {
-        ${selection}
-        pageInfo {
-          ... @defer { endCursor }
-          ... @defer { hasNextPage }
+        nodes @stream { id }
+        ... @defer {
+          failure
+          ... @defer { edges @stream { node { id } } }
         }
+        ... @defer { pageInfo { hasNextPage } }
       }
-      ... @defer { checkpoint { __typename ... @defer { releaseNode } } }
     }`,
     {},
-    {
-      path: __filename,
-      plugins: [plugin],
-      preservePayloadOrder: true,
-      contextValue: {
-        async blockNode() {
-          blocked.resolve();
-          await release.promise;
-          return true;
-        },
-        async checkpoint() {
-          await blocked.promise;
-          return {};
-        },
-        releaseNode() {
-          release.resolve();
-          return true;
-        },
-      },
-    },
+    { path: __filename, plugins: [plugin], preservePayloadOrder: true },
   );
-  expect(errors).toBeFalsy();
-  const data = payloads!.map((payload) => payload.data);
-  const finalNode = data.findIndex((entry) => entry?.id === 2 && entry.blocked);
-  expect(finalNode).toBeGreaterThan(0);
-  expect(data.findIndex((entry) => entry?.endCursor)).toBeGreaterThan(
-    finalNode,
-  );
-  expect(data.findIndex((entry) => entry?.hasNextPage)).toBeGreaterThan(
-    finalNode,
-  );
+  expect(errors).toMatchObject([{ path: ["allPeople", "failure"] }]);
+  expect(payloads!.flatMap(({ data }) => data?.id ?? [])).toEqual([1, 2]);
+  expect(payloads).toContainEqual({
+    path: ["allPeople"],
+    data: { pageInfo: { hasNextPage: true } },
+  });
 });
 
 test("streams a backward page in requested order without page flags", async () => {

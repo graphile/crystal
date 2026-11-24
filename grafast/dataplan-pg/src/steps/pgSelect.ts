@@ -18,7 +18,6 @@ import {
   __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
-  $$streamDelivery,
   access,
   arrayOfLength,
   asyncIteratorWithCleanup,
@@ -1595,28 +1594,18 @@ export class PgSelectStep<
             }
           },
         );
-        const deliveries: Promise<void>[] = [];
-        const deliveredPage = () =>
-          completion.promise.then(async (page) => {
-            await Promise.all(deliveries);
-            return page;
-          });
         return {
-          items: Object.assign(items, {
-            [$$streamDelivery](delivered: Promise<void>) {
-              deliveries.push(delivered);
-            },
-          }),
+          items,
           getFirstItem() {
             return streamInitialCount > 0
               ? (initialRows[0] ?? null)
               : readFirstRow().then((row) => (row.done ? null : row.value));
           },
-          getLastItem: () => deliveredPage().then((page) => page.lastItem),
+          getLastItem: () => completion.promise.then((page) => page.lastItem),
           getHasNextPage: () =>
             limit == null
               ? false
-              : deliveredPage().then((page) => page.hasOneExtra),
+              : completion.promise.then((page) => page.hasOneExtra),
           getHasPreviousPage: () =>
             hasPreviousPageCb(first, last, offset, false),
           cursorDetails,

@@ -1,5 +1,4 @@
 import * as assert from "../assert.ts";
-import { $$streamDelivery, type StreamDeliveryObserver } from "../constants.ts";
 import { isDev, noop } from "../dev.ts";
 import type { Maybe } from "../interfaces.ts";
 import type { Step } from "../step.ts";
@@ -58,8 +57,6 @@ export function distributor<TData>(
    * Once we start the underlying sourceIterable, we store the iterator here.
    */
   let sourceIterator: AsyncIterator<TData> | Iterator<TData> | null = null;
-
-  let deliveries: PromiseWithResolvers<void>[] | null = null;
 
   /**
    * An array of the currently delivered index for each of the dependent steps.
@@ -225,17 +222,7 @@ export function distributor<TData>(
     // same step without waiting for previous calls to resolve.
     const index = ++requestedIndex[stepIndex];
 
-    const result = yieldValue(stepIndex, index);
-    const delivery = deliveries?.[stepIndex];
-    if (delivery !== undefined) {
-      // An iterator can finish in its initial payload, without processStream.
-      void result.then((row) => {
-        if (row.done) {
-          delivery.resolve();
-        }
-      }, delivery.reject);
-    }
-    return result;
+    return yieldValue(stepIndex, index);
   }
 
   /**
@@ -356,7 +343,6 @@ export function distributor<TData>(
   }
 
   function stop(stepIndex: number, error?: unknown, advance = true) {
-    deliveries?.[stepIndex].resolve();
     if (!terminalResult[stepIndex]) {
       deliveredIndex[stepIndex] = Infinity;
       if (error) {
@@ -392,30 +378,10 @@ export function distributor<TData>(
         Symbol.asyncIterator in sourceIterable
           ? sourceIterable[Symbol.asyncIterator]()
           : sourceIterable[Symbol.iterator]();
-      const observe = (sourceIterator as StreamDeliveryObserver)[
-        $$streamDelivery
-      ];
-      if (observe !== undefined) {
-        // Reserve delivery for every consumer before the first pull, including
-        // consumers whose deferred payload has not started yet.
-        deliveries = dependentSteps.map((_, index) => {
-          const delivery = Promise.withResolvers<void>();
-          if (terminalResult[index] !== null) {
-            delivery.resolve();
-          }
-          return delivery;
-        });
-        const delivered = Promise.all(
-          deliveries.map((entry) => entry.promise),
-        ).then(noop);
-        void delivered.catch(noop);
-        observe(delivered);
-      }
     }
 
     const onAbort = () => void iterator.return().then(undefined, noop);
     const iterator = {
-      [$$streamDelivery]: deliveries?.[stepIndex].resolve,
       [Symbol.asyncIterator]() {
         return this;
       },
@@ -430,8 +396,7 @@ export function distributor<TData>(
         abortSignal.removeEventListener("abort", onAbort);
         return stop(stepIndex, e);
       },
-    } satisfies AsyncIterableIterator<TData, void, never> &
-      StreamDeliveryObserver;
+    } satisfies AsyncIterableIterator<TData, void, never>;
 
     abortSignal.addEventListener("abort", onAbort);
 

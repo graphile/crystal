@@ -35,13 +35,6 @@ export const $$eventEmitter = Symbol("executionEventEmitter");
  */
 export const $$streamMore = Symbol("streamMore");
 
-/** An iterator can register the promise for delivery of its streamed item patches. */
-export const $$streamDelivery = Symbol("streamDelivery");
-
-export interface StreamDeliveryObserver {
-  [$$streamDelivery]?: (delivered: Promise<void>) => void;
-}
-
 export const $$proxy = Symbol("proxy");
 
 /**

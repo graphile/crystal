@@ -11,11 +11,9 @@ import {
   $$contextPlanCache,
   $$eventEmitter,
   $$extensions,
-  $$streamDelivery,
   $$streamMore,
   FLAG_ERROR,
   NO_FLAGS,
-  type StreamDeliveryObserver,
 } from "./constants.ts";
 import { isDev } from "./dev.ts";
 import {
@@ -778,19 +776,6 @@ async function processStream(
   const whenDone = Promise.withResolvers<void>();
   whenDone.promise.catch(noop); // Guard against unhandledPromiseRejection
 
-  // Nested defers can themselves read page info. Signal delivery as soon as
-  // all direct item patches have been pushed, independently of their children.
-  const observeDelivery = (spec.stream as StreamDeliveryObserver)[
-    $$streamDelivery
-  ];
-  const delivered = observeDelivery ? Promise.withResolvers<void>() : null;
-  if (delivered !== null) {
-    void delivered.promise.catch(noop);
-    observeDelivery!(delivered.promise);
-    void whenDone.promise.catch(delivered.reject);
-  }
-  let outstandingItems = 0;
-
   type ResultTuple = [any, number];
 
   let queue: null | ResultTuple[] = null;
@@ -890,12 +875,6 @@ async function processStream(
           promises.push(promise);
         }
       }
-      if (delivered !== null) {
-        outstandingItems -= size;
-        if (loopComplete && outstandingItems === 0) {
-          delivered.resolve();
-        }
-      }
       if (promises.length !== 0) {
         return Promise.all(promises).then(noop);
       }
@@ -961,20 +940,11 @@ async function processStream(
         break;
       }
       const result = iteratorResult.value;
-      if (delivered !== null) {
-        outstandingItems++;
-      }
       processResult(result, payloadIndex);
       payloadIndex++;
     }
-  } catch (e) {
-    delivered?.reject(e);
-    throw e;
   } finally {
     loopComplete = true;
-    if (outstandingItems === 0) {
-      delivered?.resolve();
-    }
     if (pendingQueues === 0) {
       whenDone.resolve();
     }
