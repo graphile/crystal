@@ -1723,6 +1723,8 @@ function walkStreamInputs(
       ];
       if (
         !(flags & DEFAULT_FORBIDDEN_FLAGS) &&
+        value !== null &&
+        typeof value === "object" &&
         (pending !== undefined || stream !== null || !Array.isArray(value)) &&
         (isIterable(value) || isAsyncIterable(value))
       ) {

@@ -16,6 +16,7 @@ import {
   makeGrafastSchema,
   Step,
 } from "../dist/index.js";
+import { assertIterable, streamToArray } from "./incrementalUtils.ts";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
@@ -189,4 +190,25 @@ it("streams with non-streamable step", async () => {
   expect(payloads[3]).to.deep.equal({
     hasNext: false,
   });
+});
+
+it("rejects a string returned for a deferred streamed list", async () => {
+  const schema = makeGrafastSchema({
+    enableDeferStream: true,
+    typeDefs: "type Query { strings: [String] }",
+    objects: { Query: { plans: { strings: () => constant("abc") } } },
+  });
+  const result = await grafast({
+    schema,
+    source: "{ __typename ... @defer { strings @stream } }",
+    requestContext,
+  });
+  assertIterable(result);
+  const payloads = await streamToArray(result);
+  expect(Array.isArray(payloads) && payloads[1].data).to.deep.equal({
+    strings: null,
+  });
+  expect(Array.isArray(payloads) && payloads[1].errors?.[0].path).to.deep.equal(
+    ["strings"],
+  );
 });
