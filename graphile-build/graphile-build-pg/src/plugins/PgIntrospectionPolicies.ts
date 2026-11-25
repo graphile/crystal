@@ -7,8 +7,6 @@ import type {
 import { pruneExtensionResources } from "pg-introspection";
 
 import { invertKeyAndValue } from "../utils.ts";
-import { foreignKeyTargets } from "./PgFakeConstraintsPlugin.ts";
-
 type Entity = IntrospectionPolicy["entity"];
 type TemplateIntrospectionPolicy = Readonly<IntrospectionPolicy<any>>;
 
@@ -170,7 +168,6 @@ const DEFAULT_POLICIES = (() => {
       details.request("classes", { _id: row.confrelid }, ["enumTables"]);
     }
   });
-  policies.push(Object.freeze(foreignKeyTargets()));
   return Object.freeze(policies);
 })();
 

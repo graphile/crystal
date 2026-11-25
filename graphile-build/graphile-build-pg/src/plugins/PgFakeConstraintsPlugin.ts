@@ -60,6 +60,14 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       fakeId: 0,
     }),
     hooks: {
+      pgIntrospection_options(_info, { options }) {
+        if (options.multipass) {
+          options.multipass.policies = [
+            ...(options.multipass.policies ?? []),
+            foreignKeyTargets(),
+          ];
+        }
+      },
       // TODO:v6: build these fake constraints inside pg-introspection via a
       // multipass policy, so discovery follows them like real constraints
       // (making `foreignKeyEnumTargets` unnecessary), rather than here after

@@ -7,6 +7,7 @@ import {
 } from "pg-introspection";
 
 import type {} from "../dist/index.js";
+import { foreignKeyTargets } from "../dist/plugins/PgFakeConstraintsPlugin.js";
 import {
   postgraphileMultipass,
   postgraphilePrune,
@@ -311,12 +312,13 @@ test.each([false, true])(
         comment on table smart_fk_exposed.thing is E'@foreignKey (kind) references "Smart FK Hidden"."Kind" (type)\\n@foreignKey (plain_id) references "Smart FK Hidden".plain\\n@foreignKey (local_id) references local_target';
       `,
       );
+      const schemas = ["smart_fk_exposed"];
+      const options = postgraphileMultipass({ schemas });
+      options.policies = [...options.policies!, foreignKeyTargets()];
       const result = await introspect({
         runQuery,
         prune: postgraphilePrune,
-        multipass: multipass
-          ? postgraphileMultipass({ schemas: ["smart_fk_exposed"] })
-          : false,
+        multipass: multipass ? options : false,
       });
       const kind = result.classes.find((row) => row.relname === "Kind");
       expect(kind?.getNamespace()?.nspname).toBe("Smart FK Hidden");
