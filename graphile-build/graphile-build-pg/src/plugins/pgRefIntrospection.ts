@@ -205,13 +205,14 @@ export const refPathDependencies = (
       return;
     }
     const tags = details.getTagsAndDescription("classes", row)?.tags;
-    if (tags?.ref == null) {
-      return;
-    }
     const namespace = details.peek("namespaces", { _id: row.relnamespace }, [
       "_refPath",
     ])?.[0];
-    if (namespace === undefined || !schemas.includes(namespace.nspname)) {
+    if (
+      tags?.ref == null ||
+      namespace === undefined ||
+      !schemas.includes(namespace.nspname)
+    ) {
       return;
     }
     const refs = (Array.isArray(tags.ref) ? tags.ref : [tags.ref]).map((tag) =>

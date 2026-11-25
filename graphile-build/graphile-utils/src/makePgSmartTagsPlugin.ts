@@ -427,9 +427,6 @@ function mergeTagsPolicy(
       const namespaces = details.peek("namespaces", { _id: namespaceId }, [
         "_pgSmartTags",
       ]);
-      if (!tagsAndDescription || !namespaces) {
-        return;
-      }
       const table =
         "conrelid" in row &&
         candidates.some((rule) => rule.tableName !== undefined)
@@ -437,6 +434,9 @@ function mergeTagsPolicy(
               "_pgSmartTags",
             ])?.[0]
           : undefined;
+      if (!tagsAndDescription || !namespaces) {
+        return;
+      }
       const { tags } = tagsAndDescription;
       for (const rule of candidates) {
         if (

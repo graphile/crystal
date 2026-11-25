@@ -571,14 +571,10 @@ export function foreignKeyTargets(
     select(row, details) {
       const foreignKey = details.getTagsAndDescription("classes", row)?.tags
         .foreignKey;
-      if (foreignKey == null) {
-        return;
-      }
-      const [namespace] =
-        details.peek("namespaces", { _id: row.relnamespace }, [
-          "_foreignKeyTarget",
-        ]) ?? [];
-      if (!namespace) {
+      const namespace = details.peek("namespaces", { _id: row.relnamespace }, [
+        "_foreignKeyTarget",
+      ])?.[0];
+      if (foreignKey == null || namespace === undefined) {
         return;
       }
       const specs = Array.isArray(foreignKey) ? foreignKey : [foreignKey];
@@ -636,11 +632,10 @@ export function primaryKeyColumns(
   table: IntrospectionRow<"classes">,
   primaryKeys: readonly IntrospectionRow<"constraints">[] | undefined,
 ) {
-  if (primaryKeys === undefined) return undefined;
-  const columns = primaryKeys[0]?.conkey;
+  const columns = primaryKeys?.[0]?.conkey;
   if (columns != null) return columns;
   const spec = details.getTagsAndDescription("classes", table)?.tags.primaryKey;
-  return typeof spec === "string"
+  return primaryKeys !== undefined && typeof spec === "string"
     ? parseConstraintSpec(spec)[0].split(",")
     : undefined;
 }
