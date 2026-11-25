@@ -141,12 +141,18 @@ test("enum domains retain only their enum source, with independent policies for 
         create domain issue_2212.orders_orders_pkey_enum_domain as text;
         create function issue_2212.order_label() returns issue_2212.orders_orders_pkey_enum_domain
           language sql stable as $$ select 'Order'::issue_2212.orders_orders_pkey_enum_domain $$;
+        alter table issue_2212.orders add constraint alias unique (id);
+        comment on constraint alias on issue_2212.orders is '@enum';
+        create domain issue_2212.orders_alias_enum_domain as text;
+        create function issue_2212.username_alias() returns issue_2212.orders_alias_enum_domain
+          language sql stable as $$ select 'Alice'::issue_2212.orders_alias_enum_domain $$;
         comment on view enum_tables.abcd_view is '@primaryKey letter|@enum';
         create domain enum_tables.abcd_view_enum_domain as text;
         create function issue_2212.letter() returns enum_tables.abcd_view_enum_domain
           language sql stable as $$ select 'A'::enum_tables.abcd_view_enum_domain $$;
       `,
-      (schema) => {
+      (schema, passes) => {
+        expect(passes).toBeLessThanOrEqual(8);
         const fields = schema.getQueryType()!.getFields();
         expect(fields.allUsersCodes).toBeUndefined();
         expect(fields.allOrders).toBeUndefined();
@@ -156,6 +162,7 @@ test("enum domains retain only their enum source, with independent policies for 
         if (disableDomainDiscovery) {
           expect(String(fields.username.type)).toBe("UsersCodeEnumDomain");
         } else {
+          expect(fields.usernameAlias.type).toBe(fields.username.type);
           const user = assertObjectType(schema.getType("User"));
           expect(user.getFields().manager?.type).toBe(user);
           expect(
@@ -171,6 +178,11 @@ test("enum domains retain only their enum source, with independent policies for 
       true,
       {
         plugins: [
+          pgSmartTags({
+            kind: "type",
+            match: "issue_2212.orders_alias_enum_domain",
+            tags: { enum: "users_code" },
+          }),
           {
             name: "OnlyFunctions",
             after: ["PgEnumDomainsPlugin"],

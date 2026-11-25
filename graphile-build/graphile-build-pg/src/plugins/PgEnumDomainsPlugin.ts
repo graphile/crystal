@@ -63,12 +63,9 @@ function enumDomainTables(
       const namespaces = details.peek("namespaces", { _id: row.typnamespace }, [
         "_enumDomain",
       ]);
-      if (tagsAndDescription === undefined || namespaces === undefined) {
-        return;
-      }
       const identifier = enumDomainIdentifier(
         row.typname,
-        tagsAndDescription.tags.enum,
+        tagsAndDescription?.tags.enum,
       );
       if (!identifier) {
         return;
@@ -78,9 +75,15 @@ function enumDomainTables(
         ["pg_catalog", "text"],
         ["_enumDomain"],
       );
-      if (row.typbasetype !== text?._id) {
+      if (text !== undefined && row.typbasetype !== text?._id) {
         return;
       }
+      // The suffix can guide peeks while the base type and smart tags load.
+      // Only retain a match once a smart tag has had a chance to override it.
+      const confirmed =
+        tagsAndDescription !== undefined &&
+        namespaces !== undefined &&
+        text !== undefined;
 
       // The identifier is either the primary-key enum's table name or
       // <table>_<constraint>. Either part can itself contain underscores.
@@ -92,6 +95,7 @@ function enumDomainTables(
         )?.[0];
         if (
           table &&
+          confirmed &&
           hasEnumDomainKey(details, table, constraintName, fakeConstraints)
         ) {
           details.request("classes", { _id: table._id }, ["enumTables"]);
