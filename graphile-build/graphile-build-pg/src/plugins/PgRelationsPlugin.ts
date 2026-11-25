@@ -520,25 +520,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgTables_PgResourceOptions_relations(info, event) {
-        const { pgClass, serviceName } = event;
-        const constraints =
-          await info.helpers.pgIntrospection.getConstraintsForClass(
-            serviceName,
-            pgClass._id,
-          );
-
-        const foreignConstraints =
-          await info.helpers.pgIntrospection.getForeignConstraintsForClass(
-            serviceName,
-            pgClass._id,
-          );
-
-        for (const constraint of constraints) {
+        const { pgClass } = event;
+        for (const constraint of pgClass.getConstraints()) {
           if (info.state.foreignKeys.has(constraint)) {
             await info.helpers.pgRelations.addRelation(event, constraint);
           }
         }
-        for (const constraint of foreignConstraints) {
+        for (const constraint of pgClass.getForeignConstraints()) {
           if (info.state.foreignKeys.has(constraint)) {
             await info.helpers.pgRelations.addRelation(event, constraint, true);
           }
