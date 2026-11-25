@@ -4,13 +4,17 @@ import { gatherConfig } from "graphile-build";
 import type {
   Introspection,
   IntrospectionPolicy,
+  IntrospectionPolicyDetails,
+  IntrospectionRow,
   PgAttribute,
   PgClass,
   PgConstraint,
+  PgSmartTagsDict,
 } from "pg-introspection";
 import { parseSmartComment } from "pg-introspection";
 
 import { version } from "../version.ts";
+import { isEnumTag } from "./PgEnumTablesPlugin.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -128,7 +132,7 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   }),
 };
 
-function parseConstraintSpec(rawSpec: string) {
+export function parseConstraintSpec(rawSpec: string) {
   const [spec, ...tagComponents] = rawSpec.split(/\|/);
   return [spec, tagComponents.join("\n")];
 }
@@ -320,7 +324,7 @@ export function parseForeignKeyTag(rawSpec: string, fallbackSchema: string) {
   };
 }
 
-/** Invalid specs are reported by PgFakeConstraintsPlugin, so ignore them here. */
+/** Invalid specs are reported when gathering fake constraints. */
 export function parseForeignKeyTarget(rawSpec: unknown, schemaName: string) {
   if (typeof rawSpec !== "string") {
     return null;
@@ -553,8 +557,6 @@ function addConstraintToClass(
   }
 }
 
-// Follow `@foreignKey` smart tags on exposed classes, requesting the
-// targets tagged `@enum`.
 export function foreignKeyTargets(
   schemas: readonly string[],
 ): IntrospectionPolicy<"classes"> {
@@ -600,10 +602,118 @@ export function foreignKeyTargets(
           ]);
           continue;
         }
-        if (details.getTagsAndDescription("classes", targetClass)?.tags.enum) {
+        const targetTags = details.getTagsAndDescription(
+          "classes",
+          targetClass,
+        );
+        if (
+          isEnumTag(targetTags?.tags.enum) ||
+          (target.attributes.length === 1 &&
+            (target.foreignAttributes == null ||
+              target.foreignAttributes.length === 1) &&
+            hasEnumKey(
+              details,
+              targetClass,
+              targetTags?.tags,
+              target.foreignAttributes?.[0],
+            ))
+        ) {
           details.request("classes", { _id: targetClass._id }, ["enumTables"]);
         }
       }
     },
   };
+}
+
+/** Catalog keys identify their columns by number; smart keys use names. */
+export function primaryKeyColumns(
+  details: IntrospectionPolicyDetails,
+  table: IntrospectionRow<"classes">,
+  primaryKeys: readonly IntrospectionRow<"constraints">[] | undefined,
+) {
+  if (primaryKeys === undefined) return undefined;
+  const columns = primaryKeys[0]?.conkey;
+  if (columns != null) return columns;
+  const spec = details.getTagsAndDescription("classes", table)?.tags.primaryKey;
+  return typeof spec === "string"
+    ? parseConstraintSpec(spec)[0].split(",")
+    : undefined;
+}
+
+/** Without a target column, any single-column smart key can match. */
+export function isSmartEnumKey(
+  rawSpec: PgSmartTagsDict[string] | undefined,
+  column?: string,
+  enumTable = false,
+) {
+  if (typeof rawSpec !== "string") return false;
+  const [spec, description] = parseConstraintSpec(rawSpec);
+  return (
+    (column === undefined ? !spec.includes(",") : spec === column) &&
+    (enumTable || isEnumTag(parseSmartComment(description).tags.enum))
+  );
+}
+
+/** Match the referenced column against both catalog keys and smart keys. */
+function hasEnumKey(
+  details: IntrospectionPolicyDetails,
+  target: IntrospectionRow<"classes">,
+  tags: PgSmartTagsDict | undefined,
+  explicitColumn: string | undefined,
+) {
+  const primaryKeys = details.peek(
+    "constraints",
+    { conrelid: target._id, contype: "p" },
+    ["_foreignKeyTarget"],
+  );
+  const uniqueKeys = details.peek(
+    "constraints",
+    { conrelid: target._id, contype: "u" },
+    ["_foreignKeyTarget"],
+  );
+  const columns =
+    explicitColumn === undefined
+      ? primaryKeyColumns(details, target, primaryKeys)
+      : [explicitColumn];
+  if (columns?.length !== 1) {
+    return false;
+  }
+  const column = columns[0];
+  const attnum =
+    typeof column === "number"
+      ? column
+      : details.peek("attributes", { attrelid: target._id, attname: column }, [
+          "_foreignKeyTarget",
+        ])?.[0]?.attnum;
+  for (const keys of [primaryKeys, uniqueKeys]) {
+    if (
+      keys?.some((key) => {
+        if (key.conkey?.length !== 1 || key.conkey[0] !== attnum) {
+          return false;
+        }
+        const tag = details.getTagsAndDescription("constraints", key)?.tags
+          .enum;
+        return isEnumTag(tag);
+      })
+    ) {
+      return true;
+    }
+  }
+  if (!tags || (tags.primaryKey == null && tags.unique == null)) {
+    return false;
+  }
+  const attname =
+    typeof column === "string"
+      ? column
+      : details.peek("attributes", { attrelid: target._id, attnum: column }, [
+          "_foreignKeyTarget",
+        ])?.[0]?.attname;
+  const unique = tags.unique;
+  const specs = [
+    tags.primaryKey,
+    ...(Array.isArray(unique) ? unique : [unique]),
+  ];
+  return (
+    attname !== undefined && specs.some((spec) => isSmartEnumKey(spec, attname))
+  );
 }
