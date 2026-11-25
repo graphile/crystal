@@ -20,6 +20,12 @@ for (const multipass of [false, true]) {
       (schema) => {
         const fields = assertObjectType(schema.getType("Order")).getFields();
         const keywords = assertEnumType(getNamedType(fields.keyword.type));
+        expect(keywords.getValues().map((v) => v.value)).toEqual([
+          "Bar",
+          "Baz",
+          "Foo",
+          "Qux",
+        ]);
         expect(keywords.getValue("FOO")?.description).toBe(
           "The first metasyntactic variable",
         );

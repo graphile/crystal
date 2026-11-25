@@ -188,14 +188,14 @@ const spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum = enumCo
   name: "SimpleEnumEnum",
   identifier: TYPES.text.sqlType,
   values: [{
-    value: "Foo",
-    description: "The first metasyntactic variable"
-  }, {
     value: "Bar",
     description: null
   }, {
     value: "Baz",
     description: "The third metasyntactic variable, very similar to its predecessor"
+  }, {
+    value: "Foo",
+    description: "The first metasyntactic variable"
   }, {
     value: "Qux",
     description: null
@@ -1371,12 +1371,13 @@ enum LotsOfEnumsEnum3 {
 }
 
 enum SimpleEnum {
-  """The first metasyntactic variable"""
-  FOO
   BAR
 
   """The third metasyntactic variable, very similar to its predecessor"""
   BAZ
+
+  """The first metasyntactic variable"""
+  FOO
   QUX
 }
 

@@ -184,6 +184,30 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
       },
       async getIntrospectionData(info, serviceName, pgClass, attributes) {
         const { sql } = info.lib;
+        const constraints = pgClass.getConstraints();
+        const primaryKey = constraints.find((key) => key.contype === "p");
+        const keys = primaryKey
+          ? [primaryKey]
+          : constraints.filter((key) => key.contype === "u");
+        const orderColumns = new Set<string>();
+        for (const key of keys) {
+          const columns = key.getAttributes()!;
+          for (const column of columns) {
+            orderColumns.add(column.attname);
+          }
+          // A nullable unique key can tie on null. The next unique key
+          // breaks ties for enum values defined on its columns.
+          if (primaryKey || columns.every((column) => column.attnotnull)) {
+            break;
+          }
+        }
+        const orderBy =
+          orderColumns.size > 0
+            ? sql.fragment` order by ${sql.join(
+                Array.from(orderColumns, (name) => sql.identifier(name)),
+                ", ",
+              )}`
+            : sql.blank;
         // Load data from the table/view.
         const query = sql.compile(
           sql.fragment`select ${sql.join(
@@ -193,7 +217,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
             // NOTE: Even in the case of unqualified pgIdentifiers, we still want
             // to read _this_ enums values from _this_ schema.
             sql.identifier(pgClass.getNamespace()!.nspname, pgClass.relname)
-          };`,
+          }${orderBy};`,
         );
 
         const pgService = info.resolvedPreset.pgServices!.find(
