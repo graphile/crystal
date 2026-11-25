@@ -376,8 +376,14 @@ async function processFk(
     foreignTable,
   );
   const multipass = !!info.options.pgMultipassIntrospection;
-  // Multipass introspection may only peek at a target, without its attributes.
-  if (multipass && foreignPgClass && !foreignPgClass.getAttributes().length) {
+  // Discovery-only tables can have attributes in the lookup, but constraints
+  // can only be added to tables retained in the introspection collections.
+  if (
+    multipass &&
+    foreignPgClass &&
+    (!introspection.classes.includes(foreignPgClass) ||
+      foreignPgClass.getAttributes().length === 0)
+  ) {
     return;
   }
   if (!foreignPgClass) {

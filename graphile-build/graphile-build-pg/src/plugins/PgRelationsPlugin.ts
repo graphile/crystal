@@ -160,7 +160,9 @@ declare global {
   }
 }
 
-interface State {}
+interface State {
+  foreignKeys: Set<PgConstraint>;
+}
 const EMPTY_OBJECT = Object.freeze({});
 
 // TODO: split this into one plugin for gathering and another for schema
@@ -294,7 +296,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     initialCache() {
       return EMPTY_OBJECT;
     },
-    initialState: (): State => Object.create(null),
+    initialState: (): State => ({ foreignKeys: new Set() }),
     helpers: {
       async addRelation(info, event, pgConstraint, isReferencee = false) {
         const pgClass = isReferencee
@@ -510,6 +512,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
     },
     hooks: {
+      // Navigation can also return discovery-only constraints. Gather relations
+      // from the foreign keys retained and announced by introspection.
+      pgIntrospection_constraint(info, { entity }) {
+        if (entity.contype === "f") {
+          info.state.foreignKeys.add(entity);
+        }
+      },
       async pgTables_PgResourceOptions_relations(info, event) {
         const { pgClass, serviceName } = event;
         const constraints =
@@ -525,12 +534,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           );
 
         for (const constraint of constraints) {
-          if (constraint.contype === "f") {
+          if (info.state.foreignKeys.has(constraint)) {
             await info.helpers.pgRelations.addRelation(event, constraint);
           }
         }
         for (const constraint of foreignConstraints) {
-          if (constraint.contype === "f") {
+          if (info.state.foreignKeys.has(constraint)) {
             await info.helpers.pgRelations.addRelation(event, constraint, true);
           }
         }
