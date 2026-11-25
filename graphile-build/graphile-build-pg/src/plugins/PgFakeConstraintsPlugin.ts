@@ -3,6 +3,7 @@ import type { GatherPluginContext } from "graphile-build";
 import { gatherConfig } from "graphile-build";
 import type {
   Introspection,
+  IntrospectionPolicy,
   PgAttribute,
   PgClass,
   PgConstraint,
@@ -308,6 +309,18 @@ export function parseForeignKeyTag(rawSpec: string, fallbackSchema: string) {
   };
 }
 
+/** Invalid specs are reported by PgFakeConstraintsPlugin, so ignore them here. */
+export function parseForeignKeyTarget(rawSpec: unknown, schemaName: string) {
+  if (typeof rawSpec !== "string") {
+    return null;
+  }
+  try {
+    return parseForeignKeyTag(rawSpec, schemaName);
+  } catch {
+    return null;
+  }
+}
+
 async function processFk(
   info: GatherPluginContext<State, Cache>,
   event: {
@@ -527,4 +540,45 @@ function addConstraintToClass(
       constraints.push(pgConstraint);
     }
   }
+}
+
+// Follow `@foreignKey` smart tags on exposed classes, requesting the
+// targets tagged `@enum`.
+export function foreignKeyTargets(): IntrospectionPolicy<"classes"> {
+  return {
+    name: "foreignKeyEnumTargets",
+    entity: "classes",
+    select(row, details) {
+      const foreignKey = details.getTagsAndDescription("classes", row)?.tags
+        .foreignKey;
+      if (foreignKey == null) {
+        return;
+      }
+      const [namespace] =
+        details.peek("namespaces", { _id: row.relnamespace }, [
+          "_foreignKeyTarget",
+        ]) ?? [];
+      if (!namespace) {
+        return;
+      }
+      const specs = Array.isArray(foreignKey) ? foreignKey : [foreignKey];
+      for (const rawSpec of specs) {
+        const target = parseForeignKeyTarget(rawSpec, namespace.nspname);
+        if (!target) {
+          continue;
+        }
+        const targetClass = details.peekByName(
+          "classes",
+          [target.foreignSchema, target.foreignTable],
+          ["_foreignKeyTarget"],
+        );
+        if (
+          targetClass &&
+          details.getTagsAndDescription("classes", targetClass)?.tags.enum
+        ) {
+          details.request("classes", { _id: targetClass._id }, ["enumTables"]);
+        }
+      }
+    },
+  };
 }
