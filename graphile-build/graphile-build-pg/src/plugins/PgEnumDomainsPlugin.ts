@@ -87,13 +87,19 @@ export const PgEnumDomainsPlugin: GraphileConfig.Plugin = {
 function getFullIdentifier(codec: PgCodec) {
   if (!codec.extensions?.pg) return null;
   const { schemaName, serviceName, name: domainName } = codec.extensions.pg;
-  const enumTagValue = codec.extensions?.tags?.enum;
+  const identifier = enumDomainIdentifier(
+    domainName,
+    codec.extensions.tags?.enum,
+  );
+  return identifier !== null
+    ? `${identifier}|${schemaName}|${serviceName}`
+    : null;
+}
+
+function enumDomainIdentifier(domainName: string, enumTagValue: unknown) {
   if (enumTagValue) {
-    if (typeof enumTagValue !== "string") return null;
-    return `${enumTagValue}|${schemaName}|${serviceName}`;
+    return typeof enumTagValue === "string" ? enumTagValue : null;
   }
   if (!domainName.endsWith(ENUM_DOMAIN_SUFFIX)) return null;
-  const keepCount = domainName.length - ENUM_DOMAIN_SUFFIX.length;
-  const identifier = domainName.substring(0, keepCount);
-  return `${identifier}|${schemaName}|${serviceName}`;
+  return domainName.slice(0, -ENUM_DOMAIN_SUFFIX.length);
 }
