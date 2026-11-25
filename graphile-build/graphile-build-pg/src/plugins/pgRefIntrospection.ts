@@ -10,6 +10,10 @@ import {
   parseDatabaseIdentifiers,
   parseSmartTagsOptsString,
 } from "../utils.ts";
+import {
+  parseForeignKeyTarget,
+  primaryKeyColumns,
+} from "./PgFakeConstraintsPlugin.ts";
 
 export function parseRefHop(part: string) {
   const trimmed = part.trim();
@@ -36,6 +40,7 @@ type RefConstraint = IntrospectionRow<"constraints">;
 function refEndpoint(
   details: IntrospectionPolicyDetails,
   table: RefClass,
+  schema: string,
   columns: readonly string[] | null,
 ) {
   // Table-only hops need no attribute lookup.
@@ -46,7 +51,7 @@ function refEndpoint(
   const numbers = columns?.map(
     (name) => attributes?.find((attr) => attr.attname === name)?.attnum,
   );
-  return { table, numbers };
+  return { table, schema, columns, numbers };
 }
 type RefEndpoint = ReturnType<typeof refEndpoint>;
 
@@ -71,16 +76,65 @@ function matchingForeignKeys(
   );
 }
 
+function primaryKeyNames(details: IntrospectionPolicyDetails, table: RefClass) {
+  const keys = details.peek(
+    "constraints",
+    { conrelid: table._id, contype: "p" },
+    ["_refPath"],
+  );
+  return primaryKeyColumns(details, table, keys)?.map((column) =>
+    typeof column === "string"
+      ? column
+      : details.peek("attributes", { attrelid: table._id, attnum: column }, [
+          "_refPath",
+        ])?.[0]?.attname,
+  );
+}
+
+function hasSmartForeignKey(
+  details: IntrospectionPolicyDetails,
+  from: RefEndpoint,
+  to: RefEndpoint,
+) {
+  const tag = details.getTagsAndDescription("classes", from.table)?.tags
+    .foreignKey;
+  for (const spec of Array.isArray(tag) ? tag : [tag]) {
+    const foreignKey = parseForeignKeyTarget(spec, from.schema);
+    if (
+      foreignKey == null ||
+      foreignKey.foreignSchema !== to.schema ||
+      foreignKey.foreignTable !== to.table.relname ||
+      (from.columns !== null &&
+        !arraysMatch(foreignKey.attributes, from.columns))
+    ) {
+      continue;
+    }
+    const referencedColumns =
+      foreignKey.foreignAttributes ?? primaryKeyNames(details, to.table);
+    if (
+      referencedColumns !== undefined &&
+      referencedColumns.length === foreignKey.attributes.length &&
+      !referencedColumns.includes(undefined) &&
+      (to.columns === null || arraysMatch(referencedColumns, to.columns))
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function followRefPath(
   details: IntrospectionPolicyDetails,
   source: RefClass,
   schemaName: string,
   via: string,
   schemas: readonly string[],
+  fakeConstraints: boolean,
 ) {
   const targets: RefClass[] = [];
   const constraints: RefConstraint[] = [];
   let current = source;
+  let currentSchema = schemaName;
   for (const part of via.split(";")) {
     const { table, localColumns, remoteColumns } = parseRefHop(part);
     const [targetSchema, targetTable] = parseDatabaseIdentifier(
@@ -99,8 +153,8 @@ function followRefPath(
     if (target == null) {
       return;
     }
-    const local = refEndpoint(details, current, localColumns);
-    const remote = refEndpoint(details, target, remoteColumns);
+    const local = refEndpoint(details, current, currentSchema, localColumns);
+    const remote = refEndpoint(details, target, targetSchema, remoteColumns);
     const forwards = matchingForeignKeys(details, local, remote);
     const backwards = matchingForeignKeys(details, remote, local);
     if (
@@ -109,12 +163,21 @@ function followRefPath(
     ) {
       return;
     }
-    if (forwards.length === 0 && backwards.length === 0) {
+    if (
+      forwards.length === 0 &&
+      backwards.length === 0 &&
+      !(
+        fakeConstraints &&
+        (hasSmartForeignKey(details, local, remote) ||
+          hasSmartForeignKey(details, remote, local))
+      )
+    ) {
       return;
     }
     targets.push(target);
     constraints.push(...forwards, ...backwards);
     current = target;
+    currentSchema = targetSchema;
   }
 
   // Only a complete path needs resources and relations in the registry.
@@ -128,6 +191,7 @@ function followRefPath(
 
 export const refPathDependencies = (
   schemas: readonly string[],
+  fakeConstraints: boolean,
 ): IntrospectionPolicy<"classes"> => ({
   name: "refPathDependencies",
   entity: "classes",
@@ -166,7 +230,14 @@ export const refPathDependencies = (
     }
     for (const via of vias) {
       if (via) {
-        followRefPath(details, row, namespace.nspname, via, schemas);
+        followRefPath(
+          details,
+          row,
+          namespace.nspname,
+          via,
+          schemas,
+          fakeConstraints,
+        );
       }
     }
   },

@@ -105,7 +105,7 @@ test(
 );
 
 test(
-  "ignores smart foreign keys when fake constraints are disabled",
+  "ignores smart foreign keys and smart ref hops when fake constraints are disabled",
   core.test(
     undefined,
     "issue_2212",
@@ -113,6 +113,7 @@ test(
     `
       comment on table issue_2212.orders is $tags$
 @foreignKey (id) references users
+@ref contacts via:(id)->user_contacts(user_id)
 $tags$;
       comment on table issue_2212.user_contacts is '@foreignKey (user_id) references orders';
     `,
