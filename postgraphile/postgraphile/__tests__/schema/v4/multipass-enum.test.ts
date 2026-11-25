@@ -44,4 +44,25 @@ for (const multipass of [false, true]) {
       },
     ),
   );
+  test(
+    `exposes functions returning native enums (multipass: ${multipass})`,
+    schemaTest(
+      undefined,
+      "issue_2212",
+      {},
+      `
+        create function issue_2212.pet() returns function_returning_enum.animal_type
+          language sql stable as $$ select 'CAT'::function_returning_enum.animal_type $$;
+      `,
+      (schema) => {
+        const fields = schema.getQueryType()!.getFields();
+        expect(
+          assertEnumType(getNamedType(fields.pet.type))
+            .getValues()
+            .map((v) => v.value),
+        ).toEqual(["CAT", "DOG", "FISH"]);
+      },
+      true,
+    ),
+  );
 }
