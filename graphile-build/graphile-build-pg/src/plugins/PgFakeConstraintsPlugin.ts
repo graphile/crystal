@@ -60,11 +60,14 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       fakeId: 0,
     }),
     hooks: {
-      pgIntrospection_options(_info, { options }) {
+      pgIntrospection_options(info, { options, serviceName }) {
         if (options.multipass) {
+          const service = info.resolvedPreset.pgServices?.find(
+            (service) => service.name === serviceName,
+          );
           options.multipass.policies = [
             ...(options.multipass.policies ?? []),
-            foreignKeyTargets(),
+            foreignKeyTargets(service?.schemas ?? ["public"]),
           ];
         }
       },
@@ -552,7 +555,9 @@ function addConstraintToClass(
 
 // Follow `@foreignKey` smart tags on exposed classes, requesting the
 // targets tagged `@enum`.
-export function foreignKeyTargets(): IntrospectionPolicy<"classes"> {
+export function foreignKeyTargets(
+  schemas: readonly string[],
+): IntrospectionPolicy<"classes"> {
   return {
     name: "foreignKeyEnumTargets",
     entity: "classes",
@@ -580,10 +585,22 @@ export function foreignKeyTargets(): IntrospectionPolicy<"classes"> {
           [target.foreignSchema, target.foreignTable],
           ["_foreignKeyTarget"],
         );
+        if (!targetClass) {
+          continue;
+        }
+        // A smart FK on an entrypoint discovers its in-schema target just like
+        // a catalog FK. Outside those schemas we only need enum dependencies.
         if (
-          targetClass &&
-          details.getTagsAndDescription("classes", targetClass)?.tags.enum
+          schemas.includes(target.foreignSchema) &&
+          details.hasPurpose("initial")
         ) {
+          details.request("classes", { _id: targetClass._id }, [
+            "registryRelation",
+            "enumTables",
+          ]);
+          continue;
+        }
+        if (details.getTagsAndDescription("classes", targetClass)?.tags.enum) {
           details.request("classes", { _id: targetClass._id }, ["enumTables"]);
         }
       }

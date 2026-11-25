@@ -1,8 +1,52 @@
 import { scopedUtils } from "graphile-utils";
+import { assertObjectType } from "graphql";
 
 import * as core from "./core.ts";
 
 const { multipassInclude } = scopedUtils("default");
+
+const OrdersEntrypoint: GraphileConfig.Plugin = {
+  name: "OrdersEntrypoint",
+  gather: {
+    hooks: {
+      pgIntrospection_options(_info, { options }) {
+        if (options.multipass) {
+          options.multipass.entrypointFilters = {
+            ...options.multipass.entrypointFilters,
+            classes: "relname = 'orders'",
+          };
+        }
+      },
+    },
+  },
+};
+
+test.each(["catalog", "smart"])(
+  "discovers an in-schema resource referenced by a %s foreign key",
+  (kind) =>
+    core.test(
+      undefined,
+      "issue_2212",
+      {},
+      `
+      alter table issue_2212.orders add column user_id int;
+      ${
+        kind === "catalog"
+          ? "alter table issue_2212.orders add foreign key (user_id) references issue_2212.users;"
+          : "comment on table issue_2212.orders is '@foreignKey (user_id) references users';"
+      }
+    `,
+      (schema) => {
+        expect(
+          assertObjectType(schema.getType("User")).getFields().id,
+        ).toBeDefined();
+      },
+      true,
+      {
+        plugins: [OrdersEntrypoint],
+      },
+    )(),
+);
 
 test(
   "makes explicitly included objects available to gather plugins",
@@ -49,4 +93,30 @@ test(
       },
     ],
   }),
+);
+
+test(
+  "ignores smart foreign keys when fake constraints are disabled",
+  core.test(
+    undefined,
+    "issue_2212",
+    {},
+    `
+      comment on table issue_2212.orders is $tags$
+@foreignKey (id) references users
+$tags$;
+      comment on table issue_2212.user_contacts is '@foreignKey (user_id) references orders';
+    `,
+    (schema) => {
+      const fields = schema.getQueryType()!.getFields();
+      expect(fields.allOrders).toBeDefined();
+      expect(fields.allUsers).toBeUndefined();
+      expect(fields.allUserContacts).toBeUndefined();
+    },
+    true,
+    {
+      plugins: [OrdersEntrypoint],
+      disablePlugins: ["PgFakeConstraintsPlugin"],
+    },
+  ),
 );

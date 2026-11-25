@@ -314,7 +314,7 @@ test.each([false, true])(
       );
       const schemas = ["smart_fk_exposed"];
       const options = postgraphileMultipass({ schemas });
-      options.policies = [...options.policies!, foreignKeyTargets()];
+      options.policies = [...options.policies!, foreignKeyTargets(schemas)];
       const result = await introspect({
         runQuery,
         prune: postgraphilePrune,
