@@ -9,6 +9,7 @@ const maximumPasses: Record<string, number> = {
   geometry: 5,
   index_expressions: 4,
   inheritence: 4,
+  issue_2212: 10,
   issue_2334: 4,
   js_reserved: 4,
   nested_arrays: 4,
