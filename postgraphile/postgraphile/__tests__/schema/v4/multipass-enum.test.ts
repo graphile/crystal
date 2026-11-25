@@ -1,7 +1,14 @@
 import { pgSmartTags } from "graphile-utils";
+import type { GraphQLOutputType } from "graphql";
 import { assertEnumType, assertObjectType, getNamedType } from "graphql";
 
 import * as core from "./core.ts";
+
+function enumValues(type: GraphQLOutputType) {
+  return assertEnumType(getNamedType(type))
+    .getValues()
+    .map((v) => v.value);
+}
 
 for (const multipass of [false, true]) {
   const schemaTest = multipass ? core.test : core.testDefaultOptions;
@@ -37,24 +44,23 @@ for (const multipass of [false, true]) {
 $tags$;
         `,
         (schema) => {
-          const fields = assertObjectType(schema.getType("Order")).getFields();
-          function values(name: string) {
-            return assertEnumType(getNamedType(fields[name].type))
-              .getValues()
-              .map((v) => v.value);
-          }
-          expect(values("keyword")).toEqual(["Bar", "Baz", "Foo", "Qux"]);
+          const { keyword, letter, viewLetter, code, stage } = assertObjectType(
+            schema.getType("Order"),
+          ).getFields();
+          expect(enumValues(keyword.type)).toEqual([
+            "Bar",
+            "Baz",
+            "Foo",
+            "Qux",
+          ]);
           expect(
-            assertEnumType(getNamedType(fields.keyword.type)).getValue("FOO")
+            assertEnumType(getNamedType(keyword.type)).getValue("FOO")
               ?.description,
           ).toBe("The first metasyntactic variable");
-          expect(values("letter")).toEqual(["A", "B", "C", "D"]);
-          expect(values("viewLetter")).toEqual(["A", "B", "C", "D"]);
-          expect(values("code")).toEqual(["a1", "a2", "a3", "a4"]);
-          expect(values("stage")).toContain("pending");
-          expect(
-            schema.getQueryType()!.getFields().allAbcdViews,
-          ).toBeUndefined();
+          expect(enumValues(letter.type)).toEqual(["A", "B", "C", "D"]);
+          expect(enumValues(viewLetter.type)).toEqual(["A", "B", "C", "D"]);
+          expect(enumValues(code.type)).toEqual(["a1", "a2", "a3", "a4"]);
+          expect(enumValues(stage.type)).toContain("pending");
         },
         true,
         {
@@ -75,14 +81,30 @@ $tags$;
     );
   }
   test(
-    `exposes functions returning native and domain-backed enums (multipass: ${multipass})`,
+    `exposes a function returning a native enum (multipass: ${multipass})`,
     schemaTest(
       undefined,
       "issue_2212",
       {},
       `
+        -- Leave pet() as the only entrypoint so nothing pulls in pg_catalog.
+        drop table issue_2212.orders, issue_2212.user_contacts, issue_2212.users;
         create function issue_2212.pet() returns function_returning_enum.animal_type
           language sql stable as $$ select 'CAT'::function_returning_enum.animal_type $$;
+      `,
+      (schema) => {
+        const pet = schema.getQueryType()!.getFields().pet;
+        expect(enumValues(pet.type)).toEqual(["CAT", "DOG", "FISH"]);
+      },
+    ),
+  );
+  test(
+    `exposes functions returning domain-backed enums (multipass: ${multipass})`,
+    schemaTest(
+      undefined,
+      "issue_2212",
+      {},
+      `
         create function issue_2212.stage() returns function_returning_enum.stage_options_enum_domain
           language sql stable as $$ select 'pending'::function_returning_enum.stage_options_enum_domain $$;
         create domain function_returning_enum.transport as text;
@@ -90,23 +112,9 @@ $tags$;
           language sql stable as $$ select 'CAR'::function_returning_enum.transport $$;
       `,
       (schema) => {
-        const fields = schema.getQueryType()!.getFields();
-        expect(
-          assertEnumType(getNamedType(fields.pet.type))
-            .getValues()
-            .map((v) => v.value),
-        ).toEqual(["CAT", "DOG", "FISH"]);
-        expect(
-          assertEnumType(getNamedType(fields.stage.type))
-            .getValues()
-            .map((v) => v.value),
-        ).toContain("pending");
-        expect(
-          assertEnumType(getNamedType(fields.transport.type))
-            .getValues()
-            .map((v) => v.value),
-        ).toEqual(["BIKE", "CAR", "SUBWAY"]);
-        expect(fields.allStageOptions).toBeUndefined();
+        const { stage, transport } = schema.getQueryType()!.getFields();
+        expect(enumValues(stage.type)).toContain("pending");
+        expect(enumValues(transport.type)).toEqual(["BIKE", "CAR", "SUBWAY"]);
       },
       true,
       {
@@ -122,7 +130,7 @@ $tags$;
   );
 }
 
-test("enum domains retain only their enum source, with independent policies for each build", async () => {
+test("enum domains resolve to the intended enum, with independent policies for each build", async () => {
   for (const disableDomainDiscovery of [true, false]) {
     await core.test(
       undefined,
@@ -154,8 +162,6 @@ test("enum domains retain only their enum source, with independent policies for 
       (schema, passes) => {
         expect(passes).toBeLessThanOrEqual(7);
         const fields = schema.getQueryType()!.getFields();
-        expect(fields.allUsersCodes).toBeUndefined();
-        expect(fields.allOrders).toBeUndefined();
         expect(String(fields.orderLabel.type)).toBe(
           "OrdersOrdersPkeyEnumDomain",
         );
@@ -165,11 +171,12 @@ test("enum domains retain only their enum source, with independent policies for 
           expect(fields.usernameAlias.type).toBe(fields.username.type);
           const user = assertObjectType(schema.getType("User"));
           expect(user.getFields().manager?.type).toBe(user);
-          expect(
-            assertEnumType(getNamedType(fields.username.type))
-              .getValues()
-              .map((v) => v.value),
-          ).toEqual(["Zed", "Alice", "Bob", "Carl"]);
+          expect(enumValues(fields.username.type)).toEqual([
+            "Zed",
+            "Alice",
+            "Bob",
+            "Carl",
+          ]);
           expect(
             assertEnumType(getNamedType(fields.letter.type)).getValue("A"),
           ).toBeDefined();

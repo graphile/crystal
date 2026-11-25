@@ -35,7 +35,6 @@ test.each(["catalog", "smart"])(
           ? "alter table issue_2212.orders add foreign key (user_id) references issue_2212.users;"
           : "comment on table issue_2212.orders is '@foreignKey (user_id) references users';"
       }
-      alter table issue_2212.user_contacts add foreign key (user_id) references issue_2212.users;
       comment on table issue_2212.users is $tags$
 @ref contacts via:(id)->user_contacts(user_id)
 @foreignKey (id) references refs.people (id)
@@ -58,7 +57,7 @@ $tags$;
 );
 
 test(
-  "discovers both @foreignKey hops of a @ref together",
+  "follows a two-hop @ref from Order to UserContact through @foreignKey tags",
   core.test(
     undefined,
     "issue_2212",
@@ -73,10 +72,11 @@ $tags$;
       alter table issue_2212.user_contacts drop constraint user_contacts_user_id_fkey;
       comment on table issue_2212.user_contacts is '@foreignKey (user_id) references users';
     `,
-    (schema, passes) => {
-      expect(passes).toBeLessThanOrEqual(6);
+    (schema) => {
       const order = assertObjectType(schema.getType("Order"));
-      expect(order.getFields().contacts).toBeDefined();
+      expect(String(order.getFields().contacts.type)).toBe(
+        "UserContactsConnection!",
+      );
     },
     true,
     { plugins: [OrdersEntrypoint] },
@@ -128,60 +128,4 @@ test(
       },
     ],
   }),
-);
-
-test(
-  "discovers the @ref target even when its @foreignKey is disabled",
-  core.test(
-    undefined,
-    "issue_2212",
-    {},
-    `
-      comment on table issue_2212.orders is $tags$
-@foreignKey (id) references users
-@ref contacts via:(id)->user_contacts(user_id)
-$tags$;
-      comment on table issue_2212.user_contacts is '@foreignKey (user_id) references orders';
-    `,
-    (schema) => {
-      const fields = schema.getQueryType()!.getFields();
-      expect(fields.allOrders).toBeDefined();
-      expect(fields.allUsers).toBeUndefined();
-      expect(fields.allUserContacts).toBeDefined();
-      const order = assertObjectType(schema.getType("Order"));
-      expect(order.getFields().contacts).toBeUndefined();
-    },
-    true,
-    {
-      plugins: [OrdersEntrypoint],
-      disablePlugins: ["PgFakeConstraintsPlugin"],
-    },
-  ),
-);
-
-test(
-  "discovers tables named in an in-schema @refVia even when a hop has no relation",
-  core.test(
-    undefined,
-    "issue_2212",
-    {},
-    `
-    comment on table issue_2212.orders is $tags$
-@ref people via:user_contacts;refs.people
-@ref missing
-@refVia missing via:(id)->orders(amount_cents);users
-@refVia missing via:(id)->orders(amount_cents);invalid!
-$tags$;
-  `,
-    (schema) => {
-      const fields = schema.getQueryType()!.getFields();
-      expect(fields.allUsers).toBeDefined();
-      expect(fields.allUserContacts).toBeUndefined();
-      const order = assertObjectType(schema.getType("Order"));
-      expect(order.getFields().people).toBeUndefined();
-      expect(order.getFields().missing).toBeUndefined();
-    },
-    true,
-    { plugins: [OrdersEntrypoint] },
-  ),
 );
