@@ -11,12 +11,9 @@ import type {
 import { arraysMatch } from "grafast";
 import { gatherConfig } from "graphile-build";
 
-import {
-  parseDatabaseIdentifier,
-  parseDatabaseIdentifiers,
-  parseSmartTagsOptsString,
-} from "../utils.ts";
+import { parseDatabaseIdentifier, parseSmartTagsOptsString } from "../utils.ts";
 import { version } from "../version.ts";
+import { parseRefHop } from "./pgRefIntrospection.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -263,72 +260,23 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
               const relationEntries = relations
                 ? (Object.entries(relations) as Array<RelationEntry>)
                 : [];
-              const part = rawPart.trim();
-              // ENHANCE: allow whitespace
-              const matches = part.match(
-                /^\(([^)]+)\)->([^)]+)(?:\(([^)]+)\))?$/,
-              );
-
-              let relationEntry: RelationEntry | undefined;
-              if (matches) {
-                const [
-                  ,
-                  rawLocalCols,
-                  targetTableIdentifier,
-                  maybeRawTargetCols,
-                ] = matches;
-
-                const localAttributes = parseDatabaseIdentifiers(
-                  rawLocalCols,
-                  1,
-                ).map((i) => i[0]);
-                const maybeTargetAttributes = maybeRawTargetCols
-                  ? parseDatabaseIdentifiers(maybeRawTargetCols, 1).map(
-                      (i) => i[0],
-                    )
-                  : null;
-
-                const targetCodec = await getCodecForTableName(
-                  targetTableIdentifier,
+              const { table, localColumns, remoteColumns } =
+                parseRefHop(rawPart);
+              const targetCodec = await getCodecForTableName(table);
+              if (!targetCodec) {
+                console.error(
+                  `Ref ${refName} has bad via '${via}' which references table '${table}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
                 );
-                if (!targetCodec) {
-                  console.error(
-                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
-                  );
-                  continue outerLoop;
-                }
-
-                relationEntry = relationEntries.find(([, rel]) => {
-                  if (rel.remoteResourceOptions.codec !== targetCodec) {
-                    return false;
-                  }
-                  if (!arraysMatch(rel.localAttributes, localAttributes)) {
-                    return false;
-                  }
-                  if (maybeTargetAttributes) {
-                    if (
-                      !arraysMatch(rel.remoteAttributes, maybeTargetAttributes)
-                    ) {
-                      return false;
-                    }
-                  }
-                  return true;
-                });
-              } else {
-                const targetTableIdentifier = part;
-                const targetCodec = await getCodecForTableName(
-                  targetTableIdentifier,
-                );
-                if (!targetCodec) {
-                  console.error(
-                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
-                  );
-                  continue outerLoop;
-                }
-                relationEntry = relationEntries.find(([, rel]) => {
-                  return rel.remoteResourceOptions.codec === targetCodec;
-                });
+                continue outerLoop;
               }
+              const relationEntry = relationEntries.find(
+                ([, rel]) =>
+                  rel.remoteResourceOptions.codec === targetCodec &&
+                  (localColumns === null ||
+                    arraysMatch(rel.localAttributes, localColumns)) &&
+                  (remoteColumns === null ||
+                    arraysMatch(rel.remoteAttributes, remoteColumns)),
+              );
               if (relationEntry) {
                 path.push({
                   relationName: relationEntry[0],
