@@ -5,7 +5,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -b",
-    "build-package": "yarn build"
+    "build-package": "yarn build",
+    "test": "node --test"
   },
   "dependencies": {
     "pg": "^8.16.3",

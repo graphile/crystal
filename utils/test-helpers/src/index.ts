@@ -16,8 +16,10 @@ async function runSqlAsRoot(sql: string, maxAttempts = 1) {
       const rootClient = new Client(
         `postgres:///${process.env.OWNER_DATABASE ?? "postgres"}`,
       );
-      await rootClient.connect();
       try {
+        // A client-side authentication error can reject connect() while the
+        // socket is still open. Close it before the next provisioning attempt.
+        await rootClient.connect();
         await rootClient.query(sql);
       } finally {
         await rootClient.end();
