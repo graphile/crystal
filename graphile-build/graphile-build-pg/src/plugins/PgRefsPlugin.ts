@@ -13,7 +13,7 @@ import { gatherConfig } from "graphile-build";
 
 import { parseDatabaseIdentifier, parseSmartTagsOptsString } from "../utils.ts";
 import { version } from "../version.ts";
-import { parseRefHop } from "./pgRefIntrospection.ts";
+import { parseRefHop, refPathDependencies } from "./pgRefIntrospection.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -107,6 +107,17 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
     },
     helpers: {},
     hooks: {
+      pgIntrospection_options(info, { options, serviceName }) {
+        const { multipass } = options;
+        if (multipass) {
+          multipass.policies = [
+            ...(multipass.policies ?? []),
+            refPathDependencies(
+              schemasForService(info.resolvedPreset, serviceName),
+            ),
+          ];
+        }
+      },
       async pgCodecs_PgCodec(info, event) {
         const { pgCodec, pgClass } = event;
         if (!pgClass) {

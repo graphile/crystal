@@ -130,6 +130,8 @@ test("enum domains retain only their enum source, with independent policies for 
       {},
       `
         alter table issue_2212.user_contacts rename to users_code;
+        alter table issue_2212.users add column manager_id int references issue_2212.users;
+        comment on table issue_2212.users is '@ref manager singular via:(manager_id)->users(id)';
         insert into issue_2212.users (id, username) values (-1, 'Zed');
         alter table issue_2212.users add constraint code unique (username);
         comment on constraint code on issue_2212.users is '@enum';
@@ -154,6 +156,8 @@ test("enum domains retain only their enum source, with independent policies for 
         if (disableDomainDiscovery) {
           expect(String(fields.username.type)).toBe("UsersCodeEnumDomain");
         } else {
+          const user = assertObjectType(schema.getType("User"));
+          expect(user.getFields().manager?.type).toBe(user);
           expect(
             assertEnumType(getNamedType(fields.username.type))
               .getValues()

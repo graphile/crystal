@@ -22,7 +22,7 @@ const OrdersEntrypoint: GraphileConfig.Plugin = {
 };
 
 test.each(["catalog", "smart"])(
-  "discovers an in-schema resource referenced by a %s foreign key",
+  "follows in-schema refs on resources discovered by a %s foreign key",
   (kind) =>
     core.test(
       undefined,
@@ -35,11 +35,20 @@ test.each(["catalog", "smart"])(
           ? "alter table issue_2212.orders add foreign key (user_id) references issue_2212.users;"
           : "comment on table issue_2212.orders is '@foreignKey (user_id) references users';"
       }
+      alter table issue_2212.user_contacts add foreign key (user_id) references issue_2212.users;
+      comment on table issue_2212.users is $tags$
+@ref contacts via:(id)->user_contacts(user_id)
+@foreignKey (id) references refs.people (id)
+@ref hiddenPerson singular via:(id)->refs.people(id)
+$tags$;
     `,
       (schema) => {
-        expect(
-          assertObjectType(schema.getType("User")).getFields().id,
-        ).toBeDefined();
+        const fields = assertObjectType(schema.getType("User")).getFields();
+        expect(fields.contacts).toBeDefined();
+        const contact = assertObjectType(schema.getType("UserContact"));
+        expect(contact.getFields().phone).toBeDefined();
+        expect(fields.hiddenPerson).toBeUndefined();
+        expect(schema.getType("Person")).toBeUndefined();
       },
       true,
       {
@@ -118,5 +127,26 @@ $tags$;
       plugins: [OrdersEntrypoint],
       disablePlugins: ["PgFakeConstraintsPlugin"],
     },
+  ),
+);
+
+test(
+  "a ref whose last hop leaves the schema does not expose its first hop",
+  core.test(
+    undefined,
+    "issue_2212",
+    {},
+    `
+    alter table issue_2212.users add column order_id int references issue_2212.orders;
+    comment on table issue_2212.orders is '@ref people via:(id)->users(order_id);refs.people';
+  `,
+    (schema) => {
+      expect(schema.getQueryType()!.getFields().allUsers).toBeUndefined();
+      const order = assertObjectType(schema.getType("Order"));
+      expect(order.getFields().people).toBeUndefined();
+      expect(schema.getType("User")).toBeUndefined();
+    },
+    true,
+    { plugins: [OrdersEntrypoint] },
   ),
 );
