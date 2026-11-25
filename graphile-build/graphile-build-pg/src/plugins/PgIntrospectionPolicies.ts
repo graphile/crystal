@@ -11,6 +11,15 @@ import { invertKeyAndValue } from "../utils.ts";
 type Entity = IntrospectionPolicy["entity"];
 type TemplateIntrospectionPolicy = Readonly<IntrospectionPolicy<any>>;
 
+const NON_FOREIGN_KEY_CONSTRAINT_TYPES = [
+  "c",
+  "n",
+  "p",
+  "u",
+  "t",
+  "x",
+] as const;
+
 /**
  * The policies PostGraphile needs to satisfy its builtin plugins. More
  * policies can be added via the `pgIntrospection_options` gather hook
@@ -156,12 +165,12 @@ const DEFAULT_POLICIES = (() => {
           "completeTypeNavigation",
         ]);
       }
-      if (!["i", "I"].includes(row.relkind)) {
+      if (row.relkind !== "i" && row.relkind !== "I") {
         details.request("attributes", { attrelid: row._id }, ["registryCodec"]);
         if (full) {
           details.request("constraints", { conrelid: row._id }, [purpose]);
         } else {
-          for (const contype of ["c", "n", "p", "u", "t", "x"]) {
+          for (const contype of NON_FOREIGN_KEY_CONSTRAINT_TYPES) {
             details.request("constraints", { conrelid: row._id, contype }, [
               purpose,
             ]);

@@ -331,7 +331,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                 .getConstraints()!
                 .filter(
                   (c) =>
-                    ["u", "p"].includes(c.contype) &&
+                    (c.contype === "u" || c.contype === "p") &&
                     c.conkey?.every((k) => k > 0),
                 );
               const foreignUniqueAttributeNumberCombinations =

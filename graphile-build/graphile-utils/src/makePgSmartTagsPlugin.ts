@@ -391,6 +391,12 @@ async function resolveRules(
   return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
 }
 
+const TAG_PREVIEW_POLICIES = [
+  ["class", "classes", "mergeTags"],
+  ["type", "types", "mergeTypeTags"],
+  ["constraint", "constraints", "mergeConstraintTags"],
+] as const;
+
 /**
  * Merges the tags of name-matched rules into the tags multipass
  * policies see. Rules matched by a function cannot be applied to raw rows, so
@@ -398,7 +404,7 @@ async function resolveRules(
  */
 function mergeTagsPolicy(
   name: string,
-  entity: "classes" | "types" | "constraints",
+  entity: (typeof TAG_PREVIEW_POLICIES)[number][1],
   rules: ReadonlyArray<{
     schemaName: string | undefined;
     tableName: string | undefined;
@@ -492,11 +498,7 @@ export function pgSmartTags<
             return;
           }
           const [rules] = rulesFrom(info.state.rules);
-          for (const [kindName, entity, suffix] of [
-            ["class", "classes", "mergeTags"],
-            ["type", "types", "mergeTypeTags"],
-            ["constraint", "constraints", "mergeConstraintTags"],
-          ] as const) {
+          for (const [kindName, entity, suffix] of TAG_PREVIEW_POLICIES) {
             const discoveryRules = rules.flatMap(
               ({ serviceName, kind, parts, tags }) => {
                 if (
