@@ -626,17 +626,25 @@ export function foreignKeyTargets(
   };
 }
 
-/** Catalog keys identify their columns by number; smart keys use names. */
-export function primaryKeyColumns(
+export function primaryKeyAttnums(
   details: IntrospectionPolicyDetails,
   table: IntrospectionRow<"classes">,
   primaryKeys: readonly IntrospectionRow<"constraints">[] | undefined,
-) {
-  const columns = primaryKeys?.[0]?.conkey;
-  if (columns != null) return columns;
+): readonly number[] | undefined {
+  const conkey = primaryKeys?.[0]?.conkey;
+  if (conkey != null) return conkey;
   const spec = details.getTagsAndDescription("classes", table)?.tags.primaryKey;
-  return primaryKeys !== undefined && typeof spec === "string"
-    ? parseConstraintSpec(spec)[0].split(",")
+  if (typeof spec !== "string") return undefined;
+  const names = parseConstraintSpec(spec)[0].split(",");
+  const attnums = names.map(
+    (attname) =>
+      details.peek("attributes", { attrelid: table._id, attname }, [
+        "_foreignKeyTarget",
+      ])?.[0]?.attnum,
+  );
+  return primaryKeys !== undefined &&
+    attnums.every((attnum) => attnum !== undefined)
+    ? attnums
     : undefined;
 }
 
@@ -671,20 +679,18 @@ function hasEnumKey(
     { conrelid: target._id, contype: "u" },
     ["_foreignKeyTarget"],
   );
-  const columns =
-    explicitColumn === undefined
-      ? primaryKeyColumns(details, target, primaryKeys)
-      : [explicitColumn];
-  if (columns?.length !== 1) {
-    return false;
+  let attnum: number | undefined;
+  if (explicitColumn === undefined) {
+    const key = primaryKeyAttnums(details, target, primaryKeys);
+    if (key?.length !== 1) return false;
+    attnum = key[0];
+  } else {
+    attnum = details.peek(
+      "attributes",
+      { attrelid: target._id, attname: explicitColumn },
+      ["_foreignKeyTarget"],
+    )?.[0]?.attnum;
   }
-  const column = columns[0];
-  const attnum =
-    typeof column === "number"
-      ? column
-      : details.peek("attributes", { attrelid: target._id, attname: column }, [
-          "_foreignKeyTarget",
-        ])?.[0]?.attnum;
   for (const keys of [primaryKeys, uniqueKeys]) {
     if (
       keys?.some((key) => {
@@ -702,12 +708,12 @@ function hasEnumKey(
   if (!tags || (tags.primaryKey == null && tags.unique == null)) {
     return false;
   }
-  const attname =
-    typeof column === "string"
-      ? column
-      : details.peek("attributes", { attrelid: target._id, attnum: column }, [
-          "_foreignKeyTarget",
-        ])?.[0]?.attname;
+  let attname = explicitColumn;
+  if (attname === undefined && attnum !== undefined) {
+    attname = details.peek("attributes", { attrelid: target._id, attnum }, [
+      "_foreignKeyTarget",
+    ])?.[0]?.attname;
+  }
   const unique = tags.unique;
   const specs = [
     tags.primaryKey,

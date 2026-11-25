@@ -64,8 +64,12 @@ test(
     "issue_2212",
     {},
     `
-      comment on table issue_2212.orders is '@ref contacts via:(id)->users(id);(id)->user_contacts(user_id)';
-      comment on table issue_2212.users is '@foreignKey (id) references orders';
+      alter table issue_2212.orders drop constraint orders_pkey;
+      comment on table issue_2212.orders is $tags$
+@primaryKey phone_e164,id
+@ref contacts via:(phone_e164,id)->users(username,id);(id)->user_contacts(user_id)
+$tags$;
+      comment on table issue_2212.users is '@foreignKey (username,id) references orders';
       alter table issue_2212.user_contacts drop constraint user_contacts_user_id_fkey;
       comment on table issue_2212.user_contacts is '@foreignKey (user_id) references users';
     `,

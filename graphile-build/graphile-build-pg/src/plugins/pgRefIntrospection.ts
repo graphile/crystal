@@ -12,7 +12,7 @@ import {
 } from "../utils.ts";
 import {
   parseForeignKeyTarget,
-  primaryKeyColumns,
+  primaryKeyAttnums,
 } from "./PgFakeConstraintsPlugin.ts";
 
 export function parseRefHop(part: string) {
@@ -76,21 +76,6 @@ function matchingForeignKeys(
   );
 }
 
-function primaryKeyNames(details: IntrospectionPolicyDetails, table: RefClass) {
-  const keys = details.peek(
-    "constraints",
-    { conrelid: table._id, contype: "p" },
-    ["_refPath"],
-  );
-  return primaryKeyColumns(details, table, keys)?.map((column) =>
-    typeof column === "string"
-      ? column
-      : details.peek("attributes", { attrelid: table._id, attnum: column }, [
-          "_refPath",
-        ])?.[0]?.attname,
-  );
-}
-
 function hasSmartForeignKey(
   details: IntrospectionPolicyDetails,
   from: RefEndpoint,
@@ -109,15 +94,27 @@ function hasSmartForeignKey(
     ) {
       continue;
     }
-    const referencedColumns =
-      foreignKey.foreignAttributes ?? primaryKeyNames(details, to.table);
-    if (
-      referencedColumns !== undefined &&
-      referencedColumns.length === foreignKey.attributes.length &&
-      !referencedColumns.includes(undefined) &&
-      (to.columns === null || arraysMatch(referencedColumns, to.columns))
-    ) {
-      return true;
+    const referencedColumns = foreignKey.foreignAttributes;
+    if (referencedColumns !== null) {
+      if (
+        referencedColumns.length === foreignKey.attributes.length &&
+        (to.columns === null || arraysMatch(referencedColumns, to.columns))
+      ) {
+        return true;
+      }
+    } else {
+      const keys = details.peek(
+        "constraints",
+        { conrelid: to.table._id, contype: "p" },
+        ["_refPath"],
+      );
+      const attnums = primaryKeyAttnums(details, to.table, keys);
+      if (
+        attnums?.length === foreignKey.attributes.length &&
+        (to.numbers === undefined || arraysMatch(attnums, to.numbers))
+      ) {
+        return true;
+      }
     }
   }
   return false;
