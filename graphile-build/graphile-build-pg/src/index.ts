@@ -229,7 +229,7 @@ declare global {
       _enumDomain: true;
       /** Fetch an object and its catalog metadata together during discovery. */
       _catalogMetadata: true;
-      /** Inspect the matching classes, attributes and keys for a ref path. */
+      /** Look up the tables named in a ref path. */
       _refPath: true;
       /**
        * Peeked to follow `@foreignKey` smart tags to their target tables,

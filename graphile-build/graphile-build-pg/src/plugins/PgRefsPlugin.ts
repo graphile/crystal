@@ -113,7 +113,6 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           multipass.policies.push(
             refPathDependencies(
               schemasForService(info.resolvedPreset, serviceName),
-              info.helpers.pgFakeConstraints !== undefined,
             ),
           );
         }

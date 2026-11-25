@@ -131,7 +131,7 @@ test(
 );
 
 test(
-  "ignores @foreignKey tags, including in @ref paths, when fake constraints are disabled",
+  "discovers the @ref target even when its @foreignKey is disabled",
   core.test(
     undefined,
     "issue_2212",
@@ -147,7 +147,9 @@ $tags$;
       const fields = schema.getQueryType()!.getFields();
       expect(fields.allOrders).toBeDefined();
       expect(fields.allUsers).toBeUndefined();
-      expect(fields.allUserContacts).toBeUndefined();
+      expect(fields.allUserContacts).toBeDefined();
+      const order = assertObjectType(schema.getType("Order"));
+      expect(order.getFields().contacts).toBeUndefined();
     },
     true,
     {
@@ -158,24 +160,26 @@ $tags$;
 );
 
 test(
-  "unmatched ref paths do not expose their hops",
+  "discovers tables named in an in-schema @refVia even when a hop has no relation",
   core.test(
     undefined,
     "issue_2212",
     {},
     `
-    alter table issue_2212.users add column order_id int references issue_2212.orders;
     comment on table issue_2212.orders is $tags$
-@ref people via:(id)->users(order_id);refs.people
-@ref missing via:(id)->users(id);invalid!
+@ref people via:user_contacts;refs.people
+@ref missing
+@refVia missing via:(id)->orders(amount_cents);users
+@refVia missing via:(id)->orders(amount_cents);invalid!
 $tags$;
   `,
     (schema) => {
-      expect(schema.getQueryType()!.getFields().allUsers).toBeUndefined();
+      const fields = schema.getQueryType()!.getFields();
+      expect(fields.allUsers).toBeDefined();
+      expect(fields.allUserContacts).toBeUndefined();
       const order = assertObjectType(schema.getType("Order"));
       expect(order.getFields().people).toBeUndefined();
       expect(order.getFields().missing).toBeUndefined();
-      expect(schema.getType("User")).toBeUndefined();
     },
     true,
     { plugins: [OrdersEntrypoint] },

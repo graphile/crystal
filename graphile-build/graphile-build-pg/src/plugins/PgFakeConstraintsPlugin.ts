@@ -324,7 +324,7 @@ export function parseForeignKeyTag(rawSpec: string, fallbackSchema: string) {
 }
 
 /** Invalid specs are reported when gathering fake constraints. */
-export function parseForeignKeyTarget(rawSpec: unknown, schemaName: string) {
+function parseForeignKeyTarget(rawSpec: unknown, schemaName: string) {
   if (typeof rawSpec !== "string") {
     return null;
   }
@@ -626,7 +626,7 @@ export function foreignKeyTargets(
   };
 }
 
-export function primaryKeyAttnums(
+function primaryKeyAttnums(
   details: IntrospectionPolicyDetails,
   table: IntrospectionRow<"classes">,
   primaryKeys: readonly IntrospectionRow<"constraints">[] | undefined,
