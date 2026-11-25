@@ -95,6 +95,10 @@ const BPCHAR_ID = "1042";
 const VALID_TYPE_IDS = [VARCHAR_ID, TEXT_ID, CHAR_ID, BPCHAR_ID];
 */
 
+export function isEnumTag(tag: unknown) {
+  return tag === true || typeof tag === "string";
+}
+
 export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
   name: "PgEnumTablesPlugin",
   description: "Converts columns that reference `@enum` tables into enums",
@@ -150,14 +154,13 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
         if (!pgClass) return false;
         const { tags, description: _description } =
           pgClass.getTagsAndDescription();
-        const isEnumTable = tags.enum === true || typeof tags.enum === "string";
+        const isEnumTable = isEnumTag(tags.enum);
         if (pgConstraint.conrelid === pgClass._id) {
           const isPrimaryKey = pgConstraint.contype === "p";
           const isUniqueConstraint = pgConstraint.contype === "u";
           if (isPrimaryKey || isUniqueConstraint) {
             const conTags = pgConstraint.getTags();
-            const isExplicitEnumConstraint =
-              conTags.enum === true || typeof conTags.enum === "string";
+            const isExplicitEnumConstraint = isEnumTag(conTags.enum);
             const isPrimaryKeyOfEnumTableConstraint =
               pgConstraint.contype === "p" && isEnumTable;
             if (isExplicitEnumConstraint || isPrimaryKeyOfEnumTableConstraint) {
@@ -253,8 +256,7 @@ Original error: ${e.message}
           }
           const { tags, description: _description } =
             pgClass.getTagsAndDescription();
-          const isEnumTable =
-            tags.enum === true || typeof tags.enum === "string";
+          const isEnumTable = isEnumTag(tags.enum);
 
           // By this point, even views should have "fake" constraints we can use
           // (e.g. `@primaryKey`)
