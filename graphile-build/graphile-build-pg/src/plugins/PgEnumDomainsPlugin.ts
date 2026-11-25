@@ -8,7 +8,7 @@ import type {
 
 import { version } from "../version.ts";
 import { isEnumTag } from "./PgEnumTablesPlugin.ts";
-import { isSmartEnumKey } from "./PgFakeConstraintsPlugin.ts";
+import { isEnumKeySpec } from "./PgFakeConstraintsPlugin.ts";
 
 const ENUM_DOMAIN_SUFFIX = "_enum_domain";
 
@@ -27,7 +27,7 @@ function hasEnumDomainKey(
       : { conrelid: table._id, conname: constraintName },
     ["_enumDomain"],
   );
-  // A smart primary key also registers the enum under the bare table name.
+  // A `@primaryKey` also registers the enum under the bare table name.
   return (
     keys?.some(
       (key) =>
@@ -40,7 +40,7 @@ function hasEnumDomainKey(
     ) ||
     (constraintName === undefined &&
       fakeConstraints &&
-      isSmartEnumKey(tags?.primaryKey, undefined, enumTable))
+      isEnumKeySpec(tags?.primaryKey, undefined, enumTable))
   );
 }
 

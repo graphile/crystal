@@ -58,7 +58,7 @@ $tags$;
 );
 
 test(
-  "discovers both hops of a smart ref together",
+  "discovers both @foreignKey hops of a @ref together",
   core.test(
     undefined,
     "issue_2212",
@@ -131,7 +131,7 @@ test(
 );
 
 test(
-  "ignores smart foreign keys and smart ref hops when fake constraints are disabled",
+  "ignores @foreignKey tags, including in @ref paths, when fake constraints are disabled",
   core.test(
     undefined,
     "issue_2212",

@@ -50,7 +50,7 @@ type Cache = typeof EMPTY_OBJECT;
 export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   name: "PgFakeConstraintsPlugin",
   description:
-    "Looks for the @primaryKey, @foreignKey, @unique and @nonNull smart comments and changes the introspection results such that it's as if these were concrete constraints",
+    "Applies the @primaryKey, @foreignKey, @unique and @notNull smart tags to the introspection results",
   version: version,
   after: ["smart-tags"],
 
@@ -260,7 +260,7 @@ const removeQuotes = (str: string) => {
   if (trimmed[0] === '"') {
     if (trimmed[trimmed.length - 1] !== '"') {
       throw new Error(
-        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in smart comment identifiers (or file a PR to fix the parser).`,
+        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in identifiers used in smart tags (or file a PR to fix the parser).`,
       );
     }
     return trimmed.slice(1, -1);
@@ -591,8 +591,8 @@ export function foreignKeyTargets(
         if (!targetClass) {
           continue;
         }
-        // A smart FK on an entrypoint discovers its in-schema target just like
-        // a catalog FK. Outside those schemas we only need enum dependencies.
+        // A `@foreignKey` on an entrypoint discovers its in-schema target like
+        // a catalog foreign key. Elsewhere we only need enum dependencies.
         if (
           schemas.includes(target.foreignSchema) &&
           details.hasPurpose("initial")
@@ -648,8 +648,8 @@ export function primaryKeyAttnums(
     : undefined;
 }
 
-/** Without a target column, any single-column smart key can match. */
-export function isSmartEnumKey(
+/** With no target column, a single-column `@primaryKey` or `@unique` can match. */
+export function isEnumKeySpec(
   rawSpec: PgSmartTagsDict[string] | undefined,
   column?: string,
   enumTable = false,
@@ -662,7 +662,7 @@ export function isSmartEnumKey(
   );
 }
 
-/** Match the referenced column against both catalog keys and smart keys. */
+/** Check catalog keys, `@primaryKey`, and `@unique` for the referenced column. */
 function hasEnumKey(
   details: IntrospectionPolicyDetails,
   target: IntrospectionRow<"classes">,
@@ -720,6 +720,6 @@ function hasEnumKey(
     ...(Array.isArray(unique) ? unique : [unique]),
   ];
   return (
-    attname !== undefined && specs.some((spec) => isSmartEnumKey(spec, attname))
+    attname !== undefined && specs.some((spec) => isEnumKeySpec(spec, attname))
   );
 }

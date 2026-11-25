@@ -76,7 +76,7 @@ function matchingForeignKeys(
   );
 }
 
-function hasSmartForeignKey(
+function hasMatchingForeignKeyTag(
   details: IntrospectionPolicyDetails,
   from: RefEndpoint,
   to: RefEndpoint,
@@ -172,8 +172,8 @@ function followRefPath(
       forwards.length > 0 ||
       backwards.length > 0 ||
       (fakeConstraints &&
-        (hasSmartForeignKey(details, local, remote) ||
-          hasSmartForeignKey(details, remote, local)));
+        (hasMatchingForeignKeyTag(details, local, remote) ||
+          hasMatchingForeignKeyTag(details, remote, local)));
     if (
       !matches ||
       local.numbers?.includes(undefined) ||
