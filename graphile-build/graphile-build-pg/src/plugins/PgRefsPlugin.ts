@@ -64,6 +64,16 @@ declare global {
 
 const EMPTY_OBJECT = Object.freeze({});
 
+function schemasForService(
+  preset: GraphileConfig.ResolvedPreset,
+  serviceName: string,
+) {
+  return (
+    preset.pgServices?.find((service) => service.name === serviceName)
+      ?.schemas ?? ["public"]
+  );
+}
+
 export const PgRefsPlugin: GraphileConfig.Plugin = {
   name: "PgRefsPlugin",
   description:
@@ -175,13 +185,17 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             2,
             nsp.nspname,
           );
+          // An out-of-schema hop skips this path without a missing-table diagnostic.
+          if (!schemas.includes(targetSchemaName)) {
+            return undefined;
+          }
           const targetPgClass =
             await info.helpers.pgIntrospection.getClassByName(
               serviceName,
               targetSchemaName,
               targetTableName,
             );
-          if (!targetPgClass) {
+          if (!targetPgClass?.getType()) {
             return null;
           }
           const targetCodec = await info.helpers.pgCodecs.getCodecFromClass(
@@ -212,6 +226,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           rawRefVias?.map((refVia) => parseSmartTagsOptsString(refVia, 1)) ??
           [];
 
+        const schemas = schemasForService(info.resolvedPreset, serviceName);
         for (const [refName, refDefinition] of Object.entries(refDefinitions)) {
           const relevantVias = refVias.filter((v) => v.args[0] === refName);
           const relevantViaStrings = relevantVias
@@ -263,6 +278,9 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
               const { table, localColumns, remoteColumns } =
                 parseRefHop(rawPart);
               const targetCodec = await getCodecForTableName(table);
+              if (targetCodec === undefined) {
+                continue outerLoop;
+              }
               if (!targetCodec) {
                 console.error(
                   `Ref ${refName} has bad via '${via}' which references table '${table}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
