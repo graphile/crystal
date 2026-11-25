@@ -120,10 +120,9 @@ export const PgEnumDomainsPlugin: GraphileConfig.Plugin = {
       pgIntrospection_options(info, { options }) {
         const { multipass } = options;
         if (multipass && info.helpers.pgEnumTables !== undefined) {
-          multipass.policies = [
-            ...(multipass.policies ?? []),
+          multipass.policies.push(
             enumDomainTables(info.helpers.pgFakeConstraints !== undefined),
-          ];
+          );
         }
       },
     },

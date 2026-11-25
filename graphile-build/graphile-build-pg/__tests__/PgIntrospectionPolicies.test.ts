@@ -108,23 +108,20 @@ test.each([false, true])(
           ? ["purpose_public"]
           : ["purpose_private", "purpose_public"],
       });
-      multipass.policies = [
-        ...multipass.policies!,
-        {
-          name: "testResourcePath",
-          entity: "classes",
-          select(row, details) {
-            if (
-              row.relname !== "target" ||
-              (upgrade && !details.hasPurpose("registryRelation"))
-            ) {
-              return;
-            }
+      multipass.policies.push({
+        name: "testResourcePath",
+        entity: "classes",
+        select(row, details) {
+          if (
+            row.relname !== "target" ||
+            (upgrade && !details.hasPurpose("registryRelation"))
+          ) {
+            return;
+          }
 
-            details.request("classes", { _id: row._id }, ["registryCodec"]);
-          },
+          details.request("classes", { _id: row._id }, ["registryCodec"]);
         },
-      ];
+      });
       const result = await introspect({
         runQuery,
         prune: postgraphilePrune,
@@ -270,21 +267,16 @@ test.each([false, true])(
       };
       let subtypeCodec = false;
       let subtypeNavigation = false;
-      multipass.policies = [
-        ...multipass.policies!,
-        {
-          name: "observeRangeSubtype",
-          entity: "types",
-          select(row, details) {
-            if (row.typname === "int4") {
-              subtypeCodec ||= details.hasPurpose("registryCodec");
-              subtypeNavigation ||= details.hasPurpose(
-                "completeTypeNavigation",
-              );
-            }
-          },
+      multipass.policies.push({
+        name: "observeRangeSubtype",
+        entity: "types",
+        select(row, details) {
+          if (row.typname === "int4") {
+            subtypeCodec ||= details.hasPurpose("registryCodec");
+            subtypeNavigation ||= details.hasPurpose("completeTypeNavigation");
+          }
         },
-      ];
+      });
       await introspectRaw({ runQuery, multipass });
       expect(subtypeCodec).toBe(codec);
       if (!codec) {
@@ -314,7 +306,7 @@ test.each([false, true])(
       );
       const schemas = ["smart_fk_exposed"];
       const options = postgraphileMultipass({ schemas });
-      options.policies = [...options.policies!, foreignKeyTargets(schemas)];
+      options.policies.push(foreignKeyTargets(schemas));
       const result = await introspect({
         runQuery,
         prune: postgraphilePrune,

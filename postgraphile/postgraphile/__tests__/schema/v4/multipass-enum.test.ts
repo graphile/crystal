@@ -184,7 +184,7 @@ test("enum domains retain only their enum source, with independent policies for 
                       classes: "false",
                     };
                     if (disableDomainDiscovery) {
-                      const policy = multipass.policies!.find(
+                      const policy = multipass.policies.find(
                         (p) => p.name === "enumDomainTables",
                       )!;
                       policy.select = () => {};

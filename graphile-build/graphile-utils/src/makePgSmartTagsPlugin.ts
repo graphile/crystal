@@ -492,7 +492,6 @@ export function pgSmartTags<
             return;
           }
           const [rules] = rulesFrom(info.state.rules);
-          const policies = [...(multipass.policies ?? [])];
           for (const [kindName, entity, suffix] of [
             ["class", "classes", "mergeTags"],
             ["type", "types", "mergeTypeTags"],
@@ -516,12 +515,11 @@ export function pgSmartTags<
               },
             );
             if (discoveryRules.length > 0) {
-              policies.push(
+              multipass.policies.push(
                 mergeTagsPolicy(`${name}_${suffix}`, entity, discoveryRules),
               );
             }
           }
-          multipass.policies = policies;
         },
 
         // Run in the 'introspection' phase before anything uses the tags

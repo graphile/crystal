@@ -219,9 +219,13 @@ const escapeLiteral = (str: string) => {
   return hasBackslashes ? ` E'${result}'` : `'${result}'`;
 };
 
+export interface MutableMultipassOptions extends MultipassOptions {
+  policies: Array<NonNullable<MultipassOptions["policies"]>[number]>;
+}
+
 export function postgraphileMultipass(options: {
   schemas?: readonly string[];
-}): MultipassOptions {
+}): MutableMultipassOptions {
   const { schemas = ["public"] } = options;
   return {
     policies: DEFAULT_POLICIES.map(clonePolicy),

@@ -110,13 +110,12 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
       pgIntrospection_options(info, { options, serviceName }) {
         const { multipass } = options;
         if (multipass) {
-          multipass.policies = [
-            ...(multipass.policies ?? []),
+          multipass.policies.push(
             refPathDependencies(
               schemasForService(info.resolvedPreset, serviceName),
               info.helpers.pgFakeConstraints !== undefined,
             ),
-          ];
+          );
         }
       },
       async pgCodecs_PgCodec(info, event) {

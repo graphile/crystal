@@ -69,10 +69,9 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
           const service = info.resolvedPreset.pgServices?.find(
             (service) => service.name === serviceName,
           );
-          options.multipass.policies = [
-            ...(options.multipass.policies ?? []),
+          options.multipass.policies.push(
             foreignKeyTargets(service?.schemas ?? ["public"]),
-          ];
+          );
         }
       },
       // TODO:v6: build these fake constraints inside pg-introspection via a
