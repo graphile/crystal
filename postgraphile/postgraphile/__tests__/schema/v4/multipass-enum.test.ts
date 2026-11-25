@@ -152,7 +152,7 @@ test("enum domains retain only their enum source, with independent policies for 
           language sql stable as $$ select 'A'::enum_tables.abcd_view_enum_domain $$;
       `,
       (schema, passes) => {
-        expect(passes).toBeLessThanOrEqual(8);
+        expect(passes).toBeLessThanOrEqual(7);
         const fields = schema.getQueryType()!.getFields();
         expect(fields.allUsersCodes).toBeUndefined();
         expect(fields.allOrders).toBeUndefined();

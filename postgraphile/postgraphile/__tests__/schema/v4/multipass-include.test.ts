@@ -70,7 +70,7 @@ test(
       comment on table issue_2212.user_contacts is '@foreignKey (user_id) references users';
     `,
     (schema, passes) => {
-      expect(passes).toBeLessThanOrEqual(7);
+      expect(passes).toBeLessThanOrEqual(6);
       const order = assertObjectType(schema.getType("Order"));
       expect(order.getFields().contacts).toBeDefined();
     },

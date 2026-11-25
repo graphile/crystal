@@ -227,6 +227,8 @@ declare global {
       enumTables: true;
       /** Identify the table and constraint named by an enum domain. */
       _enumDomain: true;
+      /** Fetch an object and its catalog metadata together during discovery. */
+      _catalogMetadata: true;
       /** Inspect the matching classes, attributes and keys for a ref path. */
       _refPath: true;
       /**

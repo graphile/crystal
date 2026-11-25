@@ -799,7 +799,7 @@ function runCallback<TEntity extends EntityType>(
         return true;
       }
     },
-    request(entity, match, purposes) {
+    request(entity, match, purposes, onPending) {
       if (preview) {
         throw new Error(
           `Introspection policy '${policy.name}' cannot request from preview; use peek`,
@@ -807,7 +807,9 @@ function runCallback<TEntity extends EntityType>(
       }
       // The generic request API keeps these parameters correlated.
       const request = { entity, match, purposes } as IntrospectionRequest;
-      void requestDependency(context, policy, request);
+      if (requestDependency(context, policy, request) === undefined) {
+        onPending?.();
+      }
     },
     peek(requestEntity, match, purposes) {
       assertDiscoveryPurposes(policy, "peek with", purposes);

@@ -14,6 +14,30 @@ import {
 } from "../dist/plugins/PgIntrospectionPolicies.js";
 import { makeRunQuery, withPgClientTransaction } from "./helpers.ts";
 
+test("keeps metadata for a filtered domain base type out of the exposed collections", async () => {
+  await withPgClientTransaction(async (client) => {
+    await client.query(`
+      create schema metadata_app;
+      create schema metadata_hidden;
+      create type metadata_hidden.base as enum ('a', 'b');
+      comment on type metadata_hidden.base is 'Filtered enum base';
+      create domain metadata_app.wrapped as metadata_hidden.base;
+    `);
+    const result = await introspectRaw({
+      runQuery: makeRunQuery(client),
+      filters: { types: "typname <> 'base'" },
+      multipass: postgraphileMultipass({ schemas: ["metadata_app"] }),
+    });
+    expect(result.types.some((row) => row.typname === "wrapped")).toBe(true);
+    expect(result.types.some((row) => row.typname === "base")).toBe(false);
+    expect(
+      result.descriptions.some(
+        (row) => row.description === "Filtered enum base",
+      ),
+    ).toBe(false);
+  });
+});
+
 test.each([false, true])(
   "preserves extension row type references (multipass: %s)",
   async (multipass) => {
