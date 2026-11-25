@@ -1,15 +1,133 @@
 import type { PgCodec, PgCodecAnyScalar } from "@dataplan/pg";
 import type {} from "graphile-config";
+import type {
+  IntrospectionPolicy,
+  IntrospectionPolicyDetails,
+  IntrospectionRow,
+} from "pg-introspection";
 
 import { version } from "../version.ts";
+import { isEnumTag } from "./PgEnumTablesPlugin.ts";
+import { isSmartEnumKey } from "./PgFakeConstraintsPlugin.ts";
 
 const ENUM_DOMAIN_SUFFIX = "_enum_domain";
+
+function hasEnumDomainKey(
+  details: IntrospectionPolicyDetails,
+  table: IntrospectionRow<"classes">,
+  constraintName: string | undefined,
+  fakeConstraints: boolean,
+) {
+  const tags = details.getTagsAndDescription("classes", table)?.tags;
+  const enumTable = isEnumTag(tags?.enum);
+  const keys = details.peek(
+    "constraints",
+    constraintName === undefined
+      ? { conrelid: table._id, contype: "p" }
+      : { conrelid: table._id, conname: constraintName },
+    ["_enumDomain"],
+  );
+  // A smart primary key also registers the enum under the bare table name.
+  return (
+    keys?.some(
+      (key) =>
+        (key.contype === "p" || key.contype === "u") &&
+        key.conkey?.length === 1 &&
+        ((key.contype === "p" && enumTable) ||
+          isEnumTag(
+            details.getTagsAndDescription("constraints", key)?.tags.enum,
+          )),
+    ) ||
+    (constraintName === undefined &&
+      fakeConstraints &&
+      isSmartEnumKey(tags?.primaryKey, undefined, enumTable))
+  );
+}
+
+function enumDomainTables(
+  fakeConstraints: boolean,
+): IntrospectionPolicy<"types"> {
+  return {
+    name: "enumDomainTables",
+    entity: "types",
+    select(row, details) {
+      if (
+        row.typtype !== "d" ||
+        row.typbasetype == null ||
+        !details.hasPurpose("registryCodec")
+      ) {
+        return;
+      }
+      const tagsAndDescription = details.getTagsAndDescription("types", row);
+      // Name-matched smart tags also need the domain's namespace to be known.
+      const namespaces = details.peek("namespaces", { _id: row.typnamespace }, [
+        "_enumDomain",
+      ]);
+      if (tagsAndDescription === undefined || namespaces === undefined) {
+        return;
+      }
+      const identifier = enumDomainIdentifier(
+        row.typname,
+        tagsAndDescription.tags.enum,
+      );
+      if (!identifier) {
+        return;
+      }
+      const text = details.peekByName(
+        "types",
+        ["pg_catalog", "text"],
+        ["_enumDomain"],
+      );
+      if (row.typbasetype !== text?._id) {
+        return;
+      }
+
+      // The identifier is either the primary-key enum's table name or
+      // <table>_<constraint>. Either part can itself contain underscores.
+      const checkCandidate = (tableName: string, constraintName?: string) => {
+        const table = details.peek(
+          "classes",
+          { relnamespace: row.typnamespace, relname: tableName },
+          ["_enumDomain"],
+        )?.[0];
+        if (
+          table &&
+          hasEnumDomainKey(details, table, constraintName, fakeConstraints)
+        ) {
+          details.request("classes", { _id: table._id }, ["enumTables"]);
+        }
+      };
+      checkCandidate(identifier);
+      for (
+        let split = identifier.indexOf("_", 1);
+        split !== -1 && split < identifier.length - 1;
+        split = identifier.indexOf("_", split + 1)
+      ) {
+        checkCandidate(identifier.slice(0, split), identifier.slice(split + 1));
+      }
+    },
+  };
+}
 
 export const PgEnumDomainsPlugin: GraphileConfig.Plugin = {
   name: "PgEnumDomainsPlugin",
   description:
     "Adds support for `[table_name]_enum_domain` domain types, where `table_name` is an enum table (using `@enum` smart tag). This allows table-based enums to be used as input and output for database functions.",
   version: version,
+
+  gather: {
+    hooks: {
+      pgIntrospection_options(info, { options }) {
+        const { multipass } = options;
+        if (multipass && info.helpers.pgEnumTables !== undefined) {
+          multipass.policies = [
+            ...(multipass.policies ?? []),
+            enumDomainTables(info.helpers.pgFakeConstraints !== undefined),
+          ];
+        }
+      },
+    },
+  },
 
   schema: {
     hooks: {
@@ -91,9 +209,7 @@ function getFullIdentifier(codec: PgCodec) {
     domainName,
     codec.extensions.tags?.enum,
   );
-  return identifier !== null
-    ? `${identifier}|${schemaName}|${serviceName}`
-    : null;
+  return identifier ? `${identifier}|${schemaName}|${serviceName}` : null;
 }
 
 function enumDomainIdentifier(domainName: string, enumTagValue: unknown) {

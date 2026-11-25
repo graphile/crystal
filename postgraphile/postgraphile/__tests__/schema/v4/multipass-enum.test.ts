@@ -75,7 +75,7 @@ $tags$;
     );
   }
   test(
-    `exposes functions returning native enums (multipass: ${multipass})`,
+    `exposes functions returning native and domain-backed enums (multipass: ${multipass})`,
     schemaTest(
       undefined,
       "issue_2212",
@@ -83,6 +83,11 @@ $tags$;
       `
         create function issue_2212.pet() returns function_returning_enum.animal_type
           language sql stable as $$ select 'CAT'::function_returning_enum.animal_type $$;
+        create function issue_2212.stage() returns function_returning_enum.stage_options_enum_domain
+          language sql stable as $$ select 'pending'::function_returning_enum.stage_options_enum_domain $$;
+        create domain function_returning_enum.transport as text;
+        create function issue_2212.transport() returns function_returning_enum.transport
+          language sql stable as $$ select 'CAR'::function_returning_enum.transport $$;
       `,
       (schema) => {
         const fields = schema.getQueryType()!.getFields();
@@ -91,8 +96,102 @@ $tags$;
             .getValues()
             .map((v) => v.value),
         ).toEqual(["CAT", "DOG", "FISH"]);
+        expect(
+          assertEnumType(getNamedType(fields.stage.type))
+            .getValues()
+            .map((v) => v.value),
+        ).toContain("pending");
+        expect(
+          assertEnumType(getNamedType(fields.transport.type))
+            .getValues()
+            .map((v) => v.value),
+        ).toEqual(["BIKE", "CAR", "SUBWAY"]);
+        expect(fields.allStageOptions).toBeUndefined();
       },
       true,
+      {
+        plugins: [
+          pgSmartTags({
+            kind: "type",
+            match: "function_returning_enum.transport",
+            tags: { enum: "enum_table_transportation_enum" },
+          }),
+        ],
+      },
     ),
   );
 }
+
+test("enum domains retain only their enum source, with independent policies for each build", async () => {
+  for (const disableDomainDiscovery of [true, false]) {
+    await core.test(
+      undefined,
+      "issue_2212",
+      {},
+      `
+        alter table issue_2212.user_contacts rename to users_code;
+        insert into issue_2212.users (id, username) values (-1, 'Zed');
+        alter table issue_2212.users add constraint code unique (username);
+        comment on constraint code on issue_2212.users is '@enum';
+        create domain issue_2212.users_code_enum_domain as text;
+        create function issue_2212.username() returns issue_2212.users_code_enum_domain
+          language sql stable as $$ select 'Alice'::issue_2212.users_code_enum_domain $$;
+        create domain issue_2212.orders_orders_pkey_enum_domain as text;
+        create function issue_2212.order_label() returns issue_2212.orders_orders_pkey_enum_domain
+          language sql stable as $$ select 'Order'::issue_2212.orders_orders_pkey_enum_domain $$;
+        comment on view enum_tables.abcd_view is '@primaryKey letter|@enum';
+        create domain enum_tables.abcd_view_enum_domain as text;
+        create function issue_2212.letter() returns enum_tables.abcd_view_enum_domain
+          language sql stable as $$ select 'A'::enum_tables.abcd_view_enum_domain $$;
+      `,
+      (schema) => {
+        const fields = schema.getQueryType()!.getFields();
+        expect(fields.allUsersCodes).toBeUndefined();
+        expect(fields.allOrders).toBeUndefined();
+        expect(String(fields.orderLabel.type)).toBe(
+          "OrdersOrdersPkeyEnumDomain",
+        );
+        if (disableDomainDiscovery) {
+          expect(String(fields.username.type)).toBe("UsersCodeEnumDomain");
+        } else {
+          expect(
+            assertEnumType(getNamedType(fields.username.type))
+              .getValues()
+              .map((v) => v.value),
+          ).toEqual(["Zed", "Alice", "Bob", "Carl"]);
+          expect(
+            assertEnumType(getNamedType(fields.letter.type)).getValue("A"),
+          ).toBeDefined();
+        }
+      },
+      true,
+      {
+        plugins: [
+          {
+            name: "OnlyFunctions",
+            after: ["PgEnumDomainsPlugin"],
+            gather: {
+              hooks: {
+                pgIntrospection_options(_info, { options }) {
+                  const { multipass } = options;
+                  if (multipass) {
+                    multipass.entrypointFilters = {
+                      ...multipass.entrypointFilters,
+                      classes: "false",
+                    };
+                    if (disableDomainDiscovery) {
+                      const policy = multipass.policies!.find(
+                        (p) => p.name === "enumDomainTables",
+                      )!;
+                      policy.select = () => {};
+                    }
+                  }
+                },
+              },
+            },
+          },
+        ],
+      },
+    )();
+  }
+});
