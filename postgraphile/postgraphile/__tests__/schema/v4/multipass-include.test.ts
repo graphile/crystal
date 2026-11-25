@@ -58,6 +58,28 @@ $tags$;
 );
 
 test(
+  "discovers both hops of a smart ref together",
+  core.test(
+    undefined,
+    "issue_2212",
+    {},
+    `
+      comment on table issue_2212.orders is '@ref contacts via:(id)->users(id);(id)->user_contacts(user_id)';
+      comment on table issue_2212.users is '@foreignKey (id) references orders';
+      alter table issue_2212.user_contacts drop constraint user_contacts_user_id_fkey;
+      comment on table issue_2212.user_contacts is '@foreignKey (user_id) references users';
+    `,
+    (schema, passes) => {
+      expect(passes).toBeLessThanOrEqual(7);
+      const order = assertObjectType(schema.getType("Order"));
+      expect(order.getFields().contacts).toBeDefined();
+    },
+    true,
+    { plugins: [OrdersEntrypoint] },
+  ),
+);
+
+test(
   "makes explicitly included objects available to gather plugins",
   core.test(undefined, "issue_2212", {}, undefined, undefined, true, {
     plugins: [
@@ -132,19 +154,23 @@ $tags$;
 );
 
 test(
-  "a ref whose last hop leaves the schema does not expose its first hop",
+  "unmatched ref paths do not expose their hops",
   core.test(
     undefined,
     "issue_2212",
     {},
     `
     alter table issue_2212.users add column order_id int references issue_2212.orders;
-    comment on table issue_2212.orders is '@ref people via:(id)->users(order_id);refs.people';
+    comment on table issue_2212.orders is $tags$
+@ref people via:(id)->users(order_id);refs.people
+@ref missing via:(id)->users(id);invalid!
+$tags$;
   `,
     (schema) => {
       expect(schema.getQueryType()!.getFields().allUsers).toBeUndefined();
       const order = assertObjectType(schema.getType("Order"));
       expect(order.getFields().people).toBeUndefined();
+      expect(order.getFields().missing).toBeUndefined();
       expect(schema.getType("User")).toBeUndefined();
     },
     true,

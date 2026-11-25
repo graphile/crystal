@@ -133,15 +133,21 @@ function followRefPath(
 ) {
   const targets: RefClass[] = [];
   const constraints: RefConstraint[] = [];
-  let current = source;
+  let complete = true;
+  let current: RefClass | undefined = source;
   let currentSchema = schemaName;
   for (const part of via.split(";")) {
-    const { table, localColumns, remoteColumns } = parseRefHop(part);
-    const [targetSchema, targetTable] = parseDatabaseIdentifier(
-      table,
-      2,
-      schemaName,
-    );
+    let hop: ReturnType<typeof parseRefHop>;
+    let identifier: [string, string];
+    try {
+      hop = parseRefHop(part);
+      identifier = parseDatabaseIdentifier(hop.table, 2, schemaName);
+    } catch (e) {
+      // Only report a malformed hop if its prefix actually matches.
+      if (!complete) return;
+      throw e;
+    }
+    const [targetSchema, targetTable] = identifier;
     if (!schemas.includes(targetSchema)) {
       return;
     }
@@ -150,37 +156,41 @@ function followRefPath(
       [targetSchema, targetTable],
       ["_refPath"],
     );
-    if (target == null) {
+    if (target === null) {
       return;
     }
-    const local = refEndpoint(details, current, currentSchema, localColumns);
-    const remote = refEndpoint(details, target, targetSchema, remoteColumns);
+    const local =
+      current && refEndpoint(details, current, currentSchema, hop.localColumns);
+    const remote =
+      target && refEndpoint(details, target, targetSchema, hop.remoteColumns);
+    current = target;
+    currentSchema = targetSchema;
+    if (local === undefined || remote === undefined) {
+      complete = false;
+      continue;
+    }
     const forwards = matchingForeignKeys(details, local, remote);
     const backwards = matchingForeignKeys(details, remote, local);
+    const matches =
+      forwards.length > 0 ||
+      backwards.length > 0 ||
+      (fakeConstraints &&
+        (hasSmartForeignKey(details, local, remote) ||
+          hasSmartForeignKey(details, remote, local)));
     if (
+      !matches ||
       local.numbers?.includes(undefined) ||
       remote.numbers?.includes(undefined)
     ) {
-      return;
+      complete = false;
+      continue;
     }
-    if (
-      forwards.length === 0 &&
-      backwards.length === 0 &&
-      !(
-        fakeConstraints &&
-        (hasSmartForeignKey(details, local, remote) ||
-          hasSmartForeignKey(details, remote, local))
-      )
-    ) {
-      return;
-    }
-    targets.push(target);
+    targets.push(remote.table);
     constraints.push(...forwards, ...backwards);
-    current = target;
-    currentSchema = targetSchema;
   }
 
   // Only a complete path needs resources and relations in the registry.
+  if (!complete) return;
   for (const target of targets) {
     details.request("classes", { _id: target._id }, ["registryRelation"]);
   }
