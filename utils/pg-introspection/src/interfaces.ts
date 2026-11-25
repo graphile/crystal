@@ -65,14 +65,11 @@ export interface IntrospectionPolicyDetails {
   /**
    * Queue a dependency immediately; repeated selectors are merged.
    * Zero selectors for columns that always identify an object are ignored.
-   * If the selector needs a database fetch, call `onPending` immediately
-   * so related lookups can join the same query.
    */
   request<TEntity extends EntityType>(
     entity: TEntity,
     match: IntrospectionMatch<NoInfer<TEntity>>,
     purposes: PurposeList,
-    onPending?: () => void,
   ): void;
   /**
    * As `request`, but returns every matching row once they are all known, so

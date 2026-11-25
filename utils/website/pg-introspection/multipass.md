@@ -80,10 +80,6 @@ policy has a unique, non-empty `name`, a source collection and a synchronous
 `select` function. Call `details.request(entity, match, purposes)` to request
 dependencies; the return value of `select` is ignored.
 
-An optional fourth argument to `details.request` is a callback that runs
-synchronously when the selector needs a database fetch. Use it to queue related
-lookups for the same round when you already know their identifiers.
-
 Each request specifies a target `entity`, a non-empty `match` object of catalogue
 column equalities, and a non-empty `purposes` list. Values in `match` must match
 the selected columns' types, must not be null, and are sent as query parameters.
@@ -149,7 +145,7 @@ are not exposed; a row with any other purpose is exposed as usual.
 `details.request` only queues a dependency. When a policy needs to inspect rows,
 for example to find an object by name when its namespace OID is not yet known,
 or to decide whether it wants an object at all, use `details.peek`. It takes the
-same entity and match, requires every purpose to start with `_`, and returns every
+same arguments, except that every purpose must start with `_`, and returns every
 matching row once they are all known:
 
 ```ts

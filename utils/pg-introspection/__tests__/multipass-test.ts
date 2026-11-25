@@ -586,7 +586,6 @@ for (const [name, match, expectedCalls] of [
 ] as const) {
   it(`only skips fetching an existing unique match: ${name}`, async () => {
     let calls = 0;
-    let pending = false;
     await introspectRaw({
       async runQuery() {
         calls++;
@@ -613,16 +612,13 @@ for (const [name, match, expectedCalls] of [
             name: "requestAttribute",
             entity: "attributes",
             select(_row, details) {
-              details.request("attributes", match, ["keys"], () => {
-                pending = true;
-              });
+              details.request("attributes", match, ["keys"]);
             },
           }),
         ],
       },
     });
     assert.equal(calls, expectedCalls);
-    assert.equal(pending, expectedCalls > 1);
   });
 }
 

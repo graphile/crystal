@@ -120,9 +120,8 @@ const DEFAULT_POLICIES = (() => {
     id: string,
     purposes: PurposeList,
   ) {
-    details.request(entity, { _id: id }, purposes, () => {
-      requestCatalogMetadata(details, catalogs[entity], id, true);
-    });
+    details.request(entity, { _id: id }, purposes);
+    requestCatalogMetadata(details, catalogs[entity], id, true);
   }
 
   for (const [entity, catalog] of Object.entries(catalogs) as Array<
