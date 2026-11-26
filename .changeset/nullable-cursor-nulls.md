@@ -2,8 +2,5 @@
 "@dataplan/pg": patch
 ---
 
-Fix cursor pagination over a nullable order dropping the NULL rows: the
-one-is-null branch of the cursor condition was inverted, so `after` on an ASC
-(NULLS LAST) order skipped every NULL row, and `after` on a DESC (NULLS FIRST)
-order from a NULL cursor returned nothing. This also fixes pagination over
-nullable attributes shared by the members of a polymorphic connection.
+Fix cursor pagination sometimes skipping rows when an `ORDER BY` column is
+nullable.
