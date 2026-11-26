@@ -21,6 +21,7 @@ export function pgStepBatchOptions(
 ): PgStepBatchOptions {
   return {
     store: options.store,
+    cursorScope: options.cursorScope,
     text: options.text,
     rawSqlValues: options.rawSqlValues,
     identifierIndex: options.identifierIndex ?? null,

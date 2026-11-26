@@ -22,6 +22,7 @@ function makeContext(query: (opts: any, clientNumber: number) => Promise<any>) {
   const withPgClient = jest.fn(async (_settings, callback) => {
     const clientNumber = ++clientCount;
     const client = {
+      tryReserveCursor: () => () => {},
       query: async (opts: any) => {
         seen.push({ clientNumber, text: opts.text, name: opts.name });
         return query(opts, clientNumber);
@@ -427,3 +428,181 @@ test.each([false, true])(
     });
   },
 );
+
+test("a paused cursor fetches one batch and releases its client on cancellation", async () => {
+  let fetches = 0;
+  const executor = makeExecutor();
+  const { context, seen, withPgClient } = makeContext(async (opts) => {
+    const rows = opts.text.startsWith("fetch ")
+      ? Array.from({ length: 100 }, (_, i) => [100 * fetches + i])
+      : [];
+    if (rows.length > 0) {
+      fetches++;
+    }
+    return { rows, rowCount: rows.length };
+  });
+  const { streams } = await executor.executeStream(
+    [{ context, queryValues: [] }],
+    {
+      text: "select generate_series(0, 1000000)",
+      cursorScope: {},
+      rawSqlValues: [],
+      eventEmitter: undefined,
+    },
+  );
+  const source = await streams[0];
+  const cursor = source[Symbol.asyncIterator]();
+  expect(withPgClient).not.toHaveBeenCalled();
+  for (let i = 0; i < 100; i++) {
+    expect(await cursor.next()).toEqual({ done: false, value: [i] });
+  }
+  expect(fetches).toBe(1);
+  expect(await cursor.next()).toEqual({ done: false, value: [100] });
+  await cursor.return!();
+  expect(fetches).toBe(2);
+  expect(seen.at(-1)?.text).toMatch(/^close /);
+  expect(withPgClient).toHaveBeenCalledTimes(1);
+});
+
+test("a cursor lets an earlier queued read finish and shares its client with a later read", async () => {
+  const executor = makeExecutor();
+  const started = Promise.withResolvers<void>();
+  const finish = Promise.withResolvers<void>();
+  const { context, seen, withPgClient } = makeContext(async ({ text }) => {
+    if (text === "select early") {
+      started.resolve();
+      await finish.promise;
+    }
+    return { rows: [[1]], rowCount: 1 };
+  });
+  const input = [{ context, queryValues: [] }];
+  const common = { cursorScope: {}, rawSqlValues: [], eventEmitter: undefined };
+  const { streams } = await executor.executeStream(input, {
+    ...common,
+    text: "select page",
+  });
+  const cursor = (await streams[0])[Symbol.asyncIterator]();
+  const early = executor.executeWithCache(input, {
+    ...common,
+    text: "select early",
+  });
+  const prefix = cursor.next();
+  const later = executor.executeWithCache(input, {
+    ...common,
+    text: "select later",
+  });
+  try {
+    await started.promise;
+    expect(withPgClient).toHaveBeenCalledTimes(1);
+    finish.resolve();
+    await Promise.all([early, prefix, later]);
+    const clientFor = (text: string) =>
+      seen.find((q) => q.text.startsWith(text))!.clientNumber;
+    expect(clientFor("select early")).toBe(1);
+    expect(clientFor("declare ")).toBe(2);
+    expect(clientFor("select later")).toBe(2);
+  } finally {
+    finish.resolve();
+    await cursor.return!();
+  }
+});
+
+test("a short fetch releases the cursor before its last rows are consumed", async () => {
+  const executor = makeExecutor();
+  const { context, seen } = makeContext(async ({ text }) => {
+    const rows = text.startsWith("fetch ") ? [[1], [2]] : [];
+    return { rows, rowCount: rows.length };
+  });
+  const { streams } = await executor.executeStream(
+    [{ context, queryValues: [] }],
+    {
+      text: "select page",
+      cursorScope: {},
+      rawSqlValues: [],
+      eventEmitter: undefined,
+    },
+  );
+  const cursor = (await streams[0])[Symbol.asyncIterator]();
+  expect(await cursor.next()).toEqual({ value: [1], done: false });
+  expect(seen.map((q) => q.text.split(" ")[0])).toEqual([
+    "set",
+    "declare",
+    "fetch",
+    "close",
+  ]);
+  expect(await cursor.next()).toEqual({ value: [2], done: false });
+  expect((await cursor.next()).done).toBe(true);
+});
+
+test("cursor cleanup waits for nested reads already using its transaction", async () => {
+  const executor = makeExecutor();
+  const cursorScope = {};
+  const reading = Promise.withResolvers<void>();
+  const release = Promise.withResolvers<void>();
+  const closed = Promise.withResolvers<void>();
+  const { context, withPgClient } = makeContext(async ({ text }) => {
+    if (text === "select nested") {
+      reading.resolve();
+      await release.promise;
+    } else if (text.startsWith("close ")) {
+      closed.resolve();
+    } else if (text.startsWith("fetch ")) {
+      return {
+        rows: Array.from({ length: 100 }, (_, i) => [i]),
+        rowCount: 100,
+      };
+    }
+    return { rows: [[1]], rowCount: 1 };
+  });
+  const input = [{ context, queryValues: [] }];
+  const common = { cursorScope, rawSqlValues: [], eventEmitter: undefined };
+  const { streams } = await executor.executeStream(input, {
+    ...common,
+    text: "select parent",
+  });
+  const cursor = (await streams[0])[Symbol.asyncIterator]();
+  await cursor.next();
+  const nested = executor.executeWithoutCache(input, {
+    ...common,
+    text: "select nested",
+  });
+  await reading.promise;
+  let returned = false;
+  const cleanup = cursor.return!().then(() => {
+    returned = true;
+  });
+  await closed.promise;
+  await new Promise<void>((resolve) => setImmediate(resolve));
+  expect(returned).toBe(false);
+  release.resolve();
+  await Promise.all([nested, cleanup]);
+  expect(withPgClient).toHaveBeenCalledTimes(1);
+});
+
+test("a failed cursor fetch preserves the source error and ends the iterator", async () => {
+  const executor = makeExecutor();
+  const failure = new Error("failed fetch");
+  const { context, seen } = makeContext(async ({ text }) => {
+    if (text.startsWith("fetch ")) {
+      throw failure;
+    }
+    return { rows: [], rowCount: 0 };
+  });
+  const { streams } = await executor.executeStream(
+    [{ context, queryValues: [] }],
+    {
+      cursorScope: {},
+      text: "select parent",
+      rawSqlValues: [],
+      eventEmitter: undefined,
+    },
+  );
+  const cursor = (await streams[0])[Symbol.asyncIterator]();
+  await expect(cursor.next()).rejects.toBe(failure);
+  expect((await cursor.next()).done).toBe(true);
+  expect(seen.map((query) => query.text.split(" ")[0])).toEqual([
+    "set",
+    "declare",
+    "fetch",
+  ]);
+});

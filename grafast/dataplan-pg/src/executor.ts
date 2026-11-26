@@ -23,6 +23,8 @@ import { formatSQLForDebugging } from "./formatSQLForDebugging.ts";
 import { setFind } from "./utils.ts";
 
 const DEFAULT_MAX_CLIENT_QUEUES = 3;
+/** @internal Maximum rows in one cursor fetch. */
+export const CURSOR_BATCH_SIZE = 100;
 
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);
@@ -57,6 +59,20 @@ type ExecuteFunction = <TData>(
   text: string,
   values: ReadonlyArray<SQLRawValue>,
 ) => Promise<PgClientResult<TData>>;
+
+interface CursorSession {
+  canPin: boolean;
+  execute: ExecuteFunction;
+  read: GraphileConfig.DataplanPgClient["withTransaction"];
+  holders: number;
+  release: (failed: boolean, error?: unknown) => Promise<void>;
+}
+
+interface CursorContext {
+  session: CursorSession | null;
+  // Reads already submitted for a separate pool lease.
+  pendingReads: Set<Promise<unknown>>;
+}
 
 export interface PgClientQuery {
   /** The query string */
@@ -123,6 +139,9 @@ export interface PgClientResult<TData> {
  * different Postgres drivers.
  */
 export interface PgClient {
+  /** Reserve capacity to keep this client between pulls. The adaptor must
+   * leave capacity for independent work. Release when the transaction ends. */
+  tryReserveCursor?(): (() => void) | null;
   query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
   withTransaction<T>(callback: (client: this) => Promise<T>): Promise<T>;
 }
@@ -168,9 +187,21 @@ export type PgExecutorInput<TInput> = {
   queryValues: ReadonlyArray<TInput>;
 };
 
+interface CursorPage {
+  /** Maximum rows in the statement, including any hidden lookahead. */
+  rowCount: number;
+  visibleCount: number;
+  retainRows(count: number): void;
+  signal: AbortSignal;
+}
+
 export type PgExecutorOptions = {
   /** Execution-local cache scope; defaults to context-scoped caching. */
   store?: object;
+  /** @internal Identifies the request owning a streaming cursor. */
+  cursorScope?: object;
+  /** @internal */
+  cursorPage?: CursorPage;
   text: string;
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
@@ -306,6 +337,10 @@ export type PgExecutorSubscribeOptions = {
  * caching.
  */
 export class PgExecutor<const TName extends string = string, TSettings = any> {
+  private readonly cursorContexts = new WeakMap<
+    object,
+    WeakMap<PgExecutorContext, CursorContext>
+  >();
   private readonly batchCacheTokens = new WeakMap<PgExecutorContext, object>();
 
   /** Identifies the current read cache generation for cross-step batching. */
@@ -677,6 +712,26 @@ ${duration}
     );
   }
 
+  private withCursorTransaction<T>(
+    context: PgExecutorContext,
+    callback: (
+      client: GraphileConfig.DataplanPgClient,
+      canPin: boolean,
+    ) => Promise<T>,
+  ): Promise<T> {
+    return context.withPgClient<T>(context.pgSettings, (baseClient) =>
+      baseClient.withTransaction(async (transactionClient) => {
+        await transactionClient.query({ text: "set transaction read only" });
+        const release = transactionClient.tryReserveCursor?.();
+        try {
+          return await callback(transactionClient, release != null);
+        } finally {
+          release?.();
+        }
+      }),
+    );
+  }
+
   public async executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
@@ -843,8 +898,13 @@ ${duration}
               // PERF: we could probably make this more efficient by grouping the
               // deferreds further, DataLoader-style, and running one SQL query for
               // everything.
-              const queryResult = common.useTransaction
-                ? await this.executeMutation<PgClientResult<TOutput>>(
+              const cursorContext =
+                common.cursorScope === undefined || common.useTransaction
+                  ? undefined
+                  : this.getCursorContext(context, common.cursorScope);
+              const readOnCursor = cursorContext?.session?.read;
+              const query = common.useTransaction
+                ? this.executeMutation<PgClientResult<TOutput>>(
                     { context, store, useTransaction: common.useTransaction },
                     (client) =>
                       this._executeWithClient(
@@ -856,23 +916,44 @@ ${duration}
                         true,
                       ),
                   )
-                : useCache
-                  ? await this._executeQueued<TOutput>(
-                      context,
-                      text,
-                      sqlValues,
-                      name,
-                      publishExecute,
-                      common.affinity,
+                : readOnCursor !== undefined
+                  ? readOnCursor((client) =>
+                      this._executeWithClient<TOutput>(
+                        client,
+                        text,
+                        sqlValues,
+                        name,
+                        publishExecute,
+                        false,
+                      ),
                     )
-                  : await this._execute<TOutput>(
-                      context,
-                      text,
-                      sqlValues,
-                      name,
-                      publishExecute,
-                    );
-              const { rows } = queryResult;
+                  : useCache
+                    ? this._executeQueued<TOutput>(
+                        context,
+                        text,
+                        sqlValues,
+                        name,
+                        publishExecute,
+                        common.affinity,
+                      )
+                    : this._execute<TOutput>(
+                        context,
+                        text,
+                        sqlValues,
+                        name,
+                        publishExecute,
+                      );
+              const pendingReads =
+                readOnCursor === undefined
+                  ? cursorContext?.pendingReads
+                  : undefined;
+              pendingReads?.add(query);
+              let rows: readonly TOutput[];
+              try {
+                ({ rows } = await query);
+              } finally {
+                pendingReads?.delete(query);
+              }
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);
               for (let i = 0, l = rows.length; i < l; i++) {
@@ -939,6 +1020,25 @@ ${duration}
 
     const valuesCount = values.length;
     const streams: Array<AsyncIterable<TOutput> | Promise<never> | null> = [];
+
+    if (common.cursorScope !== undefined) {
+      // Each parent pulls its own prefix and continuation. Its portal shares a
+      // transaction and client with the other portals in this request/context.
+      const scope = common.cursorScope;
+      return {
+        streams: values.map(({ context, queryValues }) =>
+          this.singleCursor<TOutput>(
+            context,
+            text,
+            identifierIndex == null
+              ? rawSqlValues
+              : [...rawSqlValues, JSON.stringify([queryValues])],
+            scope,
+            common.cursorPage,
+          ),
+        ),
+      };
+    }
 
     // Group by context
     const groupMap = new Map<
@@ -1030,7 +1130,7 @@ ${duration}
         // PostgreSQL safe we don't need to escape it.
         const cursorIdentifier = `__cursor_${cursorCount++}__`;
 
-        const batchFetchSize = 100;
+        const batchFetchSize = CURSOR_BATCH_SIZE;
 
         const declareCursorSQL = `declare ${cursorIdentifier} insensitive no scroll cursor without hold for\n${text}`;
         const pullViaCursorSQL = `fetch forward ${batchFetchSize} from ${cursorIdentifier}`;
@@ -1244,6 +1344,167 @@ ${duration}
     return {
       streams: streams as Array<AsyncIterable<TOutput> | PromiseLike<never>>,
     };
+  }
+
+  private getCursorContext(
+    context: PgExecutorContext,
+    scope: object,
+  ): CursorContext {
+    let contexts = this.cursorContexts.get(scope);
+    if (contexts === undefined) {
+      contexts = new WeakMap();
+      this.cursorContexts.set(scope, contexts);
+    }
+    let state = contexts.get(context);
+    if (state === undefined) {
+      state = { session: null, pendingReads: new Set() };
+      contexts.set(context, state);
+    }
+    return state;
+  }
+
+  private acquireCursorSession(context: PgExecutorContext, scope: object) {
+    const state = this.getCursorContext(context, scope);
+    const existing = state.session;
+    if (existing !== null) {
+      existing.holders++;
+      return existing;
+    }
+
+    const ready = Promise.withResolvers<GraphileConfig.DataplanPgClient>();
+    const finished = Promise.withResolvers<void>();
+    const pendingReads = new Set<Promise<unknown>>();
+    // An earlier read may still be queued for the only client. Let those
+    // reads finish before pinning it. Later reads join the session below.
+    const transaction = Promise.allSettled(state.pendingReads).then(() =>
+      this.withCursorTransaction(context, async (tx, canPin) => {
+        session.canPin = canPin;
+        ready.resolve(tx);
+        try {
+          await finished.promise;
+        } finally {
+          await Promise.allSettled(pendingReads);
+        }
+      }),
+    );
+    transaction.catch(ready.reject);
+    let queue = Promise.resolve();
+    let failed = false;
+    let failure: unknown;
+    const session: CursorSession = {
+      canPin: false,
+      execute: <T>(text: string, values: ReadonlyArray<SQLRawValue>) => {
+        const result = queue.then(async () => {
+          if (failed) throw failure;
+          return this._executeWithClient<T>(
+            await ready.promise,
+            text,
+            values,
+            undefined,
+            undefined,
+            false,
+          );
+        });
+        queue = result.then(noop, noop);
+        return result;
+      },
+      read: (callback) => {
+        const read = ready.promise.then((tx) => tx.withTransaction(callback));
+        pendingReads.add(read);
+        const release = () => pendingReads.delete(read);
+        read.then(release, release);
+        return read;
+      },
+      holders: 1,
+      release: async (didFail, error) => {
+        if (didFail && !failed) {
+          failed = true;
+          failure = error;
+        }
+        if (--session.holders === 0) {
+          state.session = null;
+          if (failed) {
+            finished.promise.catch(noop);
+            finished.reject(failure);
+          } else {
+            finished.resolve();
+          }
+          await transaction;
+        }
+      },
+    };
+    state.session = session;
+    return session;
+  }
+
+  private async *singleCursor<T>(
+    context: PgExecutorContext,
+    text: string,
+    values: ReadonlyArray<SQLRawValue>,
+    scope: object,
+    page: CursorPage | undefined,
+  ): AsyncGenerator<T> {
+    const name = `__cursor_${cursorCount++}__`;
+    const session = this.acquireCursorSession(context, scope);
+    const { execute, release } = session;
+    let failed = false;
+    let failure: unknown;
+    let finalRows: readonly T[];
+    try {
+      await execute(
+        `declare ${name} insensitive no scroll cursor without hold for
+${text}`,
+        values,
+      );
+      let fetchFailed = false;
+      try {
+        let remaining = page?.rowCount ?? Infinity;
+        let visible = page?.visibleCount ?? Infinity;
+        let buffered: T[] | null = null;
+        for (;;) {
+          page?.signal.throwIfAborted();
+          const fetchSize = Math.min(CURSOR_BATCH_SIZE, remaining);
+          const { rows } = await execute<T>(
+            `fetch forward ${fetchSize} from ${name}`,
+            [],
+          );
+          remaining -= rows.length;
+          const done = rows.length < fetchSize || remaining === 0;
+          if (done && buffered === null) {
+            finalRows = rows;
+            break;
+          } else if (session.canPin) {
+            yield* rows;
+          } else {
+            // Finish the read and release the transaction before any child
+            // resolver can ask the same pool for another client.
+            const count = Math.min(visible, rows.length);
+            page?.retainRows(count);
+            visible -= count;
+            (buffered ??= []).push(...rows);
+            if (done) {
+              finalRows = buffered;
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        fetchFailed = true;
+        throw e;
+      } finally {
+        // A failed fetch aborts the transaction. Rollback closes the cursor.
+        if (!fetchFailed) {
+          await execute(`close ${name}`, []);
+        }
+      }
+    } catch (e) {
+      failed = true;
+      failure = e;
+      throw e;
+    } finally {
+      await release(failed, failure);
+    }
+    yield* finalRows;
   }
 
   public executeMutation<T>(

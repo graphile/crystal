@@ -91,11 +91,15 @@ export interface NodePostgresPgClient extends PgClient {
   rawClient: PoolClient;
 }
 
+// Count pinned transactions across all adaptors wrapping the same pool.
+const cursorLeases = new WeakMap<Pool, number>();
+
 function newNodePostgresPgClient(
   pgClient: PoolClient,
   txLevel: number,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
+  pool: Pool | null,
 ): NodePostgresPgClient {
   let queue: Promise<void> | null = null;
   const addToQueue = <T>(callback: () => Promise<T>): Promise<T> => {
@@ -114,6 +118,15 @@ function newNodePostgresPgClient(
   };
   return {
     rawClient: pgClient,
+    tryReserveCursor() {
+      if (pool === null) return null;
+      const reserved = cursorLeases.get(pool) ?? 0;
+      if (reserved >= (pool.options.max ?? 10) - 1) return null;
+      cursorLeases.set(pool, reserved + 1);
+      return () => {
+        cursorLeases.set(pool, cursorLeases.get(pool)! - 1);
+      };
+    },
     withTransaction(callback) {
       // Transactions always queue; creating queue if need be
       return addToQueue(async () => {
@@ -130,6 +143,7 @@ function newNodePostgresPgClient(
             txLevel + 1,
             alwaysQueue,
             alreadyInTransaction,
+            pool,
           );
           const innerResult = await callback(newClient);
           if (txLevel === 0 && !alreadyInTransaction) {
@@ -266,6 +280,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
   callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
+  pool: Pool | null,
 ) {
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
 
@@ -310,6 +325,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
             1,
             alwaysQueue,
             alreadyInTransaction,
+            pool,
           );
           const result = await callback(client);
           await pgClient.query({
@@ -330,6 +346,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
           0,
           alwaysQueue,
           alreadyInTransaction,
+          pool,
         );
         return await callback(client);
       }
@@ -369,6 +386,7 @@ export function makePgAdaptorWithPgClient(
         callback,
         false,
         false,
+        pool,
       );
     } finally {
       // NOTE: have decided not to `RESET ALL` here; otherwise timezone,jit,etc will reset
@@ -417,6 +435,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
       // Ensure only one withPgClient can run at a time, since we only have on pgClient.
       true,
       alreadyInTransaction,
+      null,
     );
   };
 
