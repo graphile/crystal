@@ -1362,27 +1362,33 @@ function buildTheQuery<
     };
   }
 
-  for (const orderSpec of info.orderSpecs) {
+  for (const { attribute, direction } of info.orderSpecs) {
     if (!info.attributes) {
       throw new Error(`Cannot order without attributes`);
     }
+    const { codec, notNull } = info.attributes[attribute];
+    const nullable = !notNull && !codec.notNull;
     for (const digest of info.memberDigests) {
       const { alias: tableAlias } = digest;
       const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
         digest,
-        orderSpec.attribute,
+        attribute,
       )}`;
       digest.orders.push({
         fragment: ident,
-        direction: orderSpec.direction,
-        codec: info.attributes[orderSpec.attribute].codec,
+        direction,
+        codec,
+        nullable:
+          nullable &&
+          !digest.finalResource.codec.attributes?.[attribute]?.notNull,
       });
     }
-    const selectedIndex = selectAttribute(orderSpec.attribute);
+    const selectedIndex = selectAttribute(attribute);
     info.orders.push({
       fragment: sql.identifier(String(selectedIndex)),
-      direction: orderSpec.direction,
-      codec: info.attributes[orderSpec.attribute].codec,
+      direction,
+      codec,
+      nullable,
     });
     if (info.cursorIndicies != null) {
       info.cursorIndicies.push({
@@ -1898,8 +1904,9 @@ function applyConditionFromCursor<
         order,
         memberCodecs,
       );
+      const value = parsedCursor[i + 1];
       identifierPlaceholders[i] = sql`${sql.value(
-        codec.toPg(parsedCursor[i + 1]),
+        value == null ? null : codec.toPg(value),
       )}::${codec.sqlType}`;
     } else {
       // No implementations?!
@@ -1954,7 +1961,8 @@ function applyConditionFromCursor<
             frag,
             identifierPlaceholders[i],
             order.direction,
-            isNullable,
+            // The cursor can come from a different member whose column allows nulls.
+            isNullable || parsedCursor[i + 1] === null,
             order.nulls,
           ];
         }
@@ -1982,8 +1990,8 @@ function applyConditionFromCursor<
       // Nullable, so now handle if one is null but the other isn't
       if (nullable) {
         const useAIsNullAndBIsNotNull =
-          (nullsFirst && beforeOrAfter === "after") ||
-          (!nullsFirst && beforeOrAfter === "before");
+          (!nullsFirst && beforeOrAfter === "after") ||
+          (nullsFirst && beforeOrAfter === "before");
         const oneIsNull = useAIsNullAndBIsNotNull
           ? sql`${orderFragment} is null and ${sqlValue} is not null`
           : sql`${orderFragment} is not null and ${sqlValue} is null`;
