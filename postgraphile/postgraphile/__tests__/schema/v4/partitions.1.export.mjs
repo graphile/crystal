@@ -95,10 +95,10 @@ const spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum = enumCodec
   name: "EntityKindsEnum",
   identifier: TYPES.text.sqlType,
   values: [{
-    value: "photos",
+    value: "locations",
     description: undefined
   }, {
-    value: "locations",
+    value: "photos",
     description: undefined
   }, {
     value: "profiles",
@@ -1727,8 +1727,8 @@ type LocationTag implements Node {
 }
 
 enum EntityKinds {
-  PHOTOS
   LOCATIONS
+  PHOTOS
   PROFILES
 }
 

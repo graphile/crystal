@@ -3,14 +3,22 @@ import type {
   IntrospectionPolicyDetails,
   IntrospectOptions,
   MultipassOptions,
+  PurposeList,
 } from "pg-introspection";
 import { pruneExtensionResources } from "pg-introspection";
 
 import { invertKeyAndValue } from "../utils.ts";
-import { parseForeignKeyTag } from "./PgFakeConstraintsPlugin.ts";
-
 type Entity = IntrospectionPolicy["entity"];
 type TemplateIntrospectionPolicy = Readonly<IntrospectionPolicy<any>>;
+
+const NON_FOREIGN_KEY_CONSTRAINT_TYPES = [
+  "c",
+  "n",
+  "p",
+  "u",
+  "t",
+  "x",
+] as const;
 
 /**
  * The policies PostGraphile needs to satisfy its builtin plugins. More
@@ -46,18 +54,18 @@ const DEFAULT_POLICIES = (() => {
     }
   });
   rule("typeDependencies", "types", (row, details) => {
-    details.request("namespaces", { _id: row.typnamespace }, [
+    requestWithMetadata(details, "namespaces", row.typnamespace, [
       "catalogNavigation",
     ]);
     const codec = details.hasPurpose("registryCodec");
     const purpose = codec ? "registryCodec" : "completeTypeNavigation";
     for (const id of [row.typelem, row.typarray, row.typbasetype]) {
       if (id != null) {
-        details.request("types", { _id: id }, [purpose]);
+        requestWithMetadata(details, "types", id, [purpose]);
       }
     }
     if (codec && row.typrelid != null) {
-      details.request("classes", { _id: row.typrelid }, [purpose]);
+      requestWithMetadata(details, "classes", row.typrelid, [purpose]);
     }
     if (row.typtype === "e") {
       details.request("enums", { enumtypid: row._id }, ["registryEnumCodec"]);
@@ -79,7 +87,9 @@ const DEFAULT_POLICIES = (() => {
     }
   });
   rule("indexesDependencies", "indexes", (row, details) => {
-    details.request("classes", { _id: row.indexrelid }, ["catalogNavigation"]);
+    requestWithMetadata(details, "classes", row.indexrelid, [
+      "catalogNavigation",
+    ]);
   });
   rule("inheritsDependencies", "inherits", (row, details) => {
     details.request("classes", { _id: row.inhparent }, ["registryCodec"]);
@@ -93,6 +103,36 @@ const DEFAULT_POLICIES = (() => {
     enums: "pg_enum",
     extensions: "pg_extension",
   } satisfies Partial<Record<Entity, string>>;
+
+  function requestCatalogMetadata(
+    details: IntrospectionPolicyDetails,
+    catalog: string,
+    id: string,
+    discoveryOnly: boolean,
+  ) {
+    const catalogId = invertKeyAndValue(details.catalogByOid)[catalog];
+    if (catalogId == null || !id) {
+      return;
+    }
+    details.request("descriptions", { classoid: catalogId, objoid: id }, [
+      discoveryOnly ? "_catalogMetadata" : "smartTagsAndDescriptions",
+    ]);
+    details.request("depends", { classid: catalogId, objid: id }, [
+      discoveryOnly ? "_catalogMetadata" : "pruneExtensionResources",
+    ]);
+  }
+
+  /** The catalog and OID identify an object's metadata even before its row arrives. */
+  function requestWithMetadata(
+    details: IntrospectionPolicyDetails,
+    entity: "classes" | "types" | "namespaces",
+    id: string,
+    purposes: PurposeList,
+  ) {
+    details.request(entity, { _id: id }, purposes);
+    requestCatalogMetadata(details, catalogs[entity], id, true);
+  }
+
   for (const [entity, catalog] of Object.entries(catalogs) as Array<
     [keyof typeof catalogs, string]
   >) {
@@ -100,18 +140,7 @@ const DEFAULT_POLICIES = (() => {
       `${entity}DescriptionsAndOwnership`,
       entity,
       (row: { _id: string }, details: IntrospectionPolicyDetails) => {
-        const catalogId = invertKeyAndValue(details.catalogByOid)[catalog];
-        if (catalogId == null || !row._id) {
-          return;
-        }
-        details.request(
-          "descriptions",
-          { classoid: catalogId, objoid: row._id },
-          ["smartTagsAndDescriptions"],
-        );
-        details.request("depends", { classid: catalogId, objid: row._id }, [
-          "pruneExtensionResources",
-        ]);
+        requestCatalogMetadata(details, catalog, row._id, false);
       },
     );
   }
@@ -136,12 +165,12 @@ const DEFAULT_POLICIES = (() => {
           "completeTypeNavigation",
         ]);
       }
-      if (!["i", "I"].includes(row.relkind)) {
+      if (row.relkind !== "i" && row.relkind !== "I") {
         details.request("attributes", { attrelid: row._id }, ["registryCodec"]);
         if (full) {
           details.request("constraints", { conrelid: row._id }, [purpose]);
         } else {
-          for (const contype of ["c", "n", "p", "u", "t", "x"]) {
+          for (const contype of NON_FOREIGN_KEY_CONSTRAINT_TYPES) {
             details.request("constraints", { conrelid: row._id, contype }, [
               purpose,
             ]);
@@ -170,54 +199,8 @@ const DEFAULT_POLICIES = (() => {
       details.request("classes", { _id: row.confrelid }, ["enumTables"]);
     }
   });
-  // Follow `@foreignKey` smart tags on exposed classes, requesting the
-  // targets tagged `@enum`.
-  rule("foreignKeyEnumTargets", "classes", (row, details) => {
-    const foreignKey = details.getTagsAndDescription("classes", row)?.tags
-      .foreignKey;
-    if (foreignKey == null) {
-      return;
-    }
-    const [namespace] =
-      details.peek("namespaces", { _id: row.relnamespace }, [
-        "_foreignKeyTarget",
-      ]) ?? [];
-    if (!namespace) {
-      return;
-    }
-    const specs = Array.isArray(foreignKey) ? foreignKey : [foreignKey];
-    for (const rawSpec of specs) {
-      const target = parseForeignKeyTarget(rawSpec, namespace.nspname);
-      if (!target) {
-        continue;
-      }
-      const targetClass = details.peekByName(
-        "classes",
-        [target.foreignSchema, target.foreignTable],
-        ["_foreignKeyTarget"],
-      );
-      if (
-        targetClass &&
-        details.getTagsAndDescription("classes", targetClass)?.tags.enum
-      ) {
-        details.request("classes", { _id: targetClass._id }, ["enumTables"]);
-      }
-    }
-  });
   return Object.freeze(policies);
 })();
-
-/** Invalid specs are reported by PgFakeConstraintsPlugin, so ignore them here. */
-function parseForeignKeyTarget(rawSpec: unknown, schemaName: string) {
-  if (typeof rawSpec !== "string") {
-    return null;
-  }
-  try {
-    return parseForeignKeyTag(rawSpec, schemaName);
-  } catch {
-    return null;
-  }
-}
 
 // Exclude extension resources from initial discovery, but retain dependencies
 // referenced by user resources.
@@ -267,9 +250,13 @@ const escapeLiteral = (str: string) => {
   return hasBackslashes ? ` E'${result}'` : `'${result}'`;
 };
 
+export interface MutableMultipassOptions extends MultipassOptions {
+  policies: Array<NonNullable<MultipassOptions["policies"]>[number]>;
+}
+
 export function postgraphileMultipass(options: {
   schemas?: readonly string[];
-}): MultipassOptions {
+}): MutableMultipassOptions {
   const { schemas = ["public"] } = options;
   return {
     policies: DEFAULT_POLICIES.map(clonePolicy),

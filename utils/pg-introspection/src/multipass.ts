@@ -549,6 +549,14 @@ function selectsUniqueRow(
   );
 }
 
+// These catalog names are unique within their respective parent objects.
+const uniqueNameColumns: Partial<Record<EntityType, readonly string[]>> = {
+  namespaces: ["nspname"],
+  classes: ["relnamespace", "relname"],
+  types: ["typnamespace", "typname"],
+  attributes: ["attrelid", "attname"],
+};
+
 function addToGroup(index: SelectorIndex, row: IntrospectionRow): void {
   const key = groupKey(index.columns, row);
   const group = index.groups.get(key);
@@ -1102,7 +1110,23 @@ function requestDependency<TEntity extends EntityType>(
   if (completedSelectors.has(key)) {
     return matches;
   }
-  if (matches.length > 0 && selectsUniqueRow(request)) {
+  if (matches.length > 0) {
+    const nameColumns = uniqueNameColumns[entity];
+    if (
+      selectsUniqueRow(request) ||
+      nameColumns?.every((column) => Object.hasOwn(request.match, column))
+    ) {
+      return matches;
+    }
+  }
+  // A complete collection for the class also covers narrower constraint probes.
+  if (
+    request.entity === "constraints" &&
+    request.match.conrelid != null &&
+    completedSelectors.has(
+      selectorKey({ entity, match: { conrelid: request.match.conrelid } }),
+    )
+  ) {
     return matches;
   }
   const previous = pending.get(key);

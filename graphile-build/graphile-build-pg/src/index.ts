@@ -225,6 +225,12 @@ declare global {
       pruneExtensionResources: true;
       /** Detect and build codecs from tables or unique constraints tagged `@enum`. */
       enumTables: true;
+      /** Identify the table and constraint named by an enum domain. */
+      _enumDomain: true;
+      /** Fetch an object and its catalog metadata together during discovery. */
+      _catalogMetadata: true;
+      /** Look up the tables named in a ref path. */
+      _refPath: true;
       /**
        * Peeked to follow `@foreignKey` smart tags to their target tables,
        * checking whether they are tagged `@enum`.

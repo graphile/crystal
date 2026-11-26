@@ -71,7 +71,7 @@ into 4 main categories based on the root folders, each of which have a
 - Add or adjust comments, JSDoc/TSDoc, README snippets.
 - Fix typos in prose.
 
-## Preferred Style
+## Preferred Documentation Style
 
 - Never use `<https://...>`-style links, always use `[text](https://...)`.
 - Links do not end in a slash
@@ -103,48 +103,6 @@ into 4 main categories based on the root folders, each of which have a
 - Modal verbs: avoid unnecessary language which suggests some is tentative or
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
   verbs.
-- Use block bodies for `if`, `else`, `for`, and `while`. In a short function, a
-  standalone `if` can omit braces when its condition is a single comparison and
-  the entire statement fits comfortably on one line.
-- Use a block body for any `switch` clause that declares or assigns a variable,
-  or contains more than four statements. If one clause uses a block body, use
-  block bodies for all clauses in that `switch`.
-- Prefix named symbol constants with `$$`.
-- Keep internal object shapes stable for V8. Initialize fields at construction
-  time. When a field is populated lazily, declare it as required (no `?`) and
-  extend the type with `| null` or `| undefined`. Explicitly initialize it (to
-  `null` or `undefined`) when constructing the object..
-- Add object properties in the order declared by their TypeScript interface or
-  type. Use the same order at every construction site. List properties
-  explicitly when spreading an object would make their order depend on the
-  caller.
-- Use descriptive names for variables and generic type parameters. Reserve
-  single-letter names for: simple loop indices/lengths (`i`, `j`, `l`), `e` for
-  errors, `a` and `z` for sort callback parameters (so that sort is intuitively
-  `a-z` or `z-a`), `T` where there's only one generic type parameter and it has
-  no constraints, `U` where there's only one inferred type, and `K` where
-  there's only one inferred key type. Variables in tests may use single letter
-  names.
-- Do not reassign function parameters; use a local variable instead.
-- When handling all members of a union, include an explicit exhaustiveness check
-  such as `const never: never = value;` in a `switch` default or an unreachable
-  `else`, followed by an appropriate error. Adding a union member must cause a
-  TypeScript error until it is handled; do not rely solely on the branches
-  covering today's union members.
-- This codebase is very performance sensitive. Always perform cheaper
-  comparisons before more expensive comparisons unless there is a strong reason
-  not to.
-- Prefer explicit checks over implicit boolean coercion: use `foo.length > 0`
-  rather than `foo.length`, and use `foo == null` to check for non-existence
-  rather than `!foo`. (If you know something can only be `undefined` and never
-  `null` then use `=== undefined` explicitly, and vice versa - but not on public
-  facing APIs.) Nullish assignment (`??=`) is fine for initializing internal
-  optional fields; do not expand it into an explicit check and assignment.
-- Prefer `if`/`else if`/`else` over early return in general, but not when
-  determining if a hook or middleware should apply, and not where it would cause
-  deep nesting. (In hooks/middleware we want to return ASAP if the hook isn't
-  appropriate to the current circumstance, and don't want the rest of the hook
-  body that does the work to need to be indented.)
 
 When writing Grafast plan resolvers in documentation, try and only do one action
 per statement; for example instead of:
@@ -180,6 +138,63 @@ argument destructuring such as `(_$root, { $name })`, `users.find()`,
 rather than building a custom `pgSelect({ identifiers, args, from })` wrapper.
 Reach for low-level constructors only when the resource/step APIs do not express
 the query shape.
+
+## Code Style
+
+### Performance
+
+- This codebase is very performance sensitive. Always perform cheaper
+  comparisons before more expensive comparisons unless there is a strong reason
+  not to.
+- Minimize allocations to reduce garbage collection overhead. Define fixed,
+  read-only lookup tables/arrays at module scope. Create functions in the global
+  scope where possible (i.e. when they don't capture values from a closure),
+  rather than inline.
+- Try and keep the number of HiddenClasses low. Add object properties in the
+  order declared by their TypeScript interface or type. Use the same order at
+  every construction site. List properties explicitly when spreading an object
+  would make their order depend on the caller. When omitting a property and
+  setting it to `undefined` have the same meaning, prefer `property: undefined`
+  to keep the HiddenClass stable.
+- Keep internal object shapes stable for V8. Initialize fields at construction
+  time. When a field is populated lazily, declare it as required (no `?`) and
+  extend the type with `| null` or `| undefined`. Explicitly initialize it (to
+  `null` or `undefined`) when constructing the object..
+- Do not reassign function parameters; use a local variable instead.
+- Prefer explicit checks over implicit boolean coercion: use `foo.length > 0`
+  rather than `foo.length`, and use `foo == null` to check for non-existence
+  rather than `!foo`. (If you know something can only be `undefined` and never
+  `null` then use `=== undefined` explicitly, and vice versa - but not on public
+  facing APIs.) Nullish assignment (`??=`) is fine for initializing internal
+  optional fields; do not expand it into an explicit check and assignment.
+- Lowercase SQL.
+
+### Aesthetics
+
+- Use block bodies for `if`, `else`, `for`, and `while`. In a short function, a
+  standalone `if` can omit braces when its condition is a single comparison and
+  the entire statement fits comfortably on one line.
+- Use a block body for any `switch` clause that declares or assigns a variable,
+  or contains more than four statements. If one clause uses a block body, use
+  block bodies for all clauses in that `switch`.
+- Prefix named symbol constants with `$$`.
+- Use descriptive names for variables and generic type parameters. Reserve
+  single-letter names for: simple loop indices/lengths (`i`, `j`, `l`), `e` for
+  errors, `a` and `z` for sort callback parameters (so that sort is intuitively
+  `a-z` or `z-a`), `T` where there's only one generic type parameter and it has
+  no constraints, `U` where there's only one inferred type, and `K` where
+  there's only one inferred key type. Variables in tests may use single letter
+  names.
+- When handling all members of a union, include an explicit exhaustiveness check
+  such as `const never: never = value;` in a `switch` default or an unreachable
+  `else`, followed by an appropriate error. Adding a union member must cause a
+  TypeScript error until it is handled; do not rely solely on the branches
+  covering today's union members.
+- Prefer `if`/`else if`/`else` over early return in general, but not when
+  determining if a hook or middleware should apply, and not where it would cause
+  deep nesting. (In hooks/middleware we want to return ASAP if the hook isn't
+  appropriate to the current circumstance, and don't want the rest of the hook
+  body that does the work to need to be indented.)
 
 ## Testing Rules
 

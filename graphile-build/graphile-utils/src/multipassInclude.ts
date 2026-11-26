@@ -1,5 +1,4 @@
 import type {} from "graphile-build-pg";
-import type { IntrospectionPolicy } from "graphile-build-pg/pg-introspection";
 
 import type {
   QualifiedPgNames,
@@ -56,31 +55,24 @@ export function multipassInclude<
           if (event.serviceName !== serviceName || !multipass) return;
 
           const { includePolicy } = info.lib.pgIntrospection;
-          const newPolicies: IntrospectionPolicy<null>[] = [];
           if (tables != null) {
-            newPolicies.push(
+            multipass.policies.push(
               includePolicy(`${name}_tables`, "classes", tables, [
                 "registryCodec",
               ]),
             );
           }
           if (functions != null) {
-            newPolicies.push(
+            multipass.policies.push(
               includePolicy(`${name}_functions`, "procs", functions, [
                 "registryCodec",
               ]),
             );
           }
           if (types != null) {
-            newPolicies.push(
+            multipass.policies.push(
               includePolicy(`${name}_types`, "types", types, ["registryCodec"]),
             );
-          }
-          if (newPolicies.length > 0) {
-            multipass.policies = [
-              ...(multipass.policies ?? []),
-              ...newPolicies,
-            ];
           }
         },
       },

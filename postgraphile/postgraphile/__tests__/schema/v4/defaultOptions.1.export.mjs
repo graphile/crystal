@@ -2895,14 +2895,14 @@ const registry = makeRegistry({
       name: "SimpleEnumEnum",
       identifier: TYPES.text.sqlType,
       values: [{
-        value: "Foo",
-        description: "The first metasyntactic variable"
-      }, {
         value: "Bar",
         description: null
       }, {
         value: "Baz",
         description: "The third metasyntactic variable, very similar to its predecessor"
+      }, {
+        value: "Foo",
+        description: "The first metasyntactic variable"
       }, {
         value: "Qux",
         description: null
@@ -2925,10 +2925,10 @@ const registry = makeRegistry({
       name: "EntityKindsEnum",
       identifier: TYPES.text.sqlType,
       values: [{
-        value: "photos",
+        value: "locations",
         description: undefined
       }, {
-        value: "locations",
+        value: "photos",
         description: undefined
       }, {
         value: "profiles",
@@ -2952,10 +2952,10 @@ const registry = makeRegistry({
       name: "EnumTableTransportationEnum",
       identifier: TYPES.text.sqlType,
       values: [{
-        value: "CAR",
+        value: "BIKE",
         description: undefined
       }, {
-        value: "BIKE",
+        value: "CAR",
         description: undefined
       }, {
         value: "SUBWAY",
@@ -3003,19 +3003,19 @@ const registry = makeRegistry({
       name: "StageOptionsEnum",
       identifier: TYPES.text.sqlType,
       values: [{
+        value: "hired",
+        description: undefined
+      }, {
         value: "pending",
+        description: undefined
+      }, {
+        value: "rejected",
         description: undefined
       }, {
         value: "round 1",
         description: undefined
       }, {
         value: "round 2",
-        description: undefined
-      }, {
-        value: "rejected",
-        description: undefined
-      }, {
-        value: "hired",
         description: undefined
       }],
       extensions: {

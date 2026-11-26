@@ -7,11 +7,36 @@ import {
 } from "pg-introspection";
 
 import type {} from "../dist/index.js";
+import { foreignKeyTargets } from "../dist/plugins/PgFakeConstraintsPlugin.js";
 import {
   postgraphileMultipass,
   postgraphilePrune,
 } from "../dist/plugins/PgIntrospectionPolicies.js";
 import { makeRunQuery, withPgClientTransaction } from "./helpers.ts";
+
+test("keeps metadata for a filtered domain base type out of the exposed collections", async () => {
+  await withPgClientTransaction(async (client) => {
+    await client.query(`
+      create schema metadata_app;
+      create schema metadata_hidden;
+      create type metadata_hidden.base as enum ('a', 'b');
+      comment on type metadata_hidden.base is 'Filtered enum base';
+      create domain metadata_app.wrapped as metadata_hidden.base;
+    `);
+    const result = await introspectRaw({
+      runQuery: makeRunQuery(client),
+      filters: { types: "typname <> 'base'" },
+      multipass: postgraphileMultipass({ schemas: ["metadata_app"] }),
+    });
+    expect(result.types.some((row) => row.typname === "wrapped")).toBe(true);
+    expect(result.types.some((row) => row.typname === "base")).toBe(false);
+    expect(
+      result.descriptions.some(
+        (row) => row.description === "Filtered enum base",
+      ),
+    ).toBe(false);
+  });
+});
 
 test.each([false, true])(
   "preserves extension row type references (multipass: %s)",
@@ -107,23 +132,20 @@ test.each([false, true])(
           ? ["purpose_public"]
           : ["purpose_private", "purpose_public"],
       });
-      multipass.policies = [
-        ...multipass.policies!,
-        {
-          name: "testResourcePath",
-          entity: "classes",
-          select(row, details) {
-            if (
-              row.relname !== "target" ||
-              (upgrade && !details.hasPurpose("registryRelation"))
-            ) {
-              return;
-            }
+      multipass.policies.push({
+        name: "testResourcePath",
+        entity: "classes",
+        select(row, details) {
+          if (
+            row.relname !== "target" ||
+            (upgrade && !details.hasPurpose("registryRelation"))
+          ) {
+            return;
+          }
 
-            details.request("classes", { _id: row._id }, ["registryCodec"]);
-          },
+          details.request("classes", { _id: row._id }, ["registryCodec"]);
         },
-      ];
+      });
       const result = await introspect({
         runQuery,
         prune: postgraphilePrune,
@@ -269,21 +291,16 @@ test.each([false, true])(
       };
       let subtypeCodec = false;
       let subtypeNavigation = false;
-      multipass.policies = [
-        ...multipass.policies!,
-        {
-          name: "observeRangeSubtype",
-          entity: "types",
-          select(row, details) {
-            if (row.typname === "int4") {
-              subtypeCodec ||= details.hasPurpose("registryCodec");
-              subtypeNavigation ||= details.hasPurpose(
-                "completeTypeNavigation",
-              );
-            }
-          },
+      multipass.policies.push({
+        name: "observeRangeSubtype",
+        entity: "types",
+        select(row, details) {
+          if (row.typname === "int4") {
+            subtypeCodec ||= details.hasPurpose("registryCodec");
+            subtypeNavigation ||= details.hasPurpose("completeTypeNavigation");
+          }
         },
-      ];
+      });
       await introspectRaw({ runQuery, multipass });
       expect(subtypeCodec).toBe(codec);
       if (!codec) {
@@ -311,12 +328,13 @@ test.each([false, true])(
         comment on table smart_fk_exposed.thing is E'@foreignKey (kind) references "Smart FK Hidden"."Kind" (type)\\n@foreignKey (plain_id) references "Smart FK Hidden".plain\\n@foreignKey (local_id) references local_target';
       `,
       );
+      const schemas = ["smart_fk_exposed"];
+      const options = postgraphileMultipass({ schemas });
+      options.policies.push(foreignKeyTargets(schemas));
       const result = await introspect({
         runQuery,
         prune: postgraphilePrune,
-        multipass: multipass
-          ? postgraphileMultipass({ schemas: ["smart_fk_exposed"] })
-          : false,
+        multipass: multipass ? options : false,
       });
       const kind = result.classes.find((row) => row.relname === "Kind");
       expect(kind?.getNamespace()?.nspname).toBe("Smart FK Hidden");

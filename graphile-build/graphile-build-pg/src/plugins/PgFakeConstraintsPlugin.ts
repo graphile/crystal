@@ -3,13 +3,18 @@ import type { GatherPluginContext } from "graphile-build";
 import { gatherConfig } from "graphile-build";
 import type {
   Introspection,
+  IntrospectionPolicy,
+  IntrospectionPolicyDetails,
+  IntrospectionRow,
   PgAttribute,
   PgClass,
   PgConstraint,
+  PgSmartTagsDict,
 } from "pg-introspection";
 import { parseSmartComment } from "pg-introspection";
 
 import { version } from "../version.ts";
+import { isEnumTag } from "./PgEnumTablesPlugin.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -45,7 +50,7 @@ type Cache = typeof EMPTY_OBJECT;
 export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   name: "PgFakeConstraintsPlugin",
   description:
-    "Looks for the @primaryKey, @foreignKey, @unique and @nonNull smart comments and changes the introspection results such that it's as if these were concrete constraints",
+    "Applies the @primaryKey, @foreignKey, @unique and @notNull smart tags to the introspection results",
   version: version,
   after: ["smart-tags"],
 
@@ -59,6 +64,16 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       fakeId: 0,
     }),
     hooks: {
+      pgIntrospection_options(info, { options, serviceName }) {
+        if (options.multipass) {
+          const service = info.resolvedPreset.pgServices?.find(
+            (service) => service.name === serviceName,
+          );
+          options.multipass.policies.push(
+            foreignKeyTargets(service?.schemas ?? ["public"]),
+          );
+        }
+      },
       // TODO:v6: build these fake constraints inside pg-introspection via a
       // multipass policy, so discovery follows them like real constraints
       // (making `foreignKeyEnumTargets` unnecessary), rather than here after
@@ -116,7 +131,7 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   }),
 };
 
-function parseConstraintSpec(rawSpec: string) {
+export function parseConstraintSpec(rawSpec: string) {
   const [spec, ...tagComponents] = rawSpec.split(/\|/);
   return [spec, tagComponents.join("\n")];
 }
@@ -245,7 +260,7 @@ const removeQuotes = (str: string) => {
   if (trimmed[0] === '"') {
     if (trimmed[trimmed.length - 1] !== '"') {
       throw new Error(
-        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in smart comment identifiers (or file a PR to fix the parser).`,
+        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in identifiers used in smart tags (or file a PR to fix the parser).`,
       );
     }
     return trimmed.slice(1, -1);
@@ -308,6 +323,18 @@ export function parseForeignKeyTag(rawSpec: string, fallbackSchema: string) {
   };
 }
 
+/** Invalid specs are reported when gathering fake constraints. */
+function parseForeignKeyTarget(rawSpec: unknown, schemaName: string) {
+  if (typeof rawSpec !== "string") {
+    return null;
+  }
+  try {
+    return parseForeignKeyTag(rawSpec, schemaName);
+  } catch {
+    return null;
+  }
+}
+
 async function processFk(
   info: GatherPluginContext<State, Cache>,
   event: {
@@ -348,8 +375,14 @@ async function processFk(
     foreignTable,
   );
   const multipass = !!info.options.pgMultipassIntrospection;
-  // Multipass introspection may only peek at a target, without its attributes.
-  if (multipass && foreignPgClass && !foreignPgClass.getAttributes().length) {
+  // Discovery-only tables can have attributes in the lookup, but constraints
+  // can only be added to tables retained in the introspection collections.
+  if (
+    multipass &&
+    foreignPgClass &&
+    (!introspection.classes.includes(foreignPgClass) ||
+      foreignPgClass.getAttributes().length === 0)
+  ) {
     return;
   }
   if (!foreignPgClass) {
@@ -527,4 +560,166 @@ function addConstraintToClass(
       constraints.push(pgConstraint);
     }
   }
+}
+
+export function foreignKeyTargets(
+  schemas: readonly string[],
+): IntrospectionPolicy<"classes"> {
+  return {
+    name: "foreignKeyEnumTargets",
+    entity: "classes",
+    select(row, details) {
+      const foreignKey = details.getTagsAndDescription("classes", row)?.tags
+        .foreignKey;
+      const namespace = details.peek("namespaces", { _id: row.relnamespace }, [
+        "_foreignKeyTarget",
+      ])?.[0];
+      if (foreignKey == null || namespace === undefined) {
+        return;
+      }
+      const specs = Array.isArray(foreignKey) ? foreignKey : [foreignKey];
+      for (const rawSpec of specs) {
+        const target = parseForeignKeyTarget(rawSpec, namespace.nspname);
+        if (!target) {
+          continue;
+        }
+        const targetClass = details.peekByName(
+          "classes",
+          [target.foreignSchema, target.foreignTable],
+          ["_foreignKeyTarget"],
+        );
+        if (!targetClass) {
+          continue;
+        }
+        // A `@foreignKey` on an entrypoint discovers its in-schema target like
+        // a catalog foreign key. Elsewhere we only need enum dependencies.
+        if (
+          schemas.includes(target.foreignSchema) &&
+          details.hasPurpose("initial")
+        ) {
+          details.request("classes", { _id: targetClass._id }, [
+            "registryRelation",
+            "enumTables",
+          ]);
+          continue;
+        }
+        const targetTags = details.getTagsAndDescription(
+          "classes",
+          targetClass,
+        );
+        if (
+          isEnumTag(targetTags?.tags.enum) ||
+          (target.attributes.length === 1 &&
+            (target.foreignAttributes == null ||
+              target.foreignAttributes.length === 1) &&
+            hasEnumKey(
+              details,
+              targetClass,
+              targetTags?.tags,
+              target.foreignAttributes?.[0],
+            ))
+        ) {
+          details.request("classes", { _id: targetClass._id }, ["enumTables"]);
+        }
+      }
+    },
+  };
+}
+
+function primaryKeyAttnums(
+  details: IntrospectionPolicyDetails,
+  table: IntrospectionRow<"classes">,
+  primaryKeys: readonly IntrospectionRow<"constraints">[] | undefined,
+): readonly number[] | undefined {
+  const conkey = primaryKeys?.[0]?.conkey;
+  if (conkey != null) return conkey;
+  const spec = details.getTagsAndDescription("classes", table)?.tags.primaryKey;
+  if (typeof spec !== "string") return undefined;
+  const names = parseConstraintSpec(spec)[0].split(",");
+  const attnums = names.map(
+    (attname) =>
+      details.peek("attributes", { attrelid: table._id, attname }, [
+        "_foreignKeyTarget",
+      ])?.[0]?.attnum,
+  );
+  return primaryKeys !== undefined &&
+    attnums.every((attnum) => attnum !== undefined)
+    ? attnums
+    : undefined;
+}
+
+/** With no target column, a single-column `@primaryKey` or `@unique` can match. */
+export function isEnumKeySpec(
+  rawSpec: PgSmartTagsDict[string] | undefined,
+  column?: string,
+  enumTable = false,
+) {
+  if (typeof rawSpec !== "string") return false;
+  const [spec, description] = parseConstraintSpec(rawSpec);
+  return (
+    (column === undefined ? !spec.includes(",") : spec === column) &&
+    (enumTable || isEnumTag(parseSmartComment(description).tags.enum))
+  );
+}
+
+/** Check catalog keys, `@primaryKey`, and `@unique` for the referenced column. */
+function hasEnumKey(
+  details: IntrospectionPolicyDetails,
+  target: IntrospectionRow<"classes">,
+  tags: PgSmartTagsDict | undefined,
+  explicitColumn: string | undefined,
+) {
+  const primaryKeys = details.peek(
+    "constraints",
+    { conrelid: target._id, contype: "p" },
+    ["_foreignKeyTarget"],
+  );
+  const uniqueKeys = details.peek(
+    "constraints",
+    { conrelid: target._id, contype: "u" },
+    ["_foreignKeyTarget"],
+  );
+  let attnum: number | undefined;
+  if (explicitColumn === undefined) {
+    const key = primaryKeyAttnums(details, target, primaryKeys);
+    if (key?.length !== 1) return false;
+    attnum = key[0];
+  } else {
+    attnum = details.peek(
+      "attributes",
+      { attrelid: target._id, attname: explicitColumn },
+      ["_foreignKeyTarget"],
+    )?.[0]?.attnum;
+  }
+  for (const keys of [primaryKeys, uniqueKeys]) {
+    if (
+      keys?.some((key) => {
+        if (key.conkey?.length !== 1 || key.conkey[0] !== attnum) {
+          return false;
+        }
+        const tag = details.getTagsAndDescription("constraints", key)?.tags
+          .enum;
+        return isEnumTag(tag);
+      })
+    ) {
+      return true;
+    }
+  }
+  if (!tags || (tags.primaryKey == null && tags.unique == null)) {
+    return false;
+  }
+  let attname = explicitColumn;
+  if (attname === undefined && attnum !== undefined) {
+    attname = details.peek("attributes", { attrelid: target._id, attnum }, [
+      "_foreignKeyTarget",
+    ])?.[0]?.attname;
+  }
+  const unique = tags.unique;
+  const specs = [
+    tags.primaryKey,
+    ...(Array.isArray(unique) ? unique : [unique]),
+  ];
+  return (
+    attname !== undefined && specs.some((spec) => isEnumKeySpec(spec, attname))
+  );
 }

@@ -37,6 +37,9 @@ test("uses the introspection settings to read enum table values", async () => {
     {
       getNamespace: () => ({ nspname: "app" }),
       relname: "status",
+      getConstraints: () => [
+        { contype: "p", getAttributes: () => [{ attname: "value" }] },
+      ],
     } as never,
     [{ attname: "value" }] as never,
   );

@@ -391,41 +391,64 @@ async function resolveRules(
   return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
 }
 
+const TAG_PREVIEW_POLICIES = [
+  ["class", "classes", "mergeTags"],
+  ["type", "types", "mergeTypeTags"],
+  ["constraint", "constraints", "mergeConstraintTags"],
+] as const;
+
 /**
- * Merges the tags of name-matched class rules into the tags multipass
+ * Merges the tags of name-matched rules into the tags multipass
  * policies see. Rules matched by a function cannot be applied to raw rows, so
  * they only take effect after introspection.
  */
 function mergeTagsPolicy(
   name: string,
+  entity: (typeof TAG_PREVIEW_POLICIES)[number][1],
   rules: ReadonlyArray<{
     schemaName: string | undefined;
-    relname: string | undefined;
+    tableName: string | undefined;
+    objectName: string | undefined;
     tags: PgSmartTagTags;
   }>,
-): IntrospectionPolicy<"classes"> {
+): IntrospectionPolicy<typeof entity> {
   return {
     name,
-    entity: "classes",
+    entity,
     preview(row, details) {
+      const [objectName, namespaceId] =
+        "relname" in row
+          ? [row.relname, row.relnamespace]
+          : "typname" in row
+            ? [row.typname, row.typnamespace]
+            : [row.conname, row.connamespace];
       const candidates = rules.filter(
-        (rule) => rule.relname === undefined || rule.relname === row.relname,
+        (rule) =>
+          rule.objectName === undefined || rule.objectName === objectName,
       );
       if (candidates.length === 0) {
         return;
       }
-      const tagsAndDescription = details.getTagsAndDescription("classes", row);
-      const namespaces = details.peek("namespaces", { _id: row.relnamespace }, [
+      const tagsAndDescription = details.getTagsAndDescription(entity, row);
+      const namespaces = details.peek("namespaces", { _id: namespaceId }, [
         "_pgSmartTags",
       ]);
+      const table =
+        "conrelid" in row &&
+        candidates.some((rule) => rule.tableName !== undefined)
+          ? details.peek("classes", { _id: row.conrelid }, [
+              "_pgSmartTags",
+            ])?.[0]
+          : undefined;
       if (!tagsAndDescription || !namespaces) {
         return;
       }
       const { tags } = tagsAndDescription;
       for (const rule of candidates) {
         if (
-          rule.schemaName === undefined ||
-          rule.schemaName === namespaces[0]?.nspname
+          (rule.tableName === undefined || rule.tableName === table?.relname) &&
+          (rule.schemaName === undefined ||
+            rule.schemaName === namespaces[0]?.nspname)
         ) {
           Object.assign(tags, rule.tags);
         }
@@ -475,27 +498,30 @@ export function pgSmartTags<
             return;
           }
           const [rules] = rulesFrom(info.state.rules);
-          const discoveryRules = rules.flatMap(
-            ({ serviceName, kind, parts, tags }) => {
-              if (
-                kind !== "class" ||
-                parts == null ||
-                tags == null ||
-                (serviceName != null && serviceName !== event.serviceName)
-              ) {
-                return [];
-              }
-              const [schemaName, relname] = parts;
-              return [{ schemaName, relname, tags }];
-            },
-          );
-          if (discoveryRules.length === 0) {
-            return;
+          for (const [kindName, entity, suffix] of TAG_PREVIEW_POLICIES) {
+            const discoveryRules = rules.flatMap(
+              ({ serviceName, kind, parts, tags }) => {
+                if (
+                  kind !== kindName ||
+                  parts == null ||
+                  tags == null ||
+                  (serviceName != null && serviceName !== event.serviceName)
+                ) {
+                  return [];
+                }
+                const [schemaName, tableName, objectName] =
+                  kind === "constraint"
+                    ? parts
+                    : [parts[0], undefined, parts[1]];
+                return [{ schemaName, tableName, objectName, tags }];
+              },
+            );
+            if (discoveryRules.length > 0) {
+              multipass.policies.push(
+                mergeTagsPolicy(`${name}_${suffix}`, entity, discoveryRules),
+              );
+            }
           }
-          multipass.policies = [
-            ...(multipass.policies ?? []),
-            mergeTagsPolicy(`${name}_mergeTags`, discoveryRules),
-          ];
         },
 
         // Run in the 'introspection' phase before anything uses the tags

@@ -629,17 +629,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         }
         const namespaceName = namespace.nspname;
 
-        const pgCatalog = await info.helpers.pgIntrospection.getNamespaceByName(
-          serviceName,
-          "pg_catalog",
-        );
-        if (!pgCatalog) {
-          return;
-        }
-
         // For the standard pg_catalog types, we have standard handling.
         // (In v4 we used OIDs for this, but using the name is safer for PostgreSQL-likes.)
-        if (type.typnamespace == pgCatalog._id) {
+        if (namespaceName === "pg_catalog") {
           const knownType = getCodecByPgCatalogTypeName(type.typname);
           if (knownType) {
             event.pgCodec = knownType;

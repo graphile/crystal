@@ -29,6 +29,7 @@ import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
 import {
+  type MutableMultipassOptions,
   postgraphileMultipass,
   postgraphilePrune,
 } from "./PgIntrospectionPolicies.ts";
@@ -261,7 +262,7 @@ declare global {
     interface GatherHooks {
       pgIntrospection_options(event: {
         serviceName: string;
-        options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities>;
+        options: PgIntrospectOptions;
       }): PromiseOrDirect<void>;
       pgIntrospection_introspection(event: {
         introspection: Introspection;
@@ -331,9 +332,14 @@ declare global {
   }
 }
 
+interface PgIntrospectOptions
+  extends IntrospectOptions<GraphileBuild.PgIntrospectionEntities> {
+  multipass?: false | MutableMultipassOptions;
+}
+
 type RawIntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities>;
+  options: PgIntrospectOptions;
   introspectionData: IntrospectionDataForEntities<GraphileBuild.PgIntrospectionEntities>;
 }>;
 type IntrospectionResults = Array<{
@@ -957,16 +963,15 @@ function introspectPgServices(
             });
             return row?.[0];
           };
-          const options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities> =
-            {
-              runQuery,
-              filters: { depends: "deptype in ('a', 'e')" },
-              prune: postgraphilePrune,
-              onlyEntities: [...DEFAULT_ENTITIES],
-              multipass: info.resolvedPreset.gather?.pgMultipassIntrospection
-                ? postgraphileMultipass({ schemas: pgService.schemas })
-                : false,
-            };
+          const options: PgIntrospectOptions = {
+            runQuery,
+            filters: { depends: "deptype in ('a', 'e')" },
+            prune: postgraphilePrune,
+            onlyEntities: [...DEFAULT_ENTITIES],
+            multipass: info.resolvedPreset.gather?.pgMultipassIntrospection
+              ? postgraphileMultipass({ schemas: pgService.schemas })
+              : false,
+          };
           await info.process("pgIntrospection_options", {
             serviceName: name,
             options,
