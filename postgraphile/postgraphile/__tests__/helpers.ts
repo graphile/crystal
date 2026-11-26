@@ -16,6 +16,7 @@ import "graphile-build-pg";
 import type { PgClientQuery } from "@dataplan/pg";
 import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
 import * as adaptor from "@dataplan/pg/adaptors/pg";
+import { withTestDbPgClientTransaction } from "@localrepo/test-helpers";
 import { promises as fsp } from "fs";
 import { mkdir, mkdtemp, rmdir, unlink } from "fs/promises";
 import {
@@ -51,17 +52,13 @@ import type { JwtPayload } from "jsonwebtoken";
 import * as jsonwebtoken from "jsonwebtoken";
 import { decode } from "jsonwebtoken";
 import { dirname, relative, resolve } from "path";
-import type { PoolClient } from "pg";
-import { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-  withTestWithPgClient,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import { withTestWithPgClient } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { makeSchema } from "../dist/index.js";
 import AmberPreset from "../dist/presets/amber.js";
 import { makeV4Preset } from "../dist/presets/v4.js";
+import { useTestDatabase } from "./database.ts";
 
 export const SwallowAllErrorsPlugin: GraphileConfig.Plugin = {
   name: "SwallowAllErrorsPlugin",
@@ -163,39 +160,12 @@ const pathCompare = (
   return path1.length - path2.length;
 };
 
-/** Postgres pool */
-let pgPool: Pool | null = null;
-let connectionString = "";
-let databaseName = "";
-
-beforeAll(async () => {
-  ({ connectionString, databaseName } = await createTestDatabase());
-  pgPool = new Pool({
-    connectionString,
-  });
-  pgPool.on("connect", (client) => {
-    client.on("error", () => {});
-    client.query(`set TimeZone to '+04:00'`).catch(() => {});
-  });
-  pgPool.on("error", (e) => {
-    console.error("Pool error:", e);
-  });
-}, 30000);
-
-afterAll(async () => {
-  await pgPool!.end();
-  await dropTestDatabase(databaseName);
-  const p = pgPool as any;
-  if (p._clients.length > 0) {
-    console.warn(`Warning: ${p._clients.length} clients are still in the pool`);
-  }
-  pgPool = null;
-}, 30000);
+const getTestDb = useTestDatabase();
 
 export async function withPoolClient<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
-  const poolClient = await pgPool!.connect();
+  const poolClient = await getTestDb().pgPool.connect();
   try {
     return await callback(poolClient);
   } finally {
@@ -206,14 +176,7 @@ export async function withPoolClient<T>(
 export async function withPoolClientTransaction<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
-  return withPoolClient(async (poolClient) => {
-    await poolClient.query("begin;");
-    try {
-      return await callback(poolClient);
-    } finally {
-      await poolClient.query("rollback");
-    }
-  });
+  return withTestDbPgClientTransaction(getTestDb(), callback);
 }
 
 // Has to be within `postgraphile` folder otherwise imports won't work
@@ -314,6 +277,7 @@ export async function runTestQuery(
     dontLogErrors = false,
   } = config;
   const { path } = options;
+  const { connectionString, pgPool } = getTestDb();
 
   const queries: PgClientQuery[] = [];
   const schemas = Array.isArray(config.schema)
@@ -405,10 +369,6 @@ export async function runTestQuery(
     applyV4Stuff(preset, config);
   }
 
-  if (!pgPool) {
-    throw new Error("No pool!");
-  }
-
   // Load test data
   await pgPool.query(await kitchenSinkData());
   const serverVersionNum = await getServerVersionNum(pgPool);
@@ -430,7 +390,7 @@ export async function runTestQuery(
       queries,
       Boolean(config.directPg),
       async (withPgClient) => {
-        const pgSubscriber = new PgSubscriber(pgPool!);
+        const pgSubscriber = new PgSubscriber(pgPool);
         try {
           const document = parse(source);
           const args: ExecutionArgs = {
@@ -516,7 +476,7 @@ export async function runTestQuery(
             if (!config.directPg) {
               throw new Error("Can only use callback in directPg mode");
             }
-            const poolClient = await pgPool!.connect();
+            const poolClient = await pgPool.connect();
             try {
               await options.callback(poolClient, payloads);
             } catch (e) {

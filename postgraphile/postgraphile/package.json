@@ -308,6 +308,7 @@
     "fwd"
   ],
   "devDependencies": {
+    "@localrepo/test-helpers": "workspace:*",
     "@types/debug": "^4.1.12",
     "@types/express": "^4.17.25",
     "@types/jest": "^30.0.0",
