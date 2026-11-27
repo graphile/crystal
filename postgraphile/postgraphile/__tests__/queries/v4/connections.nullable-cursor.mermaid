@@ -1,0 +1,240 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+    subgraph "Buckets for queries/v4/connections.nullable-cursor"
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 10, 11, 108, 109, 110, 111, 112, 12, 20, 27, 46<br />2: 9, 17, 24, 31, 36, 43<br />ᐳ: 78, 80, 82, 84, 86, 88<br />3: 13, 19, 26, 33, 38, 45<br />4: 48, 51, 54, 57, 60, 63"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 78, 48<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19, 80, 51<br /><br />ROOT Connectionᐸ17ᐳ[19]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26, 82, 54<br /><br />ROOT Connectionᐸ24ᐳ[26]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 84, 57<br /><br />ROOT Connectionᐸ31ᐳ[33]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 38, 86, 60<br /><br />ROOT Connectionᐸ36ᐳ[38]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 45, 88, 63<br /><br />ROOT Connectionᐸ43ᐳ[45]"):::bucket
+    Bucket13("Bucket 13 (listItem)<br />Deps: 78<br /><br />ROOT __Item{13}ᐸ48ᐳ[66]"):::bucket
+    Bucket14("Bucket 14 (listItem)<br />Deps: 80<br /><br />ROOT __Item{14}ᐸ51ᐳ[68]"):::bucket
+    Bucket15("Bucket 15 (listItem)<br />Deps: 82<br /><br />ROOT __Item{15}ᐸ54ᐳ[70]"):::bucket
+    Bucket16("Bucket 16 (listItem)<br />Deps: 84<br /><br />ROOT __Item{16}ᐸ57ᐳ[72]"):::bucket
+    Bucket17("Bucket 17 (listItem)<br />Deps: 86<br /><br />ROOT __Item{17}ᐸ60ᐳ[74]"):::bucket
+    Bucket18("Bucket 18 (listItem)<br />Deps: 88<br /><br />ROOT __Item{18}ᐸ63ᐳ[76]"):::bucket
+    Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 66, 67, 79<br /><br />ROOT Edge{13}[67]"):::bucket
+    Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 68, 69, 81<br /><br />ROOT Edge{14}[69]"):::bucket
+    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 70, 71, 83<br /><br />ROOT Edge{15}[71]"):::bucket
+    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 72, 73, 85<br /><br />ROOT Edge{16}[73]"):::bucket
+    Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 74, 75, 87<br /><br />ROOT Edge{17}[75]"):::bucket
+    Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 76, 77, 89<br /><br />ROOT Edge{18}[77]"):::bucket
+    Bucket25("Bucket 25 (nullableBoundary)<br />Deps: 90<br /><br />ROOT PgSelectSingle{19}ᐸpersonᐳ[90]"):::bucket
+    Bucket26("Bucket 26 (nullableBoundary)<br />Deps: 91<br /><br />ROOT PgSelectSingle{20}ᐸpersonᐳ[91]"):::bucket
+    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 92<br /><br />ROOT PgSelectSingle{21}ᐸpersonᐳ[92]"):::bucket
+    Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 93<br /><br />ROOT PgSelectSingle{22}ᐸpersonᐳ[93]"):::bucket
+    Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 94<br /><br />ROOT PgSelectSingle{23}ᐸpersonᐳ[94]"):::bucket
+    Bucket30("Bucket 30 (nullableBoundary)<br />Deps: 95<br /><br />ROOT PgSelectSingle{24}ᐸpersonᐳ[95]"):::bucket
+    end
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6
+    Bucket1 --> Bucket13
+    Bucket2 --> Bucket14
+    Bucket3 --> Bucket15
+    Bucket4 --> Bucket16
+    Bucket5 --> Bucket17
+    Bucket6 --> Bucket18
+    Bucket13 --> Bucket19
+    Bucket14 --> Bucket20
+    Bucket15 --> Bucket21
+    Bucket16 --> Bucket22
+    Bucket17 --> Bucket23
+    Bucket18 --> Bucket24
+    Bucket19 --> Bucket25
+    Bucket20 --> Bucket26
+    Bucket21 --> Bucket27
+    Bucket22 --> Bucket28
+    Bucket23 --> Bucket29
+    Bucket24 --> Bucket30
+
+    %% plan dependencies
+    PgSelect9[["PgSelect[9∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Constantᐸ1ᐳ[108]"]]:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object12 --> PgSelect9
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access10 & Access11 --> Object12
+    Connection13[["Connection[13∈0] ➊<br />ᐸ9ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[108]"]]:::plan
+    PgSelect9 --> Connection13
+    PgSelect17[["PgSelect[17∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Lambda20{{"Lambda[20∈0] ➊<br />ᐸparseCursorᐳ<br />More deps:<br />- Constantᐸ'WyJmZmExM2NhNjljIiwiSnVzdCBhIGZyaWVuZGx5IGh1bWFuIiwzXQ=='ᐳ[109]"}}:::plan
+    Object12 & Lambda20 --> PgSelect17
+    Connection19[["Connection[19∈0] ➊<br />ᐸ17ᐳ"]]:::plan
+    PgSelect17 & Lambda20 --> Connection19
+    PgSelect24[["PgSelect[24∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Lambda27{{"Lambda[27∈0] ➊<br />ᐸparseCursorᐳ<br />More deps:<br />- Constantᐸ'WyJmZmExM2NhNjljIixudWxsLDFd'ᐳ[110]"}}:::plan
+    Object12 & Lambda27 --> PgSelect24
+    Connection26[["Connection[26∈0] ➊<br />ᐸ24ᐳ"]]:::plan
+    PgSelect24 & Lambda27 --> Connection26
+    PgSelect31[["PgSelect[31∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Constantᐸ5ᐳ[111]"]]:::plan
+    Object12 --> PgSelect31
+    Connection33[["Connection[33∈0] ➊<br />ᐸ31ᐳ<br />More deps:<br />- Constantᐸ5ᐳ[111]"]]:::plan
+    PgSelect31 --> Connection33
+    PgSelect36[["PgSelect[36∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object12 & Lambda27 --> PgSelect36
+    Connection38[["Connection[38∈0] ➊<br />ᐸ36ᐳ"]]:::plan
+    PgSelect36 & Lambda27 --> Connection38
+    PgSelect43[["PgSelect[43∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Lambda46{{"Lambda[46∈0] ➊<br />ᐸparseCursorᐳ<br />More deps:<br />- Constantᐸ'WyJmZmExM2NhNjljIixudWxsLDZd'ᐳ[112]"}}:::plan
+    Object12 & Lambda46 --> PgSelect43
+    Connection45[["Connection[45∈0] ➊<br />ᐸ43ᐳ"]]:::plan
+    PgSelect43 & Lambda46 --> Connection45
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access10
+    __Value2 --> Access11
+    ConnectionItems48[["ConnectionItems[48∈0] ➊"]]:::plan
+    Connection13 --> ConnectionItems48
+    ConnectionItems51[["ConnectionItems[51∈0] ➊"]]:::plan
+    Connection19 --> ConnectionItems51
+    ConnectionItems54[["ConnectionItems[54∈0] ➊"]]:::plan
+    Connection26 --> ConnectionItems54
+    ConnectionItems57[["ConnectionItems[57∈0] ➊"]]:::plan
+    Connection33 --> ConnectionItems57
+    ConnectionItems60[["ConnectionItems[60∈0] ➊"]]:::plan
+    Connection38 --> ConnectionItems60
+    ConnectionItems63[["ConnectionItems[63∈0] ➊"]]:::plan
+    Connection45 --> ConnectionItems63
+    Access78{{"Access[78∈0] ➊<br />ᐸ9.cursorDetailsᐳ"}}:::plan
+    PgSelect9 --> Access78
+    Access80{{"Access[80∈0] ➊<br />ᐸ17.cursorDetailsᐳ"}}:::plan
+    PgSelect17 --> Access80
+    Access82{{"Access[82∈0] ➊<br />ᐸ24.cursorDetailsᐳ"}}:::plan
+    PgSelect24 --> Access82
+    Access84{{"Access[84∈0] ➊<br />ᐸ31.cursorDetailsᐳ"}}:::plan
+    PgSelect31 --> Access84
+    Access86{{"Access[86∈0] ➊<br />ᐸ36.cursorDetailsᐳ"}}:::plan
+    PgSelect36 --> Access86
+    Access88{{"Access[88∈0] ➊<br />ᐸ43.cursorDetailsᐳ"}}:::plan
+    PgSelect43 --> Access88
+    Edge67{{"Edge[67∈13]"}}:::plan
+    __Item66[/"__Item[66∈13]<br />ᐸ48ᐳ"\]:::itemplan
+    PgCursor79{{"PgCursor[79∈13]"}}:::plan
+    __Item66 & PgCursor79 --> Edge67
+    __Item66 & Access78 --> PgCursor79
+    ConnectionItems48 ==> __Item66
+    Edge69{{"Edge[69∈14]"}}:::plan
+    __Item68[/"__Item[68∈14]<br />ᐸ51ᐳ"\]:::itemplan
+    PgCursor81{{"PgCursor[81∈14]"}}:::plan
+    __Item68 & PgCursor81 --> Edge69
+    __Item68 & Access80 --> PgCursor81
+    ConnectionItems51 ==> __Item68
+    Edge71{{"Edge[71∈15]"}}:::plan
+    __Item70[/"__Item[70∈15]<br />ᐸ54ᐳ"\]:::itemplan
+    PgCursor83{{"PgCursor[83∈15]"}}:::plan
+    __Item70 & PgCursor83 --> Edge71
+    __Item70 & Access82 --> PgCursor83
+    ConnectionItems54 ==> __Item70
+    Edge73{{"Edge[73∈16]"}}:::plan
+    __Item72[/"__Item[72∈16]<br />ᐸ57ᐳ"\]:::itemplan
+    PgCursor85{{"PgCursor[85∈16]"}}:::plan
+    __Item72 & PgCursor85 --> Edge73
+    __Item72 & Access84 --> PgCursor85
+    ConnectionItems57 ==> __Item72
+    Edge75{{"Edge[75∈17]"}}:::plan
+    __Item74[/"__Item[74∈17]<br />ᐸ60ᐳ"\]:::itemplan
+    PgCursor87{{"PgCursor[87∈17]"}}:::plan
+    __Item74 & PgCursor87 --> Edge75
+    __Item74 & Access86 --> PgCursor87
+    ConnectionItems60 ==> __Item74
+    Edge77{{"Edge[77∈18]"}}:::plan
+    __Item76[/"__Item[76∈18]<br />ᐸ63ᐳ"\]:::itemplan
+    PgCursor89{{"PgCursor[89∈18]"}}:::plan
+    __Item76 & PgCursor89 --> Edge77
+    __Item76 & Access88 --> PgCursor89
+    ConnectionItems63 ==> __Item76
+    PgSelectSingle90{{"PgSelectSingle[90∈19]<br />ᐸpersonᐳ"}}:::plan
+    __Item66 --> PgSelectSingle90
+    PgSelectSingle91{{"PgSelectSingle[91∈20]<br />ᐸpersonᐳ"}}:::plan
+    __Item68 --> PgSelectSingle91
+    PgSelectSingle92{{"PgSelectSingle[92∈21]<br />ᐸpersonᐳ"}}:::plan
+    __Item70 --> PgSelectSingle92
+    PgSelectSingle93{{"PgSelectSingle[93∈22]<br />ᐸpersonᐳ"}}:::plan
+    __Item72 --> PgSelectSingle93
+    PgSelectSingle94{{"PgSelectSingle[94∈23]<br />ᐸpersonᐳ"}}:::plan
+    __Item74 --> PgSelectSingle94
+    PgSelectSingle95{{"PgSelectSingle[95∈24]<br />ᐸpersonᐳ"}}:::plan
+    __Item76 --> PgSelectSingle95
+    PgClassExpression96{{"PgClassExpression[96∈25]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle90 --> PgClassExpression96
+    PgClassExpression102{{"PgClassExpression[102∈25]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression96 o--o PgClassExpression102
+    PgClassExpression97{{"PgClassExpression[97∈26]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle91 --> PgClassExpression97
+    PgClassExpression103{{"PgClassExpression[103∈26]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression97 o--o PgClassExpression103
+    PgClassExpression98{{"PgClassExpression[98∈27]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle92 --> PgClassExpression98
+    PgClassExpression104{{"PgClassExpression[104∈27]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression98 o--o PgClassExpression104
+    PgClassExpression99{{"PgClassExpression[99∈28]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle93 --> PgClassExpression99
+    PgClassExpression105{{"PgClassExpression[105∈28]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression99 o--o PgClassExpression105
+    PgClassExpression100{{"PgClassExpression[100∈29]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle94 --> PgClassExpression100
+    PgClassExpression106{{"PgClassExpression[106∈29]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression100 o--o PgClassExpression106
+    PgClassExpression101{{"PgClassExpression[101∈30]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle95 --> PgClassExpression101
+    PgClassExpression107{{"PgClassExpression[107∈30]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression101 o--o PgClassExpression107
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,PgSelect9,Access10,Access11,Object12,Connection13,PgSelect17,Connection19,Lambda20,PgSelect24,Connection26,Lambda27,PgSelect31,Connection33,PgSelect36,Connection38,PgSelect43,Connection45,Lambda46,ConnectionItems48,ConnectionItems51,ConnectionItems54,ConnectionItems57,ConnectionItems60,ConnectionItems63,Access78,Access80,Access82,Access84,Access86,Access88 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+    classDef bucket6 stroke:#ff1493
+    class Bucket6 bucket6
+    classDef bucket13 stroke:#3cb371
+    class Bucket13,__Item66,Edge67,PgCursor79 bucket13
+    classDef bucket14 stroke:#a52a2a
+    class Bucket14,__Item68,Edge69,PgCursor81 bucket14
+    classDef bucket15 stroke:#ff00ff
+    class Bucket15,__Item70,Edge71,PgCursor83 bucket15
+    classDef bucket16 stroke:#f5deb3
+    class Bucket16,__Item72,Edge73,PgCursor85 bucket16
+    classDef bucket17 stroke:#696969
+    class Bucket17,__Item74,Edge75,PgCursor87 bucket17
+    classDef bucket18 stroke:#00bfff
+    class Bucket18,__Item76,Edge77,PgCursor89 bucket18
+    classDef bucket19 stroke:#7f007f
+    class Bucket19,PgSelectSingle90 bucket19
+    classDef bucket20 stroke:#ffa500
+    class Bucket20,PgSelectSingle91 bucket20
+    classDef bucket21 stroke:#0000ff
+    class Bucket21,PgSelectSingle92 bucket21
+    classDef bucket22 stroke:#7fff00
+    class Bucket22,PgSelectSingle93 bucket22
+    classDef bucket23 stroke:#ff1493
+    class Bucket23,PgSelectSingle94 bucket23
+    classDef bucket24 stroke:#808000
+    class Bucket24,PgSelectSingle95 bucket24
+    classDef bucket25 stroke:#dda0dd
+    class Bucket25,PgClassExpression96,PgClassExpression102 bucket25
+    classDef bucket26 stroke:#ff0000
+    class Bucket26,PgClassExpression97,PgClassExpression103 bucket26
+    classDef bucket27 stroke:#ffff00
+    class Bucket27,PgClassExpression98,PgClassExpression104 bucket27
+    classDef bucket28 stroke:#00ffff
+    class Bucket28,PgClassExpression99,PgClassExpression105 bucket28
+    classDef bucket29 stroke:#4169e1
+    class Bucket29,PgClassExpression100,PgClassExpression106 bucket29
+    classDef bucket30 stroke:#3cb371
+    class Bucket30,PgClassExpression101,PgClassExpression107 bucket30
+
