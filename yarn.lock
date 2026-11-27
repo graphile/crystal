@@ -21939,6 +21939,7 @@ __metadata:
     "@dataplan/json": "workspace:^"
     "@dataplan/pg": "workspace:^"
     "@graphile/lru": "workspace:^"
+    "@localrepo/test-helpers": "workspace:*"
     "@types/debug": "npm:^4.1.12"
     "@types/express": "npm:^4.17.25"
     "@types/jest": "npm:^30.0.0"
