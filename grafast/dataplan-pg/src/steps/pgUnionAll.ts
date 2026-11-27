@@ -27,7 +27,7 @@ import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.ts";
 import { TYPES } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
-import { PgExecutor } from "../executor.ts";
+import type { PgExecutor } from "../executor.ts";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.ts";
 import type {
   PgCodec,
@@ -580,7 +580,6 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
-    this.metaKey = PgExecutor.metaKey;
     {
       this.mode = spec.mode ?? "normal";
 
@@ -978,7 +977,7 @@ on (${sql.indent(
     const {
       indexMap,
       values,
-      extra: { eventEmitter, meta: store },
+      extra: { eventEmitter },
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {
@@ -1039,7 +1038,6 @@ on (${sql.indent(
         : EMPTY_ARRAY,
     );
     const common = {
-      store,
       text,
       rawSqlValues,
       identifierIndex,
@@ -1049,10 +1047,12 @@ on (${sql.indent(
       useTransaction: this.hasSideEffects,
     };
     const executionResult = this.hasSideEffects
-      ? await this.executor.executeWithoutCache(
-          keysets.map((queryValues) => ({ context, queryValues })),
-          common,
-        )
+      ? await this.executor
+          .executeDedicated(
+            keysets.map((queryValues) => ({ context, queryValues })),
+            common,
+          )
+          .finally(executionDetails.batch.invalidate)
       : {
           values: await executionDetails.batch(
             pgStepBatchExecutor,

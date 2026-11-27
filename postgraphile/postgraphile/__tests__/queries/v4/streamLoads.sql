@@ -21,8 +21,6 @@ from (
 order by __stream_wrapped__."2"
 limit 2;
 
-begin; /*fake*/
-
 declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select *
 from (
@@ -64,5 +62,3 @@ fetch forward 100 from __SNAPSHOT_CURSOR_0__
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
 
 close __SNAPSHOT_CURSOR_0__
-
-commit; /*fake*/

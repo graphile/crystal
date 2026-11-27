@@ -54,7 +54,10 @@ import { decode } from "jsonwebtoken";
 import { dirname, relative, resolve } from "path";
 import type { Pool, PoolClient } from "pg";
 
-import { withTestWithPgClient } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import {
+  sortSQLSnapshotRuns,
+  withTestWithPgClient,
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { makeSchema } from "../dist/index.js";
 import AmberPreset from "../dist/presets/amber.js";
 import { makeV4Preset } from "../dist/presets/v4.js";
@@ -824,10 +827,11 @@ export const assertSnapshotsMatch = async (
     await snapshot(formattedErrors, errorsFileName);
   } else if (only === "sql") {
     const sqlFileName = basePath + (ext || "") + ".sql";
-    const formattedQueries = queries
-      .map((q) => makeSQLSnapshotSafe(q.text))
-      .join("\n\n");
-    await snapshot(formattedQueries, sqlFileName);
+    const statements = queries.map((q) => makeSQLSnapshotSafe(q.text));
+    if (config.sqlSnapshotAdjacentOrder !== undefined) {
+      sortSQLSnapshotRuns(statements, config.sqlSnapshotAdjacentOrder);
+    }
+    await snapshot(statements.join("\n\n"), sqlFileName);
   } else if (only === "mermaid") {
     const planOp = extensions?.explain?.operations?.find(
       (op: any) => op.type === "plan",

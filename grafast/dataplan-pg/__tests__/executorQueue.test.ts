@@ -40,19 +40,18 @@ function run(
   text: string,
   value: string,
   executionAffinity?: symbol,
-  cached = true,
-  store?: object,
+  method: "executeShared" | "executeDedicated" = "executeShared",
 ) {
-  const method = cached ? "executeWithCache" : "executeWithoutCache";
-  return executor[method]([{ context, queryValues: [] }], {
-    store,
+  const inputs = [{ context, queryValues: [] }];
+  const options = {
     text,
     rawSqlValues: [value],
     name: text,
     identifierIndex: null,
     affinity: executionAffinity,
     eventEmitter: undefined,
-  });
+  };
+  return executor[method](inputs, options);
 }
 
 test("reuses one client and prepared statement for identical SQL", async () => {
@@ -168,7 +167,7 @@ test("starts a fresh lease for queued reads after a query error", async () => {
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
 
-test("does not queue uncached execution", async () => {
+test("dedicated reads with identical SQL acquire separate clients", async () => {
   const executor = makeExecutor();
   const { context, withPgClient } = makeContext(async (opts) => ({
     rows: [[opts.values[0]]],
@@ -176,8 +175,8 @@ test("does not queue uncached execution", async () => {
   }));
 
   await Promise.all([
-    run(executor, context, "select $1", "a", undefined, false),
-    run(executor, context, "select $1", "b", undefined, false),
+    run(executor, context, "select $1", "a", undefined, "executeDedicated"),
+    run(executor, context, "select $1", "b", undefined, "executeDedicated"),
   ]);
 
   expect(withPgClient).toHaveBeenCalledTimes(2);
@@ -319,99 +318,196 @@ test("rejects pending work if the last queue cannot acquire a client", async () 
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
 
-test("read caches are isolated by event, executor, and context", async () => {
+test("invalidates batch caches after successful and failed mutations", async () => {
   const executor = makeExecutor();
   let version = 1;
   const { context, seen } = makeContext(async () => ({
     rows: [[version]],
     rowCount: 1,
   }));
-  const firstEvent = {};
-  const read = (
-    target: PgExecutor,
-    scope: object | undefined,
-    ctx: ReturnType<typeof makeContext>["context"],
-  ) => run(target, ctx, "select value", "x", undefined, true, scope);
-
-  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
-  // Change what the (uncached) result will be
-  version = 2;
-  // This read is satisfied by cache, change is not reflected
-  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
-  expect(seen).toHaveLength(1);
-
-  // A new store means a fresh cache, change is reflected
-  expect((await read(executor, {}, context)).values).toEqual([[[2]]]);
-  // New PgExecutor, new cache
-  version = 3;
-  expect((await read(makeExecutor(), firstEvent, context)).values).toEqual([
-    [[3]],
-  ]);
-  // New context, new cache
-  version = 4;
-  expect((await read(executor, firstEvent, { ...context })).values).toEqual([
-    [[4]],
-  ]);
-  // Original values, use old cache, old result again
-  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
+  // This test step deliberately closes over mutable test state.
+  // eslint-disable-next-line graphile-export/export-subclasses
+  class ReadAroundMutationStep extends Step<string> {
+    async execute(details: ExecutionDetails) {
+      const read = () =>
+        details.batch(
+          pgStepBatchExecutor,
+          [[], []],
+          pgStepBatchOptions(executor, context, {
+            text: "select value",
+            rawSqlValues: [],
+            eventEmitter: undefined,
+          }),
+        );
+      const first = await read();
+      expect((await read())[0]).toBe(first[0]);
+      expect(seen).toHaveLength(1);
+      const mutate = async (callback: () => Promise<void>) => {
+        try {
+          await executor.executeMutation(
+            { context, useTransaction: false },
+            callback,
+          );
+        } finally {
+          details.batch.invalidate();
+        }
+      };
+      await expect(
+        mutate(async () => {
+          version = 2;
+          throw new Error("failed after writing");
+        }),
+      ).rejects.toThrow("failed after writing");
+      expect(await read()).toEqual([[[2]], [[2]]]);
+      expect(seen).toHaveLength(2);
+      await mutate(async () => {
+        version = 3;
+      });
+      expect(await read()).toEqual([[[3]], [[3]]]);
+      expect(seen).toHaveLength(3);
+      return ["ok"];
+    }
+  }
+  const schema = makeGrafastSchema({
+    typeDefs: "type Query { value: String }",
+    objects: {
+      // eslint-disable-next-line graphile-export/export-plans
+      Query: { plans: { value: () => new ReadAroundMutationStep() } },
+    },
+  });
+  expect(await grafast({ schema, source: "{ value }" })).toEqual({
+    data: { value: "ok" },
+  });
 });
 
-test.each([false, true])(
-  "mutations invalidate read caches (store: %s)",
-  async (scoped) => {
-    const executor = makeExecutor();
-    let version = 1;
-    const { context } = makeContext(async () => ({
-      rows: [[version]],
-      rowCount: 1,
-    }));
-    const store = scoped ? {} : undefined;
-    const read = () =>
-      run(executor, context, "select value", "x", undefined, true, store);
+test("side effects execute separately for identical inputs", async () => {
+  const executor = makeExecutor();
+  let version = 0;
+  const { context, seen } = makeContext(async () => ({
+    rows: [[++version]],
+    rowCount: 1,
+  }));
+  const result = await executor.executeDedicated(
+    [
+      { context, queryValues: [] },
+      { context, queryValues: [] },
+    ],
+    {
+      text: "select side_effect()",
+      rawSqlValues: [],
+      useTransaction: true,
+      eventEmitter: undefined,
+    },
+  );
+  expect(result.values).toEqual([[[1]], [[2]]]);
+  expect(seen).toHaveLength(2);
+});
 
-    expect((await read()).values).toEqual([[[1]]]);
-    await executor.executeMutation({ store, context }, async () => {
-      version = 2;
+test("compiled SQL with equivalent nested parameters shares batch work across connection affinity hints", async () => {
+  const executor = makeExecutor();
+  const { context, seen } = makeContext(async (opts) => ({
+    rows: [[JSON.stringify(opts.values[0])]],
+    rowCount: 1,
+  }));
+  // This test step deliberately closes over the test executor and context.
+  // eslint-disable-next-line graphile-export/export-subclasses
+  class ReadStep extends Step<string> {
+    private readonly parameter: number;
+
+    constructor(parameter: number) {
+      super();
+      this.parameter = parameter;
+    }
+
+    deduplicate() {
+      return [];
+    }
+    async execute(details: ExecutionDetails) {
+      const results = await details.batch(
+        pgStepBatchExecutor,
+        [[]],
+        pgStepBatchOptions(executor, context, {
+          text: "select $1",
+          rawSqlValues: [[this.parameter, 2]],
+          affinity: Symbol(),
+          eventEmitter: undefined,
+        }),
+      );
+      return results.map((rows) => (Array.isArray(rows) ? rows[0][0] : rows));
+    }
+  }
+  const schema = makeGrafastSchema({
+    typeDefs: "type Query { first: String, second: String, third: String }",
+    objects: {
+      Query: {
+        plans: {
+          // eslint-disable-next-line graphile-export/export-plans
+          first: () => new ReadStep(1),
+          // eslint-disable-next-line graphile-export/export-plans
+          second: () => new ReadStep(3),
+          // eslint-disable-next-line graphile-export/export-plans
+          third: () => new ReadStep(1),
+        },
+      },
+    },
+  });
+  expect(await grafast({ schema, source: "{ first second third }" })).toEqual({
+    data: { first: "[1,2]", second: "[3,2]", third: "[1,2]" },
+  });
+  expect(seen).toHaveLength(2);
+});
+
+test.each([
+  { hintedFirst: false, addsKey: false },
+  { hintedFirst: true, addsKey: false },
+  { hintedFirst: false, addsKey: true },
+  { hintedFirst: true, addsKey: true },
+])(
+  "merges affinity when adding keys (hinted request first: $hintedFirst, adds key: $addsKey)",
+  async ({ hintedFirst, addsKey }) => {
+    const executor = makeExecutor();
+    const { context, seen, withPgClient } = makeContext(async (opts) => {
+      const rows =
+        opts.text === "select page"
+          ? (JSON.parse(opts.values[0]) as string[][]).map(([key], index) => [
+              key,
+              index,
+            ])
+          : [[opts.text]];
+      return { rows, rowCount: rows.length };
     });
-    expect((await read()).values).toEqual([[[2]]]);
-  },
-);
-
-test.each([false, true])(
-  "cross-step batch caches respect mutation invalidation (store: %s)",
-  async (scoped) => {
-    const executor = makeExecutor();
-    let version = 1;
-    const { context, seen } = makeContext(async () => ({
-      rows: [[version]],
-      rowCount: 1,
-    }));
-    const store = scoped ? {} : undefined;
-    // This test step deliberately closes over mutable test state.
+    const affinity = Symbol("connection");
+    // This test step closes over the test executor and context.
     // eslint-disable-next-line graphile-export/export-subclasses
-    class ReadAroundMutationStep extends Step<string> {
+    class ReadStep extends Step<string> {
       async execute(details: ExecutionDetails) {
-        const read = () =>
+        const read = (keys: readonly string[][], hint: symbol | undefined) =>
           details.batch(
             pgStepBatchExecutor,
-            [[], []],
+            keys,
             pgStepBatchOptions(executor, context, {
-              store,
-              text: "select value",
+              text: "select page",
               rawSqlValues: [],
+              identifierIndex: 1,
+              affinity: hint,
               eventEmitter: undefined,
             }),
           );
-        const first = await read();
-        const cached = await read();
-        expect(cached[0]).toBe(first[0]);
-        expect(seen).toHaveLength(1);
-        await executor.executeMutation({ store, context }, async () => {
-          version = 2;
-        });
-        const updated = await read();
-        expect(updated).toEqual([[[2]], [[2]]]);
-        expect(seen).toHaveLength(2);
+        const first = read([["first"]], hintedFirst ? affinity : undefined);
+        const second = read(
+          addsKey ? [["first"], ["second"]] : [["first"]],
+          hintedFirst ? undefined : affinity,
+        );
+        const [firstRows, secondRows, count] = await Promise.all([
+          first,
+          second,
+          run(executor, context, "select count", "count", affinity),
+        ]);
+        expect(firstRows).toEqual([[["first", 0]]]);
+        expect(secondRows).toEqual(
+          addsKey ? [[["first", 0]], [["second", 1]]] : firstRows,
+        );
+        expect(count.values).toEqual([[["select count"]]]);
         return ["ok"];
       }
     }
@@ -419,11 +515,52 @@ test.each([false, true])(
       typeDefs: "type Query { value: String }",
       objects: {
         // eslint-disable-next-line graphile-export/export-plans
-        Query: { plans: { value: () => new ReadAroundMutationStep() } },
+        Query: { plans: { value: () => new ReadStep() } },
       },
     });
     expect(await grafast({ schema, source: "{ value }" })).toEqual({
       data: { value: "ok" },
     });
+    expect(seen.map(({ text }) => text).sort()).toEqual([
+      "select count",
+      "select page",
+    ]);
+    expect(withPgClient).toHaveBeenCalledTimes(hintedFirst || addsKey ? 1 : 2);
   },
 );
+
+test("maps compiled identifier rows back to input order, including empty groups", async () => {
+  const executor = makeExecutor();
+  const { context } = makeContext(async (opts) => {
+    expect(opts.values).toEqual(["fixed", '[["x"],["missing"],["x"]]']);
+    return {
+      rows: [
+        ["last-a", 2],
+        ["first", 0],
+        ["last-b", 2],
+      ],
+      rowCount: 3,
+    };
+  });
+  const result = await executor.executeDedicated(
+    [
+      { context, queryValues: ["x"] },
+      { context, queryValues: ["missing"] },
+      { context, queryValues: ["x"] },
+    ],
+    {
+      text: "select grouped_values",
+      rawSqlValues: ["fixed"],
+      identifierIndex: 1,
+      eventEmitter: undefined,
+    },
+  );
+  expect(result.values).toEqual([
+    [["first", 0]],
+    [],
+    [
+      ["last-a", 2],
+      ["last-b", 2],
+    ],
+  ]);
+});

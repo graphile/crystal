@@ -519,7 +519,7 @@ export type PgConditionLike = Modifier<any> & {
 };
 
 export type KeysOfType<TObject, TValueType> = {
-  [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
+  [key in keyof TObject]-?: TObject[key] extends TValueType ? key : never;
 }[keyof TObject];
 
 export interface MakePgServiceOptions
@@ -531,6 +531,7 @@ export interface MakePgServiceOptions
       | "pgSettingsKey"
       | "pgSettingsForIntrospection"
       | "withPgClientKey"
+      | "withSharedPgClientKey"
       | "pgSubscriber"
       | "pgSubscriberKey"
     >

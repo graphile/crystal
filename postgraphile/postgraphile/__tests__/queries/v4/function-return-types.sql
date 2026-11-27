@@ -6,6 +6,14 @@ from "c"."func_in_inout"(
 ) as __func_in_inout__(v);
 
 select
+  __func_in_out__.v::text as "0"
+from "c"."func_in_out"($1::"int4") as __func_in_out__(v);
+
+select
+  __func_out__.v::text as "0"
+from "c"."func_out"() as __func_out__(v);
+
+select
   __func_out_out__."first_out"::text as "0",
   __func_out_out__."second_out" as "1",
   (not (__func_out_out__ is null))::text as "2"
@@ -99,14 +107,6 @@ from "c"."func_out_complex_setof"(
   $1::"int4",
   $2::"text"
 ) as __func_out_complex_setof__;
-
-select
-  __func_in_out__.v::text as "0"
-from "c"."func_in_out"($1::"int4") as __func_in_out__(v);
-
-select
-  __func_out__.v::text as "0"
-from "c"."func_out"() as __func_out__(v);
 
 select
   __func_out_complex__."x"::text as "0",

@@ -29,13 +29,16 @@ import type {
   PgNotice,
   PgRaiseSeverity,
   WithPgClient,
+  WithPgClientOptions,
 } from "../executor.ts";
 import type { MakePgServiceOptions } from "../interfaces.ts";
 import type { PgAdaptor } from "../pgServices.ts";
+import { makeWithSharedPgClient } from "../sharedClient.ts";
 
 declare global {
   namespace Grafast {
     interface Context {
+      withSharedPgClient?: import("../sharedClient.ts").WithSharedPgClient;
       pgSettings: Record<string, string | undefined> | null;
       withPgClient: WithPgClient<NodePostgresPgClient>;
       pgSubscriber: PgSubscriber | null;
@@ -114,7 +117,13 @@ function newNodePostgresPgClient(
   };
   return {
     rawClient: pgClient,
-    withTransaction(callback) {
+    withTransaction(callback, options) {
+      if (
+        options?.savepoint === false &&
+        (txLevel > 0 || alreadyInTransaction)
+      ) {
+        return callback(this);
+      }
       // Transactions always queue; creating queue if need be
       return addToQueue(async () => {
         if (txLevel === 0 && !alreadyInTransaction) {
@@ -266,7 +275,9 @@ async function makeNodePostgresWithPgClient_inner<T>(
   callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
+  options?: WithPgClientOptions,
 ) {
+  const signal = options?.signal;
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
 
   // PERF: under what situations is this actually required? We added it to
@@ -278,6 +289,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
     await pgClient[$$queue];
   }
 
+  signal?.throwIfAborted();
   return (pgClient[$$queue] = (async () => {
     try {
       // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
@@ -301,10 +313,12 @@ async function makeNodePostgresWithPgClient_inner<T>(
           text: alreadyInTransaction ? "savepoint tx" : "begin",
         });
         try {
+          signal?.throwIfAborted();
           await pgClient.query({
             text: "select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)",
             values: [keys, values],
           });
+          signal?.throwIfAborted();
           const client = newNodePostgresPgClient(
             pgClient,
             1,
@@ -339,6 +353,38 @@ async function makeNodePostgresWithPgClient_inner<T>(
   })());
 }
 
+function makePoolWithSharedPgClient(
+  pool: Pool,
+  reserved = 0,
+  {
+    sharedClientPercentage = 80,
+    idleReservationMs,
+    acquisitionTimeoutMs,
+  }: Pick<
+    PgAdaptorMakePgServiceOptions,
+    "sharedClientPercentage" | "idleReservationMs" | "acquisitionTimeoutMs"
+  > = {},
+) {
+  if (!(sharedClientPercentage > 0 && sharedClientPercentage <= 100)) {
+    throw new Error("Invalid shared client percentage");
+  }
+  return makeWithSharedPgClient({
+    pool,
+    maxClients: Math.max(
+      1,
+      Math.floor(
+        ((pool.options.max! - reserved) * sharedClientPercentage) / 100,
+      ),
+    ),
+    isPoolWaiting: () => pool.waitingCount > 0,
+    canAcquireImmediately: () =>
+      pool.waitingCount === 0 &&
+      (pool.idleCount > 0 || pool.totalCount < pool.options.max!),
+    idleReservationMs,
+    acquisitionTimeoutMs,
+  });
+}
+
 /**
  * Returns a `withPgClient` for the given `Pool` instance.
  */
@@ -349,26 +395,30 @@ export function makePgAdaptorWithPgClient(
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,
     callback,
+    options,
   ) => {
+    options?.signal?.throwIfAborted();
     const pgClient = await pool.connect();
-    if (!pgClient[$$isSetup]) {
-      pgClient[$$isSetup] = true;
-      if (!DONT_DISABLE_JIT) {
-        // We don't actually disable JIT, it's the optimization that's expensive so we disable that.
-        pgClient.query("set jit_optimize_above_cost = -1;").catch((e) => {
-          console.error(
-            `Error occurred applying @dataplan/pg global Postgres settings: ${e}`,
-          );
-        });
-      }
-    }
     try {
+      options?.signal?.throwIfAborted();
+      if (!pgClient[$$isSetup]) {
+        pgClient[$$isSetup] = true;
+        if (!DONT_DISABLE_JIT) {
+          // We don't actually disable JIT, it's the optimization that's expensive so we disable that.
+          pgClient.query("set jit_optimize_above_cost = -1;").catch((e) => {
+            console.error(
+              `Error occurred applying @dataplan/pg global Postgres settings: ${e}`,
+            );
+          });
+        }
+      }
       return await makeNodePostgresWithPgClient_inner(
         pgClient,
         pgSettings,
         callback,
         false,
         false,
+        options,
       );
     } finally {
       // NOTE: have decided not to `RESET ALL` here; otherwise timezone,jit,etc will reset
@@ -386,6 +436,10 @@ export function makePgAdaptorWithPgClient(
     }
   };
 
+  // Only register standalone defaults if the service hasn't supplied its own facility.
+  let shared: ReturnType<typeof makeWithSharedPgClient> | undefined;
+  withPgClient.withSharedPgClient = (...args) =>
+    (shared ??= makePoolWithSharedPgClient(pool))(...args);
   withPgClient.release = releaseOnce;
   return withPgClient;
 }
@@ -409,6 +463,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,
     callback,
+    options,
   ) => {
     return makeNodePostgresWithPgClient_inner(
       pgClient,
@@ -417,6 +472,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
       // Ensure only one withPgClient can run at a time, since we only have on pgClient.
       true,
       alreadyInTransaction,
+      options,
     );
   };
 
@@ -430,6 +486,10 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
     }
   };
 
+  withPgClient.withSharedPgClient = makeWithSharedPgClient({
+    pool: pgClient,
+    maxClients: 1,
+  });
   withPgClient.release = releaseOnce;
   return withPgClient;
 }
@@ -497,8 +557,11 @@ export function createWithPgClient(
   }
 }
 
+export const providesSharedPgClient = true;
+
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
 const adaptor: PgAdaptor<"@dataplan/pg/adaptors/pg"> = {
+  providesSharedPgClient,
   createWithPgClient,
   makePgService,
 };
@@ -812,7 +875,11 @@ export class PgSubscriber<
 
 export interface PgAdaptorMakePgServiceOptions
   extends MakePgServiceOptions,
-    CommonPgAdaptorAndServiceSettings {}
+    CommonPgAdaptorAndServiceSettings {
+  sharedClientPercentage?: number;
+  idleReservationMs?: number;
+  acquisitionTimeoutMs?: number;
+}
 
 function mkpool(
   name: string,
@@ -853,6 +920,9 @@ export function makePgService(
 
     schemas,
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
+    withSharedPgClientKey = name === "main"
+      ? "withSharedPgClient"
+      : name + "_withSharedPgClient",
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
     pubsub = true,
@@ -889,6 +959,14 @@ export function makePgService(
   const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
     {
       name,
+      withSharedPgClientKey: withSharedPgClientKey as "withSharedPgClient",
+      sharedClientFactory(watch) {
+        return makePoolWithSharedPgClient(
+          pool,
+          Number(pgSubscriber != null) + Number(watch),
+          options,
+        );
+      },
       schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
       withPgClientKey: withPgClientKey as any,
       pgSettingsKey: pgSettingsKey as any,

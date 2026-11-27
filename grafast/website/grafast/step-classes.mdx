@@ -234,13 +234,21 @@ const optionsMatch = {
 own keys, and their values. A nested descriptor applies the same own-property
 rules. For other values, `"record"` and nested descriptors use `===`.
 `"tuple"` compares arrays by length and their elements in order.
+`"deep"` accepts primitive values, acyclic arrays, and acyclic plain objects.
+It compares primitives with `===`, arrays by length and element order, and plain
+objects by prototype and own keys, regardless of key order.
+`"ignore"` skips a property's value comparison when both options objects
+have that property. Use it for hints that do not affect the result.
 Gra*fast* uses these rules to narrow the search for equivalent
 options, then checks the remaining candidates against the descriptor. The index
 uses explicit rules in declaration order, followed by the other own keys in a
 canonical order. Put distinctive values early to reduce index branching. Only
 use structural rules where the callback treats the resulting values as
-equivalent. A combined batch uses the first caller's options. Omit the third
-argument when the executor accepts `undefined`.
+equivalent. Each new batch starts with its first caller's options. An executor
+can define `mergeOptions(current, incoming)` to combine hints for calls that
+add new keys to an existing queued batch. Merged options must remain equivalent
+under `optionsMatch`. Omit the third argument when the executor accepts
+`undefined`.
 
 Executor names must identify the same executor object within each schema.
 Gra*fast* checks this when `details.batch` is called: conflicting definitions
@@ -266,6 +274,13 @@ keysets are passed to the callback. Promises are allocated per batch rather than
 per key, and calls whose keys are all cached return synchronously. The cache belongs to `metaByMetaKey` and ends
 with that scope; root executions, mutation fields and subscription events have
 separate scopes. Failed batch calls are evicted so later calls can retry.
+
+#### details.batch.invalidate()
+
+Call `details.batch.invalidate()` in a `finally` block around a mutation attempt
+to clear cached results in the current execution scope. A failed mutation can
+still have side effects. Later calls fetch fresh values. Work already in flight
+can finish for its original callers.
 
 #### details.values
 

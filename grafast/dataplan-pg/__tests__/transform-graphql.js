@@ -9,7 +9,9 @@
  *   ensure that anything that wants a concrete assertion (i.e. not a snapshot
  *   that can be overwritten) can be checked.
  * - Lines starting `#>` are configurations, we expect `<key>: <value>` where
- *   `key` is a plain string and value is a JSON5 value
+ *   `key` is a plain string and value is a JSON5 value, except for
+ *   `sqlSnapshotAdjacentOrder`, an array of string or RegExp literals. Each run
+ *   of statements matching any of the patterns is sorted lexicographically.
  *   - `directPg`: use a direct connection to PG rather than our helper which tracks queries
  *   - `checkErrorSnapshots`: if set `false` then we'll not test the errors
  *   - `expectedPlanConstraints`: expected total number of variable, context
@@ -29,6 +31,7 @@ exports.makeProcess =
     const lines = src.split("\n");
     const config = Object.create(null);
     config.checkErrorSnapshots = true;
+    let sqlSnapshotAdjacentOrder;
     const assertions = [];
     const documentLines = [];
     const scripts = [];
@@ -41,8 +44,13 @@ exports.makeProcess =
           );
         }
         const key = line.substr(2, colon - 2).trim();
-        const value = JSON5.parse(line.substr(colon + 1));
-        config[key] = value;
+        const value = line.slice(colon + 1).trim();
+        if (key === "sqlSnapshotAdjacentOrder") {
+          // Emit the fixture expression alongside its assertions to preserve RegExp literals.
+          sqlSnapshotAdjacentOrder = value;
+        } else {
+          config[key] = JSON5.parse(value);
+        }
       } else if (line.startsWith("##")) {
         const assertion = line.substr(2);
         assertions.push(assertion);
@@ -73,6 +81,7 @@ const { assertSnapshotsMatch, assertResultsMatch, assertErrorsMatch, runTestQuer
 const document = ${JSON.stringify(document)};
 const path = ${JSON.stringify(path)};
 const config = ${JSON.stringify(config)};
+${sqlSnapshotAdjacentOrder === undefined ? "" : `config.sqlSnapshotAdjacentOrder = ${sqlSnapshotAdjacentOrder};`}
 
 let result1;
 let result2;

@@ -24,7 +24,6 @@ import type { PgCodecAttribute } from "../codecs.ts";
 import { sqlValueWithCodec } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
 import type { PgClientResult } from "../executor.ts";
-import { PgExecutor } from "../executor.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -153,7 +152,6 @@ export class PgUpdateSingleStep<
     },
   ) {
     super();
-    this.metaKey = PgExecutor.metaKey;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);
@@ -423,7 +421,7 @@ export class PgUpdateSingleStep<
   async execute({
     indexMap,
     values,
-    extra: { meta: store },
+    batch,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { alias, contextId, finalizeResults, resource } = this;
     if (!finalizeResults) {
@@ -560,9 +558,10 @@ export class PgUpdateSingleStep<
           true,
         );
       };
-      const { rows, rowCount, notices } =
-        await this.resource.executor.executeMutation(
-          { context, store, useTransaction: this.wrappers.length > 0 },
+      let mutationResult;
+      try {
+        mutationResult = await this.resource.executor.executeMutation(
+          { context, useTransaction: this.wrappers.length > 0 },
           this.wrappers.length > 0
             ? makeWrappedMutationExecute<PgUpdateSingleQueryBuilder, any>(
                 this.wrappers,
@@ -573,6 +572,10 @@ export class PgUpdateSingleStep<
               )
             : executeMutation,
         );
+      } finally {
+        batch.invalidate();
+      }
+      const { rows, rowCount, notices } = mutationResult;
       if (rowCount === 0) {
         // TODO: should we throw?
         return null;

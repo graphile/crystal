@@ -4,6 +4,7 @@ import { isDev, noop } from "../dev.ts";
 import { flagError } from "../error.ts";
 import type {
   BatchExecutor,
+  BatchFunction,
   ExecutionResultValue,
   PromiseOrDirect,
 } from "../interfaces.ts";
@@ -23,6 +24,28 @@ type BatchMeta = Record<PropertyKey, unknown> & {
 
 const $$batches = Symbol("Grafast batch caches");
 
+/** @internal Bind batching and invalidation to the current execution scope. */
+export function makeBatch(
+  schema: GraphQLSchema,
+  metaByMetaKey: BatchMeta,
+): BatchFunction {
+  function batch<
+    TOptions extends Record<string, unknown> | undefined,
+    TKeyset,
+    TResult,
+  >(
+    executor: BatchExecutor<TOptions, TKeyset, TResult>,
+    keysets: readonly TKeyset[],
+    options?: TOptions,
+  ) {
+    return batchInMeta(schema, metaByMetaKey, executor, keysets, options);
+  }
+  batch.invalidate = () => {
+    delete metaByMetaKey[$$batches];
+  };
+  return batch;
+}
+
 /** @internal Used to implement `ExecutionDetails.batch`. */
 export function batchInMeta<
   TOptions extends Record<string, unknown> | undefined,
@@ -41,7 +64,7 @@ export function batchInMeta<
     );
   }
   checkExecutor(schema, executor);
-  const { keysetEquality } = executor;
+  const { keysetEquality, mergeOptions } = executor;
   if (keysets.length === 0) {
     return [];
   }
@@ -58,7 +81,8 @@ export function batchInMeta<
     batches.set(executor, families);
   }
   // ExecutionDetails.batch requires options unless TOptions includes undefined.
-  const family = families.getOrCreate(options as TOptions);
+  const requestedOptions = options as TOptions;
+  const family = families.getOrCreate(requestedOptions);
 
   // Validate composite keys before queuing any work. A malformed later key
   // must not leave an earlier key's batch running without a caller.
@@ -96,6 +120,7 @@ export function batchInMeta<
    */
   let pendingIndexes: Map<Promise<ReadonlyArray<TResult>>, number[]> | null =
     null;
+  let addedKey = false;
   const results: ExecutionResultValue<TResult>[] = [];
   for (let i = 0; i < keysets.length; i++) {
     /**
@@ -128,6 +153,7 @@ export function batchInMeta<
             entries: entryI === undefined ? null : [],
             keysets: [],
           };
+          family.options = requestedOptions;
           family.queued = loadBatch;
 
           // Kick off the batch
@@ -140,6 +166,7 @@ export function batchInMeta<
           });
         }
         const index = loadBatch.keysets.push(keyset) - 1;
+        addedKey = true;
         batchForKey = loadBatch;
         sourceIndex = index;
         if (entryI === undefined) {
@@ -165,6 +192,9 @@ export function batchInMeta<
       // Pairs of source index in the pending batch and target result index.
       indexes.push(sourceIndex, targetIndex);
     }
+  }
+  if (addedKey && mergeOptions != null && family.options !== requestedOptions) {
+    family.options = mergeOptions(family.options, requestedOptions);
   }
   if (pendingIndexes === null) {
     return results;

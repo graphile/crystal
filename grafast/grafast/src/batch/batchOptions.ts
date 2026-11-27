@@ -1,3 +1,4 @@
+import { noop } from "../dev.ts";
 import type { BatchExecutor } from "../interfaces.ts";
 import { arraysMatch, isPojo } from "../utils.ts";
 import type { BatchFamily, BatchOptions } from "./batchInterfaces.ts";
@@ -30,6 +31,11 @@ const strictMatcher: OptionsMatcher = {
   },
 };
 
+const ignoreMatcher: OptionsMatcher = {
+  matches: () => true,
+  appendKeys: noop,
+};
+
 const $$scalar = Symbol("non-structural batch option");
 
 const tupleMatcher: OptionsMatcher = {
@@ -43,6 +49,57 @@ const tupleMatcher: OptionsMatcher = {
         keys.push(value[i]);
       }
     } else {
+      keys.push($$scalar, value);
+    }
+  },
+};
+
+function assertDeepScalar(value: unknown): void {
+  if (
+    value != null &&
+    (typeof value === "object" || typeof value === "function")
+  ) {
+    throw new Error(
+      'The "deep" batch option rule requires arrays, plain objects, or primitive values.',
+    );
+  }
+}
+
+const deepMatcher: OptionsMatcher = {
+  matches(left, right) {
+    if (left === right) {
+      return true;
+    } else if (left == null || right == null || typeof left !== "object") {
+      return false;
+    } else if (Array.isArray(left)) {
+      if (!Array.isArray(right)) {
+        return false;
+      }
+      const l = left.length;
+      if (l !== right.length) {
+        return false;
+      }
+      for (let i = 0; i < l; i++) {
+        if (!deepMatcher.matches(left[i], right[i])) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return deepRecordMatcher.matches(left, right);
+    }
+  },
+  appendKeys(value, keys, order) {
+    if (Array.isArray(value)) {
+      const l = value.length;
+      keys.push(l);
+      for (let i = 0; i < l; i++) {
+        deepMatcher.appendKeys(value[i], keys, order);
+      }
+    } else if (isPojo(value)) {
+      deepRecordMatcher.appendKeys(value, keys, order);
+    } else {
+      assertDeepScalar(value);
       keys.push($$scalar, value);
     }
   },
@@ -80,6 +137,7 @@ function isOptionsObject(
 
 function makeObjectMatcher(
   rules?: Map<PropertyKey, OptionsMatcher>,
+  defaultRule = strictMatcher,
 ): OptionsMatcher {
   return {
     matches(left, right) {
@@ -87,21 +145,20 @@ function makeObjectMatcher(
         return true;
       } else if (
         !isOptionsObject(left) ||
-        !isOptionsObject(right) ||
         Object.getPrototypeOf(left) !== Object.getPrototypeOf(right)
       ) {
         return false;
       }
       const keys = Reflect.ownKeys(left);
-      if (keys.length !== Reflect.ownKeys(right).length) {
+      if (keys.length !== Reflect.ownKeys(right as typeof left).length) {
         return false;
       }
       for (const key of keys) {
-        if (!Object.hasOwn(right, key)) {
+        if (!Object.hasOwn(right as typeof left, key)) {
           return false;
         }
-        const rule = rules?.get(key) ?? strictMatcher;
-        if (!rule.matches(left[key], right[key])) {
+        const rule = rules?.get(key) ?? defaultRule;
+        if (!rule.matches(left[key], (right as typeof left)[key])) {
           return false;
         }
       }
@@ -133,19 +190,29 @@ function makeObjectMatcher(
       if (ownKeys.length > 1) {
         ownKeys.sort((a, z) => compareOptionKeys(a, z, order));
       }
-      for (const key of ownKeys) {
-        keys.push(key, value[key]);
+      if (defaultRule === strictMatcher) {
+        for (const key of ownKeys) {
+          keys.push(key, value[key]);
+        }
+      } else {
+        for (const key of ownKeys) {
+          keys.push(key);
+          defaultRule.appendKeys(value[key], keys, order);
+        }
       }
     },
   };
 }
 
 const recordMatcher = makeObjectMatcher();
+const deepRecordMatcher = makeObjectMatcher(undefined, deepMatcher);
 
 interface OptionsMatchDescriptor {
   readonly [key: PropertyKey]:
     | "strict"
+    | "ignore"
     | "tuple"
+    | "deep"
     | "record"
     | OptionsMatchDescriptor
     | undefined;
@@ -159,10 +226,14 @@ function compileOptionsMatch(
     const rule = descriptor[key];
     if (rule === "tuple") {
       rules.set(key, tupleMatcher);
+    } else if (rule === "deep") {
+      rules.set(key, deepMatcher);
     } else if (rule === "record") {
       rules.set(key, recordMatcher);
     } else if (rule === "strict") {
       rules.set(key, strictMatcher);
+    } else if (rule === "ignore") {
+      rules.set(key, ignoreMatcher);
     } else if (isPojo(rule)) {
       rules.set(key, compileOptionsMatch(rule));
     } else if (rule !== undefined) {

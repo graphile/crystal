@@ -5,7 +5,7 @@ import { expect } from "chai";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { it } from "mocha";
 
-import { batchInMeta } from "../dist/batch/batchInMeta.js";
+import { batchInMeta, makeBatch } from "../dist/batch/batchInMeta.js";
 import { getOptionsMatcher } from "../dist/batch/batchOptions.js";
 import { isDev } from "../dist/dev.js";
 import type { BatchExecutor, ExecutionDetails } from "../dist/index.js";
@@ -398,6 +398,67 @@ it("matches nested option rules and compares unspecified properties strictly", a
     }),
   ]);
   expect(calls).to.deep.equal([[1, 3], [2], [4], [5], [6]]);
+});
+
+it("indexes deeply matching arrays and plain objects", async () => {
+  const calls: Array<readonly number[]> = [];
+  const executor = defineBatchExecutor({
+    name: "deep-options",
+    keysetEquality: "strict",
+    optionsMatch: { filter: "deep" },
+    callback: (_options: { filter: unknown }, keys: readonly number[]) => {
+      calls.push(keys);
+      return keys;
+    },
+  });
+  const scope = {};
+  await Promise.all([
+    batchInMeta(schema, scope, executor, [1], {
+      filter: [{ active: true, range: [1, 2] }],
+    }),
+    batchInMeta(schema, scope, executor, [2], {
+      filter: [{ __proto__: null, range: [1, 2], active: true }],
+    }),
+    batchInMeta(schema, scope, executor, [3], {
+      filter: [{ active: true, range: [2, 1] }],
+    }),
+    batchInMeta(schema, scope, executor, [4], {
+      filter: [{ range: [1, 2], active: true }],
+    }),
+  ]);
+  expect(calls).to.deep.equal([[1, 4], [2], [3]]);
+});
+
+it("reads deep options lazily and rejects unsupported values when indexing", async () => {
+  const executor = defineBatchExecutor({
+    name: "deep-options-validation",
+    keysetEquality: "strict",
+    optionsMatch: { lookup: { filter: "deep" } },
+    callback: (
+      _options: { lookup: { filter: unknown } },
+      keys: readonly number[],
+    ) => keys,
+  });
+  const scope = {};
+  const load = (value: unknown) =>
+    batchInMeta(schema, scope, executor, [1], {
+      lookup: { filter: [{ value }] },
+    });
+  let reads = 0;
+  expect(
+    await batchInMeta(schema, scope, executor, [1], {
+      lookup: {
+        get filter() {
+          reads++;
+          return [{ value: 1 }];
+        },
+      },
+    }),
+  ).to.deep.equal([1]);
+  expect(reads).to.equal(0);
+  expect(() => load(new Date(0))).to.throw('"deep" batch option rule');
+  expect(await load(2)).to.deep.equal([1]);
+  expect(() => load(() => 1)).to.throw('"deep" batch option rule');
 });
 
 it("matches arrays structurally and class instances by identity", () => {
@@ -986,7 +1047,7 @@ it("defineBatchExecutor returns the supplied executor unchanged", () => {
   expect(defineBatchExecutor(executor)).to.equal(executor);
 });
 
-it("looks up options by identity before comparing and retains canonical options", async () => {
+it("looks up options by identity before comparing and uses each batch's first options", async () => {
   let reads = 0;
   const received: Array<{ group: string }> = [];
   const executor = defineBatchExecutor({
@@ -1015,15 +1076,70 @@ it("looks up options by identity before comparing and retains canonical options"
   reads = 0;
   expect(batchInMeta(schema, meta, executor, [1], second)).to.deep.equal([1]);
   expect(reads).to.equal(0);
-  await batchInMeta(schema, meta, executor, [2], { group: "first" });
+  const nextBatchOptions = { group: "first" };
+  await batchInMeta(schema, meta, executor, [2], nextBatchOptions);
   expect(reads).to.equal(1);
   expect(received).to.have.length(3);
-  expect(received[2]).to.equal(first);
+  expect(received[2]).to.equal(nextBatchOptions);
   reads = 0;
   for (let i = 0; i < 100; i++) {
     await batchInMeta(schema, meta, executor, [2], { group: String(i) });
   }
   expect(reads).to.equal(0);
+});
+
+it("uses the new batch's ignored options without a merge hook", async () => {
+  const hints: string[] = [];
+  const executor = defineBatchExecutor({
+    name: "ignored-hints",
+    keysetEquality: "strict",
+    optionsMatch: { hint: "ignore" },
+    callback: (options: { hint: string }, keys: readonly number[]) => {
+      hints.push(options.hint);
+      return keys;
+    },
+  });
+  const scope = {};
+  await batchInMeta(schema, scope, executor, [1], { hint: "first" });
+  await batchInMeta(schema, scope, executor, [2], { hint: "second" });
+  expect(hints).to.deep.equal(["first", "second"]);
+});
+
+it("keeps hints from in-flight keys out of the queued batch", async () => {
+  const release = Promise.withResolvers<void>();
+  let merges = 0;
+  const executor = defineBatchExecutor({
+    name: "merge-hints",
+    keysetEquality: "strict",
+    optionsMatch: { hint: "ignore" },
+    mergeOptions: (current, incoming) => {
+      merges++;
+      return current.hint != null ? current : incoming;
+    },
+    callback: async (
+      options: { hint: symbol | undefined },
+      keys: readonly number[],
+    ) => {
+      if (keys.includes(1)) {
+        await release.promise;
+      }
+      return keys.map(() => options.hint);
+    },
+  });
+  const scope = {};
+  const hint = Symbol();
+  const first = batchInMeta(schema, scope, executor, [1], { hint });
+  await Promise.resolve();
+  const second = batchInMeta(schema, scope, executor, [2], { hint: undefined });
+  const joined = batchInMeta(schema, scope, executor, [1], { hint: Symbol() });
+  try {
+    expect(await second).to.deep.equal([undefined]);
+  } finally {
+    release.resolve();
+  }
+  expect(await first).to.deep.equal([hint]);
+  expect(await joined).to.deep.equal([hint]);
+  expect(merges).to.equal(0);
 });
 
 it("only compares options within the requested executor", async () => {
@@ -1160,4 +1276,36 @@ it("keeps record shapes separate even when their value paths match", async () =>
   expect(Array.isArray(cached)).to.equal(true);
   expect(cached).to.deep.equal(originals);
   expect(received).to.have.length(1);
+});
+
+it("invalidates a scope without letting old in-flight results populate its new cache", async () => {
+  let release!: () => void;
+  let version = 1;
+  const executor = defineBatchExecutor({
+    name: "generation-invalidation",
+    keysetEquality: "strict",
+    callback: async (_options: undefined, keys: readonly number[]) => {
+      const value = version;
+      if (value === 1) {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+      }
+      return keys.map(() => value);
+    },
+  });
+  const scope = {};
+  const batch = makeBatch(schema, scope);
+  const otherBatch = makeBatch(schema, scope);
+  const old = batch(executor, [1]);
+  await Promise.resolve();
+  otherBatch.invalidate();
+  version = 2;
+  try {
+    expect(await batch(executor, [1])).to.deep.equal([2]);
+  } finally {
+    release();
+  }
+  expect(await old).to.deep.equal([1]);
+  expect(otherBatch(executor, [1])).to.deep.equal([2]);
 });

@@ -11,8 +11,6 @@ where
   )
 order by __forums__."id" asc;
 
-begin; /*fake*/
-
 declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select
   __messages__."body" as "0",
@@ -29,10 +27,6 @@ order by __messages__."id" asc;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
 
-close __SNAPSHOT_CURSOR_0__
-
-commit; /*fake*/
-
 select
   (count(*))::text as "0"
 from app_public.messages as __messages__
@@ -42,6 +36,8 @@ where
   ) and (
     (__messages__.archived_at is null) = ($2::"timestamptz" is null)
   );
+
+close __SNAPSHOT_CURSOR_0__
 
 with __users_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids

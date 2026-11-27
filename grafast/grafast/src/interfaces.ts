@@ -739,7 +739,9 @@ export type BatchCallback<
 
 type BatchOptionComparison<T> =
   | "strict"
+  | "ignore"
   | "record"
+  | "deep"
   | (unknown extends T
       ? "tuple" | BatchOptionsMatch<Record<PropertyKey, unknown>>
       : T extends readonly unknown[]
@@ -766,18 +768,24 @@ export interface BatchExecutor<
   readonly callback: BatchCallback<TOptions, TKeyset, TResult>;
   /** Unspecified own properties are compared using strict equality. */
   readonly optionsMatch?: BatchOptionsMatch<NonNullable<TOptions>>;
+  /**
+   * Combine options when a request adds a new key to an existing queued batch.
+   * The returned options must remain equivalent under optionsMatch.
+   */
+  readonly mergeOptions?: (current: TOptions, incoming: TOptions) => TOptions;
 }
-export type BatchFunction = <
-  TOptions extends Record<string, unknown> | undefined,
-  TKeyset,
-  TResult,
->(
-  executor: BatchExecutor<TOptions, TKeyset, TResult>,
-  keysets: ReadonlyArray<TKeyset>,
-  ...options: undefined extends TOptions
-    ? [options?: NoInfer<TOptions>]
-    : [options: NoInfer<TOptions>]
-) => PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>>;
+export interface BatchFunction {
+  <TOptions extends Record<string, unknown> | undefined, TKeyset, TResult>(
+    executor: BatchExecutor<TOptions, TKeyset, TResult>,
+    keysets: ReadonlyArray<TKeyset>,
+    ...options: undefined extends TOptions
+      ? [options?: NoInfer<TOptions>]
+      : [options: NoInfer<TOptions>]
+  ): PromiseOrDirect<ReadonlyArray<ExecutionResultValue<TResult>>>;
+
+  /** Clear cached results in this scope after a mutation attempt settles. */
+  invalidate(): void;
+}
 
 export interface ExecutionDetailsStream {
   // TODO: subscribe: boolean;

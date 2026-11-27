@@ -1,5 +1,7 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(8);
+## expect(queries).toHaveLength(6);
+# The deferred totalCount can run just before or after the stream closes.
+#> sqlSnapshotAdjacentOrder: ["close __SNAPSHOT_CURSOR_0__", /\bcount\s*\(\s*\*\s*\)/i]
 {
   forums(includeArchived: EXCLUSIVELY) {
     name

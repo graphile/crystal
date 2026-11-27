@@ -1,4 +1,10 @@
-import type { PgClient, WithPgClient } from "./executor.ts";
+import type {
+  PgClient,
+  PgExecutorContext,
+  WithPgClient,
+  WithPgClientOptions,
+} from "./executor.ts";
+import type { SharedPgClient, WithSharedPgClient } from "./sharedClient.ts";
 
 type PromiseOrDirect<T> = T | PromiseLike<T>;
 
@@ -7,6 +13,8 @@ export interface PgAdaptor<
   TAdaptor extends
     keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
 > {
+  /** Every provider created by this adaptor exposes withSharedPgClient. */
+  providesSharedPgClient?: boolean;
   createWithPgClient: (
     adaptorSettings: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"],
     variant?: "SUPERUSER" | string | null,
@@ -77,6 +85,7 @@ export function getWithPgClientFromPgService<
       const originalWithPgClient = await factory(config.adaptorSettings);
       const withPgClient = ((...args) =>
         originalWithPgClient.apply(null, args)) as WithPgClient;
+      withPgClient.withSharedPgClient = originalWithPgClient.withSharedPgClient;
       const cachedValue: PgClientBySourceCacheValue = {
         withPgClient,
         retainers: 1,
@@ -114,20 +123,41 @@ export function getWithPgClientFromPgService<
   }
 }
 
-export async function withPgClientFromPgService<T>(
+async function withProviderFromPgService<T>(
+  config: GraphileConfig.PgServiceConfiguration,
+  callback: (provider: WithPgClient) => Promise<T>,
+): Promise<T> {
+  const result = getWithPgClientFromPgService(config);
+  const provider = isPromiseLike(result) ? await result : result;
+  try {
+    return await callback(provider);
+  } finally {
+    provider.release!();
+  }
+}
+
+export function withPgClientFromPgService<T>(
   config: GraphileConfig.PgServiceConfiguration,
   pgSettings: Record<string, string | undefined> | null,
   callback: (client: GraphileConfig.DataplanPgClient) => T | Promise<T>,
+  options?: WithPgClientOptions,
 ): Promise<T> {
-  const withPgClientFromPgService = getWithPgClientFromPgService(config);
-  const withPgClient = isPromiseLike(withPgClientFromPgService)
-    ? await withPgClientFromPgService
-    : withPgClientFromPgService;
-  try {
-    return await withPgClient(pgSettings, callback);
-  } finally {
-    withPgClient.release!();
-  }
+  return withProviderFromPgService(config, (provider) => {
+    options?.signal?.throwIfAborted();
+    return provider(pgSettings, callback, options);
+  });
+}
+
+/** Use the adaptor's physical pool when the service has no explicit sharing configuration. */
+export function withSharedPgClientFromPgService<T>(
+  config: GraphileConfig.PgServiceConfiguration,
+  context: PgExecutorContext,
+  options: Parameters<WithSharedPgClient>[1],
+  callback: (client: SharedPgClient) => T | Promise<T>,
+): Promise<T> {
+  return withProviderFromPgService(config, (provider) =>
+    provider.withSharedPgClient!(context, options, callback),
+  );
 }
 
 // We don't cache superuser withPgClients

@@ -7,6 +7,21 @@ select
 from "c"."json_identity"($1::"json") as __json_identity__(v);
 
 select
+  __jsonb_identity__.v::text as "0"
+from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
+
+select
+  __jsonb_identity__.v::text as "0"
+from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
+
+select
+  __add_1_query__.v::text as "0"
+from "a"."add_1_query"(
+  $1::"int4",
+  $2::"int4"
+) as __add_1_query__(v);
+
+select
   __add_2_query__.v::text as "0"
 from "a"."add_2_query"(
   $1::"int4",
@@ -282,18 +297,3 @@ from "a"."query_interval_set"() as __query_interval_set__(v);
 select
   (count(*))::text as "0"
 from "a"."query_interval_set"() as __query_interval_set__(v);
-
-select
-  __jsonb_identity__.v::text as "0"
-from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
-
-select
-  __jsonb_identity__.v::text as "0"
-from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
-
-select
-  __add_1_query__.v::text as "0"
-from "a"."add_1_query"(
-  $1::"int4",
-  $2::"int4"
-) as __add_1_query__(v);

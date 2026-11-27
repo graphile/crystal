@@ -1,5 +1,9 @@
 // Shared with postgraphile
 
+import {
+  createTestDatabaseWithPool,
+  type TestDb,
+} from "@localrepo/test-helpers";
 import type { Pool, QueryConfig } from "pg";
 
 import { createWithPgClient } from "../dist/adaptors/pg.js";
@@ -11,6 +15,35 @@ import {
 
 export { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 
+/** Sort each contiguous run of matching SQL statements for the snapshot. */
+export function sortSQLSnapshotRuns(
+  statements: string[],
+  patterns: readonly (string | RegExp)[],
+) {
+  const matches = (sql: string) => {
+    const text = sql.trim().replace(/\s+/g, " ");
+    return patterns.some((pattern) =>
+      typeof pattern === "string"
+        ? text.includes(pattern.trim().replace(/\s+/g, " "))
+        : text.search(pattern) !== -1,
+    );
+  };
+  let start = 0;
+  // Include the end of the list to flush a trailing run.
+  for (let end = 0, l = statements.length; end <= l; end++) {
+    if (end < l && matches(statements[end])) {
+      continue;
+    }
+    if (end - start > 1) {
+      const sorted = statements.slice(start, end).sort();
+      for (let i = start; i < end; i++) {
+        statements[i] = sorted[i - start];
+      }
+    }
+    start = end + 1;
+  }
+}
+
 function noop() {}
 
 /**
@@ -20,10 +53,10 @@ function noop() {}
  */
 function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   let queue: Promise<void> | null;
-  return (pgSettings, callback) => {
+  const queued: WithPgClient = (pgSettings, callback, options) => {
     const result = queue
-      ? queue.then(() => withPgClient(pgSettings, callback))
-      : withPgClient(pgSettings, callback);
+      ? queue.then(() => withPgClient(pgSettings, callback, options))
+      : withPgClient(pgSettings, callback, options);
     const nextQueue = result.then(noop, noop);
     queue = nextQueue;
     queue.then(() => {
@@ -33,10 +66,11 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
     });
     return result;
   };
+  queued.withSharedPgClient = withPgClient.withSharedPgClient;
+  return queued;
 }
 
-const originalPgExecutorMethod = (PgExecutor.prototype as any)
-  ._executeWithOrWithoutCache;
+const originalPgExecutorMethod = (PgExecutor.prototype as any).executeQueries;
 
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
@@ -138,14 +172,11 @@ export async function withTestWithPgClient<T>(
   } as typeof poolClient.query;
   // Monkey patch to capture queries
   if (
-    originalPgExecutorMethod !==
-    (PgExecutor.prototype as any)._executeWithOrWithoutCache
+    originalPgExecutorMethod !== (PgExecutor.prototype as any).executeQueries
   ) {
     throw new Error("Already patched!");
   }
-  (PgExecutor.prototype as any)._executeWithOrWithoutCache = function (
-    ...args: any[]
-  ) {
+  (PgExecutor.prototype as any).executeQueries = function (...args: any[]) {
     const promise = originalPgExecutorMethod.apply(this, args);
     return addBatch(promise);
   };
@@ -170,7 +201,9 @@ export async function withTestWithPgClient<T>(
         const withPgClientWithSavepoints: WithPgClient = async (
           pgSettings,
           callback,
+          options,
         ) => {
+          options?.signal?.throwIfAborted();
           if (!alive) {
             throw new Error(
               "Test transaction has already been ended - async operations shouldn't keep happening after grafast returns",
@@ -180,7 +213,7 @@ export async function withTestWithPgClient<T>(
           await poolClient.query("savepoint notxhonest; --ignore--");
           let result: any;
           try {
-            result = await withPgClient(pgSettings, callback);
+            result = await withPgClient(pgSettings, callback, options);
           } catch (e) {
             if (alive) {
               try {
@@ -205,6 +238,8 @@ export async function withTestWithPgClient<T>(
 
           return result;
         };
+        withPgClientWithSavepoints.withSharedPgClient =
+          withPgClient.withSharedPgClient;
         return await callback(queuedWPC(withPgClientWithSavepoints));
       } finally {
         await new Promise((resolve) => setTimeout(resolve, 0));
@@ -213,9 +248,20 @@ export async function withTestWithPgClient<T>(
       }
     }
   } finally {
-    (PgExecutor.prototype as any)._executeWithOrWithoutCache =
-      originalPgExecutorMethod;
+    (PgExecutor.prototype as any).executeQueries = originalPgExecutorMethod;
     poolClient.query = oldQuery;
     poolClient.release();
   }
+}
+
+/** Provision an isolated database for a Jest suite. */
+export function useTestPool() {
+  let database: TestDb;
+  beforeAll(async () => {
+    database = await createTestDatabaseWithPool();
+  });
+  afterAll(async () => {
+    await database?.release();
+  });
+  return () => database.pgPool;
 }

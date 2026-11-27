@@ -1107,7 +1107,7 @@ export class PgResource<
     return this.executor.context();
   }
 
-  /** @internal */
+  /** @deprecated Use executor.executeShared. Use ExecutionDetails.batch to cache results. */
   public executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
@@ -1116,6 +1116,22 @@ export class PgResource<
   }
 
   /** @internal */
+  public executeShared<TInput = any, TOutput = any>(
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    options: PgExecutorOptions,
+  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
+    return this.executor.executeShared(values, options);
+  }
+
+  /** @internal */
+  public executeDedicated<TInput = any, TOutput = any>(
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    options: PgExecutorOptions,
+  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
+    return this.executor.executeDedicated(values, options);
+  }
+
+  /** @deprecated Use executeDedicated. */
   public executeWithoutCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,

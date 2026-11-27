@@ -43,6 +43,7 @@ import { makeExampleSchema } from "../examples/exampleSchema.mts";
 import {
   createTestDatabase,
   dropTestDatabase,
+  sortSQLSnapshotRuns,
   withTestWithPgClient,
 } from "./sharedHelpers.ts";
 
@@ -503,7 +504,10 @@ export const assertSnapshotsMatch = async (
     result: ReturnType<typeof runTestQuery>;
     document: string;
     path: string;
-    config: any;
+    config: {
+      /** Sort consecutive statements matching any of these patterns. */
+      sqlSnapshotAdjacentOrder?: readonly (string | RegExp)[];
+    };
     ext?: string;
   },
 ): Promise<void> => {
@@ -555,11 +559,13 @@ export const assertSnapshotsMatch = async (
     await snapshot(formattedErrors, errorsFileName);
   } else if (only === "sql") {
     const sqlFileName = basePath + (ext || "") + ".sql";
-    const formattedQueries = queries
-      .map((q) => makeSQLSnapshotSafe(q.text))
-      .join("\n\n");
+    const statements = queries.map((q) => makeSQLSnapshotSafe(q.text));
+    const patterns = props.config.sqlSnapshotAdjacentOrder;
+    if (patterns !== undefined) {
+      sortSQLSnapshotRuns(statements, patterns);
+    }
     // Consistently end in a newline
-    await snapshot(formattedQueries + "\n", sqlFileName);
+    await snapshot(statements.join("\n\n") + "\n", sqlFileName);
   } else if (only === "mermaid") {
     const planOp = extensions?.explain?.operations?.find(
       (op: any) => op.type === "plan",

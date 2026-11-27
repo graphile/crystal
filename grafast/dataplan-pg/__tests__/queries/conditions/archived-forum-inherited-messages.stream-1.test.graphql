@@ -1,6 +1,6 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(7);
-# PERF: should be able to change queries down to 6 by inlining author, but only
+## expect(queries).toHaveLength(5);
+# PERF: should be able to change queries down to 4 by inlining author, but only
 # because `pageInfo` was not requested.
 {
   forums(includeArchived: EXCLUSIVELY) {

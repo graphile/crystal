@@ -73,6 +73,7 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
   WithPgClient,
+  WithPgClientOptions,
 } from "./executor.ts";
 import { PgExecutor } from "./executor.ts";
 import { PgBooleanFilter } from "./filters/pgBooleanFilter.ts";
@@ -332,6 +333,7 @@ export type {
   PlanByUniques,
   SideEffectWithPgClientStepCallback,
   WithPgClient,
+  WithPgClientOptions,
 };
 export {
   assertPgClassSingleStep,
@@ -464,6 +466,8 @@ exportAsMany("@dataplan/pg", {
   PgContextPlugin,
 });
 
+export type { SharedPgClient, WithSharedPgClient } from "./sharedClient.ts";
+export { makeWithSharedPgClient } from "./sharedClient.ts";
 export { version } from "./version.ts";
 
 declare global {
@@ -477,6 +481,14 @@ declare global {
 
       adaptor: PgAdaptor<TAdaptor>;
       adaptorSettings?: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"];
+
+      withSharedPgClientKey?: KeysOfType<
+        Grafast.Context,
+        import("./sharedClient.ts").WithSharedPgClient | undefined
+      >;
+      sharedClientFactory?: (
+        watch: boolean,
+      ) => import("./sharedClient.ts").WithSharedPgClient;
 
       /** The key on 'context' where the withPgClient function will be sourced */
       withPgClientKey: KeysOfType<

@@ -1,8 +1,19 @@
 import type {} from "grafast";
 
+import type { WithPgClient } from "../executor.ts";
 import type {} from "../interfaces.ts";
-import { withPgClientFromPgService } from "../pgServices.ts";
+import {
+  withPgClientFromPgService,
+  withSharedPgClientFromPgService,
+} from "../pgServices.ts";
 import { version } from "../version.ts";
+
+type SharedClientCache = WeakMap<
+  GraphileConfig.PgServiceConfiguration,
+  import("../sharedClient.ts").WithSharedPgClient
+>;
+const sharedClients: SharedClientCache = new WeakMap();
+const watchSharedClients: SharedClientCache = new WeakMap();
 
 export const EMPTY_OBJECT: Record<string, never> = Object.freeze(
   Object.create(null),
@@ -73,10 +84,31 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
                 `Key '${withPgClientKey}' already set on the context; refusing to overwrite - please check your configuration.`,
               );
             }
-            contextValue[withPgClientKey] = withPgClientFromPgService.bind(
-              null,
-              pgService,
-            );
+            const withPgClient: WithPgClient = (...args) =>
+              withPgClientFromPgService(pgService, ...args);
+            const key = pgService.withSharedPgClientKey;
+            if (pgService.sharedClientFactory) {
+              const watch =
+                (config as { grafserv?: { watch?: boolean } }).grafserv
+                  ?.watch === true;
+              const cache = watch ? watchSharedClients : sharedClients;
+              let shared = cache.get(pgService);
+              if (shared === undefined) {
+                shared = pgService.sharedClientFactory(watch);
+                cache.set(pgService, shared);
+              }
+              withPgClient.withSharedPgClient = shared;
+            } else if (pgService.adaptor.providesSharedPgClient) {
+              withPgClient.withSharedPgClient = (...args) =>
+                withSharedPgClientFromPgService(pgService, ...args);
+            }
+            if (key != null && withPgClient.withSharedPgClient) {
+              if (key in contextValue) {
+                throw new Error("Duplicate PostgreSQL context key " + key);
+              }
+              contextValue[key] = withPgClient.withSharedPgClient;
+            }
+            contextValue[withPgClientKey] = withPgClient;
           }
         }
         return next();

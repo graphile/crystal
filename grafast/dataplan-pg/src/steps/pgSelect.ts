@@ -49,7 +49,6 @@ import type {
   PgResourceUnique,
 } from "../datasource.ts";
 import type { PgExecutorContext, PgExecutorInput } from "../executor.ts";
-import { PgExecutor } from "../executor.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -716,7 +715,6 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
-    this.metaKey = PgExecutor.metaKey;
     if (!options.resource) {
       throw new Error(
         `Resource passed to \`pgSelect(...)\` was ${inspect(options.resource)} - perhaps you used the wrong resource name when looking it up in the registry?`,
@@ -1193,7 +1191,7 @@ export class PgSelectStep<
       indexMap,
       count,
       values,
-      extra: { eventEmitter, meta: store },
+      extra: { eventEmitter },
     } = executionDetails;
     const {
       meta,
@@ -1312,7 +1310,6 @@ export class PgSelectStep<
         });
       }
       const common = {
-        store,
         text,
         rawSqlValues,
         identifierIndex,
@@ -1325,10 +1322,12 @@ export class PgSelectStep<
         keysets.length === 0
           ? null
           : isMutation
-            ? await this.resource.executeWithoutCache(
-                keysets.map((queryValues) => ({ context, queryValues })),
-                common,
-              )
+            ? await this.resource
+                .executeDedicated(
+                  keysets.map((queryValues) => ({ context, queryValues })),
+                  common,
+                )
+                .finally(executionDetails.batch.invalidate)
             : {
                 values: await executionDetails.batch(
                   pgStepBatchExecutor,
@@ -1385,8 +1384,8 @@ export class PgSelectStep<
       }
       const initialFetchResult = specs
         ? (
-            await this.resource.executeWithoutCache(specs, {
-              store,
+            await this.resource.executeShared(specs, {
+              affinity: this.executionAffinity,
               text,
               rawSqlValues,
               identifierIndex,
@@ -1410,6 +1409,7 @@ export class PgSelectStep<
       });
       const streams = (
         await this.resource.executeStream(streamSpecs, {
+          affinity: this.executionAffinity,
           text: textForDeclare,
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex,
