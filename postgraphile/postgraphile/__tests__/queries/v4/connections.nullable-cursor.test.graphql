@@ -4,15 +4,47 @@
 #> schema: ["a", "b", "c"]
 query {
   ascFirst: allPeople(orderBy: [ABOUT_ASC], first: 1) {
-    edges { cursor node { id about } }
+    edges {
+      cursor
+      node {
+        id
+        about
+      }
+    }
   }
-  ascAfter: allPeople(orderBy: [ABOUT_ASC], after: "WyJmZmExM2NhNjljIiwiSnVzdCBhIGZyaWVuZGx5IGh1bWFuIiwzXQ==") {
-    edges { cursor node { id about } }
+  ascAfter: allPeople(
+    orderBy: [ABOUT_ASC]
+    # ["ffa13ca69c","Just a friendly human",3]
+    after: "WyJmZmExM2NhNjljIiwiSnVzdCBhIGZyaWVuZGx5IGh1bWFuIiwzXQ=="
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        about
+      }
+    }
   }
   descFirst: allPeople(orderBy: [ABOUT_DESC], first: 5) {
-    edges { cursor node { id about } }
+    edges {
+      cursor
+      node {
+        id
+        about
+      }
+    }
   }
-  descAfter: allPeople(orderBy: [ABOUT_DESC], after: "WyJmZmExM2NhNjljIixudWxsLDFd") {
-    edges { cursor node { id about } }
+  descAfter: allPeople(
+    orderBy: [ABOUT_DESC]
+    # ["ffa13ca69c",null,1]
+    after: "WyJmZmExM2NhNjljIixudWxsLDFd"
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        about
+      }
+    }
   }
 }
