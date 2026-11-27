@@ -127,6 +127,14 @@ properties:
 Exactly one of `pool` or `connectionString` must be set, all other options are
 optional, and `poolConfig` is ignored if `pool` is specified.
 
+The returned function exposes `withSharedPgClient`. This lets an executor
+context containing just `withPgClient` and `pgSettings` use PostgreSQL cursors
+for `@stream` and share their connections with regular reads. If you wrap
+`withPgClient` for the same pool, forward its `withSharedPgClient` property
+and its optional acquisition signal. An explicit `withSharedPgClient` on the
+executor context takes precedence. When neither supplies shared acquisition,
+the executor buffers the rows before returning the stream.
+
 ### new PgSubscriber(pool)
 
 Creates a new PgSubscriber instance using the given `pg.Pool` instance, ready
@@ -159,6 +167,10 @@ adaptor exports the two expected methods:
   detailing how to make requests with this adaptor.
 - `createWithPgClient(options, variant?)` - constructs a `withPgClient`
   function using this adaptor.
+
+If every provider your adaptor creates exposes `withSharedPgClient`, export
+`providesSharedPgClient = true` on the adaptor. This enables shared reads and
+cursors for services configured directly with that adaptor.
 
 You can check your adaptor conforms by adding this type assertion:
 

@@ -145,6 +145,8 @@ export interface WithPgClient<
     signal?: AbortSignal,
   ): Promise<T>;
 
+  /** Pool-backed providers can supply sharing to existing executor contexts. */
+  withSharedPgClient?: WithSharedPgClient;
   release?(): PromiseOrDirect<void>;
 }
 
@@ -160,6 +162,10 @@ export type PgExecutorContext<
   withPgClient: WithPgClient<TPgClient>;
   withSharedPgClient?: WithSharedPgClient;
 };
+
+function getWithSharedPgClient(context: PgExecutorContext) {
+  return context.withSharedPgClient ?? context.withPgClient.withSharedPgClient;
+}
 
 /** @deprecated Please use `Step<PgExecutorContext<TSettings>>` instead */
 export type PgExecutorContextPlans<
@@ -639,11 +645,12 @@ ${duration}
   }
 
   private withTransaction<T>(
+    withSharedPgClient: WithSharedPgClient,
     context: PgExecutorContext,
     options: PgExecutorOptions,
     callback: (execute: ExecuteFunction) => Promise<T>,
   ): Promise<T> {
-    return context.withSharedPgClient!(
+    return withSharedPgClient(
       context,
       {
         needsTransaction: true,
@@ -808,6 +815,9 @@ ${duration}
                   ...rawSqlValues,
                   JSON.stringify(batch.map(({ queryValues }) => queryValues)),
                 ];
+          const withSharedPgClient = shared
+            ? getWithSharedPgClient(context)
+            : undefined;
           const queryResult = common.useTransaction
             ? await this.executeMutation<PgClientResult<TOutput>>(
                 {
@@ -824,8 +834,8 @@ ${duration}
                     true,
                   ),
               )
-            : shared && context.withSharedPgClient
-              ? await context.withSharedPgClient(
+            : withSharedPgClient
+              ? await withSharedPgClient(
                   context,
                   {
                     maxClientQueues: this.maxClientQueues,
@@ -925,7 +935,8 @@ ${duration}
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
-      if (!context.withSharedPgClient) {
+      const withSharedPgClient = getWithSharedPgClient(context);
+      if (withSharedPgClient === undefined) {
         const inputs = batch.map(({ queryValues }) => ({
           context,
           queryValues,
@@ -1102,10 +1113,15 @@ ${duration}
           }
         };
 
-        this.withTransaction(context, common, (_execute) => {
-          resolveExecute(_execute);
-          return tx;
-        }).then(null, handleFetchError);
+        this.withTransaction(
+          withSharedPgClient,
+          context,
+          common,
+          (_execute) => {
+            resolveExecute(_execute);
+            return tx;
+          },
+        ).then(null, handleFetchError);
         const execute = await executePromise;
 
         // eslint-disable-next-line no-inner-declarations

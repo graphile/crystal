@@ -351,6 +351,38 @@ async function makeNodePostgresWithPgClient_inner<T>(
   })());
 }
 
+function makePoolWithSharedPgClient(
+  pool: Pool,
+  reserved = 0,
+  {
+    sharedClientPercentage = 80,
+    idleReservationMs,
+    acquisitionTimeoutMs,
+  }: Pick<
+    PgAdaptorMakePgServiceOptions,
+    "sharedClientPercentage" | "idleReservationMs" | "acquisitionTimeoutMs"
+  > = {},
+) {
+  if (!(sharedClientPercentage > 0 && sharedClientPercentage <= 100)) {
+    throw new Error("Invalid shared client percentage");
+  }
+  return makeWithSharedPgClient({
+    pool,
+    maxClients: Math.max(
+      1,
+      Math.floor(
+        ((pool.options.max! - reserved) * sharedClientPercentage) / 100,
+      ),
+    ),
+    isPoolWaiting: () => pool.waitingCount > 0,
+    canAcquireImmediately: () =>
+      pool.waitingCount === 0 &&
+      (pool.idleCount > 0 || pool.totalCount < pool.options.max!),
+    idleReservationMs,
+    acquisitionTimeoutMs,
+  });
+}
+
 /**
  * Returns a `withPgClient` for the given `Pool` instance.
  */
@@ -402,6 +434,10 @@ export function makePgAdaptorWithPgClient(
     }
   };
 
+  // Only register standalone defaults if the service hasn't supplied its own facility.
+  let shared: ReturnType<typeof makeWithSharedPgClient> | undefined;
+  withPgClient.withSharedPgClient = (...args) =>
+    (shared ??= makePoolWithSharedPgClient(pool))(...args);
   withPgClient.release = releaseOnce;
   return withPgClient;
 }
@@ -448,6 +484,10 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
     }
   };
 
+  withPgClient.withSharedPgClient = makeWithSharedPgClient({
+    pool: pgClient,
+    maxClients: 1,
+  });
   withPgClient.release = releaseOnce;
   return withPgClient;
 }
@@ -515,8 +555,11 @@ export function createWithPgClient(
   }
 }
 
+export const providesSharedPgClient = true;
+
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
 const adaptor: PgAdaptor<"@dataplan/pg/adaptors/pg"> = {
+  providesSharedPgClient,
   createWithPgClient,
   makePgService,
 };
@@ -916,22 +959,11 @@ export function makePgService(
       name,
       withSharedPgClientKey: withSharedPgClientKey as "withSharedPgClient",
       sharedClientFactory(watch) {
-        const percentage = options.sharedClientPercentage ?? 80;
-        if (!(percentage > 0 && percentage <= 100)) {
-          throw new Error("Invalid shared client percentage");
-        }
-        const available =
-          pool.options.max! - Number(pgSubscriber != null) - Number(watch);
-        return makeWithSharedPgClient({
+        return makePoolWithSharedPgClient(
           pool,
-          maxClients: Math.max(1, Math.floor((available * percentage) / 100)),
-          isPoolWaiting: () => pool.waitingCount > 0,
-          canAcquireImmediately: () =>
-            pool.waitingCount === 0 &&
-            (pool.idleCount > 0 || pool.totalCount < pool.options.max!),
-          idleReservationMs: options.idleReservationMs,
-          acquisitionTimeoutMs: options.acquisitionTimeoutMs,
-        });
+          Number(pgSubscriber != null) + Number(watch),
+          options,
+        );
       },
       schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
       withPgClientKey: withPgClientKey as any,

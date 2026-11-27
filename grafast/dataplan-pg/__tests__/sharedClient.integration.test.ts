@@ -1,6 +1,15 @@
+import { hookArgs } from "grafast";
+import { buildSchema, parse } from "grafast/graphql";
+import { resolvePreset } from "graphile-config";
+
+import * as adaptor from "../dist/adaptors/pg.js";
 import { makePgAdaptorWithPgClient } from "../dist/adaptors/pg.js";
 import { EXPORTABLE } from "../dist/datasource.js";
-import { makeWithSharedPgClient, PgExecutor } from "../dist/index.js";
+import {
+  makeWithSharedPgClient,
+  PgContextPlugin,
+  PgExecutor,
+} from "../dist/index.js";
 import { useTestPool } from "./sharedHelpers.ts";
 
 const getPool = useTestPool();
@@ -66,8 +75,12 @@ test.each([false, true])(
 
 test("buffered streaming returns its dedicated checkout before iteration", async () => {
   const pool = getPool();
+  const base = makePgAdaptorWithPgClient(pool);
+  // A custom provider that only implements dedicated checkouts.
+  const withPgClient: typeof base = (settings, callback) =>
+    base(settings, callback);
   const context = {
-    withPgClient: makePgAdaptorWithPgClient(pool),
+    withPgClient,
     pgSettings: null,
   };
   const { streams } = await executor.executeStream(
@@ -182,3 +195,60 @@ describe("executor routing", () => {
     },
   );
 });
+
+test.each(["standalone", "configured service", "manual service"])(
+  "a regular read sees the cursor in a two-key %s context",
+  async (source) => {
+    const pool = getPool();
+    let withPgClient;
+    if (source === "standalone") {
+      withPgClient = makePgAdaptorWithPgClient(pool);
+    } else {
+      const pgService =
+        source === "configured service"
+          ? adaptor.makePgService({ pool, pubsub: false })
+          : {
+              name: "main",
+              adaptor,
+              adaptorSettings: { pool },
+              withPgClientKey: "withPgClient" as const,
+            };
+      const args = await hookArgs({
+        schema: buildSchema("type Query { value: Int }"),
+        document: parse("{ value }"),
+        resolvedPreset: resolvePreset({
+          plugins: [PgContextPlugin],
+          pgServices: [pgService],
+        }),
+      });
+      withPgClient = args.contextValue.withPgClient;
+    }
+    const context = { withPgClient, pgSettings: null };
+    const inputs = [{ context, queryValues: [] }];
+    const affinity = Symbol();
+    const options = { affinity, rawSqlValues: [], eventEmitter: undefined };
+    const { streams } = await executor.executeStream<unknown, [number, number]>(
+      inputs,
+      {
+        ...options,
+        text: "select pg_backend_pid(), i from generate_series(1, 301) i",
+      },
+    );
+    const rows = (await streams[0])[Symbol.asyncIterator]();
+    try {
+      const first = await rows.next();
+      expect(first.done).toBe(false);
+      const { values } = await executor.executeShared<
+        unknown,
+        [number, number]
+      >(inputs, {
+        ...options,
+        text: "select pg_backend_pid(), count(*)::int from pg_cursors where name like '__cursor_%'",
+      });
+      expect(values[0]).toEqual([[first.value[0], 1]]);
+      expect((await rows.next()).value).toEqual([first.value[0], 2]);
+    } finally {
+      await rows.return!();
+    }
+  },
+);

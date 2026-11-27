@@ -1,7 +1,11 @@
 import type {} from "grafast";
 
+import type { WithPgClient } from "../executor.ts";
 import type {} from "../interfaces.ts";
-import { withPgClientFromPgService } from "../pgServices.ts";
+import {
+  withPgClientFromPgService,
+  withSharedPgClientFromPgService,
+} from "../pgServices.ts";
 import { version } from "../version.ts";
 
 type SharedClientCache = WeakMap<
@@ -80,8 +84,10 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
                 `Key '${withPgClientKey}' already set on the context; refusing to overwrite - please check your configuration.`,
               );
             }
+            const withPgClient: WithPgClient = (settings, callback, signal) =>
+              withPgClientFromPgService(pgService, settings, callback, signal);
             const key = pgService.withSharedPgClientKey;
-            if (key != null && pgService.sharedClientFactory) {
+            if (pgService.sharedClientFactory) {
               const watch =
                 (config as { grafserv?: { watch?: boolean } }).grafserv
                   ?.watch === true;
@@ -91,15 +97,23 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
                 shared = pgService.sharedClientFactory(watch);
                 cache.set(pgService, shared);
               }
+              withPgClient.withSharedPgClient = shared;
+            } else if (pgService.adaptor.providesSharedPgClient) {
+              withPgClient.withSharedPgClient = (context, options, callback) =>
+                withSharedPgClientFromPgService(
+                  pgService,
+                  context,
+                  options,
+                  callback,
+                );
+            }
+            if (key != null && withPgClient.withSharedPgClient) {
               if (key in contextValue) {
                 throw new Error("Duplicate PostgreSQL context key " + key);
               }
-              contextValue[key] = shared;
+              contextValue[key] = withPgClient.withSharedPgClient;
             }
-            contextValue[withPgClientKey] = withPgClientFromPgService.bind(
-              null,
-              pgService,
-            );
+            contextValue[withPgClientKey] = withPgClient;
           }
         }
         return next();

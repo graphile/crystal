@@ -31,6 +31,7 @@ from (
 order by __stream_wrapped__."2"
 limit 1;
 
+declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select *
 from (
   select
@@ -51,6 +52,8 @@ from (
 order by __stream_wrapped__."2"
 offset 1;
 
+fetch forward 100 from __SNAPSHOT_CURSOR_0__
+
 select
   __users__."username" as "0",
   __users__."gravatar_url" as "1"
@@ -61,6 +64,8 @@ where
   ) and (
     true /* authorization checks */
   );
+
+close __SNAPSHOT_CURSOR_0__
 
 with __users_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids

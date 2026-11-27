@@ -26,10 +26,10 @@ function noop() {}
  */
 function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   let queue: Promise<void> | null;
-  return (pgSettings, callback) => {
+  const queued: WithPgClient = (pgSettings, callback, signal) => {
     const result = queue
-      ? queue.then(() => withPgClient(pgSettings, callback))
-      : withPgClient(pgSettings, callback);
+      ? queue.then(() => withPgClient(pgSettings, callback, signal))
+      : withPgClient(pgSettings, callback, signal);
     const nextQueue = result.then(noop, noop);
     queue = nextQueue;
     queue.then(() => {
@@ -39,6 +39,8 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
     });
     return result;
   };
+  queued.withSharedPgClient = withPgClient.withSharedPgClient;
+  return queued;
 }
 
 const originalExecuteDedicated = PgExecutor.prototype.executeDedicated;
@@ -186,7 +188,9 @@ export async function withTestWithPgClient<T>(
         const withPgClientWithSavepoints: WithPgClient = async (
           pgSettings,
           callback,
+          signal,
         ) => {
+          signal?.throwIfAborted();
           if (!alive) {
             throw new Error(
               "Test transaction has already been ended - async operations shouldn't keep happening after grafast returns",
@@ -196,7 +200,7 @@ export async function withTestWithPgClient<T>(
           await poolClient.query("savepoint notxhonest; --ignore--");
           let result: any;
           try {
-            result = await withPgClient(pgSettings, callback);
+            result = await withPgClient(pgSettings, callback, signal);
           } catch (e) {
             if (alive) {
               try {
@@ -221,6 +225,8 @@ export async function withTestWithPgClient<T>(
 
           return result;
         };
+        withPgClientWithSavepoints.withSharedPgClient =
+          withPgClient.withSharedPgClient;
         return await callback(queuedWPC(withPgClientWithSavepoints));
       } finally {
         await new Promise((resolve) => setTimeout(resolve, 0));
