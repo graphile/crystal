@@ -43,6 +43,7 @@
     { "path": "utils/lru" },
     { "path": "utils/pg-sql2" },
     { "path": "utils/tamedevil" },
+    { "path": "utils/test-helpers" },
     { "path": "graphile-build/graphile-build" },
     { "path": "graphile-build/graphile-build-pg" },
     { "path": "graphile-build/graphile-simplify-inflection" },

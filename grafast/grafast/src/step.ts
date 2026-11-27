@@ -280,11 +280,8 @@ export /* abstract */ class Step<TData = any> {
    */
   public peerKey: string | null = null;
 
-  /**
-   * Set this true for plans that implement mutations; this will prevent them
-   * from being tree-shaken.
-   */
-  public hasSideEffects: boolean;
+  /** Backing field for `hasSideEffects`. */
+  private _hasSideEffects: boolean;
 
   /**
    * Set this to `true` if this step might return an iterable or async iterable
@@ -340,65 +337,8 @@ export /* abstract */ class Step<TData = any> {
     this._isSelectiveStep = false;
 
     this.implicitSideEffectStep = layerPlan.latestSideEffectStep;
-    this.hasSideEffects ??= false;
+    this._hasSideEffects = false;
     this.cloneStreams = false;
-    let hasSideEffects = false;
-    const stepTracker = this.layerPlan.operationPlan.stepTracker;
-    Object.defineProperty(this, "hasSideEffects", {
-      get(this: Step<TData>) {
-        return hasSideEffects;
-      },
-      set(this: Step<TData>, value) {
-        if (value === hasSideEffects) {
-          // No change necessary
-          return;
-        }
-
-        /**
-         * If steps were created after this step, an this step doesn't depend
-         * on them, then it's no longer safe to change hasSideEffects.
-         */
-        let nonDependentSteps: Step[] | null = null;
-
-        const maxStepId = stepTracker.stepCount - 1;
-        if (this.id === maxStepId) {
-          // All good - no more steps were created
-        } else {
-          // If the step created them during initialization and is dependent on
-          // them, that's fine too.
-          for (let id = this.id + 1; id <= maxStepId; id++) {
-            const step = stepTracker.getStepById(id);
-            // Allow steps that aren't in our layer plan
-            if (step.layerPlan !== this.layerPlan) continue;
-            if (stepADependsOnStepB(this, step)) continue;
-            if (nonDependentSteps === null) {
-              nonDependentSteps = [step];
-            } else {
-              nonDependentSteps.push(step);
-            }
-          }
-        }
-        if (nonDependentSteps === null) {
-          hasSideEffects = value;
-          if (value === true) {
-            this.layerPlan.latestSideEffectStep = this;
-            this.operationPlan.resetCache();
-          } else if (value !== true && hasSideEffects === true) {
-            throw new Error(
-              `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
-            );
-          }
-        } else if (value) {
-          throw new Error(
-            `Attempted to mark ${this} as having side effects, but other non-dependent steps (${nonDependentSteps
-              .map(String)
-              .join(", ")}) have already been created.`,
-          );
-        }
-      },
-      enumerable: true,
-      configurable: false,
-    });
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
@@ -412,6 +352,64 @@ export /* abstract */ class Step<TData = any> {
 
     // Important: MUST come after `this.layerPlan = ...`
     this.id = this.layerPlan._addStep(this);
+  }
+
+  /**
+   * Set this true for plans that implement mutations; this will prevent them
+   * from being tree-shaken.
+   */
+  get hasSideEffects(): boolean {
+    return this._hasSideEffects;
+  }
+
+  set hasSideEffects(value: boolean) {
+    if (value === this._hasSideEffects) {
+      // No change necessary
+      return;
+    }
+
+    /**
+     * If steps were created after this step, an this step doesn't depend
+     * on them, then it's no longer safe to change hasSideEffects.
+     */
+    let nonDependentSteps: Step[] | null = null;
+
+    const stepTracker = this.layerPlan.operationPlan.stepTracker;
+    const maxStepId = stepTracker.stepCount - 1;
+    if (this.id === maxStepId) {
+      // All good - no more steps were created
+    } else {
+      // If the step created them during initialization and is dependent on
+      // them, that's fine too.
+      for (let id = this.id + 1; id <= maxStepId; id++) {
+        const step = stepTracker.getStepById(id);
+        // Allow steps that aren't in our layer plan
+        if (step.layerPlan !== this.layerPlan) continue;
+        if (stepADependsOnStepB(this, step)) continue;
+        if (nonDependentSteps === null) {
+          nonDependentSteps = [step];
+        } else {
+          nonDependentSteps.push(step);
+        }
+      }
+    }
+    if (nonDependentSteps === null) {
+      if (value) {
+        this._hasSideEffects = true;
+        this.layerPlan.latestSideEffectStep = this;
+        this.operationPlan.resetCache();
+      } else if (this._hasSideEffects === true) {
+        throw new Error(
+          `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
+        );
+      }
+    } else if (value) {
+      throw new Error(
+        `Attempted to mark ${this} as having side effects, but other non-dependent steps (${nonDependentSteps
+          .map(String)
+          .join(", ")}) have already been created.`,
+      );
+    }
   }
 
   /**
@@ -814,6 +812,8 @@ ${printDeps(step, 1)}
    * - `indexMap`: helper function to map over each index from `0` to `count-1`,
    *   returning the resulting array.
    * - `indexForEach`: as `indexMap`, but without the array result.
+   * - `batch`: combines keysets from equivalent steps that become ready during
+   *   the same runloop tick.
    * - `meta`: [experimental]
    *
    * `execute` must return a list with `count` entries, where each value in the

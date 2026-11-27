@@ -1,0 +1,20 @@
+import type {} from "../dist/plugins/PgIntrospectionPlugin.js";
+import { postgraphileMultipass } from "../dist/plugins/PgIntrospectionPolicies.js";
+import { PgRBACPlugin } from "../dist/plugins/PgRBACPlugin.js";
+
+const hook = PgRBACPlugin.gather?.hooks?.pgIntrospection_options;
+if (typeof hook !== "function") {
+  throw new Error("PgRBACPlugin introspection options hook is not defined");
+}
+
+test("enables role filtering for multipass introspection", async () => {
+  const options = { runQuery: jest.fn(), multipass: postgraphileMultipass({}) };
+  await hook({} as never, { serviceName: "main", options });
+  expect(options.multipass.onlyAccessible).toEqual({ includeNoInherit: true });
+});
+
+test("leaves single-pass introspection disabled", async () => {
+  const options = { runQuery: jest.fn(), multipass: false as const };
+  await hook({} as never, { serviceName: "main", options });
+  expect(options.multipass).toBe(false);
+});

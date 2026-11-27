@@ -3,6 +3,7 @@ import "graphile-config";
 import * as dataplanJson from "@dataplan/json";
 import * as dataplanPg from "@dataplan/pg";
 import { PgContextPlugin } from "@dataplan/pg";
+import * as pgIntrospection from "pg-introspection";
 import sql, { version as pgSql2Version } from "pg-sql2";
 
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.ts";
@@ -53,6 +54,8 @@ declare global {
       dataplanPg: typeof dataplanPg;
       /** The `@dataplan/json` module */
       dataplanJson: typeof dataplanJson;
+      /** The `pg-introspection` module */
+      pgIntrospection: typeof pgIntrospection;
       /** The `pg-sql2` module's `sql` export */
       sql: typeof sql;
     }
@@ -69,6 +72,7 @@ export const GraphileBuildPgLibPreset: GraphileConfig.Preset = {
     },
     dataplanPg,
     dataplanJson,
+    pgIntrospection,
     sql,
   },
 };

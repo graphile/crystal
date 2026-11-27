@@ -1,11 +1,15 @@
 // Shared with postgraphile
 
-import { randomBytes } from "crypto";
-import type { Pool } from "pg";
-import { Client } from "pg";
+import type { Pool, QueryConfig } from "pg";
 
 import { createWithPgClient } from "../dist/adaptors/pg.js";
-import type { PgClientQuery, WithPgClient } from "../dist/index.js";
+import {
+  type PgClientQuery,
+  PgExecutor,
+  type WithPgClient,
+} from "../dist/index.js";
+
+export { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 
 function noop() {}
 
@@ -31,6 +35,9 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   };
 }
 
+const originalPgExecutorMethod = (PgExecutor.prototype as any)
+  ._executeWithOrWithoutCache;
+
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
  * 'queries' array.
@@ -49,38 +56,99 @@ export async function withTestWithPgClient<T>(
   direct: boolean,
   callback: (withPgClient: WithPgClient) => Promise<T>,
 ): Promise<T> {
+  let currentBatch: {
+    promises: Set<Promise<any>>;
+    queries: PgClientQuery[];
+    end: {
+      promise: Promise<void>;
+      resolve: () => void;
+    };
+  } | null = null;
+  function finishCurrentBatch() {
+    if (!currentBatch) return;
+    const currentBatchQueries = currentBatch.queries;
+    const endBatch = currentBatch.end.resolve;
+    currentBatch = null;
+    queries.push(...currentBatchQueries);
+    endBatch();
+  }
+  function addBatch(promise: Promise<any>) {
+    if (!currentBatch) {
+      currentBatch = {
+        promises: new Set([promise]),
+        queries: [],
+        end: Promise.withResolvers<void>(),
+      };
+    } else {
+      currentBatch.promises.add(promise);
+    }
+    function rm() {
+      if (!currentBatch) return;
+      currentBatch.promises.delete(promise);
+      if (currentBatch.promises.size === 0) {
+        finishCurrentBatch();
+      }
+    }
+    promise.then(rm, rm);
+    return currentBatch.end.promise.then(() => promise);
+  }
+
+  function addQuery(query: QueryConfig, flushBatch = false) {
+    if (flushBatch) {
+      finishCurrentBatch();
+    }
+    if (currentBatch) {
+      currentBatch.queries.push(query);
+    } else {
+      queries.push(query);
+    }
+  }
+
   const poolClient = await testPool.connect();
   const oldQuery = poolClient.query;
   poolClient.query = function (this: typeof poolClient, ...args: any[]) {
     const opts = typeof args[0] === "string" ? { text: args[0] } : args[0];
     if (!opts.text.includes("--ignore--")) {
       if (direct) {
-        queries.push(opts);
+        addQuery(opts, direct);
       } else {
         // Because we're wrapping everything in a transaction already, we need
         // to "pretend" for the SQL snapshots that this was actually
         // begin/commit/rollback.
         switch (opts.text) {
           case "savepoint tx": {
-            queries.push({ text: "begin; /*fake*/" });
+            addQuery({ text: "begin; /*fake*/" }, true);
             break;
           }
           case "release savepoint tx": {
-            queries.push({ text: "commit; /*fake*/" });
+            addQuery({ text: "commit; /*fake*/" }, true);
             break;
           }
           case "rollback to savepoint tx": {
-            queries.push({ text: "rollback; /*fake*/" });
+            addQuery({ text: "rollback; /*fake*/" }, true);
             break;
           }
           default: {
-            queries.push(opts);
+            addQuery(opts);
           }
         }
       }
     }
     return (oldQuery as (...args: any[]) => unknown).apply(this, args);
   } as typeof poolClient.query;
+  // Monkey patch to capture queries
+  if (
+    originalPgExecutorMethod !==
+    (PgExecutor.prototype as any)._executeWithOrWithoutCache
+  ) {
+    throw new Error("Already patched!");
+  }
+  (PgExecutor.prototype as any)._executeWithOrWithoutCache = function (
+    ...args: any[]
+  ) {
+    const promise = originalPgExecutorMethod.apply(this, args);
+    return addBatch(promise);
+  };
   try {
     if (direct) {
       const withPgClient = createWithPgClient({
@@ -145,58 +213,9 @@ export async function withTestWithPgClient<T>(
       }
     }
   } finally {
+    (PgExecutor.prototype as any)._executeWithOrWithoutCache =
+      originalPgExecutorMethod;
     poolClient.query = oldQuery;
     poolClient.release();
-  }
-}
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function runSqlAsRoot(sql: string, maxAttempts = 1) {
-  let error: Error | undefined;
-  for (let attempts = 0; attempts < maxAttempts; attempts++) {
-    if (attempts > 0) {
-      // Randomize to avoid thundering herd
-      await sleep((0.5 + Math.random()) * attempts * 200);
-    }
-    try {
-      const rootClient = new Client(
-        `postgres:///${process.env.OWNER_DATABASE ?? "postgres"}`,
-      );
-      await rootClient.connect();
-      await rootClient.query(sql);
-      await rootClient.end();
-      return;
-    } catch (e) {
-      error = e;
-    }
-  }
-  throw error ?? new Error("Failed to run SQL as root");
-}
-
-export async function createTestDatabase() {
-  const databaseName = `gctestdb_${randomBytes(8).toString("hex")}`;
-
-  await runSqlAsRoot(
-    `create database ${databaseName} with owner graphilecrystaltest template = graphilecrystaltest_template;`,
-    5,
-  );
-
-  const host = process.env.PGHOST ?? "localhost";
-
-  const connectionString = host.includes("/")
-    ? `socket://graphilecrystaltest:test@${host}?db=${encodeURIComponent(
-        databaseName,
-      )}`
-    : `postgres://graphilecrystaltest:test@${host}/${databaseName}`;
-  return { databaseName, connectionString };
-}
-
-export async function dropTestDatabase(databaseName: string) {
-  if (!databaseName) return;
-  try {
-    await runSqlAsRoot(`drop database ${databaseName};`, 2);
-  } catch {
-    // Noop
   }
 }

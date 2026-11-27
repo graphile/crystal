@@ -29,6 +29,10 @@ const LOOK_UP = "👆".repeat(30);
 
 const $$FINISHED: unique symbol = Symbol("finished");
 
+type TextAndValues = string & { brand?: "TextAndValues" };
+type IdentifiersJSON = string & { brand?: "IdentifiersJSON" };
+type CacheForQuery = Map<IdentifiersJSON, PromiseWithResolvers<any[]>>;
+
 class Wrapped<T extends Error | typeof $$FINISHED = Error | typeof $$FINISHED> {
   public originalValue: T;
 
@@ -135,10 +139,11 @@ export interface WithPgClient<
 }
 
 /**
- * The identity of this object scopes cached read results and in-flight client
- * queues. A batch of requests can share this object; a new one should be used
- * when fresh reads are needed - this is typically handled by
- * `ExecutionExtra.meta` being reset after mutations/etc.
+ * The identity of this object scopes in-flight client queues and cached reads.
+ * With `PgExecutorOptions.store`, cached reads are also scoped to that store.
+ * Built-in steps use execution metadata as the store, so subscription events
+ * and mutation fields have separate caches even when sharing this context.
+ * Callers omitting the store must use a new context when fresh reads are needed.
  */
 export type PgExecutorContext<
   TSettings = any,
@@ -164,6 +169,8 @@ export type PgExecutorInput<TInput> = {
 };
 
 export type PgExecutorOptions = {
+  /** Execution-local cache scope; defaults to context-scoped caching. */
+  store?: object;
   text: string;
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
@@ -273,6 +280,8 @@ function takePending(
 }
 
 export type PgExecutorMutationOptions = {
+  /** The cache scope used by reads in this execution. */
+  store?: object;
   context: PgExecutorContext;
   /** @defaultValue `true` */
   useTransaction?: boolean;
@@ -297,10 +306,29 @@ export type PgExecutorSubscribeOptions = {
  * caching.
  */
 export class PgExecutor<const TName extends string = string, TSettings = any> {
+  private readonly batchCacheTokens = new WeakMap<PgExecutorContext, object>();
+
+  /** Identifies the current read cache generation for cross-step batching. */
+  public getBatchCacheToken(context: PgExecutorContext): object {
+    let token = this.batchCacheTokens.get(context);
+    if (token === undefined) {
+      /* Empty identity token; only reference equality matters. */
+      token = Object.create(null) as object;
+      this.batchCacheTokens.set(context, token);
+    }
+    return token;
+  }
+
+  /** Shared execution metadata for PostgreSQL read caches. */
+  public static readonly metaKey = Symbol("PgExecutor cache");
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
   private maxClientQueues: number;
   private $$cache: symbol;
+  private _cache: WeakMap<
+    object,
+    WeakMap<object, LRU<TextAndValues, CacheForQuery>>
+  >;
   private queryQueues: WeakMap<PgExecutorContext, QueryQueueState>;
 
   constructor(options: {
@@ -317,6 +345,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     this.contextCallback = context;
     this.maxClientQueues = maxClientQueues;
     this.$$cache = Symbol(this.name + "_cache");
+    this._cache = new WeakMap();
     this.queryQueues = new WeakMap();
   }
 
@@ -681,7 +710,7 @@ ${duration}
   ): Promise<{
     values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
-    const { rawSqlValues, identifierIndex, eventEmitter } = common;
+    const { rawSqlValues, identifierIndex, eventEmitter, store } = common;
 
     const publishExecute: PublishFunction | undefined = eventEmitter
       ? (text, name, explain) => {
@@ -736,22 +765,12 @@ ${duration}
 
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
-    type TextAndValues = string & { brand?: "TextAndValues" };
-    type IdentifiersJSON = string & { brand?: "IdentifiersJSON" };
-    type CacheForQuery = Map<IdentifiersJSON, PromiseWithResolvers<any[]>>;
     for (const [batchContext, batch] of batches) {
       const context = batchContext as typeof batchContext &
         Record<symbol, LRU<TextAndValues, CacheForQuery> | undefined>;
       promises.push(
         (async () => {
-          let cacheForContext = useCache ? context[this.$$cache] : undefined;
-          if (cacheForContext === undefined) {
-            cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
-            if (useCache) {
-              context[this.$$cache] = cacheForContext;
-            }
-          }
-
+          const cacheForContext = this.cacheFor(useCache, store, context);
           const textAndValues = `${common.text}\n${JSON.stringify(rawSqlValues)}`;
           let cacheForQuery = cacheForContext.get(textAndValues);
           if (!cacheForQuery) {
@@ -826,7 +845,7 @@ ${duration}
               // everything.
               const queryResult = common.useTransaction
                 ? await this.executeMutation<PgClientResult<TOutput>>(
-                    { context, useTransaction: common.useTransaction },
+                    { context, store, useTransaction: common.useTransaction },
                     (client) =>
                       this._executeWithClient(
                         client,
@@ -1239,7 +1258,7 @@ ${duration}
     options: PgExecutorMutationOptions,
     maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
-    const { context, useTransaction } = options;
+    const { context, store, useTransaction } = options;
     const { withPgClient, pgSettings } = context;
     let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
@@ -1270,9 +1289,50 @@ ${duration}
     );
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
+    this.batchCacheTokens.delete(context);
     (context as any)[this.$$cache]?.reset();
+    if (store != null) {
+      this._cache.get(store)?.get(context)?.reset();
+    }
 
     return result;
   }
+
+  private cacheFor(
+    useCache: boolean,
+    store: object | undefined,
+    context: {
+      [key in symbol]?: LRU<TextAndValues, CacheForQuery> | undefined;
+    },
+  ) {
+    if (!useCache) {
+      return newCache();
+    } else if (store != null) {
+      let cacheForStore = this._cache.get(store);
+      if (!cacheForStore) {
+        cacheForStore = new WeakMap();
+        this._cache.set(store, cacheForStore);
+      }
+      let cacheForContext = cacheForStore.get(context);
+      if (!cacheForContext) {
+        cacheForContext = newCache();
+        cacheForStore.set(context, cacheForContext);
+      }
+      return cacheForContext;
+    } else {
+      let cacheForContext = context[this.$$cache];
+      if (cacheForContext === undefined) {
+        cacheForContext = newCache();
+        context[this.$$cache] = cacheForContext;
+      }
+      return cacheForContext;
+    }
+  }
 }
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");
+
+function newCache() {
+  return new LRU<TextAndValues, CacheForQuery>({
+    maxLength: 500 /* SQL queries */,
+  });
+}

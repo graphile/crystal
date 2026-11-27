@@ -6,6 +6,7 @@ import { inspect } from "node:util";
 import { gatherConfig } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type {
+  IntrospectionPolicy,
   PgAttribute,
   PgClass,
   PgConstraint,
@@ -16,6 +17,7 @@ import type {
 import type {} from "graphile-config";
 import JSON5 from "json5";
 
+import type { ScopedGatherPgIntrospection } from "./interfaces.ts";
 import {
   type IdentifierPart,
   parseIdentifierParts,
@@ -58,14 +60,6 @@ type PgSmartTagRules = {
 export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
 > = PgSmartTagRules[TKind];
-
-type ScopedGatherPgIntrospection<
-  TScope extends keyof GraphileBuild.PluginScopes,
-> = GraphileBuild.PluginScopes[TScope] extends {
-  gather: { pgIntrospection: infer TPgIntrospection };
-}
-  ? TPgIntrospection
-  : never;
 
 type SmartTagClassMatches<TIntrospection> = {
   [TServiceName in keyof TIntrospection &
@@ -198,6 +192,12 @@ interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
   kind: TKind;
   match: PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+  /**
+   * The parts of a string `match`, padded with leading `undefined`s to the
+   * kind's length (or empty, matching everything), or `null` for a `match`
+   * function; usable before introspection completes.
+   */
+  parts: ReadonlyArray<string | undefined> | null;
   tags?: PgSmartTagTags;
   description?: string;
 }
@@ -228,9 +228,11 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   }
 
   let match: PgSmartTagFilterFunction<any>;
+  let parts: ReadonlyArray<string | undefined> | null;
   if (typeof incomingMatch === "function") {
     // User supplied a match function; use that:
     match = incomingMatch;
+    parts = null;
   } else if (typeof incomingMatch === "string") {
     const rawParts = Object.freeze(parseIdentifierParts(incomingMatch));
     const length = rawParts.length;
@@ -252,11 +254,12 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
       return result;
     }
     if (length === 0) {
+      parts = [];
       match = () => true;
     } else {
       switch (rule.kind) {
         case "class": {
-          const [schemaName, tableName] = digest(2);
+          const [schemaName, tableName] = (parts = digest(2));
           match = (rel: PgClass) => {
             if (rel.relname !== tableName) return false;
             if (schemaName === undefined) return true;
@@ -267,7 +270,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "attribute": {
-          const [schemaName, tableName, colName] = digest(3);
+          const [schemaName, tableName, colName] = (parts = digest(3));
           match = (attr: PgAttribute) => {
             if (attr.attname !== colName) return false;
             if (tableName === undefined) return true;
@@ -282,7 +285,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "constraint": {
-          const [schemaName, tableName, conName] = digest(3);
+          const [schemaName, tableName, conName] = (parts = digest(3));
           match = (con: PgConstraint) => {
             if (con.conname !== conName) return false;
             if (tableName === undefined) return true;
@@ -297,7 +300,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "procedure": {
-          const [schemaName, procName] = digest(2);
+          const [schemaName, procName] = (parts = digest(2));
           match = (proc: PgProc) => {
             if (proc.proname !== procName) return false;
             if (schemaName === undefined) return true;
@@ -308,7 +311,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "type": {
-          const [schemaName, typeName] = digest(2);
+          const [schemaName, typeName] = (parts = digest(2));
           match = (type: PgType) => {
             if (type.typname !== typeName) return false;
             if (schemaName === undefined) return true;
@@ -319,7 +322,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "namespace": {
-          const [schemaName] = digest(1);
+          const [schemaName] = (parts = digest(1));
           match = (nsp: PgNamespace) => nsp.nspname === schemaName;
           break;
         }
@@ -337,6 +340,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   return {
     kind,
     match,
+    parts,
     ...rest,
   };
 }
@@ -387,6 +391,72 @@ async function resolveRules(
   return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
 }
 
+const TAG_PREVIEW_POLICIES = [
+  ["class", "classes", "mergeTags"],
+  ["type", "types", "mergeTypeTags"],
+  ["constraint", "constraints", "mergeConstraintTags"],
+] as const;
+
+/**
+ * Merges the tags of name-matched rules into the tags multipass
+ * policies see. Rules matched by a function cannot be applied to raw rows, so
+ * they only take effect after introspection.
+ */
+function mergeTagsPolicy(
+  name: string,
+  entity: (typeof TAG_PREVIEW_POLICIES)[number][1],
+  rules: ReadonlyArray<{
+    schemaName: string | undefined;
+    tableName: string | undefined;
+    objectName: string | undefined;
+    tags: PgSmartTagTags;
+  }>,
+): IntrospectionPolicy<typeof entity> {
+  return {
+    name,
+    entity,
+    preview(row, details) {
+      const [objectName, namespaceId] =
+        "relname" in row
+          ? [row.relname, row.relnamespace]
+          : "typname" in row
+            ? [row.typname, row.typnamespace]
+            : [row.conname, row.connamespace];
+      const candidates = rules.filter(
+        (rule) =>
+          rule.objectName === undefined || rule.objectName === objectName,
+      );
+      if (candidates.length === 0) {
+        return;
+      }
+      const tagsAndDescription = details.getTagsAndDescription(entity, row);
+      const namespaces = details.peek("namespaces", { _id: namespaceId }, [
+        "_pgSmartTags",
+      ]);
+      const table =
+        "conrelid" in row &&
+        candidates.some((rule) => rule.tableName !== undefined)
+          ? details.peek("classes", { _id: row.conrelid }, [
+              "_pgSmartTags",
+            ])?.[0]
+          : undefined;
+      if (!tagsAndDescription || !namespaces) {
+        return;
+      }
+      const { tags } = tagsAndDescription;
+      for (const rule of candidates) {
+        if (
+          (rule.tableName === undefined || rule.tableName === table?.relname) &&
+          (rule.schemaName === undefined ||
+            rule.schemaName === namespaces[0]?.nspname)
+        ) {
+          Object.assign(tags, rule.tags);
+        }
+      }
+    },
+  };
+}
+
 let counter = 0;
 export function pgSmartTags<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
@@ -400,8 +470,9 @@ export function pgSmartTags<
   details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;
+  const name = details?.name ?? `PgSmartTagsPlugin_${id}`;
   return {
-    name: details?.name ?? `PgSmartTagsPlugin_${id}`,
+    name,
     description: details?.description,
     version: details?.version ?? "0.0.0",
     before: ["smart-tags"],
@@ -419,6 +490,40 @@ export function pgSmartTags<
         };
       },
       hooks: {
+        // Multipass introspection decides what to fetch partly from smart
+        // tags (e.g. `@foreignKey`, `@enum`), so apply these rules there too.
+        pgIntrospection_options(info, event) {
+          const { multipass } = event.options;
+          if (!multipass) {
+            return;
+          }
+          const [rules] = rulesFrom(info.state.rules);
+          for (const [kindName, entity, suffix] of TAG_PREVIEW_POLICIES) {
+            const discoveryRules = rules.flatMap(
+              ({ serviceName, kind, parts, tags }) => {
+                if (
+                  kind !== kindName ||
+                  parts == null ||
+                  tags == null ||
+                  (serviceName != null && serviceName !== event.serviceName)
+                ) {
+                  return [];
+                }
+                const [schemaName, tableName, objectName] =
+                  kind === "constraint"
+                    ? parts
+                    : [parts[0], undefined, parts[1]];
+                return [{ schemaName, tableName, objectName, tags }];
+              },
+            );
+            if (discoveryRules.length > 0) {
+              multipass.policies.push(
+                mergeTagsPolicy(`${name}_${suffix}`, entity, discoveryRules),
+              );
+            }
+          }
+        },
+
         // Run in the 'introspection' phase before anything uses the tags
         pgIntrospection_introspection(info, event) {
           const { introspection, serviceName } = event;
@@ -491,6 +596,11 @@ export function pgSmartTags<
                 promise.then(
                   () => {
                     info.cache.rulesPromise = promise;
+
+                    // Smart tags impact introspection discovery, so invalidate
+                    // introspection just before we kick off a new gather
+                    info.helpers.pgIntrospection.invalidateIntrospection();
+
                     callback();
                   },
                   (e) => {

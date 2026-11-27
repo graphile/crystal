@@ -33,45 +33,40 @@ And please give some love to our featured sponsors 🤩:
 
 ## Usage
 
-Issue the `makeIntrospectionQuery()` SQL query to your database, then feed the
-first row's `introspection` field into `parseIntrospectionResults()` to get your
-strongly typed introspection results.
+Call `introspect` passing options including the required `runQuery` adaptor that
+should run the given text/values using a database adaptor of your choice and
+return the value of the `introspection` column of the first (and only) row
+returned.
 
-Example usage with `pg` module:
+```ts
+import { introspect } from "pg-introspection";
+import { runQuery } from "./runQuery.ts";
 
-```js
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
+const introspection = await introspect({ runQuery });
+console.log(introspection.database.getDba()?.rolname);
+```
+
+Here's an example of a `runQuery` function for the `pg` module:
+
+```ts
+// runQuery.ts
+import type { RunQuery } from "pg-introspection";
 import { Pool } from "pg";
 
-const pool = new Pool({
-  connectionString: "postgres://localhost:5432/my_database",
-});
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
 
-async function main() {
-  const sql = makeIntrospectionQuery();
-  const { rows } = await pool.query(sql);
-  const introspection = parseIntrospectionResults(rows[0].introspection);
-
-  console.log(
-    `The ${introspection.database.datname} DBA is ${
-      introspection.database.getDba()?.rolname ?? "-"
-    }`,
-  );
-}
-
-main();
+export const runQuery: RunQuery = async (text, values) => {
+  const { rows } = await pool.query(text, values);
+  return rows[0].introspection;
+};
 ```
 
 ## Accessors
 
-Into the introspection results we mix "accessor" functions to make following
-relationships easier. Note that these functions are typically evaluated lazily -
-the first time you call them they may need to do an expensive lookup (e.g.
-finding the relevant record from the list of records) but they cache the result
-so that the next call will be near-instant.
+Navigation helpers make following catalog relationships easier. Augmentation
+builds indexes for looking up related objects; some derived values are computed
+lazily and cached for subsequent calls.
 
 Examples:
 
@@ -93,3 +88,10 @@ read if you're not familiar with the system catalog.
 We use `_id` rather than `oid` because older versions of PostgreSQL did not
 explicitly list the `oid` columns when you `select * from` so we explicitly list
 them among the selection set.
+
+## View the docs
+
+For details of the options and advanced usage instructions (including how to
+cache the results), see the full documentation:
+
+https://star.graphile.org/pg-introspection/

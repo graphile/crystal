@@ -106,9 +106,9 @@ When exporting your schema for use in a serverless environment, every byte
 matters - for bundling, for reading, and for executing. In these environments
 it's rare that introspection is a need (no GraphiQL or build tooling
 introspecting this endpoint), so this preset strips out all of the documentation
-and deprecations from the schema, and also attempts to remove other metadata
-from the code. The result is less code to export, smaller bundle size, and
-thereby a faster serverless startup time!
+and deprecation reasons from the schema, and also attempts to remove other
+metadata from the code. The result is less code to export, smaller bundle size,
+and thereby a faster serverless startup time!
 
 ```ts title="graphile.config.ts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";

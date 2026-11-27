@@ -1,6 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
+import { batchInMeta } from "../batch/batchInMeta.ts";
 import type { Bucket, RequestTools, SharedBucketState } from "../bucket.ts";
 import {
   $$streamMore,
@@ -9,7 +10,6 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   FLAG_POLY_SKIPPED,
-  FLAG_STOPPED,
   NO_FLAGS,
 } from "../constants.ts";
 import { isDev } from "../dev.ts";
@@ -17,6 +17,7 @@ import { flagError, isFlaggedValue, SafeError } from "../error.ts";
 import { inspect } from "../inspect.ts";
 import type {
   BatchExecutionValue,
+  BatchFunction,
   ExecuteStepEvent,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -134,9 +135,17 @@ export function executeBucket(
     metaByMetaKey,
     size,
     store,
-    layerPlan: { phases },
+    layerPlan: { phases, operationPlan },
   } = bucket;
 
+  const batch: BatchFunction = (executor, keysets, options?) =>
+    batchInMeta(
+      operationPlan.schema,
+      metaByMetaKey,
+      executor,
+      keysets,
+      options,
+    );
   const phaseCount = phases.length;
 
   // Like a `for(i = 0; i < phaseCount; i++)` loop with some `await`s in it, except it does promise
@@ -827,12 +836,13 @@ export function executeBucket(
       }
     }
     const executeDetails: ExecutionDetails<readonly any[]> = {
-      indexMap: makeIndexMap(count),
-      indexForEach: makeIndexForEach(count),
       count,
       values,
-      extra,
+      indexMap: makeIndexMap(count),
+      indexForEach: makeIndexForEach(count),
+      batch,
       stream: evaluateStream(bucket, step, distributorOptions),
+      extra,
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(
@@ -873,7 +883,6 @@ export function executeBucket(
 
     /** If all we see is errors, there's no need to execute! */
     let newSize = 0;
-    const newPolymorphicPathList: (string | null)[] = [];
     let stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
     const dependenciesIncludingSideEffectsCount =
@@ -986,8 +995,7 @@ export function executeBucket(
         forcedValues.flags[dataIndex] = indexFlags;
         forcedValues.results[dataIndex] = forceIndexValue;
       } else {
-        const newIndex = newSize++;
-        newPolymorphicPathList[newIndex] = polymorphicPathList[dataIndex];
+        newSize++;
         if (needsTransform) {
           // dependenciesWithoutErrors has limited content; add this non-error value
           for (
@@ -1192,7 +1200,7 @@ export function executeBucket(
           // ExecutionValue is created:
           //   bucket.hasNonZeroStatus = true;
           return {
-            flags: arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
+            flags: arrayOfLength(size, FLAG_ERROR),
             results: arrayOfLength(size, error),
           };
         });
@@ -1204,7 +1212,7 @@ export function executeBucket(
       // ExecutionValue is created:
       //   bucket.hasNonZeroStatus = true;
       return {
-        flags: arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
+        flags: arrayOfLength(size, FLAG_ERROR),
         results: arrayOfLength(size, error),
       };
     }

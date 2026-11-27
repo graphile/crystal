@@ -58,6 +58,11 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
     },
     helpers: {},
     hooks: {
+      pgIntrospection_options(_info, event) {
+        if (event.options.multipass) {
+          event.options.multipass.onlyAccessible = { includeNoInherit: true };
+        }
+      },
       async pgCodecs_attribute(info, event) {
         const { pgAttribute, serviceName, attribute } = event;
         const pgClass = pgAttribute.getClass();
@@ -169,11 +174,11 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
+    // Permissions take precedence over smart tags: a tag cannot grant access.
     entityBehavior: {
       pgCodecAttribute: {
-        inferred: {
-          after: ["inferred"],
-          provides: ["postInferred"],
+        override: {
+          after: ["PgBasicsPlugin"],
           callback(behavior, [codec, attributeName]) {
             const attr = codec.attributes[attributeName];
             const newBehavior = [behavior];
@@ -204,9 +209,8 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRelation: {
-        inferred: {
-          after: ["inferred"],
-          provides: ["postInferred"],
+        override: {
+          after: ["PgBasicsPlugin"],
           callback(behavior, relation) {
             const resource = relation.remoteResource;
             const newBehavior = [...modBehaviorForResource(behavior, resource)];
@@ -234,18 +238,16 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         },
       },
       pgResource: {
-        inferred: {
-          after: ["inferred"],
-          provides: ["postInferred"],
+        override: {
+          after: ["PgBasicsPlugin"],
           callback(behavior, resource) {
             return modBehaviorForResource(behavior, resource);
           },
         },
       },
       pgResourceUnique: {
-        inferred: {
-          after: ["inferred"],
-          provides: ["postInferred"],
+        override: {
+          after: ["PgBasicsPlugin"],
           callback(behavior, [resource, _unique]) {
             return modBehaviorForResource(behavior, resource);
           },

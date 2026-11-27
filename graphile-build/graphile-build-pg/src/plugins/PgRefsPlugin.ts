@@ -11,12 +11,9 @@ import type {
 import { arraysMatch } from "grafast";
 import { gatherConfig } from "graphile-build";
 
-import {
-  parseDatabaseIdentifier,
-  parseDatabaseIdentifiers,
-  parseSmartTagsOptsString,
-} from "../utils.ts";
+import { parseDatabaseIdentifier, parseSmartTagsOptsString } from "../utils.ts";
 import { version } from "../version.ts";
+import { parseRefHop, refPathDependencies } from "./pgRefIntrospection.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -67,6 +64,16 @@ declare global {
 
 const EMPTY_OBJECT = Object.freeze({});
 
+function schemasForService(
+  preset: GraphileConfig.ResolvedPreset,
+  serviceName: string,
+) {
+  return (
+    preset.pgServices?.find((service) => service.name === serviceName)
+      ?.schemas ?? ["public"]
+  );
+}
+
 export const PgRefsPlugin: GraphileConfig.Plugin = {
   name: "PgRefsPlugin",
   description:
@@ -100,6 +107,16 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
     },
     helpers: {},
     hooks: {
+      pgIntrospection_options(info, { options, serviceName }) {
+        const { multipass } = options;
+        if (multipass) {
+          multipass.policies.push(
+            refPathDependencies(
+              schemasForService(info.resolvedPreset, serviceName),
+            ),
+          );
+        }
+      },
       async pgCodecs_PgCodec(info, event) {
         const { pgCodec, pgClass } = event;
         if (!pgClass) {
@@ -178,13 +195,17 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             2,
             nsp.nspname,
           );
+          // An out-of-schema hop skips this path without a missing-table diagnostic.
+          if (!schemas.includes(targetSchemaName)) {
+            return undefined;
+          }
           const targetPgClass =
             await info.helpers.pgIntrospection.getClassByName(
               serviceName,
               targetSchemaName,
               targetTableName,
             );
-          if (!targetPgClass) {
+          if (!targetPgClass?.getType()) {
             return null;
           }
           const targetCodec = await info.helpers.pgCodecs.getCodecFromClass(
@@ -215,6 +236,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           rawRefVias?.map((refVia) => parseSmartTagsOptsString(refVia, 1)) ??
           [];
 
+        const schemas = schemasForService(info.resolvedPreset, serviceName);
         for (const [refName, refDefinition] of Object.entries(refDefinitions)) {
           const relevantVias = refVias.filter((v) => v.args[0] === refName);
           const relevantViaStrings = relevantVias
@@ -263,72 +285,26 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
               const relationEntries = relations
                 ? (Object.entries(relations) as Array<RelationEntry>)
                 : [];
-              const part = rawPart.trim();
-              // ENHANCE: allow whitespace
-              const matches = part.match(
-                /^\(([^)]+)\)->([^)]+)(?:\(([^)]+)\))?$/,
-              );
-
-              let relationEntry: RelationEntry | undefined;
-              if (matches) {
-                const [
-                  ,
-                  rawLocalCols,
-                  targetTableIdentifier,
-                  maybeRawTargetCols,
-                ] = matches;
-
-                const localAttributes = parseDatabaseIdentifiers(
-                  rawLocalCols,
-                  1,
-                ).map((i) => i[0]);
-                const maybeTargetAttributes = maybeRawTargetCols
-                  ? parseDatabaseIdentifiers(maybeRawTargetCols, 1).map(
-                      (i) => i[0],
-                    )
-                  : null;
-
-                const targetCodec = await getCodecForTableName(
-                  targetTableIdentifier,
-                );
-                if (!targetCodec) {
-                  console.error(
-                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
-                  );
-                  continue outerLoop;
-                }
-
-                relationEntry = relationEntries.find(([, rel]) => {
-                  if (rel.remoteResourceOptions.codec !== targetCodec) {
-                    return false;
-                  }
-                  if (!arraysMatch(rel.localAttributes, localAttributes)) {
-                    return false;
-                  }
-                  if (maybeTargetAttributes) {
-                    if (
-                      !arraysMatch(rel.remoteAttributes, maybeTargetAttributes)
-                    ) {
-                      return false;
-                    }
-                  }
-                  return true;
-                });
-              } else {
-                const targetTableIdentifier = part;
-                const targetCodec = await getCodecForTableName(
-                  targetTableIdentifier,
-                );
-                if (!targetCodec) {
-                  console.error(
-                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
-                  );
-                  continue outerLoop;
-                }
-                relationEntry = relationEntries.find(([, rel]) => {
-                  return rel.remoteResourceOptions.codec === targetCodec;
-                });
+              const { table, localColumns, remoteColumns } =
+                parseRefHop(rawPart);
+              const targetCodec = await getCodecForTableName(table);
+              if (targetCodec === undefined) {
+                continue outerLoop;
               }
+              if (!targetCodec) {
+                console.error(
+                  `Ref ${refName} has bad via '${via}' which references table '${table}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
+                );
+                continue outerLoop;
+              }
+              const relationEntry = relationEntries.find(
+                ([, rel]) =>
+                  rel.remoteResourceOptions.codec === targetCodec &&
+                  (localColumns === null ||
+                    arraysMatch(rel.localAttributes, localColumns)) &&
+                  (remoteColumns === null ||
+                    arraysMatch(rel.remoteAttributes, remoteColumns)),
+              );
               if (relationEntry) {
                 path.push({
                   relationName: relationEntry[0],

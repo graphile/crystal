@@ -1,5 +1,6 @@
 import { pgSelect, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 import {
   connection,
   constant,
@@ -16,10 +17,6 @@ import pg, { type Pool } from "pg";
 import { makeSchema } from "postgraphile";
 import PostGraphileAmberPreset from "postgraphile/presets/amber";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { EXPORTABLE, extendSchema, gql } from "../dist/index.js";
 
 let pgPool: Pool | null = null;
@@ -156,6 +153,7 @@ it("infers scope", async () => {
         `,
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -194,6 +192,7 @@ it("enables overriding scope", async () => {
         },
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -253,6 +252,7 @@ it("supports unary steps in loadOne", async () => {
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -369,6 +369,7 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -457,6 +458,7 @@ it("supports arbitrary sql queries with unknown placeholders", async () => {
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,
@@ -669,6 +671,7 @@ it("scope", async () => {
         };
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({
         pool: pgPool!,

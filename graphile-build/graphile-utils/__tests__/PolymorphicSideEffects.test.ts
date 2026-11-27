@@ -1,5 +1,6 @@
 // See https://github.com/benjie/ouch-my-finger/pull/21
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 import { grafast } from "grafast";
 import { makeSchema } from "graphile-build";
 import type { Pool } from "pg";
@@ -9,10 +10,6 @@ import { GraphQLError } from "postgraphile/graphql";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { extendSchema, gql } from "../dist/index.js";
 
 let pgPool: Pool | null = null;
@@ -147,6 +144,7 @@ it("handles basic side effects in polymorphic positions", async () => {
   const { schema, resolvedPreset } = await makeSchema({
     extends: [PostGraphileAmberPreset, makeV4Preset()],
     plugins: [AchinthaSideEffectsPlugin],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [
       makePgService({ pool: pgPool!, schemas: ["achintha_side_effects"] }),
     ],

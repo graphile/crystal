@@ -151,6 +151,122 @@ loop yourself, the `details.indexMap` helper will call the given callback with
 each index in the batch in turn; this is commonly used when returning the result
 of the execute method.
 
+#### details.batch
+
+(Experimental)
+
+`details.batch` combines compatible work submitted by step executions that are
+ready in the same tick. It deduplicates keysets before calling your batch
+function, then returns results in the original order, including duplicates.
+This can combine work across branches of an operation as well as within a
+single step execution.
+
+```ts
+details.batch(executor, keysets, options);
+```
+
+The callback receives the options and the unique keysets, and must
+return one result for each keyset in the same order. It can return an array or a
+promise of an array. `details.batch` returns an array or a promise of an array; if the callback throws
+or rejects, each caller in that batch receives the error. An empty keyset list
+returns an empty result without calling the callback.
+
+To combine calls, use the same executor object and matching options. Calls
+share batch state across steps within the same execution scope, regardless of
+their `metaKey`. Each root execution, mutation field, and subscription event
+starts a fresh scope. Options must be plain objects and have the same prototype
+and own keys, including symbols and non-enumerable keys. By default each own
+value is compared using `===`. A missing key differs from a key whose value is
+`undefined`. Define the executor outside `execute` and pass all values that
+affect its work through the options. Keep the options and the values compared
+structurally unchanged during execution.
+
+For example, given a service whose `getUsers` method returns one result per ID:
+
+```ts
+import { defineBatchExecutor, Step, type ExecutionDetails } from "grafast";
+import { userService } from "./services/users";
+
+function fetchUsers(
+  { service }: { service: typeof userService },
+  ids: readonly string[],
+) {
+  return service.getUsers(ids);
+}
+
+const usersBatch = defineBatchExecutor({
+  name: "myapp/usersById",
+  keysetEquality: "strict",
+  callback: fetchUsers,
+});
+
+class UserStep extends Step {
+  private idDepIndex: number;
+
+  constructor($id: Step<string>) {
+    super();
+    this.idDepIndex = this.addDependency($id);
+  }
+
+  execute(details: ExecutionDetails) {
+    const idEv = details.values[this.idDepIndex];
+    const ids = details.indexMap((i) => idEv.at(i) as string);
+    return details.batch(usersBatch, ids, { service: userService });
+  }
+}
+```
+
+Supply an `optionsMatch` descriptor to `defineBatchExecutor` to choose how
+each property is compared. Properties you leave unspecified still use `===`.
+
+```ts
+// For a user lookup that also accepts filters and a list of fields:
+const optionsMatch = {
+  lookup: {
+    service: "strict",
+    filters: "record",
+  },
+  fields: "tuple",
+} as const;
+```
+
+`"strict"` uses `===`. `"record"` compares plain objects and arrays by prototype,
+own keys, and their values. A nested descriptor applies the same own-property
+rules. For other values, `"record"` and nested descriptors use `===`.
+`"tuple"` compares arrays by length and their elements in order.
+Gra*fast* uses these rules to narrow the search for equivalent
+options, then checks the remaining candidates against the descriptor. The index
+uses explicit rules in declaration order, followed by the other own keys in a
+canonical order. Put distinctive values early to reduce index branching. Only
+use structural rules where the callback treats the resulting values as
+equivalent. A combined batch uses the first caller's options. Omit the third
+argument when the executor accepts `undefined`.
+
+Executor names must identify the same executor object within each schema.
+Gra*fast* checks this when `details.batch` is called: conflicting definitions
+throw in development and log a warning once per schema and name in production.
+Conflicting executors still batch separately in production. Each schema has its
+own registry, so rebuilding a schema can introduce new executor definitions.
+Use names that distinguish your executors from those supplied by libraries.
+
+The required `keysetEquality` in `defineBatchExecutor` controls how keysets are
+deduplicated:
+
+- `"strict"` uses direct equality.
+- `"tuple"` compares arrays by length and each element in order.
+- `"object"` compares the enumerable string keys of objects, regardless of key
+  order, and compares their values.
+
+Values use the same equality as `Map` keys (`===` with `NaN` equal to itself).
+These comparisons are shallow: nested objects and arrays are compared by
+identity. Select a mode that matches the inputs your callback treats as
+equivalent. Compatible calls share cached results and in-flight work throughout
+an execution scope, including across steps and later batch calls. Only uncached
+keysets are passed to the callback. Promises are allocated per batch rather than
+per key, and calls whose keys are all cached return synchronously. The cache belongs to `metaByMetaKey` and ends
+with that scope; root executions, mutation fields and subscription events have
+separate scopes. Failed batch calls are evicted so later calls can retry.
+
 #### details.values
 
 `details.values` is also critical: an ordered array of execution values, one for
@@ -899,7 +1015,7 @@ directly on any step:
 ```ts
 const $step = doSomething();
 
-const $log = lambda(null, () => console.log("hello world"))
+const $log = lambda(null, () => console.log("hello world"));
 // Ensure $log will run and not be tree shaken away
 $log.hasSideEffects = true;
 

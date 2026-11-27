@@ -411,13 +411,10 @@ export class OperationPlan {
 
     const allTypes = Object.values(schema.getTypeMap());
 
-    const allUnions: GraphQLUnionType[] = [];
-    const allObjectTypes: GraphQLObjectType[] = [];
     this.unionsContainingObjectType = Object.create(null);
 
     for (const type of allTypes) {
       if (isUnionType(type)) {
-        allUnions.push(type);
         const members = type.getTypes();
         for (const memberType of members) {
           if (!this.unionsContainingObjectType[memberType.name]) {
@@ -429,7 +426,6 @@ export class OperationPlan {
           }
         }
       } else if (isObjectType(type)) {
-        allObjectTypes.push(type);
         if (!this.unionsContainingObjectType[type.name]) {
           this.unionsContainingObjectType[type.name] = [];
         }
@@ -3204,9 +3200,11 @@ export class OperationPlan {
         );
       }
       const argumentType = argumentDefinition.type;
-      const defaultValue = argumentDefinition.defaultValue
-        ? defaultValueToValueNode(argumentType, argumentDefinition.defaultValue)
-        : undefined;
+      const defaultValue = defaultValueToValueNode(
+        this.schema,
+        argumentType,
+        argumentDefinition.defaultValue,
+      );
       const argumentValue = argumentValues?.find(
         (v) => v.name.value === argumentName,
       );
@@ -5244,29 +5242,6 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
     );
   }
 
-  private walkOutputPlans(
-    outputPlan: OutputPlan,
-    callback: (outputPlan: OutputPlan) => void,
-  ): void {
-    callback(outputPlan);
-    if (outputPlan.child !== null) {
-      this.walkOutputPlans(outputPlan.child, callback);
-    }
-    if (outputPlan.childByTypeName !== undefined) {
-      Object.values(outputPlan.childByTypeName).forEach((childOutputPlan) => {
-        this.walkOutputPlans(childOutputPlan, callback);
-      });
-    }
-    for (const spec of Object.values(outputPlan.keys)) {
-      if (spec.type === "outputPlan") {
-        this.walkOutputPlans(spec.outputPlan, callback);
-      }
-    }
-    for (const defer of outputPlan.deferredOutputPlans) {
-      this.walkOutputPlans(defer, callback);
-    }
-  }
-
   generatePlanJSON(): GrafastPlanJSON {
     function printStep(step: Step): GrafastPlanStepJSONv1 {
       const metaString = step.toStringMeta();
@@ -5605,9 +5580,9 @@ function makeMetaByMetaKeysFactory(
   };
 }
 
-const EMPTY_OBJECT = Object.freeze(Object.create(null));
 function makeMetaByMetaKeys0() {
-  return EMPTY_OBJECT;
+  // This scope also owns batch state, even when no step declares a metaKey.
+  return Object.create(null);
 }
 function makeMetaByMetaKeys1Factory(key1: string | number | symbol) {
   return function makeMetaByMetaKeys1() {

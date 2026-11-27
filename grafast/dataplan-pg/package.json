@@ -60,7 +60,7 @@
   "dependencies": {
     "@dataplan/json": "workspace:^",
     "@graphile/lru": "workspace:^",
-    "@types/node": "^22.19.1",
+    "@types/node": "22.x || 24.x || 26.x",
     "chalk": "^4.1.2",
     "debug": "^4.4.3",
     "eventemitter3": "^5.0.1",
@@ -92,6 +92,7 @@
   ],
   "devDependencies": {
     "@graphql-codegen/cli": "^6.1.0",
+    "@localrepo/test-helpers": "workspace:*",
     "@mermaid-js/mermaid-cli": "^11.12.0",
     "@types/jest": "^30.0.0",
     "@types/json5": "^2.2.0",

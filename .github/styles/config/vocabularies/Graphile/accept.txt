@@ -35,3 +35,4 @@ TSDoc
 backoff
 (?i)accessors
 (?i)accessor
+(?i)multipass

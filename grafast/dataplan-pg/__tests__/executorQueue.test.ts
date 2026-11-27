@@ -1,5 +1,12 @@
+import type { ExecutionDetails } from "grafast";
+import { grafast, makeGrafastSchema, Step } from "grafast";
+
 import { EXPORTABLE } from "../dist/datasource.js";
 import { PgExecutor } from "../dist/executor.js";
+import {
+  pgStepBatchExecutor,
+  pgStepBatchOptions,
+} from "../dist/steps/pgStepBatch.js";
 
 function makeExecutor() {
   return EXPORTABLE(
@@ -34,9 +41,11 @@ function run(
   value: string,
   executionAffinity?: symbol,
   cached = true,
+  store?: object,
 ) {
   const method = cached ? "executeWithCache" : "executeWithoutCache";
   return executor[method]([{ context, queryValues: [] }], {
+    store,
     text,
     rawSqlValues: [value],
     name: text,
@@ -309,3 +318,112 @@ test("rejects pending work if the last queue cannot acquire a client", async () 
   ]);
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
+
+test("read caches are isolated by event, executor, and context", async () => {
+  const executor = makeExecutor();
+  let version = 1;
+  const { context, seen } = makeContext(async () => ({
+    rows: [[version]],
+    rowCount: 1,
+  }));
+  const firstEvent = {};
+  const read = (
+    target: PgExecutor,
+    scope: object | undefined,
+    ctx: ReturnType<typeof makeContext>["context"],
+  ) => run(target, ctx, "select value", "x", undefined, true, scope);
+
+  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
+  // Change what the (uncached) result will be
+  version = 2;
+  // This read is satisfied by cache, change is not reflected
+  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
+  expect(seen).toHaveLength(1);
+
+  // A new store means a fresh cache, change is reflected
+  expect((await read(executor, {}, context)).values).toEqual([[[2]]]);
+  // New PgExecutor, new cache
+  version = 3;
+  expect((await read(makeExecutor(), firstEvent, context)).values).toEqual([
+    [[3]],
+  ]);
+  // New context, new cache
+  version = 4;
+  expect((await read(executor, firstEvent, { ...context })).values).toEqual([
+    [[4]],
+  ]);
+  // Original values, use old cache, old result again
+  expect((await read(executor, firstEvent, context)).values).toEqual([[[1]]]);
+});
+
+test.each([false, true])(
+  "mutations invalidate read caches (store: %s)",
+  async (scoped) => {
+    const executor = makeExecutor();
+    let version = 1;
+    const { context } = makeContext(async () => ({
+      rows: [[version]],
+      rowCount: 1,
+    }));
+    const store = scoped ? {} : undefined;
+    const read = () =>
+      run(executor, context, "select value", "x", undefined, true, store);
+
+    expect((await read()).values).toEqual([[[1]]]);
+    await executor.executeMutation({ store, context }, async () => {
+      version = 2;
+    });
+    expect((await read()).values).toEqual([[[2]]]);
+  },
+);
+
+test.each([false, true])(
+  "cross-step batch caches respect mutation invalidation (store: %s)",
+  async (scoped) => {
+    const executor = makeExecutor();
+    let version = 1;
+    const { context, seen } = makeContext(async () => ({
+      rows: [[version]],
+      rowCount: 1,
+    }));
+    const store = scoped ? {} : undefined;
+    // This test step deliberately closes over mutable test state.
+    // eslint-disable-next-line graphile-export/export-subclasses
+    class ReadAroundMutationStep extends Step<string> {
+      async execute(details: ExecutionDetails) {
+        const read = () =>
+          details.batch(
+            pgStepBatchExecutor,
+            [[], []],
+            pgStepBatchOptions(executor, context, {
+              store,
+              text: "select value",
+              rawSqlValues: [],
+              eventEmitter: undefined,
+            }),
+          );
+        const first = await read();
+        const cached = await read();
+        expect(cached[0]).toBe(first[0]);
+        expect(seen).toHaveLength(1);
+        await executor.executeMutation({ store, context }, async () => {
+          version = 2;
+        });
+        const updated = await read();
+        expect(updated).toEqual([[[2]], [[2]]]);
+        expect(seen).toHaveLength(2);
+        return ["ok"];
+      }
+    }
+    const schema = makeGrafastSchema({
+      typeDefs: "type Query { value: String }",
+      objects: {
+        // eslint-disable-next-line graphile-export/export-plans
+        Query: { plans: { value: () => new ReadAroundMutationStep() } },
+      },
+    });
+    expect(await grafast({ schema, source: "{ value }" })).toEqual({
+      data: { value: "ok" },
+    });
+  },
+);

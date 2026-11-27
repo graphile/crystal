@@ -2059,19 +2059,3 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
 ) as __post_result__;
-
-with __post_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __post_result__.*
-from __post_identifiers__,
-lateral (
-  select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
-    __post_identifiers__.idx as "2"
-  from "a"."post" as __post__
-  where (
-    __post__."id" = __post_identifiers__."id0"
-  )
-) as __post_result__;

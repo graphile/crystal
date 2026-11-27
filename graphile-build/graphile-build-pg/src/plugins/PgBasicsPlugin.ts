@@ -196,7 +196,16 @@ declare global {
       pgRefDefinition: PgRefDefinition;
     }
     interface GatherOptions {
-      /** Set to 'unqualified' to omit the schema name from table, function, and type identifiers */
+      /**
+       * With "qualified" (default) produces fully qualified identifiers, e.g.
+       * `"public"."users"`.
+       *
+       * Set to `"unqualified"` to omit the schema name from table, function, and type
+       * identifiers (for example if you want `select * from "users"` rather than
+       * `select * from "public"."users"`); the runtime `search_path` then controls which
+       * schema is targeted. This is sometimes used for multitenant databases where each
+       * tenant has their own (identically structured) schema in the same databasee.
+       */
       pgIdentifiers?: "qualified" | "unqualified";
     }
   }

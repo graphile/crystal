@@ -617,334 +617,7 @@ const registryConfig = {
     __proto__: null,
     main: executor
   },
-  pgCodecs: Object.fromEntries([["text", TYPES.text], ["varchar", TYPES.varchar], ["bpchar", TYPES.bpchar], ["int4", TYPES.int], ["itemType", itemTypeCodec], ["null", nullCodec], ["__proto__", __proto__Codec], ["building", buildingCodec], ["constructor", constructorCodec], ["crop", cropCodec], ["machine", machineCodec], ["material", materialCodec], ["project", projectCodec], ["relationalItems", relationalItemsCodec], ["relationalStatus", relationalStatusCodec], ["relationalTopics", relationalTopicsCodec], ["reserved", reservedCodec], ["yield", yieldCodec], ["LetterAToDEnum", enumCodec({
-    name: "LetterAToDEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "A",
-      description: "The letter A"
-    }, {
-      value: "B",
-      description: "The letter B"
-    }, {
-      value: "C",
-      description: "The letter C"
-    }, {
-      value: "D",
-      description: "The letter D"
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "abcd",
-        constraintType: "p",
-        constraintName: "abcd_pkey"
-      },
-      tags: {
-        name: "LetterAToD"
-      }
-    }
-  })], ["LetterAToDViaViewEnum", enumCodec({
-    name: "LetterAToDViaViewEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "A",
-      description: "The letter A"
-    }, {
-      value: "B",
-      description: "The letter B"
-    }, {
-      value: "C",
-      description: "The letter C"
-    }, {
-      value: "D",
-      description: "The letter D"
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "abcd_view",
-        constraintType: "p",
-        constraintName: "FAKE_enum_tables_abcd_view_primaryKey_5"
-      },
-      tags: {
-        name: "LetterAToDViaView"
-      }
-    }
-  })], ["EmptyEnumEnum", enumCodec({
-    name: "EmptyEnumEnum",
-    identifier: TYPES.text.sqlType,
-    values: [],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "empty_enum",
-        constraintType: "p",
-        constraintName: "empty_enum_pkey"
-      },
-      tags: {
-        name: "EmptyEnum"
-      }
-    }
-  })], ["EnumTheFirstEnum", enumCodec({
-    name: "EnumTheFirstEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "a1",
-      description: "Desc A1"
-    }, {
-      value: "a2",
-      description: "Desc A2"
-    }, {
-      value: "a3",
-      description: "Desc A3"
-    }, {
-      value: "a4",
-      description: "Desc A4"
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "lots_of_enums",
-        constraintType: "u",
-        constraintName: "enum_1"
-      },
-      tags: {
-        name: "EnumTheFirst"
-      }
-    }
-  })], ["EnumTheSecondEnum", enumCodec({
-    name: "EnumTheSecondEnum",
-    identifier: TYPES.varchar.sqlType,
-    values: [{
-      value: "b1",
-      description: "Desc B1"
-    }, {
-      value: "b2",
-      description: "Desc B2"
-    }, {
-      value: "b3",
-      description: "Desc B3"
-    }, {
-      value: "b4",
-      description: "Desc B4"
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "lots_of_enums",
-        constraintType: "u",
-        constraintName: "enum_2"
-      },
-      tags: {
-        name: "EnumTheSecond"
-      }
-    }
-  })], ["LotsOfEnumsEnum3Enum", enumCodec({
-    name: "LotsOfEnumsEnum3Enum",
-    identifier: TYPES.bpchar.sqlType,
-    values: [{
-      value: "c1",
-      description: "Desc C1"
-    }, {
-      value: "c2",
-      description: "Desc C2"
-    }, {
-      value: "c3",
-      description: "Desc C3"
-    }, {
-      value: "c4",
-      description: "Desc C4"
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "lots_of_enums",
-        constraintType: "u",
-        constraintName: "enum_3"
-      },
-      tags: {
-        name: "LotsOfEnumsEnum3"
-      }
-    }
-  })], ["LotsOfEnumsEnum4Enum", enumCodec({
-    name: "LotsOfEnumsEnum4Enum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "d1",
-      description: "Desc D1"
-    }, {
-      value: "d2",
-      description: "Desc D2"
-    }, {
-      value: "d3",
-      description: "Desc D3"
-    }, {
-      value: "d4",
-      description: "Desc D4"
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "lots_of_enums",
-        constraintType: "u",
-        constraintName: "enum_4"
-      },
-      tags: {
-        name: "LotsOfEnumsEnum4"
-      }
-    }
-  })], ["SimpleEnumEnum", enumCodec({
-    name: "SimpleEnumEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "Foo",
-      description: "The first metasyntactic variable"
-    }, {
-      value: "Bar",
-      description: null
-    }, {
-      value: "Baz",
-      description: "The third metasyntactic variable, very similar to its predecessor"
-    }, {
-      value: "Qux",
-      description: null
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "enum_tables",
-        tableName: "simple_enum",
-        constraintType: "p",
-        constraintName: "simple_enum_pkey"
-      },
-      tags: {
-        name: "SimpleEnum"
-      }
-    }
-  })], ["EntityKindsEnum", enumCodec({
-    name: "EntityKindsEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "photos",
-      description: undefined
-    }, {
-      value: "locations",
-      description: undefined
-    }, {
-      value: "profiles",
-      description: undefined
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "partitions",
-        tableName: "entity_kinds",
-        constraintType: "p",
-        constraintName: "entity_kinds_pkey"
-      },
-      tags: {
-        name: "EntityKinds"
-      }
-    }
-  })], ["EnumTableTransportationEnum", enumCodec({
-    name: "EnumTableTransportationEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "CAR",
-      description: undefined
-    }, {
-      value: "BIKE",
-      description: undefined
-    }, {
-      value: "SUBWAY",
-      description: undefined
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "function_returning_enum",
-        tableName: "enum_table",
-        constraintType: "u",
-        constraintName: "transportation_enum"
-      },
-      tags: {
-        name: "EnumTableTransportation"
-      }
-    }
-  })], ["LengthStatusEnum", enumCodec({
-    name: "LengthStatusEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "ok",
-      description: undefined
-    }, {
-      value: "too_short",
-      description: undefined
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "function_returning_enum",
-        tableName: "length_status",
-        constraintType: "p",
-        constraintName: "length_status_pkey"
-      },
-      tags: {
-        name: "LengthStatus"
-      }
-    }
-  })], ["StageOptionsEnum", enumCodec({
-    name: "StageOptionsEnum",
-    identifier: TYPES.text.sqlType,
-    values: [{
-      value: "pending",
-      description: undefined
-    }, {
-      value: "round 1",
-      description: undefined
-    }, {
-      value: "round 2",
-      description: undefined
-    }, {
-      value: "rejected",
-      description: undefined
-    }, {
-      value: "hired",
-      description: undefined
-    }],
-    extensions: {
-      isEnumTableEnum: true,
-      enumTableEnumDetails: {
-        serviceName: "main",
-        schemaName: "function_returning_enum",
-        tableName: "stage_options",
-        constraintType: "p",
-        constraintName: "stage_options_pkey"
-      },
-      tags: {
-        name: "StageOptions"
-      }
-    }
-  })]]),
+  pgCodecs: Object.fromEntries([["int4", TYPES.int], ["text", TYPES.text], ["itemType", itemTypeCodec], ["null", nullCodec], ["__proto__", __proto__Codec], ["building", buildingCodec], ["constructor", constructorCodec], ["crop", cropCodec], ["machine", machineCodec], ["material", materialCodec], ["project", projectCodec], ["relationalItems", relationalItemsCodec], ["relationalStatus", relationalStatusCodec], ["relationalTopics", relationalTopicsCodec], ["reserved", reservedCodec], ["yield", yieldCodec]]),
   pgResources: Object.fromEntries([["__proto__", {
     executor: executor,
     name: "__proto__",
@@ -1329,19 +1002,11 @@ const nodeIdCodecs = {
   }
 };
 const building_buildingPgResource = registry.pgResources["building"];
-const relational_items_relational_itemsPgResource = registry.pgResources["relational_items"];
 function RelationalTopic_buildingByConstructorPlan($record) {
   const $buildings = building_buildingPgResource.find();
+  const i_$relational_items = $record.singleRelation("relationalItemsByMyId");
   let previousAlias = $buildings.alias;
-  const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-  $buildings.join({
-    type: "inner",
-    from: relational_items_relational_itemsPgResource.from,
-    alias: relational_itemsAlias,
-    conditions: [sql`${previousAlias}.${sql.identifier("constructor")} = ${relational_itemsAlias}.${sql.identifier("constructor")}`]
-  });
-  previousAlias = relational_itemsAlias;
-  $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
+  $buildings.where(sql`${previousAlias}.${sql.identifier("constructor")} = ${$buildings.placeholder(i_$relational_items.get("constructor"))}`);
   return $buildings.single();
 }
 const EMPTY_OBJECT = Object.freeze({});
@@ -1478,6 +1143,7 @@ function findTypeNameMatch(specifier) {
   return null;
 }
 const relational_items_pkColumnsByRelatedCodecName = Object.fromEntries([["relationalTopics", pkCols], ["relationalStatus", relational_statusUniques[0].attributes]]);
+const resource_relational_itemsPgResource = registry.pgResources["relational_items"];
 const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   function typeNameFromType(typeVal) {
     if (typeof typeVal !== "string") return null;
@@ -6653,7 +6319,7 @@ export const objects = {
       },
       allRelationalItems: {
         plan() {
-          return connection(relational_items_relational_itemsPgResource.find());
+          return connection(resource_relational_itemsPgResource.find());
         },
         args: {
           first: applyFirstArg,
@@ -6667,7 +6333,7 @@ export const objects = {
       },
       allRelationalItemsList: {
         plan() {
-          return relational_items_relational_itemsPgResource.find();
+          return resource_relational_itemsPgResource.find();
         },
         args: {
           first: applyFirstArg,
@@ -8089,7 +7755,7 @@ export const objects = {
       },
       relationalItemsByConstructor: {
         plan($record) {
-          return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
+          return connection(resource_relational_itemsPgResource.find(specFromRecord2($record)));
         },
         args: {
           first: applyFirstArg,
@@ -8103,7 +7769,7 @@ export const objects = {
       },
       relationalItemsByConstructorList: {
         plan($record) {
-          return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
+          return resource_relational_itemsPgResource.find(specFromRecord2($record));
         },
         args: {
           first: applyFirstArg,
@@ -8711,11 +8377,11 @@ export const interfaces = {
       if (step instanceof PgSelectSingleStep &&
       // NOTE: don't compare `resource` directly since it
       // could be a function.
-      step.resource.codec !== relational_items_relational_itemsPgResource.codec) {
+      step.resource.codec !== resource_relational_itemsPgResource.codec) {
         // Assume it's a child; return description of base
         const pkColumns = relational_items_pkColumnsByRelatedCodecName[step.resource.codec.name];
         if (!pkColumns) {
-          throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but '${step.resource.codec.name}' does not seem to be related!`);
+          throw new Error(`Expected a relational record for ${resource_relational_itemsPgResource.name}, but '${step.resource.codec.name}' does not seem to be related!`);
         }
         return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, pkColumns[idx])])));
       } else {
@@ -8730,7 +8396,7 @@ export const interfaces = {
       // A PgSelectSingleStep representing the base relational table
       const $base = (() => {
         if ($inStep instanceof PgSelectSingleStep) {
-          if ($inStep.resource.codec === relational_items_relational_itemsPgResource.codec) {
+          if ($inStep.resource.codec === resource_relational_itemsPgResource.codec) {
             // It's the core table; that's what we want!
             return $inStep;
           } else {
@@ -8740,16 +8406,16 @@ export const interfaces = {
             // shorter and also cacheable.
             const stepPk = $inStep.resource.uniques.find(u => u.isPrimary)?.attributes;
             if (!stepPk) {
-              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
+              throw new Error(`Expected a relational record for ${resource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
             }
             if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
-              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
+              throw new Error(`Expected a relational record for ${resource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
             }
-            return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
+            return resource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
           }
         } else {
           // Assume it's an object representing the base table
-          return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+          return resource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
         }
       })();
       const $typeVal = get2($base, "type");

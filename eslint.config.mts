@@ -99,6 +99,55 @@ const graphileCliImportsRule: Rule.RuleModule = {
   },
 };
 
+// Most package tests exercise built files. These packages test source directly.
+const sourceTestPackages = new Set([
+  "grafast/grafserv",
+  "utils/jest-serializer-graphql-schema",
+  "utils/lds",
+  "utils/lru",
+  "utils/pg-sql2",
+]);
+
+const testImportsRule: Rule.RuleModule = {
+  meta: {
+    type: "problem",
+    schema: [],
+  },
+  create(context) {
+    const relative = normalizePath(path.relative(__dirname, context.filename));
+    const match = /^([^/]+\/[^/]+)\/__tests__\//.exec(relative);
+    if (!match) {
+      return {};
+    }
+    const packagePath = match[1];
+    const expected = sourceTestPackages.has(packagePath) ? "src" : "dist";
+    const forbidden = expected === "src" ? "dist" : "src";
+    const forbiddenRoot = path.resolve(__dirname, packagePath, forbidden);
+    return {
+      "ImportDeclaration > Literal, ExportNamedDeclaration > Literal, ExportAllDeclaration > Literal, ImportExpression > Literal, TSImportType > TSLiteralType > Literal, CallExpression[callee.name='require'] > Literal"(
+        node,
+      ) {
+        const source = (node as TSESTree.StringLiteral).value;
+        if (typeof source !== "string" || !source.startsWith(".")) {
+          return;
+        }
+        const resolved = path.resolve(path.dirname(context.filename), source);
+        if (
+          resolved === forbiddenRoot ||
+          resolved.startsWith(forbiddenRoot + path.sep)
+        ) {
+          context.report({
+            node,
+            message:
+              "Tests in '{{ packagePath }}' must import '{{ expected }}' files; do not mix source and built types.",
+            data: { packagePath, expected },
+          });
+        }
+      },
+    };
+  },
+};
+
 const workspaceExports = new Map<string, Set<string>>();
 const packageJson = JSON.parse(await readFile("package.json", "utf8"));
 const workspaces = packageJson.workspaces as string[];
@@ -229,6 +278,7 @@ const config: ConfigWithExtends = {
     crystal: {
       rules: {
         "graphile-cli-imports": graphileCliImportsRule,
+        "test-imports": testImportsRule,
         "workspace-exports": workspaceExportsRule,
       },
     },
@@ -426,8 +476,10 @@ const oldConfig: { overrides: ReadonlyArray<ConfigWithExtends> } = {
 
     // Rules for tests only
     {
-      files: ["**/__tests__/**/*.{ts,js}"],
+      files: ["**/__tests__/**/*.{ts,tsx,mts,js,mjs,cjs}"],
       rules: {
+        "crystal/test-imports": "error",
+
         // Disable these to enable faster test writing
         "prefer-const": "off",
         "@typescript-eslint/no-explicit-any": "off",

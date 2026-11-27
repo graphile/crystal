@@ -1,23 +1,56 @@
-import type { PgCondition } from "@dataplan/pg";
+import type {
+  GetPgResourceAttributes,
+  PgCondition,
+  PgConditionCapableParent,
+} from "@dataplan/pg";
 import { sqlValueWithCodec } from "@dataplan/pg";
 import type { GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.ts";
-import type { ScopedTableMatch } from "./resolveTableMatch.ts";
+import type { ScopedTableMatch, TableResource } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
+
+type TableCondition<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TMatch,
+> = PgCondition<
+  PgConditionCapableParent,
+  keyof GetPgResourceAttributes<TableResource<TScope, TMatch>> & string
+>;
+
+type ConditionFieldConfig<TCondition, TValue> = Omit<
+  GrafastInputFieldConfig<TCondition, TValue>,
+  "extensions"
+> & {
+  extensions?: Omit<
+    NonNullable<GrafastInputFieldConfig["extensions"]>,
+    "grafast"
+  > & {
+    grafast?: Omit<Grafast.InputFieldExtensions, "apply"> &
+      Pick<GrafastInputFieldConfig<TCondition, TValue>, "apply">;
+  };
+};
+
+export type TableConditionArgs<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TValue,
+  TMatch extends ScopedTableMatch<TScope>,
+> = Parameters<typeof addPgTableCondition<TScope, TValue, TMatch>>;
 
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
+  TValue = any,
+  const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
 >(
-  match: ScopedTableMatch<TScope>,
+  match: TMatch,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,
-  ) => GrafastInputFieldConfig,
+  ) => ConditionFieldConfig<TableCondition<TScope, TMatch>, TValue>,
   // DEPRECATED! Use `apply` instead.
   conditionGenerator?: (
-    value: unknown,
+    value: TValue,
     helpers: {
       sql: typeof sql;
       sqlTableAlias: SQL;
@@ -26,7 +59,7 @@ export function addPgTableCondition<
       // really ought to move to using the `apply` method, so...
       build: PrunedBuild<TScope>;
       /** @internal We might expose this in future if needed */
-      condition: PgCondition;
+      condition: TableCondition<TScope, TMatch>;
     },
   ) => SQL | null | undefined,
 ): GraphileConfig.Plugin {
@@ -99,7 +132,7 @@ export function addPgTableCondition<
             );
             conditionFieldSpec.apply = EXPORTABLE(
               (_build, conditionGenerator, sql, sqlValueWithCodec) =>
-                function apply(condition: PgCondition, val) {
+                function apply(condition: TableCondition<TScope, TMatch>, val) {
                   const expression = conditionGenerator!(val, {
                     sql,
                     sqlTableAlias: condition.alias,

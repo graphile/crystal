@@ -16,7 +16,6 @@ import {
   exportAs,
   first,
   isDev,
-  isPromiseLike,
   lambda,
   reverseArray,
   SafeError,
@@ -28,7 +27,7 @@ import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.ts";
 import { TYPES } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
-import type { PgExecutor, PgExecutorInput } from "../executor.ts";
+import { PgExecutor } from "../executor.ts";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.ts";
 import type {
   PgCodec,
@@ -54,6 +53,7 @@ import type { PgCursorDetails } from "./pgCursor.ts";
 import { PgCursorStep } from "./pgCursor.ts";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { pgStepBatchExecutor, pgStepBatchOptions } from "./pgStepBatch.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -580,6 +580,7 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
+    this.metaKey = PgExecutor.metaKey;
     {
       this.mode = spec.mode ?? "normal";
 
@@ -977,7 +978,7 @@ on (${sql.indent(
     const {
       indexMap,
       values,
-      extra: { eventEmitter },
+      extra: { eventEmitter, meta: store },
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {
@@ -1029,44 +1030,44 @@ on (${sql.indent(
       throw new Error("We have no context dependency?");
     }
 
-    const specs = indexMap<PgExecutorInput<any>>((i) => {
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null
-                  ? null
-                  : alreadyEncoded
-                    ? val
-                    : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
-    const executionResult = await this.executor[executeMethod](specs, {
+    const keysets = indexMap((i) =>
+      identifierIndex !== null
+        ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
+            const val = values[dependencyIndex].at(i);
+            return val == null ? null : alreadyEncoded ? val : codec.toPg(val);
+          })
+        : EMPTY_ARRAY,
+    );
+    const common = {
+      store,
       text,
       rawSqlValues,
       identifierIndex,
       name,
       affinity: this.executionAffinity,
       eventEmitter,
-      useTransaction: false,
-    });
+      useTransaction: this.hasSideEffects,
+    };
+    const executionResult = this.hasSideEffects
+      ? await this.executor.executeWithoutCache(
+          keysets.map((queryValues) => ({ context, queryValues })),
+          common,
+        )
+      : {
+          values: await executionDetails.batch(
+            pgStepBatchExecutor,
+            keysets,
+            pgStepBatchOptions(this.executor, context, common),
+          ),
+        };
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
-      if (isPromiseLike(allVals)) {
+      if (allVals == null) {
+        return NO_ROWS;
+      } else if (!Array.isArray(allVals)) {
         // Must be an error!
         return allVals;
-      } else if (allVals == null) {
-        return NO_ROWS;
       }
       const limit = first ?? last;
       const firstAndLast = first != null && last != null && last < first;

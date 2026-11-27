@@ -114,6 +114,8 @@ export interface PgResourceParameter<
    * named arguments
    */
   name: TName;
+  /** Description of the parameter. */
+  description?: string;
   /**
    * The type of this parameter
    */

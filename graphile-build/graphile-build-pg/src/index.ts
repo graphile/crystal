@@ -200,6 +200,44 @@ declare global {
       };
     }
   }
+
+  namespace PgIntrospection {
+    interface PurposeRegistry {
+      /** Build codecs for column, function, array, domain and composite values. */
+      registryCodec: true;
+      /** Build relations from foreign keys on exposed resources. */
+      registryRelation: true;
+      /** Discover foreign keys from the initially exposed resources. */
+      discoverResourceRelations: true;
+      /** Populate catalog metadata navigation without requesting a codec. */
+      catalogNavigation: true;
+      /** Populate type navigation without requesting another resource codec. */
+      completeTypeNavigation: true;
+      /** Supply constraint information needed to construct a resource. */
+      registryResourceUnique: true;
+      /** Infer resource behaviour from row security. */
+      inferRowSecurityBehaviour: true;
+      /** Build the allowed values of a PostgreSQL enum codec. */
+      registryEnumCodec: true;
+      /** Apply smart tags and GraphQL descriptions. */
+      smartTagsAndDescriptions: true;
+      /** Exclude extension-owned resources and identify automatic dependencies. */
+      pruneExtensionResources: true;
+      /** Detect and build codecs from tables or unique constraints tagged `@enum`. */
+      enumTables: true;
+      /** Identify the table and constraint named by an enum domain. */
+      _enumDomain: true;
+      /** Fetch an object and its catalog metadata together during discovery. */
+      _catalogMetadata: true;
+      /** Look up the tables named in a ref path. */
+      _refPath: true;
+      /**
+       * Peeked to follow `@foreignKey` smart tags to their target tables,
+       * checking whether they are tagged `@enum`.
+       */
+      _foreignKeyTarget: true;
+    }
+  }
 }
 
 export {

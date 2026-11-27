@@ -4,6 +4,8 @@ import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
   Introspection,
+  IntrospectionDataForEntities,
+  IntrospectOptions,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -20,14 +22,71 @@ import type {
   PgRange,
   PgRoles,
   PgType,
+  RunQuery,
 } from "pg-introspection";
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
+import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
 
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
+import {
+  type MutableMultipassOptions,
+  postgraphileMultipass,
+  postgraphilePrune,
+} from "./PgIntrospectionPolicies.ts";
+
+declare global {
+  namespace GraphileBuild {
+    interface PgIntrospectionEntitySelection {
+      // If you add more pg-introspection entities e.g. via the
+      // pgIntrospection_options hook, expand this selection so the types know
+      // about it.
+      database: true;
+      namespaces: true;
+      classes: true;
+      attributes: true;
+      constraints: true;
+      procs: true;
+      roles: true;
+      auth_members: true;
+      types: true;
+      enums: true;
+      extensions: true;
+      indexes: true;
+      languages: true;
+      ranges: true;
+      depends: true;
+      descriptions: true;
+      inherits: true;
+      policies: true;
+      am: true;
+    }
+    type PgIntrospectionEntities =
+      keyof GraphileBuild.PgIntrospectionEntitySelection & string;
+  }
+}
+
+const DEFAULT_ENTITIES: readonly GraphileBuild.PgIntrospectionEntities[] =
+  Object.freeze([
+    "database",
+    "namespaces",
+    "classes",
+    "attributes",
+    "constraints",
+    "procs",
+    "roles",
+    "auth_members",
+    "types",
+    "enums",
+    "extensions",
+    "indexes",
+    "languages",
+    "ranges",
+    "depends",
+    "descriptions",
+    "inherits",
+    "policies",
+    "am",
+  ]);
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -51,6 +110,30 @@ export type PgEntityWithId =
 declare global {
   namespace GraphileBuild {
     interface GatherOptions {
+      /**
+       * Default: `false`
+       *
+       * Multipass introspection helps to minimize the amount of data fetched
+       * from the database for introspection, and in doing so reduces memory
+       * usage and schema build times. It starts by looking just at the
+       * resources in your chosen schemas (and only those you have access to)
+       * and then spiders out from there based on runtime
+       * discovery of dependencies.
+       *
+       * However, this optimization might omit things from your pgRegistry that
+       * you want for your plans but are not using in your generated schema (or
+       * maybe you're using a plugin it's not compatible with).
+       *
+       * We recommend setting this option to `true` to enable multipass introspection.
+       * By default, PostGraphile introspects the entire database in a single SQL query,
+       * which can increase memory usage and produce a larger `pgRegistry`.
+       *
+       * Multipass introspection produces a filtered view of the database. For
+       * example, a table's introspected constraints do not necessarily include
+       * every constraint in PostgreSQL.
+       */
+      pgMultipassIntrospection?: boolean;
+
       /**
        * Should we attempt to install the watch fixtures into the database?
        *
@@ -167,10 +250,20 @@ declare global {
           serviceName: string,
           extensionName: string,
         ): Promise<PgExtension | undefined>;
+        /**
+         * Discard cached introspection results so the next gather introspects
+         * again; call this before triggering a regather when configuration
+         * that affects multipass discovery changes.
+         */
+        invalidateIntrospection(): void;
       };
     }
 
     interface GatherHooks {
+      pgIntrospection_options(event: {
+        serviceName: string;
+        options: PgIntrospectOptions;
+      }): PromiseOrDirect<void>;
       pgIntrospection_introspection(event: {
         introspection: Introspection;
         serviceName: string;
@@ -239,13 +332,19 @@ declare global {
   }
 }
 
+interface PgIntrospectOptions
+  extends IntrospectOptions<GraphileBuild.PgIntrospectionEntities> {
+  multipass?: false | MutableMultipassOptions;
+}
+
 type RawIntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  introspectionText: string;
+  options: PgIntrospectOptions;
+  introspectionData: IntrospectionDataForEntities<GraphileBuild.PgIntrospectionEntities>;
 }>;
 type IntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  introspection: Introspection;
+  introspection: Introspection<GraphileBuild.PgIntrospectionEntities>;
 }>;
 
 interface Cache {
@@ -260,7 +359,7 @@ interface State {
   };
 }
 
-async function getDb(
+async function getIntrospection(
   info: GatherPluginContext<State, Cache>,
   serviceName: string,
 ) {
@@ -271,43 +370,19 @@ async function getDb(
   if (!relevant) {
     throw new Error(`Could not find database '${serviceName}'`);
   }
-  return relevant;
-}
-
-function makeGetEntity<
-  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
->(loc: TKey) {
-  return async (
-    info: GatherPluginContext<State, Cache>,
-    serviceName: string,
-    id: string,
-  ): Promise<Introspection[TKey][number] | undefined> => {
-    const relevant = await getDb(info, serviceName);
-    const list = relevant.introspection[loc];
-    if (!list) {
-      throw new Error(
-        `Could not find database '${serviceName}''s introspection results for '${loc}'`,
-      );
-    }
-    return (list as PgEntityWithId[]).find((entity: PgEntityWithId) =>
-      "_id" in entity
-        ? entity._id === id
-        : "indexrelid" in entity
-          ? entity.indexrelid === id
-          : false,
-    );
-  };
+  return relevant.introspection;
 }
 
 function makeGetEntities<
-  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
+  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>> &
+    keyof Introspection,
 >(loc: TKey) {
   return async (
     info: GatherPluginContext<State, Cache>,
     serviceName: string,
   ): Promise<Introspection[TKey]> => {
-    const relevant = await getDb(info, serviceName);
-    const list = relevant.introspection[loc];
+    const introspection = await getIntrospection(info, serviceName);
+    const list = introspection[loc];
     if (!list) {
       throw new Error(
         `Could not find database '${serviceName}''s introspection results for '${loc}'`,
@@ -411,24 +486,47 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         return executor;
       },
 
-      getNamespace: makeGetEntity("namespaces"),
+      async getNamespace(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getNamespace({ id });
+      },
       getClasses: makeGetEntities("classes"),
-      getClass: makeGetEntity("classes"),
-      getConstraint: makeGetEntity("constraints"),
-      getProc: makeGetEntity("procs"),
-      getRoles: makeGetEntity("roles"),
-      getType: makeGetEntity("types"),
-      getEnum: makeGetEntity("enums"),
-      getExtension: makeGetEntity("extensions"),
-      getIndex: makeGetEntity("indexes"),
-      getLanguage: makeGetEntity("languages"),
-
-      // ENHANCE: we need getters for these
-      // getAuthMembers: makeGetEntity("authMembers"),
-      // getRange: makeGetEntity("ranges"),
-      // getDepend: makeGetEntity("depends"),
-      // getDescription: makeGetEntity("descriptions"),
-      //
+      async getClass(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getClass({ id });
+      },
+      async getConstraint(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getConstraint({ id });
+      },
+      async getProc(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getProc({ id });
+      },
+      async getRoles(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getRoles({ id });
+      },
+      async getType(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getType({ id });
+      },
+      async getEnum(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getEnum({ id });
+      },
+      async getExtension(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getExtension({ id });
+      },
+      async getIndex(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getIndex({ id });
+      },
+      async getLanguage(info, serviceName, id) {
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getLanguage({ id });
+      },
 
       async getAttribute(info, serviceName, classId, attributeNumber) {
         const pgClass = await info.helpers.pgIntrospection.getClass(
@@ -464,51 +562,38 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 
       async getInheritedForClass(info, serviceName, classId) {
         // const pgClass = await info.helpers.pgIntrospection.getClass(serviceName, classId);
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.inherits;
+        const introspection = await getIntrospection(info, serviceName);
+        const list = introspection.inherits;
         // PERF: cache
         return list.filter((entity) => entity.inhrelid === classId);
       },
 
       async getInheritanceChildrenForClass(info, serviceName, classId) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.inherits;
+        const introspection = await getIntrospection(info, serviceName);
+        const list = introspection.inherits;
         // PERF: cache
         return list.filter((entity) => entity.inhparent === classId);
       },
 
       async getNamespaceByName(info, serviceName, name) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.namespaces;
-        return list.find((nsp) => nsp.nspname === name);
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getNamespace({ name });
       },
 
       async getClassByName(info, serviceName, schemaName, tableName) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.classes;
-        return list.find(
-          (rel) =>
-            rel.getNamespace()!.nspname === schemaName &&
-            rel.relname === tableName,
-        );
+        const introspection = await getIntrospection(info, serviceName);
+        const namespace = introspection.getNamespace({ name: schemaName });
+        return namespace?.getClass({ name: tableName });
       },
 
       async getTypeByName(info, serviceName, schemaName, typeName) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.types;
-        return list.find(
-          (typ) =>
-            typ.getNamespace()!.nspname === schemaName &&
-            typ.typname === typeName,
-        );
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getType({ schemaName, name: typeName });
       },
 
-      // ENHANCE: we should maybe use pg_type.typelem and look up by ID directy
-      // instead of having this function
       async getTypeByArray(info, serviceName, arrayId) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.types;
-        return list.find((type) => type.typarray === arrayId);
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getType({ arrayId });
       },
 
       async getEnumsForType(info, serviceName, typeId) {
@@ -528,10 +613,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       async getExtensionByName(info, serviceName, extensionName) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.extensions;
-        // PERF: cache
-        return list.find((entity) => entity.extname === extensionName);
+        const introspection = await getIntrospection(info, serviceName);
+        return introspection.getExtension({ name: extensionName });
+      },
+
+      invalidateIntrospection(info) {
+        info.cache.introspectionResultsPromise = null;
+        info.cache.dirty = true;
       },
 
       getIntrospection(info) {
@@ -559,11 +647,18 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             const rawIntrospections = await introspectionPromise;
 
             const introspections: IntrospectionResults = rawIntrospections.map(
-              ({ pgService, introspectionText }) => ({
-                pgService,
-                // IMPORTANT: parseIntrospectionResults must NOT be cached, because other plugins mutate it.
-                introspection: parseIntrospectionResults(introspectionText),
-              }),
+              ({ pgService, introspectionData, options }) => {
+                const clonedData = structuredClone(introspectionData);
+                // IMPORTANT: augmentation must NOT be cached, because other plugins mutate it.
+                const introspection = augmentIntrospectionData(
+                  options,
+                  clonedData,
+                );
+                return {
+                  pgService,
+                  introspection,
+                };
+              },
             );
 
             // Store the resolved state, so access during announcements doesn't cause the system to hang
@@ -854,21 +949,38 @@ function introspectPgServices(
       }
 
       // Do the introspection
-      const introspectionQuery = makeIntrospectionQuery();
-      const {
-        rows: [row],
-      } = await withPgClientFromPgService(
+      const { introspectionData, options } = await withPgClientFromPgService(
         pgService,
         pgService.pgSettingsForIntrospection ?? null,
-        (client) =>
-          client.query<{ introspection: string }>({
-            text: introspectionQuery,
-          }),
+        async (client) => {
+          const runQuery: RunQuery = async (text, values) => {
+            const {
+              rows: [row],
+            } = await client.query<[string]>({
+              text,
+              values,
+              arrayMode: true,
+            });
+            return row?.[0];
+          };
+          const options: PgIntrospectOptions = {
+            runQuery,
+            filters: { depends: "deptype in ('a', 'e')" },
+            prune: postgraphilePrune,
+            onlyEntities: [...DEFAULT_ENTITIES],
+            multipass: info.resolvedPreset.gather?.pgMultipassIntrospection
+              ? postgraphileMultipass({ schemas: pgService.schemas })
+              : false,
+          };
+          await info.process("pgIntrospection_options", {
+            serviceName: name,
+            options,
+          });
+          const introspectionData = await introspectRaw(options);
+          return { introspectionData, options };
+        },
       );
-      if (!row) {
-        throw new Error("Introspection failed");
-      }
-      return { pgService, introspectionText: row.introspection };
+      return { pgService, introspectionData, options };
     }),
   );
 }

@@ -319,6 +319,53 @@ comment on table users is
   E'@behavior -insert -delete';
 ```
 
+## @arg0description, @arg1description, ...
+
+Since PostgreSQL does not give us a way to attach comments to function
+arguments, we've added the `@arg#description` smart tag that you can use to do
+so, where `#` is the 0-indexed argument position in the database function
+definition.
+
+:::info
+
+Use `@arg0description` for the first SQL argument, `@arg1description` for the
+second, and so on. For computed columns, the hidden row argument still
+occupies position zero, so the first exposed argument uses `@arg1description`.
+`OUT` and `TABLE` arguments count towards the positions.
+
+:::
+
+```sql
+create function public.greet(person_name text)
+returns text as $$
+  select 'Hello, ' || person_name;
+$$ language sql stable;
+
+comment on function public.greet(text) is
+  E'@arg0description The name of the person to greet.\nGreets a person.';
+```
+
+The GraphQL argument `personName` now has the description "The name of the person
+to greet." The function's own description remains "Greets a person."
+
+You can also set these tags in a [smart tags file](./smart-tags-file.md), using
+`\n` for line breaks within a description:
+
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    procedure: {
+      "public.greet": {
+        tags: {
+          arg0description: "The name to greet.\nInclude their preferred title.",
+        },
+      },
+    },
+  },
+}
+```
+
 ## @arg0variant, @arg1variant, ...
 
 When building a custom mutation, you probably want to use the composite type

@@ -1,4 +1,4 @@
-import { arraysMatch, isDev } from "grafast";
+import { isDev } from "grafast";
 import { orderedApply, sortedPlugins } from "graphile-config";
 
 type BehaviorScope = string[];
@@ -132,7 +132,7 @@ export class Behavior {
           ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
-      listCache: Map<number, any[][]>;
+      listCache: ListCache;
       inferredCache: Map<
         GraphileBuild.BehaviorEntities[entityType],
         ResolvedBehavior
@@ -159,6 +159,8 @@ export class Behavior {
   };
 
   public behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[] = [];
+
+  private checkedRegistrations = new Set<string>();
 
   private globalDefaultBehavior: ResolvedBehavior;
   private resolvedPreset: GraphileConfig.ResolvedPreset;
@@ -300,7 +302,10 @@ export class Behavior {
       behaviorStrings: Object.create(null),
       inferredBehaviorCallbacks: [],
       overrideBehaviorCallbacks: [],
-      listCache: new Map(),
+      listCache: {
+        lists: new Set(),
+        root: newListTrie(),
+      },
       inferredCache: new Map(),
       overrideCache: new Map(),
       fullCache: new Map(),
@@ -345,7 +350,7 @@ export class Behavior {
     entity: GraphileBuild.BehaviorEntities[TEntityType],
     filter: TFilter,
   ): boolean | undefined {
-    if (!this.behaviorRegistry[filter]) {
+    if (this.behaviorRegistry[filter] == null) {
       // DIAGNOSTIC: enable for all filters
       /*
       console.warn(
@@ -364,27 +369,34 @@ export class Behavior {
           },
         },
       };
-    } else if (
-      !Object.entries(this.behaviorRegistry).some(
-        ([bhv, { entities }]) =>
-          entities[entityType] && stringMatches(bhv, filter),
-      )
-    ) {
-      console.warn(
-        `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
-          this.behaviorRegistry[filter].entities,
-        ).join(
-          "', '",
-        )}'; if this usage is valid, register it within a plugin with \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
-          filter,
-        )}] = { description: "...", entities: [${JSON.stringify(
-          entityType,
-        )}] }\`.`,
-      );
-      // Register it so we don't see this warning again
-      this.behaviorRegistry[filter].entities[entityType] = {
-        registeredBy: [],
-      };
+    } else if (isDev) {
+      const registrationKey = `${filter}\0${entityType}`;
+      if (!this.checkedRegistrations.has(registrationKey)) {
+        this.checkedRegistrations.add(registrationKey);
+        const isRegistered =
+          !!this.behaviorRegistry[filter].entities[entityType] ||
+          Object.entries(this.behaviorRegistry).some(
+            ([behavior, { entities }]) =>
+              entities[entityType] != null && stringMatches(behavior, filter),
+          );
+        if (!isRegistered) {
+          console.warn(
+            `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
+              this.behaviorRegistry[filter].entities,
+            ).join(
+              "', '",
+            )}'; if this usage is valid, register it within a plugin with \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+              filter,
+            )}] = { description: "...", entities: [${JSON.stringify(
+              entityType,
+            )}] }\`.`,
+          );
+          // Register it so we don't see this warning again
+          this.behaviorRegistry[filter].entities[entityType] = {
+            registeredBy: [],
+          };
+        }
+      }
     }
     const finalString = this.getBehaviorForEntity(
       entityType,
@@ -416,7 +428,7 @@ export class Behavior {
     const { fullCache: cache } = behaviorEntity;
 
     const entity = Array.isArray(rawEntity)
-      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      ? getCachedList(behaviorEntity.listCache, rawEntity)
       : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
@@ -451,7 +463,7 @@ export class Behavior {
       behaviorEntity;
 
     const entity = Array.isArray(rawEntity)
-      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      ? getCachedList(behaviorEntity.listCache, rawEntity)
       : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
@@ -480,7 +492,7 @@ export class Behavior {
       behaviorEntity;
 
     const entity = Array.isArray(rawEntity)
-      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      ? getCachedList(behaviorEntity.listCache, rawEntity)
       : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
@@ -737,15 +749,25 @@ export class Behavior {
   }
 }
 
+// If this ever becomes a memory issue we can turn it into an LRU.
+const PARSE_SCOPE_CACHE = new Map<string, BehaviorScope>();
 /**
  * Parses a scope like `query:resource:connection:filter` into it's constituent parts.
  *
  * @internal
  */
 function parseScope(scopeString: string): BehaviorScope {
-  return scopeString.split(":");
+  const existing = PARSE_SCOPE_CACHE.get(scopeString);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const scope = scopeString.split(":");
+  PARSE_SCOPE_CACHE.set(scopeString, scope);
+  return scope;
 }
 
+// If this ever becomes a memory issue we can turn it into an LRU.
+const PARSE_SPECS_CACHE = new Map<string, BehaviorSpec[]>();
 /**
  * Parses a behaviorSpecs string like `+list -connection -list:filter` into a
  * list of BehaviorSpecs.
@@ -753,6 +775,15 @@ function parseScope(scopeString: string): BehaviorScope {
  * @internal
  */
 function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
+  const existing = PARSE_SPECS_CACHE.get(behaviorSpecsString);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const specs = _parseSpecs(behaviorSpecsString);
+  PARSE_SPECS_CACHE.set(behaviorSpecsString, specs);
+  return specs;
+}
+function _parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
   const fragments = behaviorSpecsString.split(/\s+/);
   const specs: BehaviorSpec[] = [];
   for (const fragment of fragments) {
@@ -865,23 +896,47 @@ interface ResolvedBehavior {
   toString(): string;
 }
 
-function getCachedEntity<T extends any[]>(
-  listCache: Map<number, any[][]>,
-  entity: T,
-): T {
-  const nList = listCache.get(entity.length);
-  if (!nList) {
-    const list = [entity];
-    listCache.set(entity.length, list);
-    return entity;
+interface ListCache {
+  /** Allows us to shortcut looking up a list that is already deduped */
+  lists: Set<any[]>;
+  /** Trie to look up the lists by its element values */
+  root: ListTrie;
+}
+interface ListTrie {
+  children: Map<unknown, ListTrie>;
+  list: any[] | null;
+}
+
+function newListTrie(): ListTrie {
+  return { children: new Map(), list: null };
+}
+
+function trieChild<TKey>(parent: ListTrie, key: TKey): ListTrie {
+  let entry = parent.children.get(key);
+  if (entry === undefined) {
+    entry = newListTrie();
+    parent.children.set(key, entry);
   }
-  for (const entry of nList) {
-    if (arraysMatch(entry, entity)) {
-      return entry as T;
-    }
+  return entry;
+}
+
+/**
+ * Returns an array equivalent to T, but deduplicated vs all other arrays
+ * equivalent to T.
+ */
+function getCachedList<T extends any[]>(listCache: ListCache, list: T): T {
+  if (listCache.lists.has(list)) return list;
+  let entry = listCache.root;
+  for (let i = 0, l = list.length; i < l; i++) {
+    entry = trieChild(entry, list[i]);
   }
-  nList.push(entity);
-  return entity;
+  const existing = entry.list;
+  if (existing !== null) {
+    return existing as T;
+  }
+  entry.list = list;
+  listCache.lists.add(list);
+  return list;
 }
 
 const warned = new Set<string>();

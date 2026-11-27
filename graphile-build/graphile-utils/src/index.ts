@@ -74,6 +74,9 @@ export type {
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.ts";
 export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.ts";
+export { multipassInclude } from "./multipassInclude.ts";
+export type { ScopedUtils } from "./scopedUtils.ts";
+export { scopedUtils } from "./scopedUtils.ts";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {
@@ -121,6 +124,13 @@ declare global {
     interface Provides {
       extendSchema: true;
       wrapPlans: true;
+    }
+  }
+
+  namespace PgIntrospection {
+    interface PurposeRegistry {
+      /** Peeked to merge `pgSmartTags` rules into the tags policies see. */
+      _pgSmartTags: true;
     }
   }
 }

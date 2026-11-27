@@ -160,7 +160,9 @@ declare global {
   }
 }
 
-interface State {}
+interface State {
+  foreignKeys: Set<PgConstraint>;
+}
 const EMPTY_OBJECT = Object.freeze({});
 
 // TODO: split this into one plugin for gathering and another for schema
@@ -294,7 +296,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     initialCache() {
       return EMPTY_OBJECT;
     },
-    initialState: (): State => Object.create(null),
+    initialState: (): State => ({ foreignKeys: new Set() }),
     helpers: {
       async addRelation(info, event, pgConstraint, isReferencee = false) {
         const pgClass = isReferencee
@@ -329,7 +331,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                 .getConstraints()!
                 .filter(
                   (c) =>
-                    ["u", "p"].includes(c.contype) &&
+                    (c.contype === "u" || c.contype === "p") &&
                     c.conkey?.every((k) => k > 0),
                 );
               const foreignUniqueAttributeNumberCombinations =
@@ -510,27 +512,22 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
     },
     hooks: {
+      // Navigation can also return discovery-only constraints. Gather relations
+      // from the foreign keys retained and announced by introspection.
+      pgIntrospection_constraint(info, { entity }) {
+        if (entity.contype === "f") {
+          info.state.foreignKeys.add(entity);
+        }
+      },
       async pgTables_PgResourceOptions_relations(info, event) {
-        const { pgClass, serviceName } = event;
-        const constraints =
-          await info.helpers.pgIntrospection.getConstraintsForClass(
-            serviceName,
-            pgClass._id,
-          );
-
-        const foreignConstraints =
-          await info.helpers.pgIntrospection.getForeignConstraintsForClass(
-            serviceName,
-            pgClass._id,
-          );
-
-        for (const constraint of constraints) {
-          if (constraint.contype === "f") {
+        const { pgClass } = event;
+        for (const constraint of pgClass.getConstraints()) {
+          if (info.state.foreignKeys.has(constraint)) {
             await info.helpers.pgRelations.addRelation(event, constraint);
           }
         }
-        for (const constraint of foreignConstraints) {
-          if (constraint.contype === "f") {
+        for (const constraint of pgClass.getForeignConstraints()) {
+          if (info.state.foreignKeys.has(constraint)) {
             await info.helpers.pgRelations.addRelation(event, constraint, true);
           }
         }
@@ -1177,6 +1174,34 @@ function addRelations(
             );
             if (paths.length === 1) {
               const path = paths[0];
+              let numberOfSingleRelations = 0;
+              let recordIdentifier: TE = te`$record`;
+              // Follow unique relations forwards before constructing the
+              // remaining joins backwards. Reciprocal relations can then
+              // reuse a record that is already in the plan.
+              if (!isMutationPayload) {
+                while (
+                  numberOfSingleRelations < path.layers.length - 1 &&
+                  path.layers[numberOfSingleRelations].isUnique
+                ) {
+                  const layer = path.layers[numberOfSingleRelations];
+                  const nextRecordIdentifier = te.identifier(
+                    idents.makeSafeIdentifier(`$${layer.resource.name}`),
+                  );
+                  functionLines.push(
+                    te`  const ${nextRecordIdentifier} = ${recordIdentifier}.singleRelation(${te.lit(layer.relationName)});`,
+                  );
+                  recordIdentifier = nextRecordIdentifier;
+                  numberOfSingleRelations++;
+                }
+              }
+              if (isConnection && numberOfSingleRelations > 0) {
+                // A missing intermediate record must not swallow the row
+                // carrying an aggregate result such as totalCount.
+                functionLines.push(
+                  te`  ${collectionIdentifier}.setInliningStrategy("forbidden");`,
+                );
+              }
               // NOTE: do we ever need to make the above `DISTINCT ON (primary key)`?
               functionLines.push(
                 te`  let previousAlias = ${collectionIdentifier}.alias;`,
@@ -1184,12 +1209,18 @@ function addRelations(
 
               // const finalLayer = path.layers[path.layers.length - 1];
               // Process each layer
-              for (let i = path.layers.length - 1; i >= 1; i--) {
+              for (
+                let i = path.layers.length - 1;
+                i >= numberOfSingleRelations + 1;
+                i--
+              ) {
                 const layer = path.layers[i];
                 const resource = path.layers[i - 1].resource;
                 const { localAttributes, remoteAttributes } = layer;
                 const ref_resource = te.ref(resource, resource.name);
-                const layerAlias = te.identifier(resource.name + "Alias");
+                const layerAlias = te.identifier(
+                  idents.makeSafeIdentifier(resource.name + "Alias"),
+                );
                 functionLines.push(
                   te`  const ${layerAlias} = ${ref_sql}.identifier(Symbol(${te.lit(
                     resource.name,
@@ -1218,7 +1249,7 @@ function addRelations(
               }
               // Now apply `$record`
               {
-                const firstLayer = path.layers[0];
+                const firstLayer = path.layers[numberOfSingleRelations];
                 const { localAttributes, remoteAttributes } = firstLayer;
                 remoteAttributes.forEach((remoteAttrName, i) => {
                   functionLines.push(
@@ -1226,7 +1257,7 @@ function addRelations(
                       ref_sql
                     }.identifier(${te.lit(
                       remoteAttrName,
-                    )})} = \${${collectionIdentifier}.placeholder($record.get(${te.lit(
+                    )})} = \${${collectionIdentifier}.placeholder(${recordIdentifier}.get(${te.lit(
                       localAttributes[i],
                     )}))}\`);`,
                   );

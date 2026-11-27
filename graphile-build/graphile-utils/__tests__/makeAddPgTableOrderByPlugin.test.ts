@@ -1,5 +1,6 @@
 import { sqlValueWithCodec, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 import { constant, grafast, object } from "grafast";
 import type { ExecutionResult } from "grafast/graphql";
 import type { SchemaResult } from "graphile-build";
@@ -9,10 +10,6 @@ import { makeSchema } from "postgraphile";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import type { NullsSortMethod } from "../dist/index.js";
 import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../dist/index.js";
 
@@ -45,7 +42,7 @@ afterAll(async () => {
 const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
   makeAddPgTableOrderByPlugin(
     { schemaName: "graphile_utils", tableName: "users" },
-    (build) => {
+    (build, orderByAscDesc) => {
       const { sql } = build;
       const sqlIdentifier = sql.identifier(Symbol("pet"));
 
@@ -127,6 +124,7 @@ const getSchema = async (nullsSortMethod?: NullsSortMethod) => {
         ],
       }),
     ],
+    gather: { pgMultipassIntrospection: true },
     pgServices: [makePgService({ pool: pgPool!, schemas: ["graphile_utils"] })],
   });
 

@@ -1,36 +1,62 @@
 import type {
+  GetPgResourceAttributes,
   PgOrderSpec,
+  PgResource,
   PgSelectQueryBuilder,
   PgUnionAllQueryBuilder,
 } from "@dataplan/pg";
 import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
-import type { ScopedTableMatch } from "./resolveTableMatch.ts";
+import type { ScopedTableMatch, TableResource } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 type ArrayOrDirect<T> = T | Array<T>;
 
-type OrderBySpecIdentity =
-  | string // Attribute name
-  | Omit<PgOrderSpec, "direction"> // Expression
+type OrderSpecWithoutDirection<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+> =
+  PgOrderSpec<GetPgResourceAttributes<TResource>> extends infer TSpec
+    ? TSpec extends unknown
+      ? Omit<TSpec, "direction">
+      : never
+    : never;
+
+type OrderBySpecIdentity<
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
+> =
+  | (keyof GetPgResourceAttributes<TResource> & string) // Attribute name
+  | OrderSpecWithoutDirection<TResource> // Expression
   | ((
-      queryBuilder: PgSelectQueryBuilder,
+      queryBuilder: PgSelectQueryBuilder<TResource>,
       info: { scope: unknown }, // The `info` argument to `EnumValueApplyResolver`
-    ) => ArrayOrDirect<Omit<PgOrderSpec, "direction">>); // Callback, allows for joins/etc
+    ) => ArrayOrDirect<OrderSpecWithoutDirection<TResource>>); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
 }
 
+export type TableOrderByArgs<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TMatch extends ScopedTableMatch<TScope>,
+> = Parameters<typeof addPgTableOrderBy<TScope, TMatch>>;
+
 const counterByName = new Map<string, number>();
 
 export function addPgTableOrderBy<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
+  const TMatch extends ScopedTableMatch<TScope> = ScopedTableMatch<TScope>,
 >(
-  match: ScopedTableMatch<TScope>,
+  match: TMatch,
   ordersGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,
+    orderBy: typeof orderByAscDesc<TableResource<TScope, TMatch>>,
   ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
@@ -68,6 +94,7 @@ export function addPgTableOrderBy<
           }
           const newValues = ordersGenerator(
             build as GraphileBuild.ScopedBuild<TScope>,
+            orderByAscDesc<TableResource<TScope, TMatch>>,
           );
 
           return extend(values, newValues, hint);
@@ -96,6 +123,19 @@ export interface OrderByAscDescOptions {
   nullable?: boolean;
 }
 
+export function orderByAscDesc<
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
+>(
+  baseName: string,
+  attributeOrSqlFragment: NoInfer<OrderBySpecIdentity<TResource>>,
+  uniqueOrOptions?: boolean | OrderByAscDescOptions,
+): MakeAddPgTableOrderByPluginOrders;
 export function orderByAscDesc(
   baseName: string,
   attributeOrSqlFragment: OrderBySpecIdentity,

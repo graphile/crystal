@@ -100,6 +100,13 @@ import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 const preset: GraphileConfig.Preset = {
   extends: [PostGraphileAmberPreset, PgMinifySchemaPreset],
+  schema: {
+    // minifyDropsDescriptions: true,
+    // minifyDropsDeprecationReasons: true,
+    // minifyDropsDeprecatedEntities: false,
+
+    /* ... */
+  },
   /* ... */
 };
 export default preset;
