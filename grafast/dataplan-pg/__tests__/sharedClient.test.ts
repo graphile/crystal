@@ -50,28 +50,37 @@ test("late physical checkout is released after the acquisition deadline", async 
   try {
     const gate = Promise.withResolvers<void>();
     const released = Promise.withResolvers<void>();
-    const checkout = jest.fn(async (_settings, callback) => {
-      await gate.promise;
-      try {
-        return await callback({});
-      } finally {
-        released.resolve();
-      }
-    });
+    const checkout = jest.fn(
+      async (_settings, callback, _signal?: AbortSignal) => {
+        await gate.promise;
+        try {
+          return await callback({});
+        } finally {
+          released.resolve();
+        }
+      },
+    );
     const shared = makeWithSharedPgClient({
       pool: {},
       maxClients: 1,
       acquisitionTimeoutMs: 50,
     });
     const callback = jest.fn();
-    const result = shared(
-      { pgSettings: null, withPgClient: checkout },
-      {},
-      callback,
-    );
-    const rejection = expect(result).rejects.toThrow("acquisition timed out");
-    await jest.advanceTimersByTimeAsync(50);
-    await rejection;
+    const context = { pgSettings: null, withPgClient: checkout };
+    const request = () =>
+      expect(shared(context, {}, callback)).rejects.toThrow(
+        "acquisition timed out",
+      );
+    const first = request();
+    await jest.advanceTimersByTimeAsync(25);
+    const second = request();
+    await jest.advanceTimersByTimeAsync(25);
+    await first;
+    // The second borrower still needs the pending checkout until its own deadline.
+    expect(checkout.mock.calls[0][2]?.aborted).toBe(false);
+    await jest.advanceTimersByTimeAsync(25);
+    await second;
+    expect(checkout.mock.calls[0][2]?.aborted).toBe(true);
     gate.resolve();
     await released.promise;
     expect(callback).not.toHaveBeenCalled();

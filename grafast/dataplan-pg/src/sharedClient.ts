@@ -22,28 +22,46 @@ export type WithSharedPgClient = <T>(
 ) => Promise<T>;
 
 interface Borrower {
-  inFlight: number;
-  idleSince: number;
+  /** Null while acquiring or running a query. */
+  reservedUntil: number | null;
   stopped: PromiseWithResolvers<never>;
 }
-interface Checkout {
-  borrowers: Set<Borrower>;
-  client: PgClient | null;
-  controller: AbortController;
-  affinities: Set<symbol>;
-  names: Set<string>;
-  signatures: Set<string>;
-  done: PromiseWithResolvers<void>;
-  finished: Promise<void>;
-  transaction: Transaction | null;
-  reservations: number;
-  closed: boolean;
-  reservationMs: number;
-  failure: { error: unknown } | null;
+
+class Checkout {
+  readonly borrowers = new Set<Borrower>();
+  readonly controller = new AbortController();
+  readonly affinities = new Set<symbol>();
+  readonly names = new Set<string>();
+  readonly signatures = new Set<string>();
+  readonly done = Promise.withResolvers<void>();
+  finished = Promise.resolve();
+  client: PgClient | null = null;
+  transaction: Transaction | null = null;
+  failure: { error: unknown } | null = null;
+  closed = false;
+
+  isIdle(at = Infinity) {
+    for (const borrower of this.borrowers) {
+      if (borrower.reservedUntil === null || borrower.reservedUntil > at) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  fail(error: unknown) {
+    this.closed = true;
+    this.failure ??= { error };
+    for (const borrower of this.borrowers) {
+      borrower.stopped.reject(error);
+    }
+  }
 }
+
 interface Pending {
   hints: RoutingHints;
   limit: number;
+  deadline: number;
   borrower: Borrower;
   available: PromiseWithResolvers<Checkout>;
   opening: Checkout | null;
@@ -53,7 +71,7 @@ interface ContextQueue {
   checkouts: Set<Checkout>;
   pending: Set<Pending>;
   enqueue: (request: Pending) => void;
-  dispatch: (checkout?: Checkout) => void;
+  dispatch: () => void;
 }
 
 type AffinityHistory = Pick<Checkout, "affinities" | "names" | "signatures">;
@@ -84,59 +102,29 @@ export function matchesQueryAffinity(
   );
 }
 
-function idle(checkout: Checkout) {
-  for (const borrower of checkout.borrowers) {
-    if (borrower.inFlight > 0) {
-      return false;
-    }
-  }
-  return true;
-}
-
 interface Transaction {
   ready: PromiseWithResolvers<PgClient>;
   done: PromiseWithResolvers<void>;
   finished: Promise<void>;
-  closing: boolean;
+  reservations: number;
   queries: Set<Promise<unknown>>;
 }
 interface PoolState {
   limit: number;
   active: Set<Checkout>;
-  pressureChecks: Set<() => boolean>;
-  timer: ReturnType<typeof setInterval> | null;
   waiters: Set<() => void>;
 }
 const pools = new WeakMap<object, PoolState>();
 
-function stop(checkout: Checkout, error: unknown) {
-  checkout.closed = true;
-  checkout.failure ??= { error };
-  for (const borrower of checkout.borrowers) {
-    borrower.stopped.reject(error);
-  }
-}
-
-function wake(pool: PoolState) {
-  for (const waiter of [...pool.waiters]) {
-    waiter();
-  }
-}
-
 function reclaim(pool: PoolState) {
-  const now = Date.now();
+  const now = performance.now();
   for (const checkout of pool.active) {
     if (
       !checkout.closed &&
       checkout.borrowers.size > 0 &&
-      [...checkout.borrowers].every(
-        (borrower) =>
-          borrower.inFlight === 0 &&
-          now - borrower.idleSince >= checkout.reservationMs,
-      )
+      checkout.isIdle(now)
     ) {
-      stop(
-        checkout,
+      checkout.fail(
         new Error("Shared PostgreSQL client reservation reclaimed"),
       );
       return;
@@ -149,22 +137,25 @@ function startTransaction(checkout: Checkout, base: PgClient): Transaction {
     ready: Promise.withResolvers(),
     done: Promise.withResolvers(),
     finished: Promise.resolve(),
-    closing: false,
+    reservations: 0,
     queries: new Set(),
   };
   checkout.transaction = tx;
-  tx.done.promise.catch(() => {});
   tx.finished = base
     .withTransaction(
-      (client) => {
+      async (client) => {
         tx.ready.resolve(client);
-        return tx.done.promise;
+        await tx.done.promise;
+        await Promise.allSettled(tx.queries);
+        if (checkout.failure) {
+          throw checkout.failure.error;
+        }
       },
       { savepoint: false },
     )
     .catch((error) => {
       tx.ready.reject(error);
-      stop(checkout, error);
+      checkout.fail(error);
       throw error;
     })
     .finally(() => {
@@ -182,7 +173,7 @@ async function submitQuery<TData>(
   opts: PgClientQuery,
 ): Promise<PgClientResult<TData>> {
   const tx = checkout.transaction;
-  if (tx?.closing) {
+  if (tx?.reservations === 0) {
     await tx.finished;
     return submitQuery<TData>(checkout, base, opts);
   }
@@ -196,7 +187,7 @@ async function submitQuery<TData>(
   try {
     return await query;
   } catch (e) {
-    stop(checkout, e);
+    checkout.fail(e);
     throw e;
   } finally {
     tx?.queries.delete(query);
@@ -233,8 +224,6 @@ export function makeWithSharedPgClient(options: {
   const pool: PoolState = pools.get(options.pool) ?? {
     limit: maxClients,
     active: new Set<Checkout>(),
-    pressureChecks: new Set(),
-    timer: null,
     waiters: new Set<() => void>(),
   };
   // Services sharing one physical pool must all honour its smallest budget.
@@ -247,23 +236,8 @@ export function makeWithSharedPgClient(options: {
     queue: ContextQueue,
     speculative: boolean,
   ): Checkout {
-    const checkout: Checkout = {
-      borrowers: new Set(),
-      client: null,
-      controller: new AbortController(),
-      affinities: new Set(),
-      names: new Set(),
-      signatures: new Set(),
-      done: Promise.withResolvers(),
-      finished: Promise.resolve(),
-      transaction: null,
-      reservations: 0,
-      closed: false,
-      reservationMs: idleReservationMs,
-      failure: null,
-    };
+    const checkout = new Checkout();
     const { signal } = checkout.controller;
-    checkout.done.promise.catch(() => {});
     queue.checkouts.add(checkout);
     pool.active.add(checkout);
     checkout.finished = Promise.resolve()
@@ -276,24 +250,27 @@ export function makeWithSharedPgClient(options: {
         }
         return context.withPgClient(
           context.pgSettings,
-          (client) => {
+          async (client) => {
             if (signal.aborted) {
               return;
             }
             checkout.client = client;
-            queue.dispatch(checkout);
+            queue.dispatch();
             if (checkout.borrowers.size === 0) {
               checkout.closed = true;
               return;
             }
-            return checkout.done.promise;
+            await checkout.done.promise;
+            if (checkout.failure) {
+              throw checkout.failure.error;
+            }
           },
           signal,
         );
       })
       .catch((error) => {
         if (!signal.aborted) {
-          stop(checkout, error);
+          checkout.fail(error);
           for (const request of queue.pending) {
             if (request.opening === checkout) {
               request.acquisitionError = { error };
@@ -305,14 +282,17 @@ export function makeWithSharedPgClient(options: {
       .finally(() => {
         queue.checkouts.delete(checkout);
         pool.active.delete(checkout);
-        wake(pool);
+        for (const dispatch of pool.waiters) {
+          dispatch();
+        }
       });
     checkout.finished.catch(() => {});
     return checkout;
   }
 
   function makeQueue(context: PgExecutorContext): ContextQueue {
-    const checkoutsToMatch = new Set<Checkout>();
+    let scheduled: Promise<void> | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const queue: ContextQueue = {
       checkouts: new Set(),
       pending: new Set(),
@@ -327,195 +307,149 @@ export function makeWithSharedPgClient(options: {
     }
     function enqueue(request: Pending) {
       queue.pending.add(request);
-      const ready = route(request, null);
-      if (queue.pending.size > 0) {
-        pool.waiters.add(dispatch);
-        if (ready !== null) {
-          // A new read can link its checkout to previously queued work. Scan
-          // once per burst, even when many reads introduce routing hints.
-          if (checkoutsToMatch.size === 0) {
-            queueMicrotask(dispatch);
-          }
-          checkoutsToMatch.add(ready);
-        }
-      }
+      scheduled ??= Promise.resolve().then(() => {
+        scheduled = undefined;
+        dispatch(true);
+      });
     }
-    function route(request: Pending, wanted: Set<Checkout> | null) {
-      let ready: Checkout | null = null;
-      let opening: Checkout | null = null;
-      let live = 0;
+    function dispatch(checkPressure = false) {
+      // All requests in this context have the same acquisition timeout.
+      const now = performance.now();
+      for (const request of queue.pending) {
+        if (request.deadline > now) {
+          break;
+        }
+        queue.pending.delete(request);
+        request.available.reject(
+          new Error("Shared PostgreSQL client acquisition timed out"),
+        );
+      }
+      const ready: Checkout[] = [];
+      const openings: Checkout[] = [];
       for (const checkout of queue.checkouts) {
         if (checkout.closed) {
           continue;
         }
-        live++;
-        const match = matchesQueryAffinity(checkout, request.hints);
-        if (checkout.client !== null) {
-          if (match) {
-            ready = checkout;
-            break;
+        if (checkout.client === null) {
+          openings.push(checkout);
+        } else {
+          ready.push(checkout);
+          // Pull matching waiters before offering idle capacity in FIFO order.
+          for (const request of queue.pending) {
+            if (
+              request.opening === checkout ||
+              matchesQueryAffinity(checkout, request.hints)
+            ) {
+              assign(request, checkout);
+            }
           }
-          if (ready === null && idle(checkout)) {
-            ready = checkout;
-          }
-        } else if (
-          match ||
-          (opening === null && wanted !== null && !wanted.has(checkout))
-        ) {
-          opening = checkout;
         }
       }
-      if (ready !== null) {
-        assign(request, ready);
-      } else if (request.acquisitionError && live === 0) {
-        queue.pending.delete(request);
-        request.available.reject(request.acquisitionError.error);
-      } else {
-        if (
-          opening === null &&
-          !request.acquisitionError &&
-          live < request.limit &&
-          pool.active.size < pool.limit &&
-          (live === 0 || options.canAcquireImmediately?.() !== false)
-        ) {
-          opening = open(context, queue, live > 0);
-        }
-        request.opening = opening;
-        if (opening !== null) {
-          wanted?.add(opening);
-          recordQueryAffinity(opening, request.hints);
-        }
-      }
-      return ready;
-    }
-    function dispatch(checkout?: Checkout) {
-      if (checkout !== undefined) {
-        checkoutsToMatch.add(checkout);
-      }
-      // Pull matching waiters before offering idle capacity in FIFO order.
-      for (const ready of checkoutsToMatch) {
-        if (ready.closed) {
+
+      // Keep an acquisition only if at least one remaining waiter can use it.
+      const unused = new Set(openings);
+      let underPressure = false;
+      for (const request of queue.pending) {
+        const matches = (checkout: Checkout) =>
+          matchesQueryAffinity(checkout, request.hints);
+        const checkout =
+          ready.find(matches) ?? ready.find((candidate) => candidate.isIdle());
+        if (checkout !== undefined) {
+          assign(request, checkout);
           continue;
         }
-        for (const request of queue.pending) {
+
+        const live = ready.length + openings.length;
+        if (live === 0 && request.acquisitionError) {
+          queue.pending.delete(request);
+          request.available.reject(request.acquisitionError.error);
+          continue;
+        }
+        let opening = openings.find(matches) ?? unused.values().next().value;
+        if (opening === undefined && live < request.limit) {
           if (
-            request.opening === ready ||
-            matchesQueryAffinity(ready, request.hints)
+            pool.active.size >= pool.limit ||
+            (live > 0 && options.canAcquireImmediately?.() === false)
           ) {
-            assign(request, ready);
+            underPressure = true;
+          } else if (request.acquisitionError === null) {
+            opening = open(context, queue, live > 0);
+            openings.push(opening);
+          }
+        }
+        request.opening = opening ?? null;
+        if (opening !== undefined) {
+          unused.delete(opening);
+          recordQueryAffinity(opening, request.hints);
+          if (checkPressure && options.isPoolWaiting?.() === true) {
+            underPressure = true;
           }
         }
       }
-      checkoutsToMatch.clear();
-      const wanted = new Set<Checkout>();
-      for (const request of queue.pending) {
-        route(request, wanted);
-      }
       // Withdraw unused demand before the next checkout can start or apply settings.
-      for (const checkout of queue.checkouts) {
-        if (
-          checkout.client === null &&
-          !checkout.closed &&
-          !wanted.has(checkout)
-        ) {
-          checkout.closed = true;
-          checkout.controller.abort();
-        }
+      for (const checkout of unused) {
+        checkout.closed = true;
+        checkout.controller.abort();
       }
-      if (queue.pending.size === 0) {
+      const first = queue.pending.values().next().value;
+      if (first === undefined) {
         pool.waiters.delete(dispatch);
+        clearTimeout(timer);
+        timer = undefined;
+      } else {
+        pool.waiters.add(dispatch);
+        timer ??= setTimeout(
+          () => {
+            timer = undefined;
+            dispatch(true);
+          },
+          Math.min(100, first.deadline - performance.now()),
+        );
+        if (checkPressure && underPressure) {
+          reclaim(pool);
+        }
       }
     }
     byContext.set(context, queue);
     return queue;
   }
 
-  async function waitForCheckout(
-    queue: ContextQueue,
-    request: Pending,
-  ): Promise<Checkout> {
-    const underPressure = () =>
-      queue.pending.has(request) &&
-      (request.opening !== null
-        ? options.isPoolWaiting?.() === true
-        : queue.checkouts.size < request.limit &&
-          (pool.active.size >= pool.limit ||
-            options.canAcquireImmediately?.() === false));
-    pool.pressureChecks.add(underPressure);
-    if (underPressure()) {
-      reclaim(pool);
-    }
-    pool.timer ??= setInterval(() => {
-      wake(pool);
-      for (const check of pool.pressureChecks) {
-        if (check()) {
-          reclaim(pool);
-          break;
-        }
-      }
-    }, 100);
-    const timer = setTimeout(() => {
-      if (queue.pending.delete(request)) {
-        request.available.reject(
-          new Error("Shared PostgreSQL client acquisition timed out"),
-        );
-        queue.dispatch();
-      }
-    }, acquisitionTimeoutMs);
-
-    try {
-      return await request.available.promise;
-    } finally {
-      clearTimeout(timer);
-      pool.pressureChecks.delete(underPressure);
-      if (pool.pressureChecks.size === 0 && pool.timer !== null) {
-        clearInterval(pool.timer);
-        pool.timer = null;
-      }
-    }
-  }
-
   return async (context, hints, callback) => {
     const { needsTransaction = false, maxClientQueues = 3 } = hints;
     const queue = byContext.get(context) ?? makeQueue(context);
     const borrower: Borrower = {
-      inFlight: 1,
-      idleSince: 0,
+      reservedUntil: null,
       stopped: Promise.withResolvers(),
     };
     borrower.stopped.promise.catch(() => {});
     const request: Pending = {
       hints,
       limit: Math.max(1, maxClientQueues),
+      deadline: performance.now() + acquisitionTimeoutMs,
       borrower,
       available: Promise.withResolvers(),
       opening: null,
       acquisitionError: null,
     };
     queue.enqueue(request);
-    const checkout = await (queue.pending.has(request)
-      ? waitForCheckout(queue, request)
-      : request.available.promise);
+    const checkout = await request.available.promise;
     let valid = true;
-    let reserved = false;
+    let transaction: Transaction | null = null;
     const outstanding = new Set<Promise<unknown>>();
     try {
       const base = checkout.client!;
       if (needsTransaction) {
-        if (checkout.transaction?.closing) {
+        if (checkout.transaction?.reservations === 0) {
           await checkout.transaction.finished;
         }
         if (checkout.closed) {
           throw new Error("Shared PostgreSQL client released");
         }
-        const transaction =
-          checkout.transaction ?? startTransaction(checkout, base);
-        checkout.reservations++;
-        reserved = true;
+        transaction = checkout.transaction ?? startTransaction(checkout, base);
+        transaction.reservations++;
         await transaction.ready.promise;
       }
-      borrower.inFlight = 0;
-      borrower.idleSince = Date.now();
+      borrower.reservedUntil = performance.now() + idleReservationMs;
       const client: SharedPgClient = {
         query<TData>(opts: PgClientQuery) {
           if (!valid || checkout.closed) {
@@ -523,14 +457,15 @@ export function makeWithSharedPgClient(options: {
               new Error("Shared PostgreSQL client released"),
             );
           }
-          borrower.inFlight++;
+          borrower.reservedUntil = null;
           const result = submitQuery<TData>(checkout, base, opts).finally(
             () => {
               outstanding.delete(result);
-              borrower.inFlight--;
-              borrower.idleSince = Date.now();
-              if (queue.pending.size > 0) {
-                queue.dispatch(checkout);
+              if (outstanding.size === 0) {
+                borrower.reservedUntil = performance.now() + idleReservationMs;
+                if (queue.pending.size > 0) {
+                  queue.dispatch();
+                }
               }
             },
           );
@@ -539,40 +474,28 @@ export function makeWithSharedPgClient(options: {
         },
       };
       const result = callback(client);
-      if (borrower.inFlight === 0 && queue.pending.size > 0) {
-        queue.dispatch(checkout);
+      if (outstanding.size === 0 && queue.pending.size > 0) {
+        queue.dispatch();
       }
       return await Promise.race([result, borrower.stopped.promise]);
     } finally {
       valid = false;
       await Promise.allSettled(outstanding);
-      checkout.borrowers.delete(borrower);
-      if (queue.pending.size > 0) {
-        queue.dispatch(checkout);
-      }
-      const tx = checkout.transaction;
       try {
-        if (reserved && --checkout.reservations === 0 && tx) {
-          tx.closing = true;
-          await Promise.allSettled(tx.queries);
-          if (checkout.failure) {
-            tx.done.reject(checkout.failure.error);
-          } else {
-            tx.done.resolve();
-          }
-          await tx.finished;
+        if (transaction && --transaction.reservations === 0) {
+          // Closing the transaction is still work in flight on this checkout.
+          borrower.reservedUntil = null;
+          transaction.done.resolve();
+          await transaction.finished;
         }
       } finally {
+        checkout.borrowers.delete(borrower);
+        if (queue.pending.size > 0) {
+          queue.dispatch();
+        }
         if (checkout.borrowers.size === 0) {
           checkout.closed = true;
-          if (checkout.transaction?.closing) {
-            await checkout.transaction.finished.catch(() => {});
-          }
-          if (checkout.failure) {
-            checkout.done.reject(checkout.failure.error);
-          } else {
-            checkout.done.resolve();
-          }
+          checkout.done.resolve();
           await checkout.finished;
         }
       }
