@@ -1,0 +1,20 @@
+## expect(errors).toBeFalsy()
+#> schema: ["ref_to_union"]
+## expect(data.allNotes.nodes.length).toEqual(3)
+## expect(data.allNotes.nodes[0].owner).toEqual({ __typename: "Person", username: "alice" })
+## expect(data.allNotes.nodes[1].owner).toEqual({ __typename: "Person", username: "bob" })
+## expect(data.allNotes.nodes[2].owner).toBeNull()
+
+{
+  allNotes(orderBy: PRIMARY_KEY_ASC) {
+    nodes {
+      body
+      owner {
+        __typename
+        ... on Person {
+          username
+        }
+      }
+    }
+  }
+}
