@@ -1,0 +1,31 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+# Every type selects the same author fields, but `RelationalTopic` also selects
+# `personId` inside the shared field, and `RelationalPost` selects `title` beside
+# it. Each type's object must still output exactly its own selection, in order.
+{
+  allRelationalItems(orderBy: [PRIMARY_KEY_ASC]) {
+    nodes {
+      __typename
+      id
+      personByAuthorId {
+        username
+      }
+      ... on RelationalTopic {
+        personByAuthorId {
+          personId
+        }
+      }
+      position
+      ... on RelationalPost {
+        title
+      }
+      relationalItemsByParentId {
+        nodes {
+          __typename
+          id
+        }
+      }
+    }
+  }
+}
