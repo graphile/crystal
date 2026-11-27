@@ -15,6 +15,35 @@ import {
 
 export { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 
+/** Sort each contiguous run of matching SQL statements for the snapshot. */
+export function sortSQLSnapshotRuns(
+  statements: string[],
+  patterns: readonly (string | RegExp)[],
+) {
+  const matches = (sql: string) => {
+    const text = sql.trim().replace(/\s+/g, " ");
+    return patterns.some((pattern) =>
+      typeof pattern === "string"
+        ? text.includes(pattern.trim().replace(/\s+/g, " "))
+        : text.search(pattern) !== -1,
+    );
+  };
+  let start = 0;
+  // Include the end of the list to flush a trailing run.
+  for (let end = 0, l = statements.length; end <= l; end++) {
+    if (end < l && matches(statements[end])) {
+      continue;
+    }
+    if (end - start > 1) {
+      const sorted = statements.slice(start, end).sort();
+      for (let i = start; i < end; i++) {
+        statements[i] = sorted[i - start];
+      }
+    }
+    start = end + 1;
+  }
+}
+
 function noop() {}
 
 /**
