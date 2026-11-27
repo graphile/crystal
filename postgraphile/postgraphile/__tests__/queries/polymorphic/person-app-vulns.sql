@@ -129,25 +129,6 @@ select __gcp_applications_result__.*
 from __gcp_applications_identifiers__,
 lateral (
   select
-    __gcp_applications__."gcp_id" as "0",
-    __gcp_applications__."id"::text as "1",
-    __gcp_applications__."name" as "2",
-    __gcp_applications__."person_id"::text as "3",
-    __gcp_applications__."organization_id"::text as "4",
-    __gcp_applications_identifiers__.idx as "5"
-  from "polymorphic"."gcp_applications" as __gcp_applications__
-  where (
-    __gcp_applications__."id" = __gcp_applications_identifiers__."id0"
-  )
-) as __gcp_applications_result__;
-
-with __gcp_applications_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __gcp_applications_result__.*
-from __gcp_applications_identifiers__,
-lateral (
-  select
     __gcp_applications__."id"::text as "0",
     __gcp_applications_identifiers__.idx as "1"
   from "polymorphic"."gcp_applications" as __gcp_applications__
@@ -174,6 +155,25 @@ lateral (
     __aws_applications__."id" = __aws_applications_identifiers__."id0"
   )
 ) as __aws_applications_result__;
+
+with __gcp_applications_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __gcp_applications_result__.*
+from __gcp_applications_identifiers__,
+lateral (
+  select
+    __gcp_applications__."gcp_id" as "0",
+    __gcp_applications__."id"::text as "1",
+    __gcp_applications__."name" as "2",
+    __gcp_applications__."person_id"::text as "3",
+    __gcp_applications__."organization_id"::text as "4",
+    __gcp_applications_identifiers__.idx as "5"
+  from "polymorphic"."gcp_applications" as __gcp_applications__
+  where (
+    __gcp_applications__."id" = __gcp_applications_identifiers__."id0"
+  )
+) as __gcp_applications_result__;
 
 with __union_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids
@@ -250,12 +250,12 @@ lateral (
             order by
               __first_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."gcp_application_first_party_vulnerabilities" as __gcp_application_first_party_vulnerabilities__
+        from "polymorphic"."aws_application_first_party_vulnerabilities" as __aws_application_first_party_vulnerabilities__
         inner join "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
         on (
-          __first_party_vulnerabilities__."id" = __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id"
+          __first_party_vulnerabilities__."id" = __aws_application_first_party_vulnerabilities__."first_party_vulnerability_id"
         )
-        where __gcp_application_first_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
+        where __aws_application_first_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
         order by
           __first_party_vulnerabilities__."id" asc
       ) as __first_party_vulnerabilities__
@@ -272,12 +272,12 @@ lateral (
             order by
               __third_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."gcp_application_third_party_vulnerabilities" as __gcp_application_third_party_vulnerabilities__
+        from "polymorphic"."aws_application_third_party_vulnerabilities" as __aws_application_third_party_vulnerabilities__
         inner join "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
         on (
-          __third_party_vulnerabilities__."id" = __gcp_application_third_party_vulnerabilities__."third_party_vulnerability_id"
+          __third_party_vulnerabilities__."id" = __aws_application_third_party_vulnerabilities__."third_party_vulnerability_id"
         )
-        where __gcp_application_third_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
+        where __aws_application_third_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
         order by
           __third_party_vulnerabilities__."id" asc
       ) as __third_party_vulnerabilities__
@@ -311,12 +311,12 @@ lateral (
             order by
               __first_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."gcp_application_first_party_vulnerabilities" as __gcp_application_first_party_vulnerabilities__
+        from "polymorphic"."aws_application_first_party_vulnerabilities" as __aws_application_first_party_vulnerabilities__
         inner join "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
         on (
-          __first_party_vulnerabilities__."id" = __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id"
+          __first_party_vulnerabilities__."id" = __aws_application_first_party_vulnerabilities__."first_party_vulnerability_id"
         )
-        where __gcp_application_first_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
+        where __aws_application_first_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
         order by
           __first_party_vulnerabilities__."id" asc
       ) as __first_party_vulnerabilities__
@@ -333,12 +333,12 @@ lateral (
             order by
               __third_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."gcp_application_third_party_vulnerabilities" as __gcp_application_third_party_vulnerabilities__
+        from "polymorphic"."aws_application_third_party_vulnerabilities" as __aws_application_third_party_vulnerabilities__
         inner join "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
         on (
-          __third_party_vulnerabilities__."id" = __gcp_application_third_party_vulnerabilities__."third_party_vulnerability_id"
+          __third_party_vulnerabilities__."id" = __aws_application_third_party_vulnerabilities__."third_party_vulnerability_id"
         )
-        where __gcp_application_third_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
+        where __aws_application_third_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
         order by
           __third_party_vulnerabilities__."id" asc
       ) as __third_party_vulnerabilities__
@@ -368,12 +368,12 @@ lateral (
             order by
               __first_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."aws_application_first_party_vulnerabilities" as __aws_application_first_party_vulnerabilities__
+        from "polymorphic"."gcp_application_first_party_vulnerabilities" as __gcp_application_first_party_vulnerabilities__
         inner join "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
         on (
-          __first_party_vulnerabilities__."id" = __aws_application_first_party_vulnerabilities__."first_party_vulnerability_id"
+          __first_party_vulnerabilities__."id" = __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id"
         )
-        where __aws_application_first_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
+        where __gcp_application_first_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
         order by
           __first_party_vulnerabilities__."id" asc
       ) as __first_party_vulnerabilities__
@@ -390,12 +390,12 @@ lateral (
             order by
               __third_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."aws_application_third_party_vulnerabilities" as __aws_application_third_party_vulnerabilities__
+        from "polymorphic"."gcp_application_third_party_vulnerabilities" as __gcp_application_third_party_vulnerabilities__
         inner join "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
         on (
-          __third_party_vulnerabilities__."id" = __aws_application_third_party_vulnerabilities__."third_party_vulnerability_id"
+          __third_party_vulnerabilities__."id" = __gcp_application_third_party_vulnerabilities__."third_party_vulnerability_id"
         )
-        where __aws_application_third_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
+        where __gcp_application_third_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
         order by
           __third_party_vulnerabilities__."id" asc
       ) as __third_party_vulnerabilities__
@@ -429,12 +429,12 @@ lateral (
             order by
               __first_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."aws_application_first_party_vulnerabilities" as __aws_application_first_party_vulnerabilities__
+        from "polymorphic"."gcp_application_first_party_vulnerabilities" as __gcp_application_first_party_vulnerabilities__
         inner join "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
         on (
-          __first_party_vulnerabilities__."id" = __aws_application_first_party_vulnerabilities__."first_party_vulnerability_id"
+          __first_party_vulnerabilities__."id" = __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id"
         )
-        where __aws_application_first_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
+        where __gcp_application_first_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
         order by
           __first_party_vulnerabilities__."id" asc
       ) as __first_party_vulnerabilities__
@@ -451,12 +451,12 @@ lateral (
             order by
               __third_party_vulnerabilities__."id" asc
           ) as "n"
-        from "polymorphic"."aws_application_third_party_vulnerabilities" as __aws_application_third_party_vulnerabilities__
+        from "polymorphic"."gcp_application_third_party_vulnerabilities" as __gcp_application_third_party_vulnerabilities__
         inner join "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
         on (
-          __third_party_vulnerabilities__."id" = __aws_application_third_party_vulnerabilities__."third_party_vulnerability_id"
+          __third_party_vulnerabilities__."id" = __gcp_application_third_party_vulnerabilities__."third_party_vulnerability_id"
         )
-        where __aws_application_third_party_vulnerabilities__."aws_application_id" = __union_identifiers__."id0"
+        where __gcp_application_third_party_vulnerabilities__."gcp_application_id" = __union_identifiers__."id0"
         order by
           __third_party_vulnerabilities__."id" asc
       ) as __third_party_vulnerabilities__
@@ -478,40 +478,6 @@ lateral (
     __people__."person_id" = __people_identifiers__."id0"
   )
 ) as __people_result__;
-
-with __first_party_vulnerabilities_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __first_party_vulnerabilities_result__.*
-from __first_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __first_party_vulnerabilities__."cvss_score"::text as "0",
-    __first_party_vulnerabilities__."id"::text as "1",
-    __first_party_vulnerabilities__."name" as "2",
-    __first_party_vulnerabilities_identifiers__.idx as "3"
-  from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-  where (
-    __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
-  )
-) as __first_party_vulnerabilities_result__;
-
-with __third_party_vulnerabilities_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __third_party_vulnerabilities_result__.*
-from __third_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __third_party_vulnerabilities__."cvss_score"::text as "0",
-    __third_party_vulnerabilities__."id"::text as "1",
-    __third_party_vulnerabilities__."name" as "2",
-    __third_party_vulnerabilities_identifiers__.idx as "3"
-  from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
-  where (
-    __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
-  )
-) as __third_party_vulnerabilities_result__;
 
 with __first_party_vulnerabilities_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
@@ -543,6 +509,40 @@ lateral (
     __third_party_vulnerabilities__."cvss_score"::text as "2",
     __third_party_vulnerabilities__."name" as "3",
     __third_party_vulnerabilities_identifiers__.idx as "4"
+  from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
+  where (
+    __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
+  )
+) as __third_party_vulnerabilities_result__;
+
+with __first_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __first_party_vulnerabilities_result__.*
+from __first_party_vulnerabilities_identifiers__,
+lateral (
+  select
+    __first_party_vulnerabilities__."cvss_score"::text as "0",
+    __first_party_vulnerabilities__."id"::text as "1",
+    __first_party_vulnerabilities__."name" as "2",
+    __first_party_vulnerabilities_identifiers__.idx as "3"
+  from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+  where (
+    __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
+  )
+) as __first_party_vulnerabilities_result__;
+
+with __third_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __third_party_vulnerabilities_result__.*
+from __third_party_vulnerabilities_identifiers__,
+lateral (
+  select
+    __third_party_vulnerabilities__."cvss_score"::text as "0",
+    __third_party_vulnerabilities__."id"::text as "1",
+    __third_party_vulnerabilities__."name" as "2",
+    __third_party_vulnerabilities_identifiers__.idx as "3"
   from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
   where (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"

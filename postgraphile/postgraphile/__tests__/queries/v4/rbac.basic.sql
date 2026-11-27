@@ -11,6 +11,40 @@ where (
 );
 
 select
+  __person_secret__."person_id"::text as "0",
+  __person_secret__."sekrit" as "1"
+from "c"."person_secret" as __person_secret__
+order by __person_secret__."person_id" asc;
+
+select
+  __person__."id"::text as "0",
+  __person_secret__."person_id"::text as "1",
+  __person_secret__."sekrit" as "2"
+from "c"."person" as __person__
+left outer join "c"."person_secret" as __person_secret__
+on (
+/* WHERE becoming ON */ (
+  __person_secret__."person_id" = __person__."id"
+))
+where (
+  __person__."id" = $1::"int4"
+);
+
+select
+  __person__."id"::text as "0",
+  __person_secret__."person_id"::text as "1",
+  __person_secret__."sekrit" as "2"
+from "c"."person" as __person__
+left outer join "c"."person_secret" as __person_secret__
+on (
+/* WHERE becoming ON */ (
+  __person_secret__."person_id" = __person__."id"
+))
+where (
+  __person__."id" = $1::"int4"
+);
+
+select
   __left_arm__."id"::text as "0",
   __left_arm__."person_id"::text as "1",
   __left_arm__."length_in_metres"::text as "2",
@@ -86,51 +120,5 @@ select
   __return_table_without_grants__."person_id_1"::text as "0",
   __return_table_without_grants__."person_id_2"::text as "1"
 from "c"."return_table_without_grants"() as __return_table_without_grants__;
-
-commit; /*fake*/
-
-begin; /*fake*/
-
-select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
-
-select
-  __person_secret__."person_id"::text as "0",
-  __person_secret__."sekrit" as "1"
-from "c"."person_secret" as __person_secret__
-order by __person_secret__."person_id" asc;
-
-commit; /*fake*/
-
-begin; /*fake*/
-
-select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
-
-select
-  __person__."id"::text as "0",
-  __person_secret__."person_id"::text as "1",
-  __person_secret__."sekrit" as "2"
-from "c"."person" as __person__
-left outer join "c"."person_secret" as __person_secret__
-on (
-/* WHERE becoming ON */ (
-  __person_secret__."person_id" = __person__."id"
-))
-where (
-  __person__."id" = $1::"int4"
-);
-
-select
-  __person__."id"::text as "0",
-  __person_secret__."person_id"::text as "1",
-  __person_secret__."sekrit" as "2"
-from "c"."person" as __person__
-left outer join "c"."person_secret" as __person_secret__
-on (
-/* WHERE becoming ON */ (
-  __person_secret__."person_id" = __person__."id"
-))
-where (
-  __person__."id" = $1::"int4"
-);
 
 commit; /*fake*/

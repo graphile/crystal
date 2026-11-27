@@ -26,28 +26,6 @@ lateral (
   )
 ) as __relational_topics_result__;
 
-select
-  __relational_checklists__."checklist_item_id"::text as "0"
-from "polymorphic"."relational_checklists" as __relational_checklists__
-where (
-  __relational_checklists__."checklist_item_id" = $1::"int4"
-);
-
-with __relational_checklist_items_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __relational_checklist_items_result__.*
-from __relational_checklist_items_identifiers__,
-lateral (
-  select
-    __relational_checklist_items__."checklist_item_item_id"::text as "0",
-    __relational_checklist_items_identifiers__.idx as "1"
-  from "polymorphic"."relational_checklist_items" as __relational_checklist_items__
-  where (
-    __relational_checklist_items__."checklist_item_item_id" = __relational_checklist_items_identifiers__."id0"
-  )
-) as __relational_checklist_items_result__;
-
 with __relational_posts_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
@@ -77,6 +55,28 @@ lateral (
     __relational_dividers__."divider_item_id" = __relational_dividers_identifiers__."id0"
   )
 ) as __relational_dividers_result__;
+
+select
+  __relational_checklists__."checklist_item_id"::text as "0"
+from "polymorphic"."relational_checklists" as __relational_checklists__
+where (
+  __relational_checklists__."checklist_item_id" = $1::"int4"
+);
+
+with __relational_checklist_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __relational_checklist_items_result__.*
+from __relational_checklist_items_identifiers__,
+lateral (
+  select
+    __relational_checklist_items__."checklist_item_item_id"::text as "0",
+    __relational_checklist_items_identifiers__.idx as "1"
+  from "polymorphic"."relational_checklist_items" as __relational_checklist_items__
+  where (
+    __relational_checklist_items__."checklist_item_item_id" = __relational_checklist_items_identifiers__."id0"
+  )
+) as __relational_checklist_items_result__;
 
 select
   __relational_posts__."post_item_id"::text as "0"

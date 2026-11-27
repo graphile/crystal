@@ -22,6 +22,30 @@ select
   __person__."last_login_from_subnet"::text as "5",
   __person__."user_mac"::text as "6"
 from "c"."person" as __person__
+order by __person__."id" asc
+limit 3;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."id" desc
+limit 3;
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
 order by __person__."person_full_name" asc, __person__."id" asc;
 
 select
@@ -111,8 +135,8 @@ from "a"."post" as __post__
 where (
   __post__."author_id" = $1::"int4"
 )
-order by __post__."id" asc
-limit 3;
+order by __post__."headline" desc, __post__."id" desc
+limit 2;
 
 select
   __post__."headline" as "0",
@@ -122,8 +146,8 @@ from "a"."post" as __post__
 where (
   __post__."author_id" = $1::"int4"
 )
-order by __post__."headline" desc, __post__."id" desc
-limit 2;
+order by __post__."id" asc
+limit 3;
 
 select
   __person__."id"::text as "0",
@@ -307,27 +331,3 @@ select
   __null_test_record__."id"::text as "2"
 from "c"."null_test_record" as __null_test_record__
 order by __null_test_record__."id" asc;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."config"::text as "3",
-  __person__."last_login_from_ip"::text as "4",
-  __person__."last_login_from_subnet"::text as "5",
-  __person__."user_mac"::text as "6"
-from "c"."person" as __person__
-order by __person__."id" asc
-limit 3;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."config"::text as "3",
-  __person__."last_login_from_ip"::text as "4",
-  __person__."last_login_from_subnet"::text as "5",
-  __person__."user_mac"::text as "6"
-from "c"."person" as __person__
-order by __person__."id" desc
-limit 3;

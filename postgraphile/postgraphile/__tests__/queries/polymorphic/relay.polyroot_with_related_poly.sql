@@ -12,28 +12,6 @@ on (
 order by __single_table_items_2."id" asc;
 
 select
-  __relational_item_relations__."id"::text as "0",
-  __relational_items__."id"::text as "1",
-  __relational_items__."type"::text as "2",
-  __relational_items_2."id"::text as "3",
-  __relational_items_2."type"::text as "4"
-from "polymorphic"."relational_item_relations" as __relational_item_relations__
-left outer join "polymorphic"."relational_items" as __relational_items__
-on (
-/* WHERE becoming ON */ (
-  __relational_items__."id" = __relational_item_relations__."child_id"
-))
-left outer join "polymorphic"."relational_items" as __relational_items_2
-on (
-/* WHERE becoming ON */ (
-  __relational_items_2."id" = __relational_item_relations__."parent_id"
-))
-where (
-  __relational_item_relations__."child_id" = $1::"int4"
-)
-order by __relational_item_relations__."id" asc;
-
-select
   __relational_items_2."id"::text as "0",
   __relational_items_2."type"::text as "1",
   __relational_items__."id"::text as "2",
@@ -68,6 +46,28 @@ where (
 )
 order by __single_table_item_relations__."id" asc;
 
+select
+  __relational_item_relations__."id"::text as "0",
+  __relational_items__."id"::text as "1",
+  __relational_items__."type"::text as "2",
+  __relational_items_2."id"::text as "3",
+  __relational_items_2."type"::text as "4"
+from "polymorphic"."relational_item_relations" as __relational_item_relations__
+left outer join "polymorphic"."relational_items" as __relational_items__
+on (
+/* WHERE becoming ON */ (
+  __relational_items__."id" = __relational_item_relations__."child_id"
+))
+left outer join "polymorphic"."relational_items" as __relational_items_2
+on (
+/* WHERE becoming ON */ (
+  __relational_items_2."id" = __relational_item_relations__."parent_id"
+))
+where (
+  __relational_item_relations__."child_id" = $1::"int4"
+)
+order by __relational_item_relations__."id" asc;
+
 with __relational_topics_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
@@ -82,35 +82,6 @@ lateral (
     __relational_topics__."topic_item_id" = __relational_topics_identifiers__."id0"
   )
 ) as __relational_topics_result__;
-
-select
-  __relational_checklists__."checklist_item_id"::text as "0"
-from "polymorphic"."relational_checklists" as __relational_checklists__
-where (
-  __relational_checklists__."checklist_item_id" = $1::"int4"
-);
-
-with __relational_checklist_items_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
-)
-select __relational_checklist_items_result__.*
-from __relational_checklist_items_identifiers__,
-lateral (
-  select
-    __relational_checklist_items__."checklist_item_item_id"::text as "0",
-    __relational_checklist_items_identifiers__.idx as "1"
-  from "polymorphic"."relational_checklist_items" as __relational_checklist_items__
-  where (
-    __relational_checklist_items__."checklist_item_item_id" = __relational_checklist_items_identifiers__."id0"
-  )
-) as __relational_checklist_items_result__;
-
-select
-  __relational_checklist_items__."checklist_item_item_id"::text as "0"
-from "polymorphic"."relational_checklist_items" as __relational_checklist_items__
-where (
-  __relational_checklist_items__."checklist_item_item_id" = $1::"int4"
-);
 
 with __relational_posts_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
@@ -141,6 +112,35 @@ lateral (
     __relational_dividers__."divider_item_id" = __relational_dividers_identifiers__."id0"
   )
 ) as __relational_dividers_result__;
+
+select
+  __relational_checklists__."checklist_item_id"::text as "0"
+from "polymorphic"."relational_checklists" as __relational_checklists__
+where (
+  __relational_checklists__."checklist_item_id" = $1::"int4"
+);
+
+with __relational_checklist_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
+select __relational_checklist_items_result__.*
+from __relational_checklist_items_identifiers__,
+lateral (
+  select
+    __relational_checklist_items__."checklist_item_item_id"::text as "0",
+    __relational_checklist_items_identifiers__.idx as "1"
+  from "polymorphic"."relational_checklist_items" as __relational_checklist_items__
+  where (
+    __relational_checklist_items__."checklist_item_item_id" = __relational_checklist_items_identifiers__."id0"
+  )
+) as __relational_checklist_items_result__;
+
+select
+  __relational_checklist_items__."checklist_item_item_id"::text as "0"
+from "polymorphic"."relational_checklist_items" as __relational_checklist_items__
+where (
+  __relational_checklist_items__."checklist_item_item_id" = $1::"int4"
+);
 
 select
   __relational_posts__."post_item_id"::text as "0"
