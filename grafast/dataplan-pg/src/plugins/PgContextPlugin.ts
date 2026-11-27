@@ -4,6 +4,13 @@ import type {} from "../interfaces.ts";
 import { withPgClientFromPgService } from "../pgServices.ts";
 import { version } from "../version.ts";
 
+type SharedClientCache = WeakMap<
+  GraphileConfig.PgServiceConfiguration,
+  import("../sharedClient.ts").WithSharedPgClient
+>;
+const sharedClients: SharedClientCache = new WeakMap();
+const watchSharedClients: SharedClientCache = new WeakMap();
+
 export const EMPTY_OBJECT: Record<string, never> = Object.freeze(
   Object.create(null),
 );
@@ -72,6 +79,22 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
               throw new Error(
                 `Key '${withPgClientKey}' already set on the context; refusing to overwrite - please check your configuration.`,
               );
+            }
+            const key = pgService.withSharedPgClientKey;
+            if (key != null && pgService.sharedClientFactory) {
+              const watch =
+                (config as { grafserv?: { watch?: boolean } }).grafserv
+                  ?.watch === true;
+              const cache = watch ? watchSharedClients : sharedClients;
+              let shared = cache.get(pgService);
+              if (shared === undefined) {
+                shared = pgService.sharedClientFactory(watch);
+                cache.set(pgService, shared);
+              }
+              if (key in contextValue) {
+                throw new Error("Duplicate PostgreSQL context key " + key);
+              }
+              contextValue[key] = shared;
             }
             contextValue[withPgClientKey] = withPgClientFromPgService.bind(
               null,

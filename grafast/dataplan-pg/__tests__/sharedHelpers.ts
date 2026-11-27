@@ -1,5 +1,9 @@
 // Shared with postgraphile
 
+import {
+  createTestDatabaseWithPool,
+  type TestDb,
+} from "@localrepo/test-helpers";
 import type { Pool, QueryConfig } from "pg";
 
 import { createWithPgClient } from "../dist/adaptors/pg.js";
@@ -37,8 +41,8 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   };
 }
 
-const originalExecuteWithoutCache = PgExecutor.prototype.executeWithoutCache;
-const originalExecuteWithQueue = PgExecutor.prototype.executeWithQueue;
+const originalExecuteDedicated = PgExecutor.prototype.executeDedicated;
+const originalExecuteShared = PgExecutor.prototype.executeShared;
 
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
@@ -140,12 +144,12 @@ export async function withTestWithPgClient<T>(
   } as typeof poolClient.query;
   // Release concurrent executor calls together for consistent SQL snapshots.
   if (
-    originalExecuteWithoutCache !== PgExecutor.prototype.executeWithoutCache ||
-    originalExecuteWithQueue !== PgExecutor.prototype.executeWithQueue
+    originalExecuteDedicated !== PgExecutor.prototype.executeDedicated ||
+    originalExecuteShared !== PgExecutor.prototype.executeShared
   ) {
     throw new Error("Already patched!");
   }
-  function withBatchCompletion(execute: PgExecutor["executeWithQueue"]) {
+  function withBatchCompletion(execute: PgExecutor["executeShared"]) {
     return function <TInput, TOutput>(
       this: PgExecutor,
       values: readonly PgExecutorInput<TInput>[],
@@ -155,11 +159,11 @@ export async function withTestWithPgClient<T>(
       return addBatch(executeTyped.call(this, values, options));
     };
   }
-  PgExecutor.prototype.executeWithoutCache = withBatchCompletion(
-    originalExecuteWithoutCache,
+  PgExecutor.prototype.executeDedicated = withBatchCompletion(
+    originalExecuteDedicated,
   );
-  PgExecutor.prototype.executeWithQueue = withBatchCompletion(
-    originalExecuteWithQueue,
+  PgExecutor.prototype.executeShared = withBatchCompletion(
+    originalExecuteShared,
   );
   try {
     if (direct) {
@@ -225,9 +229,21 @@ export async function withTestWithPgClient<T>(
       }
     }
   } finally {
-    PgExecutor.prototype.executeWithoutCache = originalExecuteWithoutCache;
-    PgExecutor.prototype.executeWithQueue = originalExecuteWithQueue;
+    PgExecutor.prototype.executeDedicated = originalExecuteDedicated;
+    PgExecutor.prototype.executeShared = originalExecuteShared;
     poolClient.query = oldQuery;
     poolClient.release();
   }
+}
+
+/** Provision an isolated database for a Jest suite. */
+export function useTestPool() {
+  let database: TestDb;
+  beforeAll(async () => {
+    database = await createTestDatabaseWithPool();
+  });
+  afterAll(async () => {
+    await database?.release();
+  });
+  return () => database.pgPool;
 }

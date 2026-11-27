@@ -425,39 +425,42 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         if (!pgService) {
           throw new Error(`Database '${serviceName}' not found`);
         }
-        const { pgSettingsKey, withPgClientKey } = pgService;
-        /* TODO: consider replacing the `withPgClient` with:
-           ```
-           withPgClient: assertNotNull(
-             ctx.get(withPgClientKey),
-             `Server is misconfigured; unable to find '${withPgClientKey}' in context.`,
-           ),
-           ```
-        */
-        const contextCallback =
-          pgSettingsKey != null
-            ? EXPORTABLE(
-                (context, object, pgSettingsKey, withPgClientKey) => () => {
-                  const ctx = context();
-                  return object({
-                    pgSettings: ctx.get(pgSettingsKey),
-                    withPgClient: ctx.get(withPgClientKey),
-                  }) as Step<PgExecutorContext<any>>;
-                },
-                [context, object, pgSettingsKey, withPgClientKey],
-                "contextCallback",
-              )
-            : EXPORTABLE(
-                (constant, context, object, withPgClientKey) => () => {
-                  const ctx = context();
-                  return object({
-                    pgSettings: constant(null),
-                    withPgClient: ctx.get(withPgClientKey),
-                  }) as Step<PgExecutorContext<any>>;
-                },
-                [constant, context, object, withPgClientKey],
-                "contextCallback",
-              );
+        const { pgSettingsKey, withPgClientKey, withSharedPgClientKey } =
+          pgService;
+        const contextCallback = EXPORTABLE(
+          (
+            constant,
+            context,
+            object,
+            pgSettingsKey,
+            withPgClientKey,
+            withSharedPgClientKey,
+          ) =>
+            () => {
+              const ctx = context();
+              return object({
+                pgSettings:
+                  pgSettingsKey == null
+                    ? constant(null)
+                    : ctx.get(pgSettingsKey),
+                withPgClient: ctx.get(withPgClientKey),
+                ...(withSharedPgClientKey == null
+                  ? {}
+                  : {
+                      withSharedPgClient: ctx.get(withSharedPgClientKey),
+                    }),
+              }) as Step<PgExecutorContext<any>>;
+            },
+          [
+            constant,
+            context,
+            object,
+            pgSettingsKey,
+            withPgClientKey,
+            withSharedPgClientKey,
+          ],
+          "contextCallback",
+        );
         const maxClientQueues = info.options.pgExecutorMaxClientQueues;
         const pgExecutorConfig =
           maxClientQueues !== undefined

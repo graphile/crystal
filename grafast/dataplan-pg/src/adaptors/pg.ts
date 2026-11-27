@@ -32,10 +32,12 @@ import type {
 } from "../executor.ts";
 import type { MakePgServiceOptions } from "../interfaces.ts";
 import type { PgAdaptor } from "../pgServices.ts";
+import { makeWithSharedPgClient } from "../sharedClient.ts";
 
 declare global {
   namespace Grafast {
     interface Context {
+      withSharedPgClient?: import("../sharedClient.ts").WithSharedPgClient;
       pgSettings: Record<string, string | undefined> | null;
       withPgClient: WithPgClient<NodePostgresPgClient>;
       pgSubscriber: PgSubscriber | null;
@@ -114,7 +116,13 @@ function newNodePostgresPgClient(
   };
   return {
     rawClient: pgClient,
-    withTransaction(callback) {
+    withTransaction(callback, options) {
+      if (
+        options?.savepoint === false &&
+        (txLevel > 0 || alreadyInTransaction)
+      ) {
+        return callback(this);
+      }
       // Transactions always queue; creating queue if need be
       return addToQueue(async () => {
         if (txLevel === 0 && !alreadyInTransaction) {
@@ -812,7 +820,11 @@ export class PgSubscriber<
 
 export interface PgAdaptorMakePgServiceOptions
   extends MakePgServiceOptions,
-    CommonPgAdaptorAndServiceSettings {}
+    CommonPgAdaptorAndServiceSettings {
+  sharedClientPercentage?: number;
+  idleReservationMs?: number;
+  acquisitionTimeoutMs?: number;
+}
 
 function mkpool(
   name: string,
@@ -853,6 +865,9 @@ export function makePgService(
 
     schemas,
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
+    withSharedPgClientKey = name === "main"
+      ? "withSharedPgClient"
+      : name + "_withSharedPgClient",
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
     pubsub = true,
@@ -889,6 +904,22 @@ export function makePgService(
   const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
     {
       name,
+      withSharedPgClientKey: withSharedPgClientKey as "withSharedPgClient",
+      sharedClientFactory(watch) {
+        const percentage = options.sharedClientPercentage ?? 80;
+        if (!(percentage > 0 && percentage <= 100)) {
+          throw new Error("Invalid shared client percentage");
+        }
+        const available =
+          pool.options.max! - Number(pgSubscriber != null) - Number(watch);
+        return makeWithSharedPgClient({
+          pool,
+          maxClients: Math.max(1, Math.floor((available * percentage) / 100)),
+          isPoolWaiting: () => pool.waitingCount > 0,
+          idleReservationMs: options.idleReservationMs,
+          acquisitionTimeoutMs: options.acquisitionTimeoutMs,
+        });
+      },
       schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
       withPgClientKey: withPgClientKey as any,
       pgSettingsKey: pgSettingsKey as any,

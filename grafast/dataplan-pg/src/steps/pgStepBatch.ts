@@ -39,7 +39,7 @@ export const pgStepBatchExecutor = defineBatchExecutor({
       context,
       queryValues,
     }));
-    return (await executor.executeWithQueue(inputs, options)).values;
+    return (await executor.executeShared(inputs, options)).values;
   },
   // Affinity routes the query to a connection queue without affecting its rows.
   optionsMatch: {

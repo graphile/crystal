@@ -52,7 +52,7 @@ function run(
     eventEmitter: undefined,
   };
   return queued
-    ? executor.executeWithQueue(inputs, options)
+    ? executor.executeShared(inputs, options)
     : executor.executeWithoutCache(inputs, options);
 }
 
@@ -320,7 +320,7 @@ test("rejects pending work if the last queue cannot acquire a client", async () 
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
 
-test("executeWithCache queues uncached reads and warns only once", async () => {
+test("executeWithCache reuses cached reads and warns only once", async () => {
   const executor = makeExecutor();
   let version = 1;
   const { context, seen, withPgClient } = makeContext(async () => ({
@@ -338,12 +338,12 @@ test("executeWithCache queues uncached reads and warns only once", async () => {
     expect((await read()).values).toEqual([[[1]]]);
     version = 2;
     const results = await Promise.all([read(), read()]);
-    expect(results.map(({ values }) => values)).toEqual([[[[2]]], [[[2]]]]);
-    expect(seen).toHaveLength(3);
-    expect(withPgClient).toHaveBeenCalledTimes(2);
+    expect(results.map(({ values }) => values)).toEqual([[[[1]]], [[[1]]]]);
+    expect(seen).toHaveLength(1);
+    expect(withPgClient).toHaveBeenCalledTimes(1);
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("deprecated");
-    expect(warn.mock.calls[0][0]).toContain("executeWithQueue");
+    expect(warn.mock.calls[0][0]).toContain("executeShared");
   } finally {
     warn.mockRestore();
   }

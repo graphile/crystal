@@ -46,6 +46,21 @@ plugin is recommended, as it results in a much leaner schema that doesn't
 contain functionality that you can't actually use. You can, however, disable it
 via `disablePlugins: ['PgRBACPlugin']`.
 
+## Connection pool size
+
+PostGraphile requires a pool of at least four connections to support all
+features. Typical deployments use 10–100 connections. Smaller pools risk
+deadlocks and acquisition timeouts. With a single connection, disable
+subscriptions, streaming and watch mode.
+
+The PostgreSQL service option `sharedClientPercentage` defaults to 80. This
+percentage applies after reserving one connection each for subscriptions and
+watch mode when enabled, rounding down with a minimum of one shared connection.
+A shared borrower keeps its idle reservation for `idleReservationMs` (default
+5,000 ms). It can continue using the connection after that interval until
+another borrower needs the capacity. `acquisitionTimeoutMs` controls how long
+a borrower waits for a shared client and also defaults to 5,000 ms.
+
 ## Database Latency
 
 PostGraphile needs to issue queries to your database. For a transaction this

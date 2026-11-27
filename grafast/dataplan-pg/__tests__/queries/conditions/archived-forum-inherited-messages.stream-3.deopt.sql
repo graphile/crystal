@@ -31,9 +31,6 @@ from (
 order by __stream_wrapped__."2"
 limit 1;
 
-begin; /*fake*/
-
-declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select *
 from (
   select
@@ -53,12 +50,6 @@ from (
 ) __stream_wrapped__
 order by __stream_wrapped__."2"
 offset 1;
-
-fetch forward 100 from __SNAPSHOT_CURSOR_0__
-
-close __SNAPSHOT_CURSOR_0__
-
-commit; /*fake*/
 
 select
   __users__."username" as "0",

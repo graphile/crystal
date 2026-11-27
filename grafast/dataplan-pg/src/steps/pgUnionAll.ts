@@ -1049,7 +1049,7 @@ on (${sql.indent(
     let executionResult;
     if (this.hasSideEffects) {
       try {
-        executionResult = await this.executor.executeWithoutCache(
+        executionResult = await this.executor.executeDedicated(
           keysets.map((queryValues) => ({ context, queryValues })),
           common,
         );

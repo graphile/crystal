@@ -1,3 +1,4 @@
+import LRU from "@graphile/lru";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
@@ -19,6 +20,7 @@ import {
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.ts";
+import type { SharedPgClient, WithSharedPgClient } from "./sharedClient.ts";
 import { setFind } from "./utils.ts";
 
 const DEFAULT_MAX_CLIENT_QUEUES = 3;
@@ -121,7 +123,11 @@ export interface PgClientResult<TData> {
  */
 export interface PgClient {
   query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
-  withTransaction<T>(callback: (client: this) => Promise<T>): Promise<T>;
+  /** Pass `savepoint: false` to join an ambient transaction without a rollback boundary. */
+  withTransaction<T>(
+    callback: (client: this) => Promise<T>,
+    options?: { savepoint?: boolean },
+  ): Promise<T>;
 }
 
 export interface WithPgClient<
@@ -145,6 +151,7 @@ export type PgExecutorContext<
 > = {
   pgSettings: TSettings;
   withPgClient: WithPgClient<TPgClient>;
+  withSharedPgClient?: WithSharedPgClient;
 };
 
 /** @deprecated Please use `Step<PgExecutorContext<TSettings>>` instead */
@@ -300,6 +307,10 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
   public static readonly metaKey = Symbol("PgExecutor cache");
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
+  private legacyCaches = new WeakMap<
+    PgExecutorContext,
+    LRU<string, Map<string, Promise<ReadonlyArray<unknown>>>>
+  >();
   private maxClientQueues: number;
   private queryQueues: WeakMap<PgExecutorContext, QueryQueueState>;
 
@@ -330,7 +341,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
 
   /** @internal */
   public async _executeWithClient<TData>(
-    client: GraphileConfig.DataplanPgClient,
+    client: SharedPgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
     name: string | undefined,
@@ -631,23 +642,24 @@ ${duration}
     context: PgExecutorContext,
     callback: (execute: ExecuteFunction) => Promise<T>,
   ): Promise<T> {
-    return context.withPgClient<T>(context.pgSettings, (baseClient) =>
-      baseClient.withTransaction((transactionClient) => {
-        const execute: ExecuteFunction = (text, values) =>
+    return context.withSharedPgClient!(
+      context,
+      { needsTransaction: true },
+      (client) =>
+        callback((text, values) =>
           this._executeWithClient(
-            transactionClient,
+            client,
             text,
             values,
-            undefined, // TODO: add 'name' to args?
+            undefined,
             undefined,
             false,
-          );
-        return callback(execute);
-      }),
+          ),
+        ),
     );
   }
 
-  /** @deprecated Use ExecutionDetails.batch for caching or executeWithQueue for queued reads. */
+  /** @deprecated Use ExecutionDetails.batch for caching or executeShared for queued reads. */
   public executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
@@ -655,32 +667,79 @@ ${duration}
     if (!warnedExecuteWithCache) {
       warnedExecuteWithCache = true;
       console.warn(
-        "PgExecutor.executeWithCache is deprecated and now forwards to executeWithQueue. Use ExecutionDetails.batch for caching.",
+        "PgExecutor.executeWithCache is deprecated and now forwards to executeShared. Use ExecutionDetails.batch for caching.",
       );
     }
-    return this.executeWithQueue<TInput, TOutput>(values, common);
+    if (common.useTransaction) {
+      return this.executeDedicated<TInput, TOutput>(values, common);
+    }
+    const missing: PgExecutorInput<TInput>[] = [];
+    const deferreds: Array<PromiseWithResolvers<readonly TOutput[]>> = [];
+    const discard: Array<() => void> = [];
+    const queryKey = common.text + "\n" + JSON.stringify(common.rawSqlValues);
+    const rows = values.map((input) => {
+      let cache = this.legacyCaches.get(input.context);
+      if (cache === undefined) {
+        cache = new LRU({ maxLength: 500 });
+        this.legacyCaches.set(input.context, cache);
+      }
+      let keys = cache.get(queryKey);
+      if (!keys) {
+        keys = new Map();
+        cache.set(queryKey, keys);
+      }
+      const key = JSON.stringify(input.queryValues);
+      const existing = keys.get(key);
+      if (existing) {
+        return existing as Promise<readonly TOutput[]>;
+      }
+      const deferred = Promise.withResolvers<readonly TOutput[]>();
+      keys.set(key, deferred.promise);
+      missing.push(input);
+      deferreds.push(deferred);
+      discard.push(() => keys.delete(key));
+      return deferred.promise;
+    });
+    if (missing.length > 0) {
+      void this.executeShared<TInput, TOutput>(missing, common).then(
+        (result) => deferreds.forEach((d, i) => d.resolve(result.values[i])),
+        (error) =>
+          deferreds.forEach((d, i) => {
+            discard[i]();
+            d.reject(error);
+          }),
+      );
+    }
+    return Promise.all(rows).then((values) => ({ values }));
   }
 
-  /** Execute reads through the client queue. Results are uncached. */
-  public executeWithQueue<TInput = any, TOutput = any>(
+  /** Execute reads on a shared client. Results are uncached. */
+  public executeShared<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
     return this.executeQueries<TInput, TOutput>(values, common, true);
   }
 
-  /** Execute queries directly without caching or queueing. */
+  /** @deprecated Use executeDedicated. */
   public executeWithoutCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
+    return this.executeDedicated<TInput, TOutput>(values, common);
+  }
+
+  public executeDedicated<TInput = any, TOutput = any>(
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    common: PgExecutorOptions,
+  ) {
     return this.executeQueries<TInput, TOutput>(values, common, false);
   }
 
   private async executeQueries<TInput, TOutput>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
-    queue: boolean,
+    shared: boolean,
   ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
     const { rawSqlValues, identifierIndex, eventEmitter } = common;
     const publishExecute: PublishFunction | undefined = eventEmitter
@@ -758,22 +817,33 @@ ${duration}
                     true,
                   ),
               )
-            : queue
-              ? await this._executeQueued<TOutput>(
-                  context,
-                  text,
-                  sqlValues,
-                  name,
-                  publishExecute,
-                  common.affinity,
+            : shared && context.withSharedPgClient
+              ? await context.withSharedPgClient(context, {}, (client) =>
+                  this._executeWithClient<TOutput>(
+                    client,
+                    text,
+                    sqlValues,
+                    name,
+                    publishExecute,
+                    false,
+                  ),
                 )
-              : await this._execute<TOutput>(
-                  context,
-                  text,
-                  sqlValues,
-                  name,
-                  publishExecute,
-                );
+              : shared
+                ? await this._executeQueued<TOutput>(
+                    context,
+                    text,
+                    sqlValues,
+                    name,
+                    publishExecute,
+                    common.affinity,
+                  )
+                : await this._execute<TOutput>(
+                    context,
+                    text,
+                    sqlValues,
+                    name,
+                    publishExecute,
+                  );
           const { rows } = queryResult;
           if (identifierIndex == null) {
             for (const { resultIndex } of batch) {
@@ -840,6 +910,31 @@ ${duration}
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
+      if (!context.withSharedPgClient) {
+        const inputs = batch.map(({ queryValues }) => ({
+          context,
+          queryValues,
+        }));
+        promises.push(
+          this.executeDedicated<TInput, TOutput>(inputs, common).then(
+            ({ values }) => {
+              batch.forEach(({ resultIndex }, i) => {
+                streams[resultIndex] = (async function* () {
+                  yield* values[i];
+                })();
+              });
+            },
+            (error) => {
+              const rejected = Promise.reject(error);
+              rejected.catch(noop);
+              for (const { resultIndex } of batch) {
+                streams[resultIndex] = rejected;
+              }
+            },
+          ),
+        );
+        continue;
+      }
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
       const { resolve: resolveTx, promise: tx } = promiseWithResolve<void>();
       let txResolved = false;
@@ -1158,12 +1253,13 @@ ${duration}
 
     // We don't explicitly need a transaction for mutations; but for safety
     // create one unless caller opts out.
+    this.legacyCaches.delete(context);
     return withPgClient(
       pgSettings,
       useTransaction === false
         ? callback
         : (client) => client.withTransaction(callback),
-    );
+    ).finally(() => this.legacyCaches.delete(context));
   }
 }
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");

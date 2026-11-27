@@ -1323,7 +1323,7 @@ export class PgSelectStep<
         executionResult = null;
       } else if (isMutation) {
         try {
-          executionResult = await this.resource.executeWithoutCache(
+          executionResult = await this.resource.executeDedicated(
             keysets.map((queryValues) => ({ context, queryValues })),
             common,
           );
@@ -1388,7 +1388,7 @@ export class PgSelectStep<
       }
       const initialFetchResult = specs
         ? (
-            await this.resource.executeWithoutCache(specs, {
+            await this.resource.executeShared(specs, {
               text,
               rawSqlValues,
               identifierIndex,
