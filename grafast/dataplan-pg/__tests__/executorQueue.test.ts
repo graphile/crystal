@@ -318,35 +318,6 @@ test("rejects pending work if the last queue cannot acquire a client", async () 
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
 
-test("executeWithCache reuses cached reads and warns only once", async () => {
-  const executor = makeExecutor();
-  let version = 1;
-  const { context, seen, withPgClient } = makeContext(async () => ({
-    rows: [[version]],
-    rowCount: 1,
-  }));
-  const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
-  const read = () =>
-    executor.executeWithCache([{ context, queryValues: [] }], {
-      text: "select value",
-      rawSqlValues: [],
-      eventEmitter: undefined,
-    });
-  try {
-    expect((await read()).values).toEqual([[[1]]]);
-    version = 2;
-    const results = await Promise.all([read(), read()]);
-    expect(results.map(({ values }) => values)).toEqual([[[[1]]], [[[1]]]]);
-    expect(seen).toHaveLength(1);
-    expect(withPgClient).toHaveBeenCalledTimes(1);
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain("deprecated");
-    expect(warn.mock.calls[0][0]).toContain("executeShared");
-  } finally {
-    warn.mockRestore();
-  }
-});
-
 test("invalidates batch caches after successful and failed mutations", async () => {
   const executor = makeExecutor();
   let version = 1;

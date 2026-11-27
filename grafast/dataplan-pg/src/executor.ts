@@ -1,4 +1,3 @@
-import LRU from "@graphile/lru";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
@@ -309,14 +308,8 @@ export type PgExecutorSubscribeOptions = {
  * query scheduling.
  */
 export class PgExecutor<const TName extends string = string, TSettings = any> {
-  /** @deprecated PostgreSQL steps now use ExecutionDetails.batch. */
-  public static readonly metaKey = Symbol("PgExecutor cache");
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
-  private legacyCaches = new WeakMap<
-    PgExecutorContext,
-    LRU<string, Map<string, Promise<ReadonlyArray<unknown>>>>
-  >();
   private maxClientQueues: number;
   private queryQueues: WeakMap<PgExecutorContext, QueryQueueState>;
 
@@ -666,7 +659,7 @@ ${duration}
     }
   }
 
-  /** @deprecated Use ExecutionDetails.batch for caching or executeShared for queued reads. */
+  /** @deprecated Use executeShared. Use ExecutionDetails.batch to cache results. */
   public executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
@@ -677,42 +670,7 @@ ${duration}
         "PgExecutor.executeWithCache is deprecated and now forwards to executeShared. Use ExecutionDetails.batch for caching.",
       );
     }
-    if (common.useTransaction) {
-      return this.executeDedicated<TInput, TOutput>(values, common);
-    }
-    const missing: PgExecutorInput<TInput>[] = [];
-    const deferreds: Array<PromiseWithResolvers<readonly TOutput[]>> = [];
-    const queryKey = common.text + "\n" + JSON.stringify(common.rawSqlValues);
-    const rows = values.map((input) => {
-      let cache = this.legacyCaches.get(input.context);
-      if (cache === undefined) {
-        cache = new LRU({ maxLength: 500 });
-        this.legacyCaches.set(input.context, cache);
-      }
-      let keys = cache.get(queryKey);
-      if (!keys) {
-        keys = new Map();
-        cache.set(queryKey, keys);
-      }
-      const key = JSON.stringify(input.queryValues);
-      const existing = keys.get(key);
-      if (existing) {
-        return existing as Promise<readonly TOutput[]>;
-      }
-      const deferred = Promise.withResolvers<readonly TOutput[]>();
-      keys.set(key, deferred.promise);
-      missing.push(input);
-      deferreds.push(deferred);
-      deferred.promise.catch(() => keys.delete(key));
-      return deferred.promise;
-    });
-    if (missing.length > 0) {
-      void this.executeShared<TInput, TOutput>(missing, common).then(
-        (result) => deferreds.forEach((d, i) => d.resolve(result.values[i])),
-        (error) => deferreds.forEach((d) => d.reject(error)),
-      );
-    }
-    return Promise.all(rows).then((values) => ({ values }));
+    return this.executeShared<TInput, TOutput>(values, common);
   }
 
   /** Execute reads on a shared client. Results are uncached. */
@@ -1271,13 +1229,12 @@ ${duration}
 
     // We don't explicitly need a transaction for mutations; but for safety
     // create one unless caller opts out.
-    this.legacyCaches.delete(context);
     return withPgClient(
       pgSettings,
       useTransaction === false
         ? callback
         : (client) => client.withTransaction(callback),
-    ).finally(() => this.legacyCaches.delete(context));
+    );
   }
 }
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");
