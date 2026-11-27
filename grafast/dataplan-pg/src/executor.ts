@@ -528,6 +528,28 @@ ${duration}
     publish: PublishFunction | undefined,
     affinity: symbol | undefined,
   ): Promise<PgClientResult<TData>> {
+    const withSharedPgClient = getWithSharedPgClient(context);
+    if (withSharedPgClient) {
+      return withSharedPgClient(
+        context,
+        {
+          maxClientQueues: this.maxClientQueues,
+          name,
+          affinity,
+          signature: getSignature(text),
+        },
+        (client) =>
+          this._executeWithClient<TData>(
+            client,
+            text,
+            values,
+            name,
+            publish,
+            false,
+          ),
+      );
+    }
+    // Custom providers without sharing still use the original executor queue.
     return new Promise<PgClientResult<TData>>((resolve, reject) => {
       const item: QueuedQuery = {
         name,
@@ -644,35 +666,6 @@ ${duration}
     }
   }
 
-  private withTransaction<T>(
-    withSharedPgClient: WithSharedPgClient,
-    context: PgExecutorContext,
-    options: PgExecutorOptions,
-    callback: (execute: ExecuteFunction) => Promise<T>,
-  ): Promise<T> {
-    return withSharedPgClient(
-      context,
-      {
-        needsTransaction: true,
-        maxClientQueues: this.maxClientQueues,
-        name: options.name,
-        affinity: options.affinity,
-        signature: getSignature(options.text),
-      },
-      (client) =>
-        callback((text, values) =>
-          this._executeWithClient(
-            client,
-            text,
-            values,
-            undefined,
-            undefined,
-            false,
-          ),
-        ),
-    );
-  }
-
   /** @deprecated Use ExecutionDetails.batch for caching or executeShared for queued reads. */
   public executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
@@ -689,7 +682,6 @@ ${duration}
     }
     const missing: PgExecutorInput<TInput>[] = [];
     const deferreds: Array<PromiseWithResolvers<readonly TOutput[]>> = [];
-    const discard: Array<() => void> = [];
     const queryKey = common.text + "\n" + JSON.stringify(common.rawSqlValues);
     const rows = values.map((input) => {
       let cache = this.legacyCaches.get(input.context);
@@ -711,17 +703,13 @@ ${duration}
       keys.set(key, deferred.promise);
       missing.push(input);
       deferreds.push(deferred);
-      discard.push(() => keys.delete(key));
+      deferred.promise.catch(() => keys.delete(key));
       return deferred.promise;
     });
     if (missing.length > 0) {
       void this.executeShared<TInput, TOutput>(missing, common).then(
         (result) => deferreds.forEach((d, i) => d.resolve(result.values[i])),
-        (error) =>
-          deferreds.forEach((d, i) => {
-            discard[i]();
-            d.reject(error);
-          }),
+        (error) => deferreds.forEach((d) => d.reject(error)),
       );
     }
     return Promise.all(rows).then((values) => ({ values }));
@@ -772,12 +760,13 @@ ${duration}
     const results: Array<ReadonlyArray<TOutput>> = [];
     const batches = (() => {
       if (common.useTransaction) {
-        // Side effects must execute once per input, even for duplicate keys.
+        // If we're using a transaction, use a separate batch for each query.
         return values.map(
           ({ context, queryValues }, resultIndex) =>
             [context, [{ queryValues, resultIndex }]] as const,
         );
       } else {
+        // Group by context
         const groupMap = new Map<
           PgExecutorContext,
           Array<{
@@ -791,12 +780,13 @@ ${duration}
           resultIndex++
         ) {
           const { context, queryValues } = values[resultIndex];
-          let group = groupMap.get(context);
-          if (group === undefined) {
-            group = [];
-            groupMap.set(context, group);
+
+          let entry = groupMap.get(context);
+          if (!entry) {
+            entry = [];
+            groupMap.set(context, entry);
           }
-          group.push({ queryValues, resultIndex });
+          entry.push({ queryValues, resultIndex });
         }
         return groupMap.entries();
       }
@@ -815,9 +805,6 @@ ${duration}
                   ...rawSqlValues,
                   JSON.stringify(batch.map(({ queryValues }) => queryValues)),
                 ];
-          const withSharedPgClient = shared
-            ? getWithSharedPgClient(context)
-            : undefined;
           const queryResult = common.useTransaction
             ? await this.executeMutation<PgClientResult<TOutput>>(
                 {
@@ -834,41 +821,22 @@ ${duration}
                     true,
                   ),
               )
-            : withSharedPgClient
-              ? await withSharedPgClient(
+            : shared
+              ? await this._executeQueued<TOutput>(
                   context,
-                  {
-                    maxClientQueues: this.maxClientQueues,
-                    name,
-                    affinity: common.affinity,
-                    signature: getSignature(text),
-                  },
-                  (client) =>
-                    this._executeWithClient<TOutput>(
-                      client,
-                      text,
-                      sqlValues,
-                      name,
-                      publishExecute,
-                      false,
-                    ),
+                  text,
+                  sqlValues,
+                  name,
+                  publishExecute,
+                  common.affinity,
                 )
-              : shared
-                ? await this._executeQueued<TOutput>(
-                    context,
-                    text,
-                    sqlValues,
-                    name,
-                    publishExecute,
-                    common.affinity,
-                  )
-                : await this._execute<TOutput>(
-                    context,
-                    text,
-                    sqlValues,
-                    name,
-                    publishExecute,
-                  );
+              : await this._execute<TOutput>(
+                  context,
+                  text,
+                  sqlValues,
+                  name,
+                  publishExecute,
+                );
           const { rows } = queryResult;
           if (identifierIndex == null) {
             for (const { resultIndex } of batch) {
@@ -901,6 +869,11 @@ ${duration}
     return { values: results };
   }
 
+  /**
+   * Returns a list of streams (async iterables), one for each entry in
+   * `values`, for the results from the cursor defined by running the query
+   * `common.text` with the given variables.
+   */
   public async executeStream<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
@@ -1113,12 +1086,26 @@ ${duration}
           }
         };
 
-        this.withTransaction(
-          withSharedPgClient,
+        withSharedPgClient(
           context,
-          common,
-          (_execute) => {
-            resolveExecute(_execute);
+          {
+            needsTransaction: true,
+            maxClientQueues: this.maxClientQueues,
+            name: common.name,
+            affinity: common.affinity,
+            signature: getSignature(common.text),
+          },
+          (client) => {
+            resolveExecute((text, values) =>
+              this._executeWithClient(
+                client,
+                text,
+                values,
+                undefined,
+                undefined,
+                false,
+              ),
+            );
             return tx;
           },
         ).then(null, handleFetchError);

@@ -514,9 +514,8 @@ export class PgInsertSingleStep<
           true,
         );
       };
-      let mutationResult;
-      try {
-        mutationResult = await executor.executeMutation(
+      const { rows, notices, rowCount } = await executor
+        .executeMutation(
           { context, useTransaction: this.wrappers.length > 0 },
           this.wrappers.length > 0
             ? makeWrappedMutationExecute<PgInsertSingleQueryBuilder, any>(
@@ -527,11 +526,8 @@ export class PgInsertSingleStep<
                 executeMutation,
               )
             : executeMutation,
-        );
-      } finally {
-        batch.invalidate();
-      }
-      const { rows, notices, rowCount } = mutationResult;
+        )
+        .finally(batch.invalidate);
       return {
         __proto__: null,
         m: meta,

@@ -10,8 +10,6 @@ import { createWithPgClient } from "../dist/adaptors/pg.js";
 import {
   type PgClientQuery,
   PgExecutor,
-  type PgExecutorInput,
-  type PgExecutorOptions,
   type WithPgClient,
 } from "../dist/index.js";
 
@@ -43,8 +41,7 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   return queued;
 }
 
-const originalExecuteDedicated = PgExecutor.prototype.executeDedicated;
-const originalExecuteShared = PgExecutor.prototype.executeShared;
+const originalPgExecutorMethod = (PgExecutor.prototype as any).executeQueries;
 
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
@@ -80,7 +77,7 @@ export async function withTestWithPgClient<T>(
     queries.push(...currentBatchQueries);
     endBatch();
   }
-  function addBatch<TResult>(promise: Promise<TResult>): Promise<TResult> {
+  function addBatch(promise: Promise<any>) {
     if (!currentBatch) {
       currentBatch = {
         promises: new Set([promise]),
@@ -144,29 +141,16 @@ export async function withTestWithPgClient<T>(
     }
     return (oldQuery as (...args: any[]) => unknown).apply(this, args);
   } as typeof poolClient.query;
-  // Release concurrent executor calls together for consistent SQL snapshots.
+  // Monkey patch to capture queries
   if (
-    originalExecuteDedicated !== PgExecutor.prototype.executeDedicated ||
-    originalExecuteShared !== PgExecutor.prototype.executeShared
+    originalPgExecutorMethod !== (PgExecutor.prototype as any).executeQueries
   ) {
     throw new Error("Already patched!");
   }
-  function withBatchCompletion(execute: PgExecutor["executeShared"]) {
-    return function <TInput, TOutput>(
-      this: PgExecutor,
-      values: readonly PgExecutorInput<TInput>[],
-      options: PgExecutorOptions,
-    ) {
-      const executeTyped = execute<TInput, TOutput>;
-      return addBatch(executeTyped.call(this, values, options));
-    };
-  }
-  PgExecutor.prototype.executeDedicated = withBatchCompletion(
-    originalExecuteDedicated,
-  );
-  PgExecutor.prototype.executeShared = withBatchCompletion(
-    originalExecuteShared,
-  );
+  (PgExecutor.prototype as any).executeQueries = function (...args: any[]) {
+    const promise = originalPgExecutorMethod.apply(this, args);
+    return addBatch(promise);
+  };
   try {
     if (direct) {
       const withPgClient = createWithPgClient({
@@ -235,8 +219,7 @@ export async function withTestWithPgClient<T>(
       }
     }
   } finally {
-    PgExecutor.prototype.executeDedicated = originalExecuteDedicated;
-    PgExecutor.prototype.executeShared = originalExecuteShared;
+    (PgExecutor.prototype as any).executeQueries = originalPgExecutorMethod;
     poolClient.query = oldQuery;
     poolClient.release();
   }

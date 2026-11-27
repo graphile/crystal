@@ -1318,27 +1318,23 @@ export class PgSelectStep<
         eventEmitter,
         useTransaction: isMutation,
       };
-      let executionResult;
-      if (keysets.length === 0) {
-        executionResult = null;
-      } else if (isMutation) {
-        try {
-          executionResult = await this.resource.executeDedicated(
-            keysets.map((queryValues) => ({ context, queryValues })),
-            common,
-          );
-        } finally {
-          executionDetails.batch.invalidate();
-        }
-      } else {
-        executionResult = {
-          values: await executionDetails.batch(
-            pgStepBatchExecutor,
-            keysets,
-            pgStepBatchOptions(this.resource.executor, context, common),
-          ),
-        };
-      }
+      const executionResult =
+        keysets.length === 0
+          ? null
+          : isMutation
+            ? await this.resource
+                .executeDedicated(
+                  keysets.map((queryValues) => ({ context, queryValues })),
+                  common,
+                )
+                .finally(executionDetails.batch.invalidate)
+            : {
+                values: await executionDetails.batch(
+                  pgStepBatchExecutor,
+                  keysets,
+                  pgStepBatchOptions(this.resource.executor, context, common),
+                ),
+              };
       // debugExecute("%s; result: %c", this, executionResult);
 
       return indexMap((i) => {

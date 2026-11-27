@@ -439,9 +439,8 @@ export class PgDeleteSingleStep<
           true,
         );
       };
-      let mutationResult;
-      try {
-        mutationResult = await this.resource.executor.executeMutation(
+      const { rows, rowCount, notices } = await this.resource.executor
+        .executeMutation(
           { context, useTransaction: this.wrappers.length > 0 },
           this.wrappers.length > 0
             ? makeWrappedMutationExecute<PgDeleteSingleQueryBuilder, any>(
@@ -452,11 +451,8 @@ export class PgDeleteSingleStep<
                 executeMutation,
               )
             : executeMutation,
-        );
-      } finally {
-        batch.invalidate();
-      }
-      const { rows, rowCount, notices } = mutationResult;
+        )
+        .finally(batch.invalidate);
       if (rowCount === 0) {
         return flagError(
           new Error(

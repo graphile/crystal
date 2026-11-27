@@ -84,8 +84,8 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
                 `Key '${withPgClientKey}' already set on the context; refusing to overwrite - please check your configuration.`,
               );
             }
-            const withPgClient: WithPgClient = (settings, callback, signal) =>
-              withPgClientFromPgService(pgService, settings, callback, signal);
+            const withPgClient: WithPgClient = (...args) =>
+              withPgClientFromPgService(pgService, ...args);
             const key = pgService.withSharedPgClientKey;
             if (pgService.sharedClientFactory) {
               const watch =
@@ -99,13 +99,8 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
               }
               withPgClient.withSharedPgClient = shared;
             } else if (pgService.adaptor.providesSharedPgClient) {
-              withPgClient.withSharedPgClient = (context, options, callback) =>
-                withSharedPgClientFromPgService(
-                  pgService,
-                  context,
-                  options,
-                  callback,
-                );
+              withPgClient.withSharedPgClient = (...args) =>
+                withSharedPgClientFromPgService(pgService, ...args);
             }
             if (key != null && withPgClient.withSharedPgClient) {
               if (key in contextValue) {

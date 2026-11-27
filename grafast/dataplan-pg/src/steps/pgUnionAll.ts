@@ -1046,25 +1046,20 @@ on (${sql.indent(
       eventEmitter,
       useTransaction: this.hasSideEffects,
     };
-    let executionResult;
-    if (this.hasSideEffects) {
-      try {
-        executionResult = await this.executor.executeDedicated(
-          keysets.map((queryValues) => ({ context, queryValues })),
-          common,
-        );
-      } finally {
-        executionDetails.batch.invalidate();
-      }
-    } else {
-      executionResult = {
-        values: await executionDetails.batch(
-          pgStepBatchExecutor,
-          keysets,
-          pgStepBatchOptions(this.executor, context, common),
-        ),
-      };
-    }
+    const executionResult = this.hasSideEffects
+      ? await this.executor
+          .executeDedicated(
+            keysets.map((queryValues) => ({ context, queryValues })),
+            common,
+          )
+          .finally(executionDetails.batch.invalidate)
+      : {
+          values: await executionDetails.batch(
+            pgStepBatchExecutor,
+            keysets,
+            pgStepBatchOptions(this.executor, context, common),
+          ),
+        };
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
