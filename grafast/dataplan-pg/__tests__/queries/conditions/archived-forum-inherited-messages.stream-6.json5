@@ -31,10 +31,6 @@
       cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBkMDkwIl0=",
       node: {
         body: "Dogs = awesome -- Alice",
-        author: {
-          username: "Alice",
-          gravatarUrl: null,
-        },
       },
     },
     path: [
@@ -50,10 +46,6 @@
       cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBkMDkwIl0=",
       node: {
         body: "Dogs = awesome -- Bob",
-        author: {
-          username: "Bob",
-          gravatarUrl: null,
-        },
       },
     },
     path: [
@@ -69,10 +61,6 @@
       cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBkMDkwIl0=",
       node: {
         body: "Dogs = awesome -- Cecilia",
-        author: {
-          username: "Cecilia",
-          gravatarUrl: null,
-        },
       },
     },
     path: [
@@ -86,10 +74,6 @@
   {
     data: {
       body: "Dogs = awesome -- Alice",
-      author: {
-        username: "Alice",
-        gravatarUrl: null,
-      },
     },
     path: [
       "forums",
@@ -102,10 +86,6 @@
   {
     data: {
       body: "Dogs = awesome -- Bob",
-      author: {
-        username: "Bob",
-        gravatarUrl: null,
-      },
     },
     path: [
       "forums",
@@ -118,10 +98,6 @@
   {
     data: {
       body: "Dogs = awesome -- Cecilia",
-      author: {
-        username: "Cecilia",
-        gravatarUrl: null,
-      },
     },
     path: [
       "forums",

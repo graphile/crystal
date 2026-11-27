@@ -1,7 +1,6 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
-import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.ts";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
@@ -18,6 +17,7 @@ import { Step, UnbatchedStep } from "../step.ts";
 import {
   asyncIteratorWithCleanup,
   maybeArraysMatch,
+  recordsMatch,
   terminateIterable,
 } from "../utils.ts";
 import { __FlagStep } from "./__flag.ts";
@@ -410,10 +410,6 @@ export class ConnectionStep<
 
   private neededCollection = false;
   private collectionDepId: number;
-  /**
-   * null = unknown
-   */
-  private _mightStream: boolean | null = null;
 
   // Pagination stuff
   private _firstDepId: number | null = null;
@@ -468,8 +464,22 @@ export class ConnectionStep<
     }
   }
 
+  /**
+   * Whether our items may be a stream; known from the `optimize` phase
+   * onwards (Grafast works it out from the lists consuming our items).
+   */
   public mightStream() {
-    return this._mightStream === true;
+    return this._mayStream === true;
+  }
+
+  /**
+   * Grafast tells us what each list consuming our items needs; we pass it on
+   * to whichever step handles our pagination.
+   */
+  public addStreamDetails(
+    $streamDetails: Step<ExecutionDetailsStream | null> | null,
+  ) {
+    this.getHandler(true).addStreamDetails?.($streamDetails);
   }
 
   public getSubplan(): TCollectionStep {
@@ -708,31 +718,11 @@ export class ConnectionStep<
     }
   };
 
-  private captureStream() {
-    const $streamDetails = currentFieldStreamDetails();
-    if ($streamDetails === null || $streamDetails === true) {
-      this.getHandler(true).addStreamDetails?.(null);
-
-      this._mightStream = false;
-    } else {
-      this.getHandler(true).addStreamDetails?.($streamDetails);
-
-      if (this._mightStream === null) {
-        // Only override if it was unknown
-        this._mightStream = true;
-      }
-    }
-  }
-
   public edges(): Step {
-    this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.edgePlan as any);
   }
 
   public nodes() {
-    this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.nodePlan as any);
   }
 
@@ -742,6 +732,7 @@ export class ConnectionStep<
 
   /** @internal */
   public _items() {
+    this.neededCollection = true;
     return this.withMyLayerPlan(() =>
       this.operationPlan.cacheStep(
         this,
@@ -792,7 +783,36 @@ export class ConnectionStep<
      */
     return this;
   }
-  deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any>) {
+  deduplicate(
+    peers: readonly ConnectionStep<any, any, any, any, any, any>[],
+  ): ConnectionStep<
+    TItem,
+    TNodeStep,
+    TEdgeDataStep,
+    TEdgeStep,
+    TCursorValue,
+    TCollectionStep
+  >[] {
+    // Peers share our dependencies; they're equivalent if those dependencies
+    // play the same roles and the edges are built the same way.
+    return peers.filter(
+      (p) =>
+        p.collectionDepId === this.collectionDepId &&
+        p.paramsDepId === this.paramsDepId &&
+        p._firstDepId === this._firstDepId &&
+        p._lastDepId === this._lastDepId &&
+        p._offsetDepId === this._offsetDepId &&
+        p._beforeDepId === this._beforeDepId &&
+        p._afterDepId === this._afterDepId &&
+        paginationFeaturesMatch(
+          p.collectionPaginationSupport,
+          this.collectionPaginationSupport,
+        ) &&
+        p.edgeDataPlan === this.edgeDataPlan,
+    );
+  }
+
+  deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any, any>) {
     if (this.neededCollection) {
       replacement.neededCollection = true;
     }
@@ -828,7 +848,7 @@ export class ConnectionStep<
         // collection handles everything
         const result = collectionValue as ConnectionHandlingResult<any>;
         if (
-          !this._mightStream &&
+          this._mayStream !== true &&
           result.items != null &&
           !Array.isArray(result.items)
         ) {
@@ -890,7 +910,7 @@ export class ConnectionStep<
       }
 
       if (
-        this._mightStream !== true &&
+        this._mayStream !== true &&
         (mode === MODE_ITERABLE || mode === MODE_ASYNC_ITERABLE)
       ) {
         // Convert to array, then process
@@ -1258,6 +1278,19 @@ export function itemsOrStep<
     : $step;
 }
 
+function paginationFeaturesMatch(
+  a: PaginationFeatures | null,
+  b: PaginationFeatures | null,
+): boolean {
+  if (a === b) {
+    return true;
+  } else if (a === null || b === null) {
+    return false;
+  } else {
+    return recordsMatch(a, b);
+  }
+}
+
 function encodeNumericCursor(index: number | readonly number[]): string {
   const cursor =
     typeof index === "number" ? index : index.reduce((memo, n) => memo + n, 0);
@@ -1586,14 +1619,12 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $first = first($connection._items(), isArray);
+        const $first = first($connection._items(), false);
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get last node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $last = last($connection._items(), isArray);
+        const $last = last($connection._items(), false);
         return $connection.cursorPlan($last);
       }
       default: {
@@ -1635,9 +1666,13 @@ export class ConnectionItemsStep extends Step {
     >;
   }
 
+  /** We yield our connection's items as our list. */
+  public streamSourceDepIndex(): number {
+    return 0;
+  }
+
   public optimize(_options: StepOptimizeOptions): Step {
-    // If false, connection guarantees an array
-    this.cloneStreams = this.getConnection().mightStream();
+    this.cloneStreams = this._mayStream === true;
     return this;
   }
 

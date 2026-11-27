@@ -99,7 +99,19 @@ export function currentFieldStreamDetails():
   if (globalData_stepStreamOptions === true) {
     return true;
   }
-  const { ifStepId, initialCountStepId } = globalData_stepStreamOptions;
+  return streamDetailsStep(globalData_stepStreamOptions);
+}
+
+/**
+ * The step that evaluates the given `@stream` options (its `if` and
+ * `initialCount`) at runtime.
+ *
+ * @internal
+ */
+export function streamDetailsStep(
+  streamOptions: StepStreamOptions,
+): Step<ExecutionDetailsStream | null> {
+  const { ifStepId, initialCountStepId } = streamOptions;
   return operationPlan().withRootLayerPlan(() => {
     const $obj = object({
       if: ifStepId

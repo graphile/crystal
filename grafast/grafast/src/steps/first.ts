@@ -30,13 +30,20 @@ export class FirstStep<TData> extends Step<TData> {
   constructor(parentPlan: StepRepresentingList<TData>, isArray = true) {
     super();
     this.addStrongDependency(itemsOrStep(parentPlan));
-    if (isArray) {
+    this.isSyncAndSafe = isArray;
+  }
+
+  finalize() {
+    const parent = this.getDepOptions(0).step;
+    if (
+      this.isSyncAndSafe ||
+      (!parent.cloneStreams && parent.mayStream() === false)
+    ) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;
       this.isSyncAndSafe = true;
-    } else {
-      this.isSyncAndSafe = false;
     }
+    super.finalize();
   }
 
   [$$deepDepSkip](): Step {
