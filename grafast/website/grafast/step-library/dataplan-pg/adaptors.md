@@ -49,8 +49,9 @@ not they will supply a `pgSettings` object.
 Every adaptor must give a way to build or retrieve a `withPgClient` function
 (see the adaptor documentation). This function is typically stored onto the
 GraphQL context and will be called by the resources (via the executor) at run
-time in order to communicate with the database. The function accepts two
-parameters (`pgSettings` and `callback`) and it:
+time in order to communicate with the database. Call it as
+`withPgClient(pgSettings, callback, options?)`. The adaptor manages the client
+for the duration of the callback.
 
 1. creates or retrieves a `PgClient` (see below) connected to the database,
 2. if set, applies any settings from the `pgSettings` object (creating a
@@ -60,6 +61,9 @@ parameters (`pgSettings` and `callback`) and it:
    necessary) and returns the result of the callback,
 5. on error releases the client (after rolling back the transaction if
    necessary) and raises the error.
+
+The optional `options.signal` can cancel acquisition until the callback starts.
+Wrappers should pass the options object through to the underlying provider.
 
 ## PgClient
 

@@ -1,4 +1,9 @@
-import type { PgClient, PgExecutorContext, WithPgClient } from "./executor.ts";
+import type {
+  PgClient,
+  PgExecutorContext,
+  WithPgClient,
+  WithPgClientOptions,
+} from "./executor.ts";
 import type { SharedPgClient, WithSharedPgClient } from "./sharedClient.ts";
 
 type PromiseOrDirect<T> = T | PromiseLike<T>;
@@ -135,11 +140,11 @@ export function withPgClientFromPgService<T>(
   config: GraphileConfig.PgServiceConfiguration,
   pgSettings: Record<string, string | undefined> | null,
   callback: (client: GraphileConfig.DataplanPgClient) => T | Promise<T>,
-  signal?: AbortSignal,
+  options?: WithPgClientOptions,
 ): Promise<T> {
   return withProviderFromPgService(config, (provider) => {
-    signal?.throwIfAborted();
-    return provider(pgSettings, callback, signal);
+    options?.signal?.throwIfAborted();
+    return provider(pgSettings, callback, options);
   });
 }
 

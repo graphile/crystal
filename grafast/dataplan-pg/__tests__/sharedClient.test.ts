@@ -1,7 +1,11 @@
 import type { Pool } from "pg";
 
 import { makePgAdaptorWithPgClient } from "../dist/adaptors/pg.js";
-import { makeWithSharedPgClient, type SharedPgClient } from "../dist/index.js";
+import {
+  makeWithSharedPgClient,
+  type SharedPgClient,
+  type WithPgClientOptions,
+} from "../dist/index.js";
 
 test("idle reservations expire only under pressure from another wrapper on the same pool", async () => {
   jest.useFakeTimers();
@@ -51,7 +55,7 @@ test("late physical checkout is released after the acquisition deadline", async 
     const gate = Promise.withResolvers<void>();
     const released = Promise.withResolvers<void>();
     const checkout = jest.fn(
-      async (_settings, callback, _signal?: AbortSignal) => {
+      async (_settings, callback, _options?: WithPgClientOptions) => {
         await gate.promise;
         try {
           return await callback({});
@@ -77,10 +81,11 @@ test("late physical checkout is released after the acquisition deadline", async 
     await jest.advanceTimersByTimeAsync(25);
     await first;
     // The second borrower still needs the pending checkout until its own deadline.
-    expect(checkout.mock.calls[0][2]?.aborted).toBe(false);
+    const signal = checkout.mock.calls[0][2]?.signal;
+    expect(signal?.aborted).toBe(false);
     await jest.advanceTimersByTimeAsync(25);
     await second;
-    expect(checkout.mock.calls[0][2]?.aborted).toBe(true);
+    expect(signal?.aborted).toBe(true);
     gate.resolve();
     await released.promise;
     expect(callback).not.toHaveBeenCalled();
@@ -178,7 +183,8 @@ test.each([
   const thirdConnection = Promise.withResolvers<void>();
   const signals: AbortSignal[] = [];
   const setup: number[] = [];
-  const withPgClient = jest.fn(async (_settings, callback, signal) => {
+  const withPgClient = jest.fn(async (_settings, callback, options) => {
+    const { signal } = options;
     const id = signals.push(signal);
     if (id === 3) {
       if (scenario === "checkout failed") {
@@ -257,7 +263,9 @@ test("a cancelled pg pool acquisition releases the connection before applying se
   const withPgClient = makePgAdaptorWithPgClient(pool as unknown as Pool);
   const callback = jest.fn();
   const controller = new AbortController();
-  const result = withPgClient({ role: "reader" }, callback, controller.signal);
+  const result = withPgClient({ role: "reader" }, callback, {
+    signal: controller.signal,
+  });
   expect(pool.connect).toHaveBeenCalledTimes(1);
   controller.abort();
   connection.resolve(raw);

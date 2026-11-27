@@ -29,6 +29,7 @@ import type {
   PgNotice,
   PgRaiseSeverity,
   WithPgClient,
+  WithPgClientOptions,
 } from "../executor.ts";
 import type { MakePgServiceOptions } from "../interfaces.ts";
 import type { PgAdaptor } from "../pgServices.ts";
@@ -274,8 +275,9 @@ async function makeNodePostgresWithPgClient_inner<T>(
   callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
-  signal?: AbortSignal,
+  options?: WithPgClientOptions,
 ) {
+  const signal = options?.signal;
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
 
   // PERF: under what situations is this actually required? We added it to
@@ -393,12 +395,12 @@ export function makePgAdaptorWithPgClient(
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,
     callback,
-    signal,
+    options,
   ) => {
-    signal?.throwIfAborted();
+    options?.signal?.throwIfAborted();
     const pgClient = await pool.connect();
     try {
-      signal?.throwIfAborted();
+      options?.signal?.throwIfAborted();
       if (!pgClient[$$isSetup]) {
         pgClient[$$isSetup] = true;
         if (!DONT_DISABLE_JIT) {
@@ -416,7 +418,7 @@ export function makePgAdaptorWithPgClient(
         callback,
         false,
         false,
-        signal,
+        options,
       );
     } finally {
       // NOTE: have decided not to `RESET ALL` here; otherwise timezone,jit,etc will reset
@@ -461,7 +463,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,
     callback,
-    signal,
+    options,
   ) => {
     return makeNodePostgresWithPgClient_inner(
       pgClient,
@@ -470,7 +472,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
       // Ensure only one withPgClient can run at a time, since we only have on pgClient.
       true,
       alreadyInTransaction,
-      signal,
+      options,
     );
   };
 

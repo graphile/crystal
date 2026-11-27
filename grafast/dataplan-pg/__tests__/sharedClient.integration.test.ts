@@ -152,15 +152,15 @@ describe("executor routing", () => {
       const expectedClients = Math.min(groupCount, 3);
       let checkouts = 0;
       // Hold the first reads until every expected connection has done work.
-      const withPgClient: typeof base = (settings, callback, signal) => {
+      const withPgClient: typeof base = (settings, callback, options) => {
         checkouts++;
         return base(
           settings,
           (client) =>
             callback({
               ...client,
-              async query<TData>(options: Parameters<typeof client.query>[0]) {
-                const result = await client.query<TData>(options);
+              async query<TData>(query: Parameters<typeof client.query>[0]) {
+                const result = await client.query<TData>(query);
                 pids.add((result.rows[0] as [number])[0]);
                 if (pids.size === expectedClients) {
                   guard.resolve();
@@ -169,7 +169,7 @@ describe("executor routing", () => {
                 return result;
               },
             }),
-          signal,
+          options,
         );
       };
       const context = {

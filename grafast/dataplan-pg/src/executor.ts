@@ -134,14 +134,19 @@ export interface PgClient {
   ): Promise<T>;
 }
 
+export interface WithPgClientOptions {
+  /** Cancels client acquisition until the callback starts. */
+  signal?: AbortSignal;
+}
+
 export interface WithPgClient<
   TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 > {
   <T>(
     pgSettings: Record<string, string | undefined> | null,
     callback: (client: TPgClient) => T | Promise<T>,
-    /** Cancels acquisition until the callback starts. Wrappers should forward this signal. */
-    signal?: AbortSignal,
+    /** Wrappers should forward these options to the underlying provider. */
+    options?: WithPgClientOptions,
   ): Promise<T>;
 
   /** Pool-backed providers can supply sharing to existing executor contexts. */

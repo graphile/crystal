@@ -53,10 +53,10 @@ function noop() {}
  */
 function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   let queue: Promise<void> | null;
-  const queued: WithPgClient = (pgSettings, callback, signal) => {
+  const queued: WithPgClient = (pgSettings, callback, options) => {
     const result = queue
-      ? queue.then(() => withPgClient(pgSettings, callback, signal))
-      : withPgClient(pgSettings, callback, signal);
+      ? queue.then(() => withPgClient(pgSettings, callback, options))
+      : withPgClient(pgSettings, callback, options);
     const nextQueue = result.then(noop, noop);
     queue = nextQueue;
     queue.then(() => {
@@ -201,9 +201,9 @@ export async function withTestWithPgClient<T>(
         const withPgClientWithSavepoints: WithPgClient = async (
           pgSettings,
           callback,
-          signal,
+          options,
         ) => {
-          signal?.throwIfAborted();
+          options?.signal?.throwIfAborted();
           if (!alive) {
             throw new Error(
               "Test transaction has already been ended - async operations shouldn't keep happening after grafast returns",
@@ -213,7 +213,7 @@ export async function withTestWithPgClient<T>(
           await poolClient.query("savepoint notxhonest; --ignore--");
           let result: any;
           try {
-            result = await withPgClient(pgSettings, callback, signal);
+            result = await withPgClient(pgSettings, callback, options);
           } catch (e) {
             if (alive) {
               try {

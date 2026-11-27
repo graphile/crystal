@@ -73,6 +73,7 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
   WithPgClient,
+  WithPgClientOptions,
 } from "./executor.ts";
 import { PgExecutor } from "./executor.ts";
 import { PgBooleanFilter } from "./filters/pgBooleanFilter.ts";
@@ -332,6 +333,7 @@ export type {
   PlanByUniques,
   SideEffectWithPgClientStepCallback,
   WithPgClient,
+  WithPgClientOptions,
 };
 export {
   assertPgClassSingleStep,

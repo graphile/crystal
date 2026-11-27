@@ -265,7 +265,7 @@ export function makeWithSharedPgClient(options: {
               throw checkout.failure.error;
             }
           },
-          signal,
+          { signal },
         );
       })
       .catch((error) => {
