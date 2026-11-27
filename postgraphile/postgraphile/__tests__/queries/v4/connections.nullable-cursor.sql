@@ -10,7 +10,7 @@ select
   __person__."about" as "1"
 from "c"."person" as __person__
 where (
-  (((__person__."about" < $1::"text") or (__person__."about" is not null and $1::"text" is null)))
+  (((__person__."about" < $1::"text") or ($1::"text" is null and __person__."about" is not null)))
   or (
     __person__."about" is not distinct from $1::"text"
     and 
@@ -24,7 +24,7 @@ select
   __person__."about" as "1"
 from "c"."person" as __person__
 where (
-  (((__person__."about" > $1::"text") or (__person__."about" is null and $1::"text" is not null)))
+  (((__person__."about" > $1::"text") or ($1::"text" is not null and __person__."about" is null)))
   or (
     __person__."about" is not distinct from $1::"text"
     and 

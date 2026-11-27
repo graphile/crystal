@@ -230,7 +230,7 @@ select
   __post__."id"::text as "2"
 from "a"."post" as __post__
 where (
-  (((__post__."author_id" < $1::"int4") or (__post__."author_id" is not null and $1::"int4" is null)))
+  (((__post__."author_id" < $1::"int4") or ($1::"int4" is null and __post__."author_id" is not null)))
   or (
     __post__."author_id" is not distinct from $1::"int4"
     and 

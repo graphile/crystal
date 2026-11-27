@@ -16,7 +16,7 @@ select
   __compound_key__."person_id_2"::text as "2"
 from "c"."compound_key" as __compound_key__
 where (
-  (((__compound_key__."extra" > $1::"bool") or (__compound_key__."extra" is null and $1::"bool" is not null)))
+  (((__compound_key__."extra" > $1::"bool") or ($1::"bool" is not null and __compound_key__."extra" is null)))
   or (
     __compound_key__."extra" is not distinct from $1::"bool"
     and 
