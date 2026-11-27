@@ -1962,7 +1962,7 @@ function applyConditionFromCursor<
             identifierPlaceholders[i],
             order.direction,
             // The cursor can come from a different member whose column allows nulls.
-            isNullable || parsedCursor[i + 1] === null,
+            isNullable || parsedCursor[i + 1] == null,
             order.nulls,
           ];
         }
