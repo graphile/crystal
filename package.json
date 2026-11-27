@@ -7,6 +7,7 @@
     "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --all --topological-dev run pretest",
     "test": "NODE_ENV=test yarn workspaces foreach --all --topological-dev run test",
     "posttest": "NODE_ENV=test yarn workspaces foreach --all --topological-dev run posttest && node scripts/benjies-depcheck.mjs",
+    "doccheck": "node scripts/ensure-sql-is-lowercase.mjs && node scripts/ensure-no-slashes-on-internal-links.mjs",
     "build-init": "yarn && yarn workspace ruru-components build-package && yarn workspace ruru build-package && tsc -b",
     "build": "yarn build-init && yarn workspaces foreach --parallel --topological-dev --all --exclude '.' --exclude 'ruru' --exclude 'ruru-components' run build-package",
     "watch": "BUILD_MODE=development yarn build && tsc -b --watch",
@@ -30,7 +31,7 @@
     "prettier:fix": "yarn prettier:all --write",
     "prettier:check": "yarn prettier:all --list-different",
     "typecheck:tests": "tsc -b tsconfig.test.json utils/*/tsconfig.test.json grafast/*/tsconfig.test.json graphile-build/*/tsconfig.test.json postgraphile/*/tsconfig.test.json",
-    "prepush": "yarn typecheck:tests && yarn lint:fix && yarn test"
+    "prepush": "yarn && yarn doccheck && yarn typecheck:tests && yarn lint:fix && yarn pretest && yarn test"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",

@@ -1,0 +1,14 @@
+{
+  forums: [
+    {
+      name: "Cats",
+      firstFeaturedMessageAuthor: null,
+    },
+    {
+      name: "Postgres",
+      firstFeaturedMessageAuthor: {
+        username: "Bob",
+      },
+    },
+  ],
+}

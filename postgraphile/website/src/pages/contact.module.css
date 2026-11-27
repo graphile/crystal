@@ -1,5 +1,5 @@
 .contactSection {
-  padding-top: 4rem;
+  padding-top: 2rem;
 }
 
 .cardLayout {
@@ -30,7 +30,6 @@
   flex-direction: column;
   justify-content: flex-start;
   font-weight: normal;
-  font-size: 0.9rem;
   padding: 1rem;
 }
 

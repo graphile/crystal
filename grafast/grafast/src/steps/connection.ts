@@ -1342,7 +1342,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
       (p) =>
         p.paginationSupport === this.paginationSupport &&
         p.firstDepId === this.firstDepId &&
-        p.afterDepId === this.afterDepId &&
+        p.lastDepId === this.lastDepId &&
         p.offsetDepId === this.offsetDepId &&
         p.beforeDepId === this.beforeDepId &&
         p.afterDepId === this.afterDepId &&

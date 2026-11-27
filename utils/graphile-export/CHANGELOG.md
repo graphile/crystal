@@ -1,5 +1,27 @@
 # graphile-export
 
+## 1.0.3
+
+### Patch Changes
+
+- [#3210](https://github.com/graphile/crystal/pull/3210)
+  [`9b54140`](https://github.com/graphile/crystal/commit/9b54140403b04717989e688125268848bc757a2f)
+  Thanks [@dilame](https://github.com/dilame)! - Export an interface's
+  `interfaces` as a thunk to avoid
+  `Cannot access '<Interface>' before initialization`.
+
+## 1.0.2
+
+### Patch Changes
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+
 ## 1.0.1
 
 ### Patch Changes

@@ -708,9 +708,12 @@ class CodegenFile {
         ),
         interfaces:
           config.interfaces.length > 0
-            ? t.arrayExpression(
-                config.interfaces.map((interfaceType) =>
-                  this.declareType(interfaceType),
+            ? t.arrowFunctionExpression(
+                [],
+                t.arrayExpression(
+                  config.interfaces.map((interfaceType) =>
+                    this.declareType(interfaceType),
+                  ),
                 ),
               )
             : null,

@@ -1,5 +1,31 @@
 # ruru-components
 
+## 2.0.2
+
+### Patch Changes
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+- Updated dependencies
+  [[`8fc04f0`](https://github.com/graphile/crystal/commit/8fc04f0ecf8bfaac713992b494b94f61f942630b),
+  [`7c39592`](https://github.com/graphile/crystal/commit/7c39592b14290536d9db19ad811e89e7eef3388c),
+  [`85a3d1c`](https://github.com/graphile/crystal/commit/85a3d1c4610c4e74086d6cb1f05ed25e8904da02),
+  [`26a3fc4`](https://github.com/graphile/crystal/commit/26a3fc47952afe75eaafa647249f197ce06ee10e),
+  [`92978f3`](https://github.com/graphile/crystal/commit/92978f39316da4e18c619be255d775d0e29843f7),
+  [`631ed94`](https://github.com/graphile/crystal/commit/631ed94ec6a26c0016ef60fc561b612139b7460c),
+  [`0c73163`](https://github.com/graphile/crystal/commit/0c73163f8f543ec7ef709f177346341506d6daf7),
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc),
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc),
+  [`4b948fc`](https://github.com/graphile/crystal/commit/4b948fc7a440887ee35f43e22fa0ae0f420ec3c1),
+  [`a38b59f`](https://github.com/graphile/crystal/commit/a38b59fecdfef010aab86ece61c64d42f152a166)]:
+  - grafast@1.2.0
+  - ruru-types@2.0.1
+
 ## 2.0.1
 
 ### Patch Changes

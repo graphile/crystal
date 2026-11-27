@@ -1,5 +1,24 @@
 # eslint-plugin-graphile-export
 
+## 1.0.1
+
+### Patch Changes
+
+- [#3220](https://github.com/graphile/crystal/pull/3220)
+  [`eb0df49`](https://github.com/graphile/crystal/commit/eb0df496ffc79b9beaff44c73e9b96223272b285)
+  Thanks [@jasontd92](https://github.com/jasontd92)! - Read `context.filename`
+  and `context.physicalFilename` when available, falling back to
+  `context.getFilename()` and `context.getPhysicalFilename()` (removed in
+  ESLint 10) on older ESLint versions.
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.5.

@@ -1362,27 +1362,33 @@ function buildTheQuery<
     };
   }
 
-  for (const orderSpec of info.orderSpecs) {
+  for (const { attribute, direction } of info.orderSpecs) {
     if (!info.attributes) {
       throw new Error(`Cannot order without attributes`);
     }
+    const { codec, notNull } = info.attributes[attribute];
+    const nullable = !notNull && !codec.notNull;
     for (const digest of info.memberDigests) {
       const { alias: tableAlias } = digest;
       const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
         digest,
-        orderSpec.attribute,
+        attribute,
       )}`;
       digest.orders.push({
         fragment: ident,
-        direction: orderSpec.direction,
-        codec: info.attributes[orderSpec.attribute].codec,
+        direction,
+        codec,
+        nullable:
+          nullable &&
+          !digest.finalResource.codec.attributes?.[attribute]?.notNull,
       });
     }
-    const selectedIndex = selectAttribute(orderSpec.attribute);
+    const selectedIndex = selectAttribute(attribute);
     info.orders.push({
       fragment: sql.identifier(String(selectedIndex)),
-      direction: orderSpec.direction,
-      codec: info.attributes[orderSpec.attribute].codec,
+      direction,
+      codec,
+      nullable,
     });
     if (info.cursorIndicies != null) {
       info.cursorIndicies.push({
@@ -1898,8 +1904,9 @@ function applyConditionFromCursor<
         order,
         memberCodecs,
       );
+      const value = parsedCursor[i + 1];
       identifierPlaceholders[i] = sql`${sql.value(
-        codec.toPg(parsedCursor[i + 1]),
+        value == null ? null : codec.toPg(value),
       )}::${codec.sqlType}`;
     } else {
       // No implementations?!
@@ -1954,7 +1961,8 @@ function applyConditionFromCursor<
             frag,
             identifierPlaceholders[i],
             order.direction,
-            isNullable,
+            // The cursor can come from a different member whose column allows nulls.
+            isNullable || parsedCursor[i + 1] == null,
             order.nulls,
           ];
         }
@@ -1962,6 +1970,9 @@ function applyConditionFromCursor<
 
       // For the truth-table of this code, have a look at this spreadsheet:
       // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+      //
+      // Note: A = cursor value, B = table value
+      // i.e. A = sqlValue, B = fragment
 
       const gt =
         (direction === "ASC" && beforeOrAfter === "after") ||
@@ -1985,8 +1996,8 @@ function applyConditionFromCursor<
           (nullsFirst && beforeOrAfter === "after") ||
           (!nullsFirst && beforeOrAfter === "before");
         const oneIsNull = useAIsNullAndBIsNotNull
-          ? sql`${orderFragment} is null and ${sqlValue} is not null`
-          : sql`${orderFragment} is not null and ${sqlValue} is null`;
+          ? sql`${sqlValue} is null and ${orderFragment} is not null`
+          : sql`${sqlValue} is not null and ${orderFragment} is null`;
         fragment = sql`((${fragment}) or (${oneIsNull}))`;
       }
 
