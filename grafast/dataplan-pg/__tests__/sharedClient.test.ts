@@ -114,6 +114,45 @@ test("a pending query protects its checkout from reclamation", async () => {
   }
 });
 
+test("a checkout pulls matching reads past an older unrelated waiter", async () => {
+  jest.useFakeTimers();
+  const release = Promise.withResolvers<void>();
+  const issued: string[] = [];
+  const withPgClient = jest.fn(async (_settings, callback) =>
+    callback({
+      async query({ text }: { text: string }) {
+        issued.push(text);
+        await release.promise;
+        return { rows: [], rowCount: 0 };
+      },
+    }),
+  );
+  const shared = makeWithSharedPgClient({ pool: {}, maxClients: 1 });
+  const context = { withPgClient, pgSettings: null };
+  const affinity = Symbol();
+  const run = (signature: string, hint?: symbol) =>
+    shared(context, { affinity: hint, signature }, (client) =>
+      client.query({ text: signature }),
+    );
+  const running = run("first", affinity);
+  await jest.advanceTimersByTimeAsync(0);
+  const unrelated = run("unrelated");
+  const matching = run("related");
+  // This read links the queued SQL signature to the active checkout.
+  const bridge = run("related", affinity);
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    expect(issued).toEqual(["first", "related", "related"]);
+    release.resolve();
+    await Promise.all([running, unrelated, matching, bridge]);
+    expect(issued).toEqual(["first", "related", "related", "unrelated"]);
+  } finally {
+    release.resolve();
+    await Promise.allSettled([running, unrelated, matching, bridge]);
+    jest.useRealTimers();
+  }
+});
+
 test.each([
   "pool limit",
   "context limit",

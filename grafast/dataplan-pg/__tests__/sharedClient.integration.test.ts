@@ -136,24 +136,33 @@ test("a transaction failure wakes an idle borrower and frees the shared slot", a
 
 describe("executor routing", () => {
   const getPool = useTestPool();
-  test.each(["unrelated", "affinity", "name", "signature"])(
-    "routes overlapping %s reads to the expected PostgreSQL backends",
-    async (kind) => {
+  test.each([
+    { kind: "unrelated", groupCount: 20 },
+    // Two of these groups must queue behind the first three.
+    { kind: "affinity", groupCount: 5 },
+    { kind: "name", groupCount: 2 },
+    { kind: "signature", groupCount: 2 },
+  ])(
+    "routes 20 overlapping $kind reads to the expected PostgreSQL backends",
+    async ({ kind, groupCount }) => {
       const pool = getPool();
       const base = makePgAdaptorWithPgClient(pool);
       const guard = Promise.withResolvers<void>();
-      const pids: number[] = [];
-      // Hold the query promises in flight until all three reads reach PostgreSQL.
-      const withPgClient: typeof base = (settings, callback, signal) =>
-        base(
+      const pids = new Set<number>();
+      const expectedClients = Math.min(groupCount, 3);
+      let checkouts = 0;
+      // Hold the first reads until every expected connection has done work.
+      const withPgClient: typeof base = (settings, callback, signal) => {
+        checkouts++;
+        return base(
           settings,
           (client) =>
             callback({
               ...client,
               async query<TData>(options: Parameters<typeof client.query>[0]) {
                 const result = await client.query<TData>(options);
-                pids.push((result.rows[0] as [number])[0]);
-                if (pids.length === 3) {
+                pids.add((result.rows[0] as [number])[0]);
+                if (pids.size === expectedClients) {
                   guard.resolve();
                 }
                 await guard.promise;
@@ -162,32 +171,43 @@ describe("executor routing", () => {
             }),
           signal,
         );
+      };
       const context = {
         pgSettings: null,
         withPgClient,
         withSharedPgClient: makeWithSharedPgClient({ pool, maxClients: 4 }),
       };
-      const affinity = Symbol();
+      const affinities = Array.from({ length: groupCount }, () => Symbol());
       const timer = setTimeout(
         () => guard.reject(new Error("Reads did not run concurrently")),
         3000,
       );
       try {
-        await Promise.all(
-          [0, 1, 2].map((i) =>
-            executor.executeShared([{ context, queryValues: [] }], {
-              text:
-                kind === "signature" || kind === "name"
-                  ? "select pg_backend_pid()"
-                  : `select pg_backend_pid(), ${i}`,
-              name: kind === "name" ? "shared_pid" : undefined,
-              affinity: kind === "affinity" ? affinity : undefined,
-              rawSqlValues: [],
-              eventEmitter: undefined,
-            }),
-          ),
+        const results = await Promise.all(
+          Array.from({ length: 20 }, (_, i) => {
+            const group = i % groupCount;
+            const statement =
+              kind === "signature" || kind === "name" ? group : i;
+            return executor.executeShared<unknown, [number, number]>(
+              [{ context, queryValues: [] }],
+              {
+                text: `select pg_backend_pid(), ${statement}`,
+                name: kind === "name" ? `shared_pid_${group}` : undefined,
+                affinity: kind === "affinity" ? affinities[group] : undefined,
+                rawSqlValues: [],
+                eventEmitter: undefined,
+              },
+            );
+          }),
         );
-        expect(new Set(pids).size).toBe(kind === "unrelated" ? 3 : 1);
+        expect(pids.size).toBe(expectedClients);
+        expect(checkouts).toBe(expectedClients);
+        const backends = results.map(({ values }) => values[0][0][0]);
+        if (groupCount < backends.length) {
+          expect(backends).toEqual(
+            backends.map((_, i) => backends[i % groupCount]),
+          );
+        }
       } finally {
         clearTimeout(timer);
         guard.resolve();

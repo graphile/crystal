@@ -53,7 +53,7 @@ interface ContextQueue {
   checkouts: Set<Checkout>;
   pending: Set<Pending>;
   enqueue: (request: Pending) => void;
-  dispatch: (arrived?: Checkout) => void;
+  dispatch: (checkout?: Checkout) => void;
 }
 
 type AffinityHistory = Pick<Checkout, "affinities" | "names" | "signatures">;
@@ -312,6 +312,7 @@ export function makeWithSharedPgClient(options: {
   }
 
   function makeQueue(context: PgExecutorContext): ContextQueue {
+    const checkoutsToMatch = new Set<Checkout>();
     const queue: ContextQueue = {
       checkouts: new Set(),
       pending: new Set(),
@@ -325,12 +326,18 @@ export function makeWithSharedPgClient(options: {
       request.available.resolve(checkout);
     }
     function enqueue(request: Pending) {
-      // All existing openings already have demand. Only reconsider older
-      // waiters when capacity changes, especially for large same-affinity bursts.
       queue.pending.add(request);
-      route(request, null);
+      const ready = route(request, null);
       if (queue.pending.size > 0) {
         pool.waiters.add(dispatch);
+        if (ready !== null) {
+          // A new read can link its checkout to previously queued work. Scan
+          // once per burst, even when many reads introduce routing hints.
+          if (checkoutsToMatch.size === 0) {
+            queueMicrotask(dispatch);
+          }
+          checkoutsToMatch.add(ready);
+        }
       }
     }
     function route(request: Pending, wanted: Set<Checkout> | null) {
@@ -379,17 +386,27 @@ export function makeWithSharedPgClient(options: {
           recordQueryAffinity(opening, request.hints);
         }
       }
+      return ready;
     }
-    function dispatch(arrived?: Checkout) {
-      // Checkouts can arrive out of order. Give their intended borrowers first
-      // choice before offering spare capacity to unrelated work.
-      if (arrived !== undefined) {
+    function dispatch(checkout?: Checkout) {
+      if (checkout !== undefined) {
+        checkoutsToMatch.add(checkout);
+      }
+      // Pull matching waiters before offering idle capacity in FIFO order.
+      for (const ready of checkoutsToMatch) {
+        if (ready.closed) {
+          continue;
+        }
         for (const request of queue.pending) {
-          if (request.opening === arrived) {
-            assign(request, arrived);
+          if (
+            request.opening === ready ||
+            matchesQueryAffinity(ready, request.hints)
+          ) {
+            assign(request, ready);
           }
         }
       }
+      checkoutsToMatch.clear();
       const wanted = new Set<Checkout>();
       for (const request of queue.pending) {
         route(request, wanted);
@@ -513,7 +530,7 @@ export function makeWithSharedPgClient(options: {
               borrower.inFlight--;
               borrower.idleSince = Date.now();
               if (queue.pending.size > 0) {
-                queue.dispatch();
+                queue.dispatch(checkout);
               }
             },
           );
@@ -523,7 +540,7 @@ export function makeWithSharedPgClient(options: {
       };
       const result = callback(client);
       if (borrower.inFlight === 0 && queue.pending.size > 0) {
-        queue.dispatch();
+        queue.dispatch(checkout);
       }
       return await Promise.race([result, borrower.stopped.promise]);
     } finally {
@@ -531,7 +548,7 @@ export function makeWithSharedPgClient(options: {
       await Promise.allSettled(outstanding);
       checkout.borrowers.delete(borrower);
       if (queue.pending.size > 0) {
-        queue.dispatch();
+        queue.dispatch(checkout);
       }
       const tx = checkout.transaction;
       try {
