@@ -1970,6 +1970,9 @@ function applyConditionFromCursor<
 
       // For the truth-table of this code, have a look at this spreadsheet:
       // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+      //
+      // Note: A = cursor value, B = table value
+      // i.e. A = sqlValue, B = fragment
 
       const gt =
         (direction === "ASC" && beforeOrAfter === "after") ||
@@ -1990,11 +1993,11 @@ function applyConditionFromCursor<
       // Nullable, so now handle if one is null but the other isn't
       if (nullable) {
         const useAIsNullAndBIsNotNull =
-          (!nullsFirst && beforeOrAfter === "after") ||
-          (nullsFirst && beforeOrAfter === "before");
+          (nullsFirst && beforeOrAfter === "after") ||
+          (!nullsFirst && beforeOrAfter === "before");
         const oneIsNull = useAIsNullAndBIsNotNull
-          ? sql`${orderFragment} is null and ${sqlValue} is not null`
-          : sql`${orderFragment} is not null and ${sqlValue} is null`;
+          ? sql`${sqlValue} is null and ${orderFragment} is not null`
+          : sql`${sqlValue} is not null and ${orderFragment} is null`;
         fragment = sql`((${fragment}) or (${oneIsNull}))`;
       }
 
