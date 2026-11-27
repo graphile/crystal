@@ -4,6 +4,8 @@
 ## expect(data.descAfterNull.edges.map(e => e.node.id)).toEqual([3]);
 ## expect(data.descAfterNull2.edges.map(e => e.node.id)).toEqual([5, 4, 2, 1, 3]);
 #> schema: ["a", "b", "c"]
+# The six top-level fields paginate independently.
+#> sqlSnapshotAdjacentOrder: ['order by __person__."about"']
 query {
   ascFirst: allPeople(orderBy: [ABOUT_ASC], first: 1) {
     edges {
