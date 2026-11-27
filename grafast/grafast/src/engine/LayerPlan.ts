@@ -332,6 +332,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    */
   public copyStepIds: number[] = [];
 
+  /** Copied lists to walk in this bucket before using their items. @internal */
+  public readonly streamInputs: LayerPlanReasonListItem[] = [];
+
   /** @internal */
   public children: LayerPlan[] = [];
 

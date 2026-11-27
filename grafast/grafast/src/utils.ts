@@ -1323,6 +1323,11 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
   return true;
 }
 
+/** Whether the finalized plan opts the step into streaming. */
+export function stepMightReturnStream(step: Step): boolean {
+  return step._stepOptions.stream !== null || step.cloneStreams;
+}
+
 export function isPhaseTransitionLayerPlan(
   layerPlan: LayerPlan,
 ): layerPlan is

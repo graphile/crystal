@@ -1,13 +1,19 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
+import assert from "node:assert/strict";
+
 import { expect } from "chai";
 import { resolvePreset } from "graphile-config";
 import { type AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
 import {
+  access,
   connection,
+  type ConnectionHandlingResult,
+  type ConnectionHandlingResultWithGetters,
   get,
   grafast,
+  lambda,
   loadMany,
   loadManyCallback,
   makeGrafastSchema,
@@ -37,6 +43,7 @@ const schema = makeGrafastSchema({
       connection(max: Int! = 100): FibConnection
     }
     type FibConnection {
+      failure: Int!
       edges(throw: Boolean! = false): [FibEdge]
       nodes(throw: Boolean! = false): [Fib]
       pageInfo(throw: Boolean! = false): PageInfo
@@ -67,6 +74,11 @@ const schema = makeGrafastSchema({
     },
     FibConnection: {
       plans: {
+        failure() {
+          return lambda(null, () => {
+            throw new Error("connection failed");
+          });
+        },
         pageInfo($connection, { $throw }) {
           sideEffect($throw, (t) => {
             if (t) {
@@ -95,6 +107,133 @@ const schema = makeGrafastSchema({
     },
   },
   enableDeferStream: true,
+});
+
+function fullPaginationSchema(
+  page: () =>
+    | ConnectionHandlingResult<number>
+    | ConnectionHandlingResultWithGetters<number>,
+) {
+  return makeGrafastSchema({
+    enableDeferStream: true,
+    typeDefs: `
+      type Query { connection: Connection }
+      type Connection { nodes: [Int!]!, pageInfo: PageInfo }
+      type PageInfo { hasNextPage: Boolean!, hasPreviousPage: Boolean! }
+    `,
+    objects: {
+      Query: {
+        plans: {
+          connection() {
+            const $page = lambda(null, page);
+            return connection(
+              Object.assign($page, {
+                paginationSupport: { full: true, cursor: true },
+                items: () => access($page, "items"),
+                setNeedsHasMore() {},
+              }),
+            );
+          },
+        },
+      },
+    },
+  });
+}
+
+it("streams the initial node when the requested full pagination flag is known", async () => {
+  const secondRow = Promise.withResolvers<void>();
+  const schema = fullPaginationSchema(() => ({
+    items: (async function* () {
+      yield 7;
+      await secondRow.promise;
+      yield 8;
+    })(),
+    hasNextPage: Promise.resolve(true),
+    hasPreviousPage: false,
+  }));
+  try {
+    const result = await grafast({
+      schema,
+      source:
+        "{ connection { nodes @stream(initialCount: 1) pageInfo { hasPreviousPage } } }",
+      requestContext,
+    });
+    assertIterable(result);
+    const iterator = result[Symbol.asyncIterator]();
+    expect((await iterator.next()).value?.data).to.deep.equal({
+      connection: { nodes: [7], pageInfo: { hasPreviousPage: false } },
+    });
+    secondRow.resolve();
+    expect((await iterator.next()).value?.data).to.equal(8);
+    expect((await iterator.next()).value?.hasNext).to.equal(false);
+  } finally {
+    secondRow.resolve();
+  }
+});
+
+it("preserves inherited page flags when materializing streamed items", async () => {
+  class Page {
+    items = (async function* () {
+      yield* [7, 8];
+    })();
+    get hasNextPage() {
+      return true;
+    }
+    get hasPreviousPage() {
+      return false;
+    }
+  }
+  const payloads = await streamToArray(
+    await grafast({
+      schema: fullPaginationSchema(() => new Page()),
+      source:
+        "{ connection { nodes @stream pageInfo { hasNextPage hasPreviousPage } } }",
+      requestContext,
+    }),
+  );
+  assert.ok(Array.isArray(payloads));
+  expect(resolveStreamDefer(payloads).data).to.deep.equal({
+    connection: {
+      nodes: [7, 8],
+      pageInfo: { hasNextPage: true, hasPreviousPage: false },
+    },
+  });
+});
+
+it("awaits full pagination getters without a custom page-info plan", async () => {
+  const schema = fullPaginationSchema(() => {
+    const exhausted = Promise.withResolvers<void>();
+    return {
+      items: (async function* () {
+        yield 7;
+        exhausted.resolve();
+      })(),
+      async getHasNextPage() {
+        await exhausted.promise;
+        return true;
+      },
+      async getHasPreviousPage() {
+        return false;
+      },
+    };
+  });
+  const result = await grafast({
+    schema,
+    source:
+      "{ connection { nodes @stream(initialCount: 0) pageInfo { hasNextPage hasPreviousPage } } }",
+    requestContext,
+  });
+  assertIterable(result);
+  const payloads = await streamToArray(result);
+  assert.ok(Array.isArray(payloads));
+  const resolved = resolveStreamDefer(payloads);
+  expect(resolved.errors).not.to.exist;
+  expect(resolved.data).to.deep.equal({
+    connection: {
+      nodes: [7],
+      pageInfo: { hasNextPage: true, hasPreviousPage: false },
+    },
+  });
 });
 
 function fib($max: Step<number>) {
@@ -705,3 +844,16 @@ it(
     expect(endCount).to.equal(1);
   }),
 );
+
+it("releases the stream when a non-null sibling skips its only deferred consumer", async () => {
+  const result = await grafast({
+    schema,
+    requestContext,
+    resolvedPreset,
+    source: `{ connection { failure ... @defer { nodes @stream { value } } } }`,
+  });
+  assertNotIterable(result);
+  expect(result.errors?.[0].message).to.equal("connection failed");
+  expect(result.data).to.deep.equal({ connection: null });
+  expect(endCount).to.equal(1);
+});

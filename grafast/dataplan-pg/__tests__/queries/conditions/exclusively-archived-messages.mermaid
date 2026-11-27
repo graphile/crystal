@@ -69,12 +69,12 @@ graph TD
     Lambda91{{"Lambda[91∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List90 --> Lambda91
     PgCursor48{{"PgCursor[48∈3]"}}:::plan
-    First46{{"First[46∈3]"}}:::plan
+    Lambda46[["Lambda[46∈3]<br />ᐸfirstItemᐳ"]]:::unbatchedplan
     Access47{{"Access[47∈3]<br />ᐸ87.cursorDetailsᐳ"}}:::plan
-    First46 & Access47 --> PgCursor48
+    Lambda46 & Access47 --> PgCursor48
     PgCursor50{{"PgCursor[50∈3]"}}:::plan
-    Last49{{"Last[49∈3]"}}:::plan
-    Last49 & Access47 --> PgCursor50
+    Lambda49[["Lambda[49∈3]<br />ᐸlastItemᐳ"]]:::unbatchedplan
+    Lambda49 & Access47 --> PgCursor50
     ConnectionItems30[["ConnectionItems[30∈3]"]]:::plan
     Connection25 --> ConnectionItems30
     PageInfo35{{"PageInfo[35∈3]"}}:::plan
@@ -91,9 +91,9 @@ graph TD
     PageInfo35 o--o Access44
     Access45{{"Access[45∈3]<br />ᐸ25.hasPreviousPageᐳ"}}:::plan
     Access44 o--o Access45
-    ConnectionItems30 --> First46
+    Lambda87 --> Lambda46
     Lambda87 --> Access47
-    ConnectionItems30 --> Last49
+    Lambda87 --> Lambda49
     Access77{{"Access[77∈3]<br />ᐸ87.m.joinDetailsFor55ᐳ"}}:::plan
     Lambda87 --> Access77
     Access81{{"Access[81∈3]<br />ᐸ87.m.joinDetailsFor67ᐳ"}}:::plan
@@ -147,7 +147,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17,Connection25,List86,Lambda87,List90,Lambda91 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,ConnectionItems30,PageInfo35,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression40,Access44,Access45,First46,Access47,PgCursor48,Last49,PgCursor50,Access77,Access81 bucket3
+    class Bucket3,ConnectionItems30,PageInfo35,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression40,Access44,Access45,Lambda46,Access47,PgCursor48,Lambda49,PgCursor50,Access77,Access81 bucket3
     classDef bucket6 stroke:#ff1493
     class Bucket6,__Item41,PgSelectSingle42,Edge43,PgCursor53 bucket6
     classDef bucket7 stroke:#808000

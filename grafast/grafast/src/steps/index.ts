@@ -14,6 +14,7 @@ export { access, AccessStep } from "./access.ts";
 export { coalesce, CoalesceStep } from "./coalesce.ts";
 export type {
   ConnectionHandlingResult,
+  ConnectionHandlingResultWithGetters,
   ConnectionHandlingStep,
   ConnectionOptimizedStep,
   PaginationFeatures,

@@ -201,6 +201,9 @@ the query shape.
 - Prefer **incremental** tests: cover public APIs and critical paths first.
 - Use existing test utilities and patterns; mirror nearby tests.
 - Keep tests deterministic.
+- Incremental delivery payload order need not be stable. Each payload must be
+  valid, and applying the payloads in received order to the initial response
+  must yield a stable final result.
 - Do not add relative imports across package boundaries, including in tests. Add
   package-local test helpers where needed.
 - Use PostgreSQL pools in tests rather than standalone `Client` connections. Use
@@ -324,3 +327,11 @@ field, so it could be the field plan. We may need crispness here, or maybe not.
 
 "Global dependencies" is now referred to as "Unary dependencies" for more
 precision.
+
+Outside GraphQL list positions, treat iterable step results (including maps
+and sets) as regular values. `first` and `last` generally expect arrays. They
+support iterable inputs through explicit opt-in or when the plan indicates
+that the input is likely to stream.
+
+The execution-time result of `pgSelect()` is opaque. Read supported fields
+through `get($select, key)` so the step can plan the access.

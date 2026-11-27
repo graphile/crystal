@@ -253,12 +253,17 @@ export async function runTestQuery(
     ) => Promise<void>;
     path: string;
     prepare?: boolean;
+    plugins?: GraphileConfig.Plugin[];
+    contextValue?: Record<string, unknown>;
+    preservePayloadOrder?: boolean;
+    onInitialPayload?: (payload: AsyncExecutionResult) => Promise<void>;
   } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
     data?: { [key: string]: any };
     errors?: readonly GraphQLError[];
     extensions?: any;
+    path?: readonly (string | number)[];
   }>;
   data?: { [key: string]: any };
   errors?: readonly GraphQLError[];
@@ -313,6 +318,7 @@ export async function runTestQuery(
     extends: [AmberPreset, MultipassIntrospectionPreset, ...presets],
     plugins: [
       StreamDeferPlugin,
+      ...(options.plugins ?? []),
       ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),
     ],
     pgServices: [
@@ -403,6 +409,7 @@ export async function runTestQuery(
 
           // We must override the context so that we can listen to the SQL queries.
           args.contextValue = {
+            ...options.contextValue,
             pgSettings: (args.contextValue as any).pgSettings,
             withPgClient,
             pgSubscriber,
@@ -503,6 +510,12 @@ export async function runTestQuery(
                 if (Object.keys(rest).length > 0 || hasNext) {
                   // Do not add the trailing `{hasNext: false}` entry to the snapshot
                   originalPayloads.push(rest);
+                  if (
+                    originalPayloads.length === 1 &&
+                    options.onInitialPayload
+                  ) {
+                    await options.onInitialPayload(entry);
+                  }
                 }
                 if (entry.errors) {
                   if (!errors) {
@@ -579,7 +592,7 @@ export async function runTestQuery(
               );
             };
             const payloads =
-              operationType === "subscription"
+              operationType === "subscription" || options.preservePayloadOrder
                 ? (originalPayloads as ExecutionResult[])
                 : ([
                     originalPayloads[0],

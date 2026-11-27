@@ -1617,6 +1617,7 @@ function makeObjectExecutor<TAsString extends boolean>(
             bucketIndex,
             outputPlan: defer,
             label: defer.type.deferLabel,
+            pendingIterators: null,
           });
         }
       }

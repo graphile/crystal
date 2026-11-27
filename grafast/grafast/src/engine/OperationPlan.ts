@@ -3730,7 +3730,9 @@ export class OperationPlan {
     if (step.hasSideEffects) {
       return true;
     }
-    if (isPrepopulatedStep(step)) {
+    // Walk streamed lists where their output paths are known. Hoisting the
+    // clone above a parent list would share one iterator across its items.
+    if (step instanceof __CloneStreamStep || isPrepopulatedStep(step)) {
       return true;
     }
     if (step[$$subroutine] !== null) {
@@ -3832,7 +3834,14 @@ export class OperationPlan {
         // Should be safe to hoist so long as it doesn't depend on the
         // `__ItemStep` itself (which is just a regular dependency, so it'll be
         // checked later).
-        // NOTE: this is true even if the listItem streams.
+        // Later parent items execute in separate buckets. Each bucket must
+        // acquire its own stream since earlier buckets can already be drained.
+        if (
+          step.layerPlan.reason.stream != null &&
+          step._stepOptions.stream !== null
+        ) {
+          return;
+        }
         break;
       }
       case "mutationField": {
@@ -4539,8 +4548,15 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         const $dep = $clone.dependencies[0];
         if ($dep.dependents.length === 1) {
           $dep.cloneStreams = false;
-          $dep._stepOptions.walkIterable ||= $clone._stepOptions.walkIterable;
-          $dep._stepOptions.stream ||= $clone._stepOptions.stream;
+          // A constant can execute before the stream directive arguments.
+          // Let the consuming layer walk it once those values are available.
+          if (
+            $dep.layerPlan === $clone.layerPlan &&
+            !($dep instanceof ConstantStep)
+          ) {
+            $dep._stepOptions.walkIterable ||= $clone._stepOptions.walkIterable;
+            $dep._stepOptions.stream ||= $clone._stepOptions.stream;
+          }
           this.stepTracker.replaceStep($clone, $dep);
         }
       }
@@ -5085,6 +5101,14 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         );
         const stream = layerPlan.reason.stream;
         if (stream != null) {
+          // A single consumer can receive the raw iterable from an ancestor.
+          // Walk it in the bucket that will deliver the list.
+          if (!parentStep._stepOptions.walkIterable) {
+            parentStep._hasStreamInputConsumer = true;
+            layerPlan.reason.parentLayerPlan.streamInputs.push(
+              layerPlan.reason,
+            );
+          }
           if (stream.initialCountStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.initialCountStepId),

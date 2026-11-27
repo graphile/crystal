@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/partitions"
-    Bucket0("Bucket 0 (root)<br /><br />1: 207, 211, 215, 219, 223, 227, 231<br />ᐳ: 9, 10, 94, 100, 104, 110, 114, 120, 11<br />2: 8, 15, 20, 25, 30, 35, 40, 65<br />ᐳ: 86, 208, 212, 216, 220, 224, 228, 232<br />3: 12, 17, 22, 27, 32, 37, 42, 67<br />ᐳ: 66, 68, 69<br />4: 44, 47, 50, 53, 56, 59, 62<br />ᐳ: 85, 87, 88, 89"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: 207, 211, 215, 219, 223, 227, 231<br />ᐳ: 9, 10, 94, 100, 104, 110, 114, 120, 11<br />2: 8, 15, 20, 25, 30, 35, 40, 65<br />ᐳ: 86, 208, 212, 216, 220, 224, 228, 232<br />3: 12, 17, 22, 27, 32, 37, 42, 67, 85, 88<br />ᐳ: 66, 68, 69, 87, 89<br />4: 44, 47, 50, 53, 56, 59, 62"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 86, 44, 208, 69, 87, 89<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 47, 94, 212, 100<br /><br />ROOT Connectionᐸ15ᐳ[17]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 50, 100, 216<br /><br />ROOT Connectionᐸ20ᐳ[22]"):::bucket
@@ -112,7 +112,7 @@ graph TD
     PgSelect35 --> Connection37
     Connection42[["Connection[42∈0] ➊<br />ᐸ40ᐳ"]]:::plan
     PgSelect40 --> Connection42
-    ConnectionItems44[["ConnectionItems[44∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[12]"]]:::plan
+    ConnectionItems44[["ConnectionItems[44∈0] ➊<br />More deps:<br />- Connection[12]"]]:::plan
     ConnectionItems47[["ConnectionItems[47∈0] ➊"]]:::plan
     Connection17 --> ConnectionItems47
     ConnectionItems50[["ConnectionItems[50∈0] ➊"]]:::plan
@@ -133,10 +133,12 @@ graph TD
     PgSelect65 --> PgSelectRows67
     PgSelectSingle68{{"PgSelectSingle[68∈0] ➊<br />ᐸmeasurementsᐳ"}}:::plan
     First66 --> PgSelectSingle68
-    First85{{"First[85∈0] ➊<br />More deps:<br />- ConnectionItems[44]"}}:::plan
+    Lambda85[["Lambda[85∈0] ➊<br />ᐸfirstItemᐳ"]]:::unbatchedplan
+    PgSelect8 --> Lambda85
     Access86{{"Access[86∈0] ➊<br />ᐸ8.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect8 --> Access86
-    Last88{{"Last[88∈0] ➊<br />More deps:<br />- ConnectionItems[44]"}}:::plan
+    Lambda88[["Lambda[88∈0] ➊<br />ᐸlastItemᐳ"]]:::unbatchedplan
+    PgSelect8 --> Lambda88
     Access208{{"Access[208∈0] ➊<br />ᐸ8.m.joinDetailsFor189ᐳ"}}:::plan
     PgSelect8 --> Access208
     Access212{{"Access[212∈0] ➊<br />ᐸ15.m.joinDetailsFor146ᐳ"}}:::plan
@@ -155,10 +157,11 @@ graph TD
     Access90{{"Access[90∈1] ➊<br />ᐸ12.hasNextPageᐳ<br />More deps:<br />- Connection[12]"}}:::plan
     Access91{{"Access[91∈1] ➊<br />ᐸ12.hasPreviousPageᐳ<br />More deps:<br />- Connection[12]"}}:::plan
     Edge72{{"Edge[72∈15]"}}:::plan
-    __Item71[/"__Item[71∈15]<br />ᐸ44ᐳ<br />More deps:<br />- ConnectionItems[44]"\]:::itemplan
+    __Item71[/"__Item[71∈15]<br />ᐸ44ᐳ"\]:::itemplan
     PgCursor93{{"PgCursor[93∈15]<br />More deps:<br />- Access[86]"}}:::plan
     __Item71 & PgCursor93 --> Edge72
     __Item71 --> PgCursor93
+    ConnectionItems44 ==> __Item71
     __Item73[/"__Item[73∈16]<br />ᐸ47ᐳ"\]:::itemplan
     ConnectionItems47 ==> __Item73
     PgSelectSingle74{{"PgSelectSingle[74∈16]<br />ᐸlocation_tagsᐳ"}}:::plan
@@ -346,7 +349,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,PgSelect15,Connection17,PgSelect20,Connection22,PgSelect25,Connection27,PgSelect30,Connection32,PgSelect35,Connection37,PgSelect40,Connection42,ConnectionItems44,ConnectionItems47,ConnectionItems50,ConnectionItems53,ConnectionItems56,ConnectionItems59,ConnectionItems62,PgSelect65,First66,PgSelectRows67,PgSelectSingle68,First85,Access86,Last88,PgSelectInlineApply207,Access208,PgSelectInlineApply211,Access212,PgSelectInlineApply215,Access216,PgSelectInlineApply219,Access220,PgSelectInlineApply223,Access224,PgSelectInlineApply227,Access228,PgSelectInlineApply231,Access232 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,PgSelect15,Connection17,PgSelect20,Connection22,PgSelect25,Connection27,PgSelect30,Connection32,PgSelect35,Connection37,PgSelect40,Connection42,ConnectionItems44,ConnectionItems47,ConnectionItems50,ConnectionItems53,ConnectionItems56,ConnectionItems59,ConnectionItems62,PgSelect65,First66,PgSelectRows67,PgSelectSingle68,Lambda85,Access86,Lambda88,PgSelectInlineApply207,Access208,PgSelectInlineApply211,Access212,PgSelectInlineApply215,Access216,PgSelectInlineApply219,Access220,PgSelectInlineApply223,Access224,PgSelectInlineApply227,Access228,PgSelectInlineApply231,Access232 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PageInfo70,Access90,Access91 bucket1
     classDef bucket2 stroke:#7f007f

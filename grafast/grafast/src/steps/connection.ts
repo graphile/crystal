@@ -1,7 +1,10 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.ts";
-import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.ts";
+import {
+  currentFieldStreamDetails,
+  currentLayerPlan,
+} from "../engine/lib/withGlobalLayerPlan.ts";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
@@ -92,7 +95,8 @@ export interface PaginationFeatures {
    * each individual parameter through to your collection step. Your collection
    * step is also responsible for implementing the
    * `hasNextPage`/`hasPreviousPage` logic, and must yield from execution an
-   * object conforming to `ConnectionHandlingResult`.
+   * object conforming to `ConnectionHandlingResult` or
+   * `ConnectionHandlingResultWithGetters`.
    */
   full?: boolean;
 }
@@ -275,6 +279,23 @@ export interface ConnectionHandlingResult<
   items: ReadonlyArray<TItem> | AsyncIterable<TItem>;
 }
 
+/** A full pagination result that computes the page flags on demand. */
+export interface ConnectionHandlingResultWithGetters<TItem> {
+  items: ConnectionHandlingResult<TItem>["items"];
+  getHasNextPage(): PromiseOrDirect<boolean>;
+  getHasPreviousPage(): PromiseOrDirect<boolean>;
+}
+
+export type FullPaginationResult<TItem> =
+  | ConnectionHandlingResult<TItem>
+  | ConnectionHandlingResultWithGetters<TItem>;
+
+type PageInfoKey =
+  | "hasNextPage"
+  | "hasPreviousPage"
+  | "startCursor"
+  | "endCursor";
+
 export interface ConnectionHandlingStep<
   TItem,
   TNodeStep extends Step = Step<TItem>,
@@ -283,7 +304,8 @@ export interface ConnectionHandlingStep<
     TNodeStep
   >,
   TCursorValue = string,
-> extends Step<Maybe<ConnectionHandlingResult<TItem>>>,
+  TResult extends FullPaginationResult<TItem> = ConnectionHandlingResult<TItem>,
+> extends Step<Maybe<TResult>>,
     Pick<
       ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>,
       "parseCursor" | "nodeForItem" | "edgeForItem" | "listItem"
@@ -301,7 +323,7 @@ export interface ConnectionHandlingStep<
    */
   connectionClone?(
     ...args: any[]
-  ): ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>; // TODO: `this`
+  ): ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue, TResult>; // TODO: `this`
 
   paginationSupport: {
     full: true;
@@ -318,6 +340,16 @@ export interface ConnectionHandlingStep<
    */
   setNeedsHasMore(): void;
 
+  /**
+   * Plan a page-info field using the collection's pagination implementation.
+   * Pass true to the fallback when the requested page flag is known to be synchronous.
+   */
+  planPageInfo?(
+    key: PageInfoKey,
+    layerPlan: Step["layerPlan"],
+    fallback: (pageFlagIsSync?: boolean) => Step,
+  ): Step;
+
   // TODO: would be better to expose this as
   // `setInitialCount(Step<number | null>): void` and only call it once.
   /**
@@ -330,6 +362,7 @@ export interface ConnectionHandlingStep<
    */
   addStreamDetails?(
     $streamDetails: Step<ExecutionDetailsStream | null> | null,
+    consumerLayer?: Step["layerPlan"],
   ): void;
 }
 
@@ -410,9 +443,14 @@ export class ConnectionStep<
 
   private neededCollection = false;
   private collectionDepId: number;
-  /**
-   * null = unknown
-   */
+  private readonly streamConsumers = new Set<Step["layerPlan"]>();
+  private readonly flagReaders: Array<{
+    layer: Step["layerPlan"];
+    key: "hasNextPage" | "hasPreviousPage";
+  }> = [];
+  private eagerNextPage = false;
+  private eagerPreviousPage = false;
+  /** null = unknown */
   private _mightStream: boolean | null = null;
 
   // Pagination stuff
@@ -508,7 +546,13 @@ export class ConnectionStep<
     needsCollection: boolean,
   ):
     | (TCollectionStep &
-        ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>)
+        ConnectionHandlingStep<
+          TItem,
+          TNodeStep,
+          TEdgeStep,
+          TCursorValue,
+          FullPaginationResult<TItem>
+        >)
     | ConnectionParamsStep<TCursorValue> {
     if (this.collectionPaginationSupport?.full) {
       return this.setupSubplanWithPagination(needsCollection) as any;
@@ -627,7 +671,13 @@ export class ConnectionStep<
     ...args: Parameters<
       TCollectionStep extends
         | ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
-        | ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
+        | ConnectionHandlingStep<
+            TItem,
+            TNodeStep,
+            TEdgeStep,
+            TCursorValue,
+            FullPaginationResult<TItem>
+          >
         ? Exclude<TCollectionStep["connectionClone"], undefined>
         : never
     >
@@ -715,7 +765,11 @@ export class ConnectionStep<
 
       this._mightStream = false;
     } else {
-      this.getHandler(true).addStreamDetails?.($streamDetails);
+      this.streamConsumers.add(currentLayerPlan());
+      this.getHandler(true).addStreamDetails?.(
+        $streamDetails,
+        currentLayerPlan(),
+      );
 
       if (this._mightStream === null) {
         // Only override if it was unknown
@@ -726,13 +780,11 @@ export class ConnectionStep<
 
   public edges(): Step {
     this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.edgePlan as any);
   }
 
   public nodes() {
     this.captureStream();
-    this.setupSubplanWithPagination(true);
     return each(this._items(), this.nodePlan as any);
   }
 
@@ -742,6 +794,7 @@ export class ConnectionStep<
 
   /** @internal */
   public _items() {
+    this.neededCollection = true;
     return this.withMyLayerPlan(() =>
       this.operationPlan.cacheStep(
         this,
@@ -778,6 +831,21 @@ export class ConnectionStep<
     return new PageInfoStep(this);
   }
 
+  public planPageInfo(
+    key: PageInfoKey,
+    fallback: (pageFlagIsSync?: boolean) => Step,
+  ): Step {
+    const handler = this.getHandler(true);
+    if ("planPageInfo" in handler && handler.planPageInfo != null) {
+      return handler.planPageInfo(key, currentLayerPlan(), fallback);
+    }
+    if (key === "hasNextPage" || key === "hasPreviousPage") {
+      this.setNeedsHasMore();
+      this.flagReaders.push({ layer: currentLayerPlan(), key });
+    }
+    return fallback();
+  }
+
   public optimize() {
     if (!this.neededCollection) {
       return constant(EMPTY_CONNECTION_RESULT);
@@ -793,6 +861,10 @@ export class ConnectionStep<
     return this;
   }
   deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any>) {
+    replacement.flagReaders.push(...this.flagReaders);
+    for (const consumer of this.streamConsumers) {
+      replacement.streamConsumers.add(consumer);
+    }
     if (this.neededCollection) {
       replacement.neededCollection = true;
     }
@@ -802,6 +874,28 @@ export class ConnectionStep<
     if (this.needsHasMore) {
       replacement.needsHasMore = true;
     }
+  }
+
+  public finalize() {
+    for (const { layer, key } of this.flagReaders) {
+      for (const consumer of this.streamConsumers) {
+        if (
+          !layer.ancestry.some(
+            (ancestor) =>
+              ancestor.reason.type === "defer" &&
+              consumer.ancestry[ancestor.depth] !== ancestor,
+          )
+        ) {
+          if (key === "hasNextPage") {
+            this.eagerNextPage = true;
+          } else {
+            this.eagerPreviousPage = true;
+          }
+          break;
+        }
+      }
+    }
+    super.finalize();
   }
 
   public execute({
@@ -826,19 +920,26 @@ export class ConnectionStep<
 
       if (params === null) {
         // collection handles everything
-        const result = collectionValue as ConnectionHandlingResult<any>;
+        if (collectionValue == null) {
+          return null;
+        }
+        const result = collectionValue as FullPaginationResult<TItem>;
+        const { items } = result;
         if (
-          !this._mightStream &&
-          result.items != null &&
-          !Array.isArray(result.items)
+          items != null &&
+          !Array.isArray(items) &&
+          (!this._mightStream ||
+            (this.eagerNextPage &&
+              !hasBooleanPageFlag(result, "hasNextPage")) ||
+            (this.eagerPreviousPage &&
+              !hasBooleanPageFlag(result, "hasPreviousPage")))
         ) {
-          // Except it might return a stream which we should turn into an array.
-          return (async () => ({
-            ...result,
-            items: await iterableToArray(result.items),
-          }))();
+          // An eager flag may need the stream to finish before it is ready.
+          return iterableToArray(items).then((items) =>
+            fullPaginationConnectionResult(result, items),
+          );
         } else {
-          return result;
+          return fullPaginationConnectionResult(result, items);
         }
       }
 
@@ -903,15 +1004,66 @@ export class ConnectionStep<
           ),
         );
       } else {
-        return makeProcessedCollection(
+        const result = makeProcessedCollection(
           mode,
           collection,
           params,
           !this.collectionPaginationSupport?.cursor,
         );
+        // A flag that needs lookahead cannot wait for its own payload to drain.
+        if (
+          mode !== MODE_ARRAY &&
+          typeof params.__hasMore !== "boolean" &&
+          (params.__isForwardPagination
+            ? this.eagerNextPage
+            : this.eagerPreviousPage)
+        ) {
+          return iterableToArray(result.items).then((items) => ({
+            ...result,
+            items,
+          }));
+        }
+        return result;
       }
     });
   }
+}
+
+// Only inspect stored values: an on-demand getter can require exhaustion.
+function hasBooleanPageFlag<TItem>(
+  result: FullPaginationResult<TItem>,
+  key: "hasNextPage" | "hasPreviousPage",
+): boolean {
+  return (
+    typeof Object.getOwnPropertyDescriptor(result, key)?.value === "boolean"
+  );
+}
+
+function fullPaginationConnectionResult<TItem>(
+  result: FullPaginationResult<TItem>,
+  items: ConnectionHandlingResult<TItem>["items"],
+): ConnectionHandlingResult<TItem> {
+  if ("getHasNextPage" in result) {
+    return {
+      items,
+      get hasNextPage() {
+        return result.getHasNextPage();
+      },
+      get hasPreviousPage() {
+        return result.getHasPreviousPage();
+      },
+    };
+  }
+  if (items === result.items) return result;
+  return {
+    items,
+    get hasNextPage() {
+      return result.hasNextPage;
+    },
+    get hasPreviousPage() {
+      return result.hasPreviousPage;
+    },
+  };
 }
 
 const MODE_NULL = 0;
@@ -1555,6 +1707,13 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   }
 }
 
+const pageFlagGetters = {
+  hasNextPage: (result: ConnectionResult<unknown> | null) =>
+    result?.hasNextPage,
+  hasPreviousPage: (result: ConnectionResult<unknown> | null) =>
+    result?.hasPreviousPage,
+};
+
 class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
   static $$export = {
     moduleName: "grafast",
@@ -1576,25 +1735,25 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       any
     >;
     switch (key) {
-      case "hasNextPage": {
-        $connection.setNeedsHasMore();
-        return access($connection, "hasNextPage");
-      }
+      case "hasNextPage":
       case "hasPreviousPage": {
-        $connection.setNeedsHasMore();
-        return access($connection, "hasPreviousPage");
+        return $connection.planPageInfo(key, (pageFlagIsSync) =>
+          pageFlagIsSync === true
+            ? access($connection, key)
+            : lambda($connection, pageFlagGetters[key]),
+        );
       }
       case "startCursor": {
-        // Get first node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $first = first($connection._items(), isArray);
-        return $connection.cursorPlan($first);
+        return $connection.planPageInfo(key, () => {
+          const $first = first($connection._items(), "auto");
+          return $connection.cursorPlan($first);
+        });
       }
       case "endCursor": {
-        // Get last node, get cursor for it
-        const isArray = !$connection.mightStream();
-        const $last = last($connection._items(), isArray);
-        return $connection.cursorPlan($last);
+        return $connection.planPageInfo(key, () => {
+          const $last = last($connection._items(), "auto");
+          return $connection.cursorPlan($last);
+        });
       }
       default: {
         // TODO: allow expansion
@@ -1636,7 +1795,6 @@ export class ConnectionItemsStep extends Step {
   }
 
   public optimize(_options: StepOptimizeOptions): Step {
-    // If false, connection guarantees an array
     this.cloneStreams = this.getConnection().mightStream();
     return this;
   }

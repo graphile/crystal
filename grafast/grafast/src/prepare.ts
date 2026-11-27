@@ -139,6 +139,7 @@ function releaseUnusedIterators(
   bucket: Bucket,
   bucketIndex: number,
   streams: SubsequentStreamSpec[] | null,
+  queue?: SubsequentPayloadSpec[],
 ) {
   const allStreams = bucket.iterators[bucketIndex];
   if (!allStreams) {
@@ -156,6 +157,20 @@ function releaseUnusedIterators(
         console.error(
           `GrafastInternalError<1e43efdf-f901-43dd-8a82-768246e61478>: Stream was returned from an output plan, but that stream wasn't tracked via the bucket.`,
         );
+      }
+    }
+  }
+  if (allStreams.size > 0 && queue !== undefined) {
+    // Transfer ownership only to deferred payloads that survived output.
+    for (const spec of queue) {
+      for (const stepId of spec.outputPlan.layerPlan.copyStepIds) {
+        const value = spec.bucket.store.get(stepId)?.at(spec.bucketIndex);
+        const pending = Array.isArray(value)
+          ? (value as StreamMaybeMoreableArray)[$$streamMore]
+          : undefined;
+        if (pending !== undefined && allStreams.delete(pending)) {
+          (spec.pendingIterators ??= new Set()).add(pending);
+        }
       }
     }
   }
@@ -306,7 +321,12 @@ function outputBucket(
     ctx.root.errors.push(error);
     return [ctx, null];
   } finally {
-    releaseUnusedIterators(rootBucket, rootBucketIndex, ctx.root.streams);
+    releaseUnusedIterators(
+      rootBucket,
+      rootBucketIndex,
+      ctx.root.streams,
+      ctx.root.queue,
+    );
   }
 }
 
@@ -973,7 +993,7 @@ function processSingleDeferred(
     const spec = specs[bucketIndex][1];
     polymorphicPathList[bucketIndex] =
       spec.bucket.polymorphicPathList[spec.bucketIndex];
-    iterators[bucketIndex] = new Set();
+    iterators[bucketIndex] = spec.pendingIterators ?? new Set();
   }
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);

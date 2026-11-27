@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
-  ConnectionHandlingResult,
+  ConnectionHandlingResultWithGetters,
   ConnectionHandlingStep,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -20,7 +20,9 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
+  asyncIteratorWithCleanup,
   ConstantStep,
+  consume,
   currentFieldStreamDetails,
   DEFAULT_ACCEPT_FLAGS,
   exportAs,
@@ -31,6 +33,7 @@ import {
   isPromiseLike,
   lambda,
   maybeArraysMatch,
+  noop,
   reverseArray,
   SafeError,
   Step,
@@ -92,6 +95,7 @@ import type {
   PgStmtCompileQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
+  PgStreamSlice,
   ResolvedPgStmtCommonQueryInfo,
 } from "./pgStmt.ts";
 import {
@@ -124,9 +128,11 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
-  hasNextPage: false,
-  hasPreviousPage: false,
   items: [],
+  getFirstItem: () => null,
+  getLastItem: () => null,
+  getHasNextPage: () => false,
+  getHasPreviousPage: () => false,
   cursorDetails: undefined,
   groupDetails: undefined,
   m: Object.create(null),
@@ -382,15 +388,33 @@ interface QueryBuildResult {
   groupDetails: PgGroupDetails | undefined;
 }
 
-interface PgSelectStepResult extends ConnectionHandlingResult<unknown> {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+interface PgSelectStepResult
+  extends ConnectionHandlingResultWithGetters<unknown> {
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
+  getFirstItem(): PromiseOrDirect<unknown[] | null>;
+  getLastItem(): PromiseOrDirect<unknown[] | null>;
   cursorDetails: PgCursorDetails | undefined;
   groupDetails: PgGroupDetails | undefined;
   m: Record<string, unknown>;
 }
+
+const pgSelectResultGetters = {
+  hasNextPage: (result: PgSelectStepResult) => result.getHasNextPage(),
+  hasPreviousPage: (result: PgSelectStepResult) => result.getHasPreviousPage(),
+  firstItem: (result: PgSelectStepResult) => result.getFirstItem(),
+  lastItem: (result: PgSelectStepResult) => result.getLastItem(),
+};
+type PgSelectResultKey = keyof typeof pgSelectResultGetters;
+
+type PgSelectPropertySteps = {
+  [TKey in keyof PgSelectStepResult]: Step<PgSelectStepResult[TKey]>;
+} & {
+  firstItem: Step<unknown[] | null>;
+  lastItem: Step<unknown[] | null>;
+  hasNextPage: Step<boolean>;
+  hasPreviousPage: Step<boolean>;
+};
 
 export interface PgGroupDetails {
   readonly indicies: ReadonlyArray<{
@@ -419,13 +443,14 @@ export class PgSelectStep<
       any
     > = PgResource,
   >
-  extends PgStmtBaseStep<any>
+  extends PgStmtBaseStep<PgSelectStepResult>
   implements
     ConnectionHandlingStep<
       any,
       PgSelectSingleStep<TResource> | PgClassExpressionStep<any, TResource>,
       any,
-      null | readonly any[]
+      null | readonly any[],
+      PgSelectStepResult
     >,
     /**
      * @internal PgSelectStep might not always implement PgSelectQueryBuilder;
@@ -506,6 +531,14 @@ export class PgSelectStep<
   protected firstStepId: number | null = null;
   protected lastStepId: number | null = null;
   protected fetchOneExtra = false;
+  private needsFirstItem = false;
+  private requiresCompletePage = false;
+  private requiresHasNextPage = false;
+  private readonly streamConsumers = new Set<Step["layerPlan"]>();
+  private readonly completionReaders = new Map<
+    Step["layerPlan"],
+    "lastItem" | "hasNextPage"
+  >();
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
   protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
@@ -700,6 +733,7 @@ export class PgSelectStep<
       $clone.firstStepId = cloneFromMatchingMode.firstStepId;
       $clone.lastStepId = cloneFromMatchingMode.lastStepId;
       $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
+      cloneFromMatchingMode.copyPageRequirementsTo($clone);
       $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
 
       // dependencies were already added, so we can just copy the dependency references
@@ -1168,6 +1202,81 @@ export class PgSelectStep<
     return new PgCursorStep($item, this.getCursorDetails());
   }
 
+  public override setNeedsHasMore() {
+    super.setNeedsHasMore();
+    this.requiresHasNextPage = true;
+  }
+
+  declare readonly __inferGet?: PgSelectPropertySteps;
+
+  public get<TKey extends keyof PgSelectPropertySteps>(
+    key: TKey,
+  ): PgSelectPropertySteps[TKey];
+  public get(key: keyof PgSelectPropertySteps): Step {
+    switch (key) {
+      case "firstItem":
+      case "lastItem":
+      case "hasNextPage":
+      case "hasPreviousPage": {
+        const $getter = lambda<
+          PgSelectStep<TResource>,
+          boolean | unknown[] | null
+        >(this, pgSelectResultGetters[key]);
+        if (key === "firstItem") {
+          this.needsFirstItem = true;
+        } else {
+          this.requirePageValue(key, $getter.layerPlan);
+        }
+        return $getter;
+      }
+      default: {
+        return access(this, key);
+      }
+    }
+  }
+
+  private requirePageValue(
+    key: Exclude<PgSelectResultKey, "firstItem">,
+    layerPlan: Step["layerPlan"],
+  ): boolean {
+    if (key !== "lastItem") {
+      this.fetchOneExtra = true;
+    }
+    const eager = !hasIndependentDefer(layerPlan, this.layerPlan);
+    // A forward page knows hasPreviousPage from its offset. Backward
+    // lookahead already uses array mode because the extra row comes first.
+    if (key !== "hasPreviousPage") {
+      if (eager) {
+        this.requireEagerValue(key);
+      } else if (this.completionReaders.get(layerPlan) !== "lastItem") {
+        this.completionReaders.set(layerPlan, key);
+      }
+    }
+    return eager;
+  }
+
+  private requireEagerValue(key: "lastItem" | "hasNextPage") {
+    if (key === "lastItem") {
+      this.requiresCompletePage = true;
+    } else {
+      this.requiresHasNextPage = true;
+    }
+  }
+
+  public planPageInfo(
+    key: "hasNextPage" | "hasPreviousPage" | "startCursor" | "endCursor",
+    layerPlan: Step["layerPlan"],
+    fallback: (pageFlagIsSync?: boolean) => Step,
+  ): Step {
+    if (key === "startCursor" || key === "endCursor") {
+      const $item = this.get(key === "startCursor" ? "firstItem" : "lastItem");
+      return this.cursorForItem($item);
+    }
+    return this.requirePageValue(key, layerPlan)
+      ? fallback(true)
+      : this.get(key);
+  }
+
   private needsGroups = false;
   public getGroupDetails(): Step<PgGroupDetails> {
     this.needsGroups = true;
@@ -1417,66 +1526,126 @@ export class PgSelectStep<
         })
       ).streams;
 
+      const { abortSignal } = executionDetails.extra._requestContext;
+      const limit = this.fetchOneExtra ? first : null;
+      const needsCompletion =
+        limit != null
+          ? this.completionReaders.size > 0
+          : Array.from(this.completionReaders.values()).includes("lastItem");
+
+      const needsFirstPull = this.needsFirstItem && streamInitialCount === 0;
       return streams.map((iterable, idx) => {
         if (!isAsyncIterable(iterable)) {
           // Must be an error
           return iterable as never;
         }
-        if (!initialFetchResult) {
-          return {
-            hasNextPage: false,
-            hasPreviousPage: false,
-            items: iterable,
-            cursorDetails,
-            groupDetails,
-            m: meta,
-          };
+        const initialRows = initialFetchResult?.[idx] ?? EMPTY_ARRAY;
+        if (isPromiseLike(initialRows)) {
+          consume(iterable[Symbol.asyncIterator]().return?.());
+          return initialRows as never;
+        }
+        const iterator = iterable[Symbol.asyncIterator]();
+        let firstRow: Promise<IteratorResult<unknown[]>> | undefined;
+        // startCursor and the item stream must share the first pull.
+        const readFirstRow = () => (firstRow ??= iterator.next());
+        const completion = Promise.withResolvers<{
+          hasOneExtra: boolean;
+          lastItem: unknown[] | null;
+        }>();
+        void completion.promise.catch(noop);
+        const hasRemainingRows = initialRows.length >= streamInitialCount;
+        let lastItem: unknown[] | null = null;
+        let index = 0;
+        let finished = false;
+        let hasOneExtra = false;
+        async function nextPageItem(): Promise<unknown[] | null> {
+          let item: unknown[] | null = null;
+          if (index < initialRows.length) {
+            item = initialRows[index];
+          } else if (hasRemainingRows) {
+            const next = await (index === 0 ? readFirstRow() : iterator.next());
+            if (!next.done) {
+              item = next.value;
+            }
+          }
+          if (item === null || index === limit) {
+            finished = true;
+            hasOneExtra = item !== null;
+            return null;
+          }
+          index++;
+          lastItem = item;
+          return item;
         }
 
-        // Munge the initialCount records into the streams
-        const innerIterator = iterable[Symbol.asyncIterator]();
-
-        let i = 0;
-        let done = false;
-        const l = initialFetchResult[idx].length;
-        const mergedGenerator: AsyncGenerator<PromiseOrDirect<unknown[]>> = {
-          async [Symbol.asyncDispose]() {
-            await this.return(undefined);
-          },
-          next() {
-            if (done) {
-              return Promise.resolve({ value: undefined, done });
-            } else if (i < l) {
-              return Promise.resolve({
-                value: initialFetchResult[idx][i++],
-                done,
-              });
-            } else if (streamInitialCount != null && l < streamInitialCount) {
-              done = true;
-              const r = innerIterator.return?.();
-              return r ?? Promise.resolve({ value: undefined, done });
+        // A discarded list can still have a sibling reading the page info.
+        async function closePage() {
+          try {
+            try {
+              if (
+                needsFirstPull &&
+                firstRow === undefined &&
+                !abortSignal.aborted
+              ) {
+                await readFirstRow();
+              }
+              while (!finished && needsCompletion && !abortSignal.aborted) {
+                await nextPageItem();
+              }
+            } finally {
+              await iterator.return?.();
+            }
+            if (finished) {
+              completion.resolve({ hasOneExtra, lastItem });
             } else {
-              return innerIterator.next();
+              completion.reject(
+                abortSignal.reason ?? new Error("Page stream closed"),
+              );
+            }
+          } catch (e) {
+            completion.reject(e);
+            throw e;
+          }
+        }
+
+        let started = false;
+        const items = asyncIteratorWithCleanup(
+          (async function* () {
+            started = true;
+            try {
+              let item: unknown[] | null;
+              while ((item = await nextPageItem()) !== null) {
+                yield item;
+              }
+            } catch (e) {
+              finished = true;
+              completion.reject(e);
+              throw e;
+            } finally {
+              await closePage();
+            }
+          })(),
+          () => {
+            // Returning an unstarted generator skips its finally block.
+            if (!started) {
+              consume(closePage());
             }
           },
-          return(value) {
-            done = true;
-            const r = innerIterator.return?.(value);
-            return r ?? Promise.resolve({ value: undefined, done });
-          },
-          throw(e) {
-            done = true;
-            const r = innerIterator.throw?.(e);
-            return r ?? Promise.resolve({ value: undefined, done });
-          },
-          [Symbol.asyncIterator]() {
-            return this;
-          },
-        };
+        );
         return {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          items: mergedGenerator,
+          items,
+          getFirstItem() {
+            return streamInitialCount > 0
+              ? (initialRows[0] ?? null)
+              : readFirstRow().then((row) => (row.done ? null : row.value));
+          },
+          getLastItem: () => completion.promise.then((page) => page.lastItem),
+          getHasNextPage: () =>
+            limit == null
+              ? false
+              : completion.promise.then((page) => page.hasOneExtra),
+          getHasPreviousPage: () =>
+            hasPreviousPageCb(first, last, offset, false),
           cursorDetails,
           groupDetails,
           m: meta,
@@ -1486,6 +1655,16 @@ export class PgSelectStep<
   }
 
   public finalize(): void {
+    // The stream only starts draining after its payload is ready. A reader
+    // waiting in that same payload (including a deferred one) would deadlock.
+    for (const [reader, key] of this.completionReaders) {
+      for (const consumer of this.streamConsumers) {
+        if (!hasIndependentDefer(reader, consumer)) {
+          this.requireEagerValue(key);
+          break;
+        }
+      }
+    }
     // In case we have any lock actions in future:
     this.lock();
 
@@ -1711,8 +1890,23 @@ export class PgSelectStep<
     if (this.fetchOneExtra) {
       replacement.fetchOneExtra = true;
     }
+    this.copyPageRequirementsTo(replacement);
     if (this.needsCursor) {
       replacement.needsCursor = true;
+    }
+  }
+
+  private copyPageRequirementsTo(target: PgSelectStep<TResource>) {
+    target.needsFirstItem ||= this.needsFirstItem;
+    target.requiresCompletePage ||= this.requiresCompletePage;
+    target.requiresHasNextPage ||= this.requiresHasNextPage;
+    for (const layer of this.streamConsumers) {
+      target.streamConsumers.add(layer);
+    }
+    for (const [layer, key] of this.completionReaders) {
+      if (target.completionReaders.get(layer) !== "lastItem") {
+        target.completionReaders.set(layer, key);
+      }
     }
   }
 
@@ -1995,8 +2189,10 @@ export class PgSelectStep<
   private streamDetailsDepIds: number[] | null = [];
   addStreamDetails(
     $details: Step<ExecutionDetailsStream | null> | false | null,
+    consumerLayer: Step["layerPlan"] = this.layerPlan,
   ) {
     if ($details) {
+      this.streamConsumers.add(consumerLayer);
       this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
     } else {
       // Explicitly disable streaming
@@ -2344,6 +2540,9 @@ export class PgSelectStep<
       orders: $source.orders,
       selects: $source.selects,
       fetchOneExtra: $source.fetchOneExtra,
+      needsFirstItem: $source.needsFirstItem,
+      requiresCompletePage: $source.requiresCompletePage,
+      requiresHasNextPage: $source.requiresHasNextPage,
       isOrderUnique: $source.isOrderUnique,
       isUnique: $source.isUnique,
       isSimpleUnique:
@@ -3019,6 +3218,9 @@ interface PgSelectQueryInfo<
   readonly meta: { readonly [key: string]: any };
 
   readonly streamDetailsDepIds: null | readonly number[];
+  readonly needsFirstItem: boolean;
+  readonly requiresCompletePage: boolean;
+  readonly requiresHasNextPage: boolean;
 }
 
 type CoreInfo<TResource extends PgResource<any, any, any, any, any, any, any>> =
@@ -3261,8 +3463,6 @@ function buildTheQueryCore<
   if (info.needsCursor || after != null || before != null) {
     info.cursorDigest = getOrderByDigest(info);
   }
-  // PERF: only calculate this if needed
-  const { sql: trueOrderBySQL } = buildOrderBy(info, false);
   if (info.cursorIndicies) {
     // PERF: calculate cursorDigest here instead?
     if (info.orders.length > 0) {
@@ -3315,6 +3515,16 @@ function buildTheQueryCore<
   applyConditionFromCursor(info, "before", before);
 
   applyCommonPaginationStuff(info);
+  if (
+    info.shouldReverseOrder ||
+    info.requiresCompletePage ||
+    (info.requiresHasNextPage && hasNextPageCb(info.first, info.last, true)) ||
+    (info.last != null &&
+      (info.fetchOneExtra || (info.first != null && info.last < info.first)))
+  ) {
+    // Materialize pages that need reversal, slicing, or eager lookahead.
+    stream = null;
+  }
 
   /****************************************
    *                                      *
@@ -3324,7 +3534,6 @@ function buildTheQueryCore<
 
   return {
     count,
-    trueOrderBySQL,
     info,
     stream,
     meta,
@@ -3340,7 +3549,7 @@ function buildTheQuery<
     fixedPlaceholderValues,
     _symbolSubstitutes,
   } = rawInfo;
-  const { count, trueOrderBySQL, info, stream, meta } = runtimeScopedSQL(() =>
+  const { count, info, stream, meta } = runtimeScopedSQL(() =>
     buildTheQueryCore(rawInfo),
   );
 
@@ -3378,17 +3587,9 @@ function buildTheQuery<
   for (const [key, value] of fixedPlaceholderValues) {
     placeholderValues.set(key, value);
   }
-  const forceOrder = (stream && info.shouldReverseOrder) || false;
-
-  const makeQuery = ({
-    limit,
-    offset,
-    options,
-  }: {
-    limit?: number;
-    offset?: number;
-    options?: Parameters<typeof sql.compile>[1];
-  } = {}): {
+  const makeQuery = (
+    streamSlice?: PgStreamSlice,
+  ): {
     text: string;
     rawSqlValues: SQLRawValue[];
     identifierIndex: number | null;
@@ -3397,59 +3598,11 @@ function buildTheQuery<
       queryValues.length > 0 ||
       (count !== 1 && (forceIdentity || hasSideEffects))
     ) {
-      const extraSelects: SQL[] = [];
-
-      const identifierIndexOffset =
-        extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
-      // PERF: try and re-use existing trueOrderBySQL selection?
-      const rowNumberIndexOffset =
-        forceOrder || limit != null || offset != null
-          ? extraSelects.push(
-              sql`row_number() over (${sql.indent(trueOrderBySQL)})`,
-            ) - 1
-          : -1;
-
       const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
-        extraSelects,
-        forceOrder,
+        extraSelects: [sql`${identifiersAlias}.idx`],
+        streamSlice,
       });
-      const identifierIndex = extraSelectIndexes[identifierIndexOffset];
-
-      const rowNumberIndex =
-        rowNumberIndexOffset >= 0
-          ? extraSelectIndexes[rowNumberIndexOffset]
-          : null;
-      const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
-
-      /*
-       * This wrapper around the inner query is for @stream:
-       *
-       * - stream must be in the correct order, so if we have
-       *   `shouldReverseOrder` then we must reverse the order
-       *   ourselves here;
-       * - stream can have an `initialCount` - we want to satisfy all
-       *   `initialCount` records from _each identifier group_ before we then
-       *   resolve the remaining records.
-       *
-       * NOTE: if neither of the above cases apply then we can skip this,
-       * even for @stream.
-       */
-      const wrappedInnerQuery =
-        rowNumberIndex != null ||
-        limit != null ||
-        (offset != null && offset > 0)
-          ? sql`select *\nfrom (${sql.indent(
-              baseQuery,
-            )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
-              String(rowNumberIndex),
-            )}${
-              limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
-            }${
-              offset != null && offset > 0
-                ? sql`\noffset ${sql.literal(offset)}`
-                : sql.blank
-            }`
-          : baseQuery;
+      const identifierIndex = extraSelectIndexes[0];
 
       // PERF: if the query does not have a limit/offset; should we use an
       // `inner join` in a flattened query instead of a wrapped query with
@@ -3463,8 +3616,8 @@ function buildTheQuery<
         values: rawSqlValues,
         [$$symbolToIdentifier]: symbolToIdentifier,
       } = sql.compile(
-        sql`lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`,
-        options,
+        sql`lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`,
+        { placeholderValues },
       );
 
       const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
@@ -3497,68 +3650,11 @@ from ${identifiersAliasText},
 ${lateralText};`;
 
       return { text, rawSqlValues, identifierIndex };
-    } else if (
-      (limit != null && limit >= 0) ||
-      (offset != null && offset > 0)
-    ) {
-      // ENHANCEMENT: make this nicer; combine with the `if` branch above?
-
-      const extraSelects: SQL[] = [];
-      const rowNumberIndexOffset =
-        forceOrder || limit != null || offset != null
-          ? extraSelects.push(
-              sql`row_number() over (${sql.indent(trueOrderBySQL)})`,
-            ) - 1
-          : -1;
-
-      const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
-        extraSelects,
-      });
-      const rowNumberIndex =
-        rowNumberIndexOffset >= 0
-          ? extraSelectIndexes[rowNumberIndexOffset]
-          : null;
-      const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
-      /*
-       * This wrapper around the inner query is for @stream:
-       *
-       * - stream must be in the correct order, so if we have
-       *   `shouldReverseOrder` then we must reverse the order
-       *   ourselves here;
-       * - stream can have an `initialCount` - we want to satisfy all
-       *   `initialCount` records from _each identifier group_ before we then
-       *   resolve the remaining records.
-       *
-       * NOTE: if neither of the above cases apply then we can skip this,
-       * even for @stream.
-       */
-      const wrappedInnerQuery =
-        rowNumberIndex != null ||
-        limit != null ||
-        (offset != null && offset > 0)
-          ? sql`select *\nfrom (${sql.indent(
-              baseQuery,
-            )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
-              String(rowNumberIndex),
-            )}${
-              limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
-            }${
-              offset != null && offset > 0
-                ? sql`\noffset ${sql.literal(offset)}`
-                : sql.blank
-            };`
-          : sql`${baseQuery};`;
-      const { text, values: rawSqlValues } = sql.compile(
-        wrappedInnerQuery,
-        options,
-      );
-      return { text, rawSqlValues, identifierIndex: null };
     } else {
-      const { sql: query } = buildQuery(info, {});
-      const { text, values: rawSqlValues } = sql.compile(
-        sql`${query};`,
-        options,
-      );
+      const { sql: query } = buildQuery(info, { streamSlice });
+      const { text, values: rawSqlValues } = sql.compile(sql`${query};`, {
+        placeholderValues,
+      });
       return { text, rawSqlValues, identifierIndex: null };
     }
   };
@@ -3571,8 +3667,13 @@ ${lateralText};`;
     ? { indicies: groupIndicies }
     : undefined;
 
-  const initialCount = stream?.initialCount;
-  if (initialCount != null) {
+  if (stream !== null) {
+    // Fetch the first row of every parent before a shared cursor can block
+    // behind rows for another parent. GraphQL keeps its own initialCount.
+    const initialCount = Math.max(
+      stream.initialCount,
+      count > 1 && info.needsFirstItem ? 1 : 0,
+    );
     // PERF: should use the queryForSingle optimization in here too
 
     // When streaming we can't reverse order in JS - we must do it in the DB.
@@ -3588,16 +3689,14 @@ ${lateralText};`;
         rawSqlValues,
         identifierIndex: initialFetchIdentifierIndex,
       } = makeQuery({
-        limit: initialCount,
-        options: { placeholderValues },
+        take: initialCount,
       });
       const {
         text: textForDeclare,
         rawSqlValues: rawSqlValuesForDeclare,
         identifierIndex: streamIdentifierIndex,
       } = makeQuery({
-        offset: initialCount,
-        options: { placeholderValues },
+        skip: initialCount,
       });
       if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
         throw new Error(
@@ -3631,12 +3730,7 @@ ${lateralText};`;
         text: textForDeclare,
         rawSqlValues: rawSqlValuesForDeclare,
         identifierIndex: streamIdentifierIndex,
-      } = makeQuery({
-        offset: 0,
-        options: {
-          placeholderValues,
-        },
-      });
+      } = makeQuery();
       return {
         meta,
         // This is a hack since this is the _only_ place we don't want
@@ -3659,11 +3753,7 @@ ${lateralText};`;
       };
     }
   } else {
-    const { text, rawSqlValues, identifierIndex } = makeQuery({
-      options: {
-        placeholderValues,
-      },
-    });
+    const { text, rawSqlValues, identifierIndex } = makeQuery();
     return {
       meta,
       text,
@@ -3695,6 +3785,9 @@ type StaticKeys =
   | "orders"
   | "selects"
   | "fetchOneExtra"
+  | "needsFirstItem"
+  | "requiresCompletePage"
+  | "requiresHasNextPage"
   | "isOrderUnique"
   | "isUnique"
   | "isSimpleUnique"
@@ -4107,9 +4200,8 @@ function buildQueryParts<
 >(
   info: ResolvedPgSelectQueryInfo<TResource>,
   options: {
-    withIdentifiers?: boolean;
     extraSelects?: SQL[];
-    forceOrder?: boolean;
+    streamSlice?: PgStreamSlice;
   } = Object.create(null),
 ) {
   const { alias, resource, selects: baseSelects, _symbolSubstitutes } = info;
@@ -4141,7 +4233,10 @@ function buildQueryParts<
   // then we do the last artificially later.
   // https://relay.dev/graphql/connections.htm#EdgesToReturn()
 
-  const [limitAndOffsetSQL] = calculateLimitAndOffsetSQLFromInfo(info);
+  const [limitAndOffsetSQL] = calculateLimitAndOffsetSQLFromInfo(
+    info,
+    options.streamSlice,
+  );
 
   function buildLimitAndOffset() {
     return {
@@ -4151,10 +4246,7 @@ function buildQueryParts<
 
   const { sql: from } = buildFrom();
   const { sql: groupBy } = buildGroupBy();
-  const { sql: orderBy } = buildOrderBy(
-    info,
-    options.forceOrder ? false : info.shouldReverseOrder,
-  );
+  const { sql: orderBy } = buildOrderBy(info, info.shouldReverseOrder);
   const { sql: limitAndOffset } = buildLimitAndOffset();
 
   const { extraSelects = EMPTY_ARRAY } = options;
@@ -4185,9 +4277,8 @@ function buildQuery<
 >(
   info: MutablePgSelectQueryInfo<TResource>,
   options: {
-    withIdentifiers?: boolean;
     extraSelects?: SQL[];
-    forceOrder?: boolean;
+    streamSlice?: PgStreamSlice;
   } = Object.create(null),
 ): {
   sql: SQL;
@@ -4377,6 +4468,18 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
   return sql.join(sqlAliases, "");
 }
 
+// A streamed list item can also run in its parent's initial payload.
+// Only an explicit defer guarantees the reader can wait for that stream.
+function hasIndependentDefer(
+  reader: Step["layerPlan"],
+  producer: Step["layerPlan"],
+) {
+  return reader.ancestry.some(
+    (layer) =>
+      layer.reason.type === "defer" && producer.ancestry[layer.depth] !== layer,
+  );
+}
+
 function createSelectResult(
   allVals: ExecutionResultValue<null | readonly any[]>,
   {
@@ -4418,12 +4521,12 @@ function createSelectResult(
   const orderedRows = shouldReverseOrder
     ? reverseArray(slicedRows)
     : slicedRows;
-  const hasNextPage = hasNextPageCb(first, last, hasMore);
-  const hasPreviousPage = hasPreviousPageCb(first, last, offset, hasMore);
   return {
-    hasNextPage,
-    hasPreviousPage,
     items: orderedRows,
+    getFirstItem: () => orderedRows[0] ?? null,
+    getLastItem: () => orderedRows[orderedRows.length - 1] ?? null,
+    getHasNextPage: () => hasNextPageCb(first, last, hasMore),
+    getHasPreviousPage: () => hasPreviousPageCb(first, last, offset, hasMore),
     cursorDetails,
     groupDetails,
     m: meta,
@@ -4444,13 +4547,15 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     items.push(newItem);
   }
   return {
-    hasPreviousPage: false,
-    hasNextPage: false,
     // We return a list here because our children are going to use a
     // `first` plan on us.
     // NOTE: we don't need to reverse the list for relay pagination
     // because it only contains one entry.
     items,
+    getFirstItem: () => items[0] ?? null,
+    getLastItem: () => items[items.length - 1] ?? null,
+    getHasNextPage: NO_ROWS.getHasNextPage,
+    getHasPreviousPage: NO_ROWS.getHasPreviousPage,
     cursorDetails,
     groupDetails,
     m: meta,

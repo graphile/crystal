@@ -6,6 +6,7 @@ import type { Bucket, RequestTools, SharedBucketState } from "../bucket.ts";
 import {
   $$streamMore,
   $$timeout,
+  DEFAULT_FORBIDDEN_FLAGS,
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
@@ -46,6 +47,7 @@ import {
 } from "../utils.ts";
 import type { DistributorOptions } from "./distributor.ts";
 import {
+  distributeIterator,
   distributor,
   isDistributor,
   resolveDistributorOptions,
@@ -320,6 +322,27 @@ export function executeBucket(
           return;
         }
 
+        if (
+          finishedStep._hasStreamInputConsumer &&
+          !Array.isArray(rawValue) &&
+          (isIterable(rawValue) || isAsyncIterable(rawValue))
+        ) {
+          // Acquire cleanup ownership now, without pulling the first item.
+          walkStream(
+            bucket,
+            finishedStep,
+            resultIndex,
+            rawValue,
+            flags,
+            {
+              initialCount: 0,
+            },
+            requestContext.abortSignal,
+            null,
+          );
+          return;
+        }
+
         // PERF: do we want to handle arrays differently?
         let valueIsIterable = false;
         let valueIsAsyncIterable = false;
@@ -412,89 +435,18 @@ export function executeBucket(
             bucket.setResult(finishedStep, resultIndex, value, flags);
           }
         } else if (willConsumeAsIterator) {
-          const value = rawValue;
-          const initialCount = stream?.initialCount ?? Infinity;
-
-          let iterator: Iterator<any, any, any> | AsyncIterator<any, any, any>;
-          try {
-            iterator = valueIsAsyncIterable
-              ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
-              : (value as Iterable<any>)[Symbol.iterator]();
-          } catch (e) {
-            bucket.setResult(finishedStep, resultIndex, e, flags | FLAG_ERROR);
-            return;
-          }
-
-          // Here we track the iterator via the bucket, this allows us to
-          // ensure that the iterator is terminated even if the stream is never
-          // consumed (e.g. if an error is thrown/caught during execution of
-          // the output plan).
-          if (!bucket.iterators[resultIndex]) {
-            bucket.iterators[resultIndex] = new Set();
-          }
-          bucket.iterators[resultIndex]!.add(iterator);
-
-          if (initialCount === 0) {
-            // Optimization - defer everything
-            const arr: StreamMaybeMoreableArray<any> = [];
-            arr[$$streamMore] = iterator;
-            bucket.setResult(finishedStep, resultIndex, arr, flags);
-          } else {
-            // Evaluate the first initialCount entries, rest is streamed.
-            const promise = (async () => {
-              try {
-                let valuesSeen = 0;
-                const arr: StreamMaybeMoreableArray<any> = [];
-
-                /*
-                 * We need to "shift" a few entries off the top of the
-                 * iterator, but still keep it iterable for the later
-                 * stream. To accomplish this we have to do manual
-                 * looping
-                 */
-
-                let resultPromise:
-                  | Promise<IteratorResult<any, any>>
-                  | IteratorResult<any, any>;
-                while ((resultPromise = iterator.next())) {
-                  const resolvedResult = await resultPromise;
-                  if (resolvedResult.done) {
-                    break;
-                  }
-                  try {
-                    const v = resolvedResult.value;
-                    if (isPromiseLike(v)) {
-                      arr.push(await v);
-                    } else {
-                      arr.push(v);
-                    }
-                  } catch (e) {
-                    arr.push(flagError(e));
-                  }
-                  if (++valuesSeen >= initialCount) {
-                    // This is safe to do in the `while` since we checked
-                    // the `0` entries condition in the optimization
-                    // above.
-                    arr[$$streamMore] = iterator;
-                    break;
-                  }
-                }
-
-                bucket.setResult(finishedStep, resultIndex, arr, flags);
-              } catch (e) {
-                bucket.setResult(
-                  finishedStep,
-                  resultIndex,
-                  e,
-                  flags | FLAG_ERROR,
-                );
-              }
-            })();
-            if (promises === undefined) {
-              promises = [promise];
-            } else {
-              promises.push(promise);
-            }
+          const promise = walkStream(
+            bucket,
+            finishedStep,
+            resultIndex,
+            rawValue as Iterable<unknown> | AsyncIterable<unknown>,
+            flags,
+            stream,
+            requestContext.abortSignal,
+            distributorOptions,
+          );
+          if (promise !== undefined) {
+            (promises ??= []).push(promise);
           }
         } else {
           bucket.setResult(finishedStep, resultIndex, rawValue, flags);
@@ -1219,6 +1171,20 @@ export function executeBucket(
   }
 
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
+    if (bucket.layerPlan.streamInputs.length > 0) {
+      const promises = walkStreamInputs(
+        bucket,
+        requestContext.abortSignal,
+        distributorOptions,
+      );
+      if (promises.length > 0) {
+        return Promise.all(promises).then(completeBucket);
+      }
+    }
+    return completeBucket();
+  }
+
+  function completeBucket(): PromiseOrDirect<void> {
     const result = completeBucketAndExecuteSamePhaseChildren(
       bucket,
       requestContext,
@@ -1748,12 +1714,152 @@ function executeStepFromEvent(event: ExecuteStepEvent) {
   return event.step.execute(event.executeDetails);
 }
 
+function walkStreamInputs(
+  bucket: Bucket,
+  abortSignal: AbortSignal,
+  distributorOptions: DistributorOptions,
+): PromiseLike<void>[] {
+  const promises: PromiseLike<void>[] = [];
+  const { layerPlan, store } = bucket;
+  for (const { parentStep: step, stream: options } of layerPlan.streamInputs) {
+    const input = store.get(step.id)!;
+    const stream = evaluateStream(bucket, step, distributorOptions, options);
+    if (input.isBatch) {
+      // Copy the execution value before updating entries in this bucket.
+      store.set(
+        step.id,
+        batchExecutionValue([...input.entries], [...input._flags]),
+      );
+    }
+    const count = input.isBatch ? bucket.size : 1;
+    for (let index = 0; index < count; index++) {
+      const value = input.at(index);
+      const flags = input._flagsAt(index);
+      const pending = (value as StreamMaybeMoreableArray | null)?.[
+        $$streamMore
+      ];
+      if (
+        !(flags & DEFAULT_FORBIDDEN_FLAGS) &&
+        value !== null &&
+        typeof value === "object" &&
+        (pending !== undefined || stream !== null || !Array.isArray(value)) &&
+        (isIterable(value) || isAsyncIterable(value))
+      ) {
+        if (!input.isBatch) {
+          // setResult will install a fresh unary execution value.
+          store.delete(step.id);
+        }
+        const promise = walkStream(
+          bucket,
+          step,
+          index,
+          value,
+          flags,
+          stream,
+          abortSignal,
+          distributorOptions,
+          pending,
+        );
+        if (promise !== undefined) {
+          promises.push(promise);
+        }
+      }
+    }
+  }
+  return promises;
+}
+
+function walkStream(
+  bucket: Bucket,
+  step: Step,
+  resultIndex: number,
+  value: Iterable<unknown> | AsyncIterable<unknown>,
+  flags: ExecutionEntryFlags,
+  stream: ExecutionDetailsStream | null,
+  abortSignal: AbortSignal,
+  distributorOptions: DistributorOptions | null,
+  pending?: AsyncIterator<unknown> | Iterator<unknown>,
+): PromiseOrDirect<void> {
+  const initialCount = stream?.initialCount ?? Infinity;
+
+  let iterator: Iterator<any, any, any> | AsyncIterator<any, any, any>;
+  try {
+    iterator =
+      pending ??
+      (isIterable(value)
+        ? value[Symbol.iterator]()
+        : (value as AsyncIterable<unknown>)[Symbol.asyncIterator]());
+  } catch (e) {
+    bucket.setResult(step, resultIndex, e, flags | FLAG_ERROR);
+    return;
+  }
+
+  // The bucket closes any iterator its output plan doesn't claim.
+  (bucket.iterators[resultIndex] ??= new Set()).add(iterator);
+  const items: StreamMaybeMoreableArray<unknown> = [];
+  function storeStream() {
+    if (step._isUnary && bucket.size > 1 && distributorOptions !== null) {
+      // One list step can yield the initial items for several output paths.
+      // Each path needs its own position in the remaining stream.
+      const consumers = distributeIterator(
+        iterator,
+        bucket.size,
+        abortSignal,
+        distributorOptions,
+      );
+      bucket.iterators[resultIndex].delete(iterator);
+      const entries = Array.from({ length: bucket.size }, (_, index) => {
+        const initial: StreamMaybeMoreableArray = items.slice();
+        const consumer = consumers.iteratorFor(index);
+        initial[$$streamMore] = consumer;
+        (bucket.iterators[index] ??= new Set()).add(consumer);
+        return initial;
+      });
+      bucket.flagUnion |= flags;
+      bucket.store.set(
+        step.id,
+        batchExecutionValue(entries, arrayOfLength(bucket.size, flags)),
+      );
+    } else {
+      items[$$streamMore] = iterator;
+      bucket.setResult(step, resultIndex, items, flags);
+    }
+  }
+  if (initialCount === 0) {
+    storeStream();
+    return;
+  }
+
+  return (async () => {
+    try {
+      // Leave the iterator positioned after the initial payload.
+      while (true) {
+        const next = await iterator.next();
+        if (next.done) break;
+        try {
+          const item = next.value;
+          items.push(isPromiseLike(item) ? await item : item);
+        } catch (e) {
+          items.push(flagError(e));
+        }
+        if (items.length >= initialCount) {
+          storeStream();
+          return;
+        }
+      }
+      bucket.setResult(step, resultIndex, items, flags);
+    } catch (e) {
+      bucket.setResult(step, resultIndex, e, flags | FLAG_ERROR);
+    }
+  })();
+}
+
 function evaluateStream(
   bucket: Bucket,
   step: Step,
   distributorOptions: DistributorOptions,
+  stream = step._stepOptions.stream,
 ): ExecutionDetailsStream | null {
-  const stream = step._stepOptions.stream;
   if (stream === null) return null;
 
   const shouldStream =
