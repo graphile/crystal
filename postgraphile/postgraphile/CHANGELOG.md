@@ -1,5 +1,17 @@
 # postgraphile
 
+## 5.2.2
+
+### Patch Changes
+
+- [#3290](https://github.com/graphile/crystal/pull/3290)
+  [`b9cd9fd`](https://github.com/graphile/crystal/commit/b9cd9fdc8c052adb6be48e2e25ad576fe97bd1e4)
+  Thanks [@benjie](https://github.com/benjie)! - Fix cursor pagination sometimes
+  skipping rows when an `ORDER BY` column is nullable.
+- Updated dependencies
+  [[`b9cd9fd`](https://github.com/graphile/crystal/commit/b9cd9fdc8c052adb6be48e2e25ad576fe97bd1e4)]:
+  - @dataplan/pg@1.2.2
+
 ## 5.2.1
 
 ### Patch Changes
