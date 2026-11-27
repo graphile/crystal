@@ -1,6 +1,8 @@
 ## expect(errors).toBeFalsy();
-## expect(data.ascAfter.edges.map(e => e.node.id)).toEqual([1, 2, 4, 5, 6]);
-## expect(data.descAfter.edges.map(e => e.node.id)).toEqual([3]);
+## expect(data.ascAfterNonNull.edges.map(e => e.node.id)).toEqual([1, 2, 4, 5, 6]);
+## expect(data.ascAfterNull.edges.map(e => e.node.id)).toEqual([2, 4, 5, 6]);
+## expect(data.descAfterNull.edges.map(e => e.node.id)).toEqual([3]);
+## expect(data.descAfterNull2.edges.map(e => e.node.id)).toEqual([5, 4, 2, 1, 3]);
 #> schema: ["a", "b", "c"]
 query {
   ascFirst: allPeople(orderBy: [ABOUT_ASC], first: 1) {
@@ -12,10 +14,23 @@ query {
       }
     }
   }
-  ascAfter: allPeople(
+  ascAfterNonNull: allPeople(
     orderBy: [ABOUT_ASC]
     # ["ffa13ca69c","Just a friendly human",3]
     after: "WyJmZmExM2NhNjljIiwiSnVzdCBhIGZyaWVuZGx5IGh1bWFuIiwzXQ=="
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        about
+      }
+    }
+  }
+  ascAfterNull: allPeople(
+    orderBy: [ABOUT_ASC]
+    # ["ffa13ca69c",null,1]
+    after: "WyJmZmExM2NhNjljIixudWxsLDFd"
   ) {
     edges {
       cursor
@@ -34,10 +49,23 @@ query {
       }
     }
   }
-  descAfter: allPeople(
+  descAfterNull: allPeople(
     orderBy: [ABOUT_DESC]
     # ["ffa13ca69c",null,1]
     after: "WyJmZmExM2NhNjljIixudWxsLDFd"
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        about
+      }
+    }
+  }
+  descAfterNull2: allPeople(
+    orderBy: [ABOUT_DESC]
+    # ["ffa13ca69c",null,6]
+    after: "WyJmZmExM2NhNjljIixudWxsLDZd"
   ) {
     edges {
       cursor
