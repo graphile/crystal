@@ -1,0 +1,33 @@
+## expect(errors).toBeFalsy()
+## expect(data.allPeople.nodes[0].applications.nodes.map(a => a.ordered.nodes.map(v => v.name))).toEqual([["Exponential backtracking", "CSRF", "Information disclosure"], ["Exponential backtracking", "Malware", "Timing attack"], ["XSS", "License", "Malware", "Off-by-one"], ["Exponential backtracking", "License", "Malware"]])
+## expect(data.allPeople.nodes[0].applications.nodes.map(a => a.filtered.nodes.map(v => v.name))).toEqual([[], [], ["XSS"], []])
+#> schema: ["polymorphic"]
+
+# `orderBy` and `condition` on a connection field of an interface
+# (`Application.vulnerabilities`), as on the same field of its implementations.
+{
+  allPeople(first: 1) {
+    nodes {
+      username
+      applications {
+        nodes {
+          __typename
+          name
+          ordered: vulnerabilities(orderBy: [CVSS_SCORE_DESC, NAME_ASC]) {
+            nodes {
+              __typename
+              name
+              cvssScore
+            }
+          }
+          filtered: vulnerabilities(condition: { name: "XSS" }) {
+            nodes {
+              __typename
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
