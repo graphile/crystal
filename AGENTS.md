@@ -255,6 +255,11 @@ message.
 
 ## Glossary
 
+Projects can define shared terminology in a package-local `GLOSSARY.md`.
+When working on a project, use the terms in its glossary. For PostgreSQL client
+and connection terminology, see the
+[`@dataplan/pg` glossary](grafast/dataplan-pg/GLOSSARY.md).
+
 ### Grafast
 
 - Operation plan - how to execute a GraphQL request, comprised of the "execution
