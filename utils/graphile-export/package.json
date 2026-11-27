@@ -1,6 +1,6 @@
 {
   "name": "graphile-export",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Export in-memory generated GraphQL schemas to JS files when built with our helpers.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -18,7 +18,8 @@
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "test": "node --test --experimental-vm-modules"
   },
   "repository": {
     "type": "git",
