@@ -40,7 +40,7 @@ function run(
   text: string,
   value: string,
   executionAffinity?: symbol,
-  queued = true,
+  method: "executeShared" | "executeDedicated" = "executeShared",
 ) {
   const inputs = [{ context, queryValues: [] }];
   const options = {
@@ -51,9 +51,7 @@ function run(
     affinity: executionAffinity,
     eventEmitter: undefined,
   };
-  return queued
-    ? executor.executeShared(inputs, options)
-    : executor.executeWithoutCache(inputs, options);
+  return executor[method](inputs, options);
 }
 
 test("reuses one client and prepared statement for identical SQL", async () => {
@@ -169,7 +167,7 @@ test("starts a fresh lease for queued reads after a query error", async () => {
   expect(withPgClient).toHaveBeenCalledTimes(3);
 });
 
-test("does not queue uncached execution", async () => {
+test("dedicated reads with identical SQL acquire separate clients", async () => {
   const executor = makeExecutor();
   const { context, withPgClient } = makeContext(async (opts) => ({
     rows: [[opts.values[0]]],
@@ -177,8 +175,8 @@ test("does not queue uncached execution", async () => {
   }));
 
   await Promise.all([
-    run(executor, context, "select $1", "a", undefined, false),
-    run(executor, context, "select $1", "b", undefined, false),
+    run(executor, context, "select $1", "a", undefined, "executeDedicated"),
+    run(executor, context, "select $1", "b", undefined, "executeDedicated"),
   ]);
 
   expect(withPgClient).toHaveBeenCalledTimes(2);
@@ -418,7 +416,7 @@ test("side effects execute separately for identical inputs", async () => {
     rows: [[++version]],
     rowCount: 1,
   }));
-  const result = await executor.executeWithoutCache(
+  const result = await executor.executeDedicated(
     [
       { context, queryValues: [] },
       { context, queryValues: [] },
@@ -573,7 +571,7 @@ test("maps compiled identifier rows back to input order, including empty groups"
       rowCount: 3,
     };
   });
-  const result = await executor.executeWithoutCache(
+  const result = await executor.executeDedicated(
     [
       { context, queryValues: ["x"] },
       { context, queryValues: ["missing"] },
