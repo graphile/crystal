@@ -1,5 +1,15 @@
 # grafast
 
+## 1.2.1
+
+### Patch Changes
+
+- [#3263](https://github.com/graphile/crystal/pull/3263)
+  [`e1e0bc3`](https://github.com/graphile/crystal/commit/e1e0bc35f332b40b821e4106d1c666b5405251de)
+  Thanks [@dilame](https://github.com/dilame)! - Fix comparison typo in
+  `connection()` that could, in an extremely contrived situation, cause
+  otherwise identical connections to incorrectly deduplicate.
+
 ## 1.2.0
 
 ### Minor Changes
