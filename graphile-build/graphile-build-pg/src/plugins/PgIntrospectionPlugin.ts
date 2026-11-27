@@ -445,7 +445,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                     : ctx.get(pgSettingsKey),
                 withPgClient: ctx.get(withPgClientKey),
                 ...(withSharedPgClientKey == null
-                  ? {}
+                  ? null
                   : {
                       withSharedPgClient: ctx.get(withSharedPgClientKey),
                     }),
