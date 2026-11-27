@@ -68,7 +68,7 @@ export class ListenStep<
     values,
     stream,
   }: ExecutionDetails<
-    readonly [GrafastSubscriber<TTopics>, TTopic]
+    readonly [GrafastSubscriber<TTopics>, TTopic, TTopics[TTopic] | undefined]
   >): GrafastResultStreamList<TTopics[TTopic]> {
     if (!stream) {
       throw new Error("ListenStep must be streamed, never merely executed");
@@ -76,7 +76,7 @@ export class ListenStep<
     const pubsubValue = values[this.pubsubDep as 0];
     const topicValue = values[this.topicDep as 1];
     const initialEventValue =
-      this.initialEventDep !== null ? values[this.initialEventDep] : null;
+      this.initialEventDep !== null ? values[this.initialEventDep as 2] : null;
     return indexMap((i) => {
       const pubsub = pubsubValue.at(i);
       if (!pubsub) {
