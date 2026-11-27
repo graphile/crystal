@@ -1,3 +1,6 @@
+import type { Pool } from "pg";
+
+import { makePgAdaptorWithPgClient } from "../dist/adaptors/pg.js";
 import { makeWithSharedPgClient, type SharedPgClient } from "../dist/index.js";
 
 test("idle reservations expire only under pressure from another wrapper on the same pool", async () => {
@@ -109,4 +112,109 @@ test("a pending query protects its checkout from reclamation", async () => {
   } finally {
     jest.useRealTimers();
   }
+});
+
+test.each([
+  "pool limit",
+  "context limit",
+  "pool full",
+  "driver waiting",
+  "checkout failed",
+])("an idle second client takes pending work (%s)", async (scenario) => {
+  const queries: Array<[number, string]> = [];
+  const busy = [Promise.withResolvers<void>(), Promise.withResolvers<void>()];
+  const running = [
+    Promise.withResolvers<void>(),
+    Promise.withResolvers<void>(),
+  ];
+  const thirdConnection = Promise.withResolvers<void>();
+  const signals: AbortSignal[] = [];
+  const setup: number[] = [];
+  const withPgClient = jest.fn(async (_settings, callback, signal) => {
+    const id = signals.push(signal);
+    if (id === 3) {
+      if (scenario === "checkout failed") {
+        throw new Error("connection unavailable");
+      }
+      await thirdConnection.promise;
+    }
+    signal.throwIfAborted();
+    setup.push(id);
+    return callback({
+      async query({ text }: { text: string }) {
+        queries.push([id, text]);
+        if (text !== "C") {
+          running[id - 1].resolve();
+          await busy[id - 1].promise;
+        }
+        return { rows: [id], rowCount: 1 };
+      },
+    });
+  });
+  let poolAvailable = true;
+  const shared = makeWithSharedPgClient({
+    pool: {},
+    maxClients: scenario === "pool limit" ? 2 : 4,
+    canAcquireImmediately: () => poolAvailable,
+  });
+  const context = { withPgClient, pgSettings: { role: "reader" } };
+  const run = (text: string) =>
+    shared(
+      context,
+      {
+        signature: text,
+        maxClientQueues: scenario === "context limit" ? 2 : 3,
+      },
+      (client) => client.query({ text }),
+    );
+  const a = run("A");
+  await running[0].promise;
+  const b = run("B");
+  await running[1].promise;
+  poolAvailable = scenario !== "pool full";
+  const c = run("C");
+  try {
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    const enteredDriver =
+      scenario === "driver waiting" || scenario === "checkout failed";
+    expect(withPgClient).toHaveBeenCalledTimes(enteredDriver ? 3 : 2);
+    busy[1].resolve();
+    expect((await c).rows).toEqual([2]);
+    if (scenario === "driver waiting") {
+      expect(signals[2].aborted).toBe(true);
+    }
+    poolAvailable = true;
+    thirdConnection.resolve();
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    expect(withPgClient).toHaveBeenCalledTimes(enteredDriver ? 3 : 2);
+    expect(setup).toEqual([1, 2]);
+    expect(queries).toEqual([
+      [1, "A"],
+      [2, "B"],
+      [2, "C"],
+    ]);
+  } finally {
+    for (const query of busy) {
+      query.resolve();
+    }
+    thirdConnection.resolve();
+    await Promise.allSettled([a, b, c]);
+  }
+});
+
+test("a cancelled pg pool acquisition releases the connection before applying settings", async () => {
+  const raw = { query: jest.fn(), release: jest.fn() };
+  const connection = Promise.withResolvers<typeof raw>();
+  const pool = { connect: jest.fn(() => connection.promise) };
+  const withPgClient = makePgAdaptorWithPgClient(pool as unknown as Pool);
+  const callback = jest.fn();
+  const controller = new AbortController();
+  const result = withPgClient({ role: "reader" }, callback, controller.signal);
+  expect(pool.connect).toHaveBeenCalledTimes(1);
+  controller.abort();
+  connection.resolve(raw);
+  await expect(result).rejects.toThrow();
+  expect(raw.release).toHaveBeenCalledTimes(1);
+  expect(raw.query).not.toHaveBeenCalled();
+  expect(callback).not.toHaveBeenCalled();
 });

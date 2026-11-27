@@ -20,7 +20,12 @@ import {
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.ts";
-import type { SharedPgClient, WithSharedPgClient } from "./sharedClient.ts";
+import {
+  matchesQueryAffinity,
+  recordQueryAffinity,
+  type SharedPgClient,
+  type WithSharedPgClient,
+} from "./sharedClient.ts";
 import { setFind } from "./utils.ts";
 
 const DEFAULT_MAX_CLIENT_QUEUES = 3;
@@ -136,6 +141,8 @@ export interface WithPgClient<
   <T>(
     pgSettings: Record<string, string | undefined> | null,
     callback: (client: TPgClient) => T | Promise<T>,
+    /** Cancels acquisition until the callback starts. Wrappers should forward this signal. */
+    signal?: AbortSignal,
   ): Promise<T>;
 
   release?(): PromiseOrDirect<void>;
@@ -220,12 +227,7 @@ function queueMatches(
   queue: QueryQueue,
   item: Pick<QueuedQuery, "name" | "signature" | "affinity">,
 ): boolean {
-  if (queue.closed) return false;
-  return (
-    (item.name !== undefined && queue.names.has(item.name)) ||
-    (item.affinity !== undefined && queue.affinities.has(item.affinity)) ||
-    queue.signatures.has(item.signature)
-  );
+  return !queue.closed && matchesQueryAffinity(queue, item);
 }
 
 function addToQueue(
@@ -233,9 +235,7 @@ function addToQueue(
   item: QueuedQuery,
   justSignatures = false,
 ): void {
-  if (item.name !== undefined) queue.names.add(item.name);
-  if (item.affinity !== undefined) queue.affinities.add(item.affinity);
-  queue.signatures.add(item.signature);
+  recordQueryAffinity(queue, item);
   if (justSignatures === false) {
     if (queue.last !== undefined) queue.last.next = item;
     else queue.first = item;
@@ -640,11 +640,18 @@ ${duration}
 
   private withTransaction<T>(
     context: PgExecutorContext,
+    options: PgExecutorOptions,
     callback: (execute: ExecuteFunction) => Promise<T>,
   ): Promise<T> {
     return context.withSharedPgClient!(
       context,
-      { needsTransaction: true },
+      {
+        needsTransaction: true,
+        maxClientQueues: this.maxClientQueues,
+        name: options.name,
+        affinity: options.affinity,
+        signature: getSignature(options.text),
+      },
       (client) =>
         callback((text, values) =>
           this._executeWithClient(
@@ -818,15 +825,23 @@ ${duration}
                   ),
               )
             : shared && context.withSharedPgClient
-              ? await context.withSharedPgClient(context, {}, (client) =>
-                  this._executeWithClient<TOutput>(
-                    client,
-                    text,
-                    sqlValues,
+              ? await context.withSharedPgClient(
+                  context,
+                  {
+                    maxClientQueues: this.maxClientQueues,
                     name,
-                    publishExecute,
-                    false,
-                  ),
+                    affinity: common.affinity,
+                    signature: getSignature(text),
+                  },
+                  (client) =>
+                    this._executeWithClient<TOutput>(
+                      client,
+                      text,
+                      sqlValues,
+                      name,
+                      publishExecute,
+                      false,
+                    ),
                 )
               : shared
                 ? await this._executeQueued<TOutput>(
@@ -1087,7 +1102,7 @@ ${duration}
           }
         };
 
-        this.withTransaction(context, (_execute) => {
+        this.withTransaction(context, common, (_execute) => {
           resolveExecute(_execute);
           return tx;
         }).then(null, handleFetchError);

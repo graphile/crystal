@@ -1389,6 +1389,7 @@ export class PgSelectStep<
       const initialFetchResult = specs
         ? (
             await this.resource.executeShared(specs, {
+              affinity: this.executionAffinity,
               text,
               rawSqlValues,
               identifierIndex,
@@ -1412,6 +1413,7 @@ export class PgSelectStep<
       });
       const streams = (
         await this.resource.executeStream(streamSpecs, {
+          affinity: this.executionAffinity,
           text: textForDeclare,
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex,

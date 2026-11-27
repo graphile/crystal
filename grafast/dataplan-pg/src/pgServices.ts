@@ -118,13 +118,15 @@ export async function withPgClientFromPgService<T>(
   config: GraphileConfig.PgServiceConfiguration,
   pgSettings: Record<string, string | undefined> | null,
   callback: (client: GraphileConfig.DataplanPgClient) => T | Promise<T>,
+  signal?: AbortSignal,
 ): Promise<T> {
   const withPgClientFromPgService = getWithPgClientFromPgService(config);
   const withPgClient = isPromiseLike(withPgClientFromPgService)
     ? await withPgClientFromPgService
     : withPgClientFromPgService;
   try {
-    return await withPgClient(pgSettings, callback);
+    signal?.throwIfAborted();
+    return await withPgClient(pgSettings, callback, signal);
   } finally {
     withPgClient.release!();
   }

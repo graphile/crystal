@@ -61,6 +61,12 @@ A shared borrower keeps its idle reservation for `idleReservationMs` (default
 another borrower needs the capacity. `acquisitionTimeoutMs` controls how long
 a borrower waits for a shared client and also defaults to 5,000 ms.
 
+Within that pool-wide budget, each executor context can use up to three shared
+connections for concurrent reads. Set `gather.pgExecutorMaxClientQueues` to
+change this limit. Reads with a matching affinity, prepared statement name or
+SQL signature prefer the same connection. If a connection becomes idle while
+another checkout is pending, waiting work can use the idle connection.
+
 ## Database Latency
 
 PostGraphile needs to issue queries to your database. For a transaction this

@@ -274,6 +274,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
   callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
+  signal?: AbortSignal,
 ) {
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
 
@@ -286,6 +287,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
     await pgClient[$$queue];
   }
 
+  signal?.throwIfAborted();
   return (pgClient[$$queue] = (async () => {
     try {
       // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
@@ -309,10 +311,12 @@ async function makeNodePostgresWithPgClient_inner<T>(
           text: alreadyInTransaction ? "savepoint tx" : "begin",
         });
         try {
+          signal?.throwIfAborted();
           await pgClient.query({
             text: "select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)",
             values: [keys, values],
           });
+          signal?.throwIfAborted();
           const client = newNodePostgresPgClient(
             pgClient,
             1,
@@ -357,26 +361,30 @@ export function makePgAdaptorWithPgClient(
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,
     callback,
+    signal,
   ) => {
+    signal?.throwIfAborted();
     const pgClient = await pool.connect();
-    if (!pgClient[$$isSetup]) {
-      pgClient[$$isSetup] = true;
-      if (!DONT_DISABLE_JIT) {
-        // We don't actually disable JIT, it's the optimization that's expensive so we disable that.
-        pgClient.query("set jit_optimize_above_cost = -1;").catch((e) => {
-          console.error(
-            `Error occurred applying @dataplan/pg global Postgres settings: ${e}`,
-          );
-        });
-      }
-    }
     try {
+      signal?.throwIfAborted();
+      if (!pgClient[$$isSetup]) {
+        pgClient[$$isSetup] = true;
+        if (!DONT_DISABLE_JIT) {
+          // We don't actually disable JIT, it's the optimization that's expensive so we disable that.
+          pgClient.query("set jit_optimize_above_cost = -1;").catch((e) => {
+            console.error(
+              `Error occurred applying @dataplan/pg global Postgres settings: ${e}`,
+            );
+          });
+        }
+      }
       return await makeNodePostgresWithPgClient_inner(
         pgClient,
         pgSettings,
         callback,
         false,
         false,
+        signal,
       );
     } finally {
       // NOTE: have decided not to `RESET ALL` here; otherwise timezone,jit,etc will reset
@@ -417,6 +425,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,
     callback,
+    signal,
   ) => {
     return makeNodePostgresWithPgClient_inner(
       pgClient,
@@ -425,6 +434,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
       // Ensure only one withPgClient can run at a time, since we only have on pgClient.
       true,
       alreadyInTransaction,
+      signal,
     );
   };
 
@@ -916,6 +926,9 @@ export function makePgService(
           pool,
           maxClients: Math.max(1, Math.floor((available * percentage) / 100)),
           isPoolWaiting: () => pool.waitingCount > 0,
+          canAcquireImmediately: () =>
+            pool.waitingCount === 0 &&
+            (pool.idleCount > 0 || pool.totalCount < pool.options.max!),
           idleReservationMs: options.idleReservationMs,
           acquisitionTimeoutMs: options.acquisitionTimeoutMs,
         });

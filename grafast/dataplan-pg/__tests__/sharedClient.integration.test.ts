@@ -120,3 +120,65 @@ test("a transaction failure wakes an idle borrower and frees the shared slot", a
   ]);
   await shared(context, {}, (client) => client.query({ text: "select 1" }));
 });
+
+describe("executor routing", () => {
+  const getPool = useTestPool();
+  test.each(["unrelated", "affinity", "name", "signature"])(
+    "routes overlapping %s reads to the expected PostgreSQL backends",
+    async (kind) => {
+      const pool = getPool();
+      const base = makePgAdaptorWithPgClient(pool);
+      const guard = Promise.withResolvers<void>();
+      const pids: number[] = [];
+      // Hold the query promises in flight until all three reads reach PostgreSQL.
+      const withPgClient: typeof base = (settings, callback, signal) =>
+        base(
+          settings,
+          (client) =>
+            callback({
+              ...client,
+              async query<TData>(options: Parameters<typeof client.query>[0]) {
+                const result = await client.query<TData>(options);
+                pids.push((result.rows[0] as [number])[0]);
+                if (pids.length === 3) {
+                  guard.resolve();
+                }
+                await guard.promise;
+                return result;
+              },
+            }),
+          signal,
+        );
+      const context = {
+        pgSettings: null,
+        withPgClient,
+        withSharedPgClient: makeWithSharedPgClient({ pool, maxClients: 4 }),
+      };
+      const affinity = Symbol();
+      const timer = setTimeout(
+        () => guard.reject(new Error("Reads did not run concurrently")),
+        3000,
+      );
+      try {
+        await Promise.all(
+          [0, 1, 2].map((i) =>
+            executor.executeShared([{ context, queryValues: [] }], {
+              text:
+                kind === "signature" || kind === "name"
+                  ? "select pg_backend_pid()"
+                  : `select pg_backend_pid(), ${i}`,
+              name: kind === "name" ? "shared_pid" : undefined,
+              affinity: kind === "affinity" ? affinity : undefined,
+              rawSqlValues: [],
+              eventEmitter: undefined,
+            }),
+          ),
+        );
+        expect(new Set(pids).size).toBe(kind === "unrelated" ? 3 : 1);
+      } finally {
+        clearTimeout(timer);
+        guard.resolve();
+      }
+    },
+  );
+});
